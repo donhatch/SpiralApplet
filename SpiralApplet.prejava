@@ -897,7 +897,7 @@ public class SpiralApplet
                     java.util.Random rng = new java.util.Random(1);
                     theSpiralModel = new SpiralModel(n, nPartitions, SpiralModel.DELTA_ANY, rng);
                 }
-                int pixelsPerIncrement = 4; // must be multiple of 2 currently
+                int pixelsPerIncrement = 2; // must be multiple of 2 currently
                 if (theSpiralView == null)
                 {
                     double focusQuantum = 2./pixelsPerIncrement; // so it moves 2 pixels per time step
@@ -939,8 +939,11 @@ public class SpiralApplet
                 nPaints++;
                 g.setColor(java.awt.Color.white);
                 g.drawString(""+nPaints+" paints",
-                              size.width - 50,
+                              size.width - 75,
                               20);
+                g.drawString("focus: "+theSpiralView.focus,
+                             10,
+                             20);
 
                 // swing swaps buffers for us
 
@@ -950,8 +953,10 @@ public class SpiralApplet
 
                     if (true)
                     {
+                        //int fps = 10;
+                        int fps = 1000;
                         try {
-                            Thread.sleep(1); // any nonzero number of milliseconds seems to be adequate to smooth it out
+                            Thread.sleep(1000/fps); // any nonzero number of milliseconds seems to be adequate to smooth it out
                         } catch (InterruptedException e) {
                         }
                     }
@@ -1018,9 +1023,6 @@ public class SpiralApplet
 
 
 
-    //
-    // App-specific variables...
-    //
         public class SpiralModel
         {
             public int n; // wrap period
@@ -1149,8 +1151,7 @@ public class SpiralApplet
                 this.focusAnimationVelocity = 0.;
             }
         }; // public class SpiralView
-        public SpiralModel theSpiralModel = null;
-        public SpiralView theSpiralView = null;
+
 
         public void drawTicker(java.awt.Graphics g,
                                java.awt.Dimension gsize,
@@ -1159,7 +1160,7 @@ public class SpiralApplet
                                SpiralModel spiralModel,
                                SpiralView spiralView)
         {
-            System.out.println("    in drawTicker");
+            //System.out.println("    in drawTicker");
             int n = spiralModel.n;
 
             assert(pixelsPerIncrement % 2 == 0); // doesn't work otherwise
@@ -1172,14 +1173,14 @@ public class SpiralApplet
             int i1 = (i0+1)%n;
             int val0 = spiralModel.theList[i0];
             int val1 = spiralModel.theList[i1];
-            PRINT(val0);
-            PRINT(val1);
-            PRINT(frac);
+            //PRINT(val0);
+            //PRINT(val1);
+            //PRINT(frac);
             double val = LERP(val0,val1,frac);
-            PRINT(val);
+            //PRINT(val);
 
             int tickerHeight = pixelsPerIncrement * spiralModel.nPartitions;
-            PRINT(tickerHeight);
+            //PRINT(tickerHeight);
             assert(tickerHeight % 4 == 0);
 
             java.awt.Color gray128 = new java.awt.Color(128,128,128);
@@ -1216,7 +1217,7 @@ public class SpiralApplet
                 //   /  |  /
                 //  /  i0\/
                 // /     /
-                System.out.println("increasing... focus is on a vertical segment");
+                //System.out.println("increasing... focus is on a vertical segment");
                 x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
                 y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
             }
@@ -1229,7 +1230,7 @@ public class SpiralApplet
                 //   /i0-i1/
                 //  /    \/
                 // /     /
-                System.out.println("decreasing... focus is on a horizontal segment");
+                //System.out.println("decreasing... focus is on a horizontal segment");
                 y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
                 x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
             }
@@ -1294,7 +1295,7 @@ public class SpiralApplet
                 }
             }
 
-            System.out.println("    out drawTicker");
+            //System.out.println("    out drawTicker");
         } // drawTicker
 
         // Exacly one of drawPrimalFlag and drawDualFlag must be true
@@ -1307,7 +1308,7 @@ public class SpiralApplet
         {
             // draw exactly one of primal and dual at a time
             assert(drawPrimalFlag != drawDualFlag);
-            System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
+            //System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
 
             if (drawPrimalFlag)
                 mg.setColor(new java.awt.Color(128,128,255)); // light blue
@@ -1343,6 +1344,9 @@ public class SpiralApplet
 
             double scale = .5;
 
+            java.awt.Color gray128 = new java.awt.Color(128,128,128);
+            java.awt.Color gray64 = new java.awt.Color(64,64,64);
+            java.awt.Color gray32 = new java.awt.Color(32,32,32);
 
             // scanDir=1: the part *after* (bigger than) the focus.
             // scanDir=-1: the part *before* (smaller than) the focus.
@@ -1357,7 +1361,13 @@ public class SpiralApplet
                         mg.setColor(new java.awt.Color(128,255,128)); // light green
                     else
                         mg.setColor(new java.awt.Color(128,128,255)); // light blue
-
+                }
+                else
+                {
+                    if (scanDir == -1)
+                        mg.setColor(java.awt.Color.white);
+                    else
+                        mg.setColor(gray64);
                 }
 
 
@@ -1371,6 +1381,12 @@ public class SpiralApplet
                 double primalX = primalR * Math.cos(primalAng);
                 double primalY = primalR * Math.sin(primalAng);
 
+
+
+                // Accumulate center of curvature, if scanDir  is -1
+                double centerX = 0.;
+                double centerY = 0.;
+                double area = 0.;
 
 
                 double prevPrevVal = val;
@@ -1426,12 +1442,6 @@ public class SpiralApplet
                                    > SQR(1) + SQR(2)) // XXX should be max distance of any corner of window from origin
                                     break;
                             }
-                            else
-                            {
-                                if (SQR(nextPrimalX)+SQR(nextPrimalY)
-                                   < SQR(1e-3))
-                                    break;
-                            }
                         }
 
                         primalAng = nextPrimalAng;
@@ -1466,6 +1476,7 @@ public class SpiralApplet
                             mg.drawLine(dualX, dualY,
                                         nextDualX, nextDualY,
                                         antiAliasFlag);
+
                             if (prevVal==prevPrevVal
                              || (thisVal>prevVal) != (prevVal>prevPrevVal))
                             {
@@ -1479,17 +1490,31 @@ public class SpiralApplet
                                 else
                                     mg.drawPoint(dualX, dualY, 3);
                             }
+
                             if (scanDir > 0)
                             {
                                 if (SQR(nextDualX)+SQR(nextDualY)
                                    > SQR(1) + SQR(2)) // XXX should be max distance of any corner of window from origin
                                     break;
                             }
-                            else
+                        }
+
+                        if (scanDir < 0)
+                        {
+                            double areaIncr = twiceTriangleArea(0.,0., dualX,dualY, nextDualX,nextDualY);
+                            areaIncr = ABS(areaIncr);
+
+                            if (area+areaIncr == area)
+                                break; // this is the condition for loop termination
+                            //if (dualY != 0.) // FUDGE! if we omit first one, should sometimes assert-fail due to center being too low
                             {
-                                if (SQR(nextDualX)+SQR(nextDualY)
-                                   < SQR(1e-3))
-                                    break;
+                                area += areaIncr;
+
+                                centerX = LERP(centerX, primalX, areaIncr/area);
+                                centerY = LERP(centerY, primalY, areaIncr/area);
+                                //PRINT(areaIncr);
+                                //PRINT(areaIncr*primalX);
+                                //PRINT(areaIncr*primalY);
                             }
                         }
 
@@ -1501,9 +1526,30 @@ public class SpiralApplet
                     prevPrevVal = prevVal;
                     prevVal = thisVal;
                 }
-            }
-            System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
+
+                if (scanDir < 0 && drawPrimalFlag)
+                {
+                    mg.setColor(java.awt.Color.yellow);
+                    mg.drawPoint(centerX, centerY, 5);
+                    if (centerY <= 0.)
+                    {
+                        System.out.println("HEY! centerY is "+centerY);
+                    }
+                    assert(centerY > 0.);
+                }
+
+            } // for iScanDir
+            //System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
         } // drawSpiral
+
+    //
+    // App-specific variables...
+    //
+
+        public SpiralModel theSpiralModel = null;
+        public SpiralView theSpiralView = null;
+
+
 
 
 
