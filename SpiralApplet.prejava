@@ -1,0 +1,1611 @@
+/*
+    TODO: assert fail in paint, displayed line number is too small by a few lines
+*/
+
+#include "macros.h"
+
+// So can compile in pre-1.4,
+// we use these instead of java.awt.event.MouseEvent.BUTTON1 etc.
+#define java_awt_event_MouseEvent_BUTTON1 1
+#define java_awt_event_MouseEvent_BUTTON2 2
+#define java_awt_event_MouseEvent_BUTTON3 3
+
+//import com.donhatchsw.util.Arrays;
+//import com.donhatchsw.util.MyMath;
+import com.donhatchsw.util.VecMath;
+//import com.donhatchsw.util.SortStuff;
+import com.donhatchsw.util.Listenable;
+import com.donhatchsw.compat.ArrayList;
+//import com.donhatchsw.compat.IntArrayList;
+//import com.donhatchsw.compat.DoubleArrayList;
+
+import com.donhatchsw.awt.ColLayout;
+import com.donhatchsw.awt.JRow;
+import com.donhatchsw.awt.JCol;
+//import com.donhatchsw.awt.JTablePanel;
+
+//import javax.swing.ButtonGroup;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JApplet;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+//import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+//import javax.swing.JComboBox;
+import javax.swing.JCheckBox;
+
+
+public class SpiralApplet
+    extends JApplet
+{
+    //
+    // Utilities for applet stuff...
+    //
+        private String getParameterString(String paramName,
+                                       String defaultValue)
+        {
+            String paramValueString = getParameter(paramName);
+            if (paramValueString != null)
+                return paramValueString;
+            else
+                return defaultValue;
+        }
+        private int getParameterInt(String paramName,
+                                    int defaultValue)
+        {
+            String paramValueString = getParameter(paramName);
+            if (paramValueString != null)
+            {
+                try
+                {
+                    return Integer.decode(paramValueString).intValue();
+                }
+                catch (NumberFormatException e)
+                {
+                    return 0;
+                }
+            }
+            else
+                return defaultValue;
+        }
+        private double getParameterDouble(String paramName,
+                                          double defaultValue)
+        {
+            String paramValueString = getParameter(paramName);
+            if (paramValueString != null)
+            {
+                try
+                {
+                    return Double.parseDouble(paramValueString);
+                }
+                catch (NumberFormatException e)
+                {
+                    return 0;
+                }
+            }
+            else
+                return defaultValue;
+        }
+        private boolean getParameterBoolean(String paramName,
+                                            boolean defaultValue)
+        {
+            String paramValueString = getParameter(paramName);
+            if (paramValueString != null)
+            {
+                // Too simplistic, only honors case-sensitive "true"
+                //return Boolean.valueOf(paramValueString).booleanValue();
+
+                try
+                {
+                    int n = Integer.decode(paramValueString).intValue();
+                    return n != 0;
+                }
+                catch (NumberFormatException e)
+                {
+                    if (paramValueString.equalsIgnoreCase("true")
+                     || paramValueString.equalsIgnoreCase("yes")
+                     || paramValueString.equalsIgnoreCase("t")
+                     || paramValueString.equalsIgnoreCase("y"))
+                        return true;
+                    return false;
+                }
+            }
+            else
+                return defaultValue;
+        }
+
+        // ButtonGroup doesn't support *at most* one checked.
+        // Implement one that does.
+        private static class ButtonGroupThatAllowsNone
+        {
+            private ArrayList buttons = new ArrayList();
+            private ArrayList actionListeners = new ArrayList();
+            public void add(final JToggleButton button) // checkbox or radio button
+            {
+                java.awt.event.ActionListener actionListener = new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    {
+                        if (button.isSelected())
+                        {
+                            // then deselect everyone else
+                            int nButtons = buttons.size();
+                            for (int i = 0; i < nButtons; ++i)
+                            {
+                                JToggleButton otherButton = (JToggleButton)buttons.get(i);
+                                if (otherButton != button)
+                                    if (otherButton.isSelected())
+                                        otherButton.setSelected(false);
+                            }
+                        }
+                    }
+                };
+                button.addActionListener(actionListener);
+                buttons.add(button);
+                actionListeners.add(actionListener);
+            }
+        }; // class ButtonGroupThatAllowsNone
+        // That was fun, let's make another that enforces
+        // that the selection is a prefix of the set of buttons.
+        private static class PrefixButtonGroup
+        {
+            private ArrayList buttons = new ArrayList();
+            private ArrayList actionListeners = new ArrayList();
+            public void add(final JToggleButton button) // checkbox or radio button
+            {
+                java.awt.event.ActionListener actionListener = new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    {
+                        int nButtons = buttons.size();
+                        if (button.isSelected())
+                        {
+                            // then select everyone before me
+                            FORI (i, nButtons)
+                            {
+                                JToggleButton otherButton = (JToggleButton)buttons.get(i);
+                                if (otherButton == button)
+                                    break;
+                                if (!otherButton.isSelected())
+                                    otherButton.setSelected(true);
+                            }
+                        }
+                        else
+                        {
+                            // deselect everyone after me
+                            FORIDOWN(i, nButtons)
+                            {
+                                JToggleButton otherButton = (JToggleButton)buttons.get(i);
+                                if (otherButton == button)
+                                    break;
+                                if (otherButton.isSelected())
+                                    otherButton.setSelected(false);
+                            }
+                        }
+                    }
+                };
+                button.addActionListener(actionListener);
+                buttons.add(button);
+                actionListeners.add(actionListener);
+            }
+        } // PrefixButtonGroup
+
+        // http://tech-eureka.blogspot.com/2010/12/how-to-implement-repeating-swing.html
+        private static class JRepeatingButton extends JButton
+        {
+            public JRepeatingButton(String text)
+            {
+                super(text);
+            }
+            public void addActionListener(final java.awt.event.ActionListener actionListener)
+            {
+                addMouseListener(new java.awt.event.MouseAdapter() {
+                    private javax.swing.Timer repeatTimer = null;
+                    private java.awt.event.ActionEvent synthesizedActionEvent = null;
+                    public void mousePressed(java.awt.event.MouseEvent mouseEvent)
+                    {
+                        synthesizedActionEvent = new java.awt.event.ActionEvent(
+                            JRepeatingButton.this,
+                            java.awt.event.ActionEvent.ACTION_PERFORMED,
+                            JRepeatingButton.this.getText(),
+                            mouseEvent.getModifiers());
+                        // the ctor that takes "when" introduced some time in (1.3, 1.6]
+                        // so don't use it, so we can compile using 1.3
+                        actionListener.actionPerformed(synthesizedActionEvent); // initial execution
+
+                        repeatTimer = new javax.swing.Timer(100, new java.awt.event.ActionListener() {
+                            public void actionPerformed(java.awt.event.ActionEvent timerActionEvent)
+                            {
+                                actionListener.actionPerformed(synthesizedActionEvent);
+                            }
+                        });
+                        repeatTimer.setInitialDelay(500);
+                        repeatTimer.start();
+                    }
+                    public void mouseReleased(java.awt.event.MouseEvent arg0)
+                    {
+                        repeatTimer.stop();
+                        repeatTimer = null;
+                        synthesizedActionEvent = null;
+                    }
+                });
+            }
+        } // JRepeatingButton
+
+        // A textfield that turns green or red when editing and not yet committed.
+        // Esc reverts.
+        private static class JValidatingTextField extends JTextField
+        {
+            // subclass can override this
+            public boolean validate(String text)
+            {
+                return true; // it's all good by default
+            }
+
+            private String committedText;
+            public JValidatingTextField(String text)
+            {
+                super(text);
+                committedText = getText();
+
+                getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+                    private void anyUpdate(javax.swing.event.DocumentEvent e)
+                    {
+                        if (!getText().equals(committedText)) // TODO: == doesn't work here?  I forget the difference
+                        {
+                            if (validate(getText()))
+                            {
+                                // TODO: if value semantically equals committed value, turn white instead.  hmm, can build this into validate() by having it return a value (Object), maybe?
+                                setBackground(new java.awt.Color(192,255,192)); // light green
+                            }
+                            else
+                                setBackground(new java.awt.Color(255,192,192)); // pink
+                        }
+                        else
+                            setBackground(java.awt.Color.white);
+                    }
+                    public void insertUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
+                    public void removeUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
+                    public void changedUpdate(javax.swing.event.DocumentEvent e) {anyUpdate(e);}
+                });
+                addKeyListener(new java.awt.event.KeyAdapter() {
+                    public void keyPressed(java.awt.event.KeyEvent e)
+                    {
+                        if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE)
+                        {
+                            setText(committedText);
+                        }
+                    }
+                });
+                addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    {
+                        if (validate(getText()))
+                        {
+                            committedText = getText();
+                            setBackground(java.awt.Color.white);
+                        }
+                    }
+                });
+            }
+            public void setText(String text)
+            {
+                super.setText(text);
+                if (validate(getText()))
+                {
+                    committedText = getText();
+                    setBackground(java.awt.Color.white);
+                }
+            }
+        } // JValidatingTextField
+
+
+        private static class SpiralAppletControlPanel
+            extends JPanel
+        {
+            public SpiralAppletControlPanel(final SpiralApplet applet)
+            {
+                java.awt.Container contentPane = this;
+
+                contentPane.setLayout(new ColLayout());
+
+                // used as "fill" argument to add()
+                final java.awt.GridBagConstraints stretchx = new java.awt.GridBagConstraints(){{fill=HORIZONTAL;weightx=1.;}};
+                final java.awt.GridBagConstraints stretchy = new java.awt.GridBagConstraints(){{fill=VERTICAL;weighty=1.;}};
+                final java.awt.GridBagConstraints stretchxy = new java.awt.GridBagConstraints(){{fill=BOTH;weightx=weighty=1.;}};
+                final java.awt.GridBagConstraints rightjustify = new java.awt.GridBagConstraints(){{anchor=EAST;}};
+
+                // used as arg to setMargin()
+                final java.awt.Insets nomargin = new java.awt.Insets(0,0,0,0);
+
+
+
+                contentPane.add(new JSeparator(), stretchx);
+                contentPane.add(new JLabel("File/Edit"));
+                add(new JRow() {{
+                    // ...
+                }});
+                contentPane.add(new JSeparator(), stretchx);
+                contentPane.add(new JLabel("Behavior"));
+                // ...
+                contentPane.add(new JSeparator(), stretchx);
+                contentPane.add(new JLabel("Appearance/Transforms"));
+                // ...
+                contentPane.add(new JSeparator(), stretchx);
+                contentPane.add(new JLabel("Symmetry"));
+                // ...
+                contentPane.add(new JSeparator(), stretchx);
+                contentPane.add(new JLabel("Debug"));
+                add(new JRow() {{
+                    add(new JLabel("        ")); // indent a bit
+                    add(new JCol() {{
+                        add(new JRow() {{
+                            add(new JButton("Dump window positions and sizes") {{
+                                setMargin(nomargin);
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        System.out.println("----------------");
+                                        System.out.println("      main applet: "+applet.theMainAppletWindow.getWidth()+"x"+applet.theMainAppletWindow.getHeight()+"+"+applet.theMainAppletWindow.getX()+"+"+applet.theMainAppletWindow.getY()+"");
+                                        System.out.println("    control panel: "+applet.theControlPanelWindow.getWidth()+"x"+applet.theControlPanelWindow.getHeight()+"+"+applet.theControlPanelWindow.getX()+"+"+applet.theControlPanelWindow.getY()+"");
+                                        System.out.println("             help: "+applet.theHelpWindow.getWidth()+"x"+applet.theHelpWindow.getHeight()+"+"+applet.theHelpWindow.getX()+"+"+applet.theHelpWindow.getY()+"");
+                                        System.out.println("----------------");
+                                    }
+                                });
+                            }});
+                            add(new JLabel("    "));
+                            add(new JRow() {{
+
+
+                                add(new JLabel("Window title:"));
+                                add(new JTextFieldForString(applet.windowTitle) {
+                                    public java.awt.Dimension getPreferredSize()
+                                    {
+                                        java.awt.Dimension superSize = super.getPreferredSize();
+                                        // TODO: who owns it? can I tweak it and return it?
+                                        return new java.awt.Dimension(200, superSize.height);
+                                    }
+                                    // weird, getPreferredSize seems adequate when returning 100... but when returning 200, it turns to zero!? unless we also provide getMinimumSize
+                                    public java.awt.Dimension getMinimumSize()
+                                    {
+                                        return getPreferredSize();
+                                    }
+                                });
+                            }});
+                        }});
+                    }});
+                }});
+                contentPane.add(new JSeparator(), stretchx);
+
+                //randomlyColorize(this);
+
+            } // SpiralAppletControlPanel ctor
+        } // class SpiralAppletControlPanel
+
+    //
+    // Implementing Applet methods...
+    //
+        public SpiralApplet()
+        {
+            java.awt.Container contentPane = getContentPane();
+
+            contentPane.setLayout(new ColLayout());
+
+            // used as "fill" argument to add()
+            final java.awt.GridBagConstraints stretchxy = new java.awt.GridBagConstraints(){{fill=BOTH;weightx=weighty=1.;}};
+
+            contentPane.add(theCanvas = new TheCanvas() {}, stretchxy);
+
+            //
+            // Make the menu bar
+            //
+            if (true)
+            {
+                // http://www.isr.umd.edu/~austin/ence688r.d/java-swing/menu.d/DemoMenuItem.java
+                JMenuBar menuBar = new JMenuBar();
+
+                menuBar.setBorderPainted(false); // true is default. false makes it blend into the background a tiny bit more, which is good.
+
+                this.setJMenuBar(menuBar);
+
+                JMenu fileMenu = new JMenu("File", true);
+                menuBar.add(fileMenu);
+
+                JMenu editMenu = new JMenu("Edit", true);
+                menuBar.add(editMenu);
+
+                JMenu windowsMenu = new JMenu("Windows", true);
+                menuBar.add(windowsMenu);
+                windowsMenu.add(new JMenuItem("Control Panel") {{
+                    addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent e)
+                        {
+                            theControlPanelWindow.setState(JFrame.NORMAL); // not iconified
+                            theControlPanelWindow.setVisible(true); // also brings it to front, apparently
+                        }
+                    });
+                }});
+
+                JMenu helpMenu = new JMenu("Help", true);
+                menuBar.add(helpMenu);
+                helpMenu.add(new JMenuItem("Help") {{
+                    addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent e)
+                        {
+                            help();
+                        }
+                    });
+                }});
+                helpMenu.add(new JMenuItem("About...") {{
+                    // TODO: do me
+                }});
+            }
+
+            //randomlyColorize(this);
+
+            //
+            // Make the control panel window
+            //
+            if (true)
+            {
+                theControlPanelWindow = new JFrame(windowTitle + " Control Panel");
+                // no need for setDefaultCloseOperation
+                // since the default is HIDE_ON_CLOSE which is what we want
+
+
+                final int preferredWidth = 683;
+                final int preferredHeight = 822;
+                theControlPanelWindow.getContentPane().add(new JScrollPane(new SpiralAppletControlPanel(this) {
+                    public java.awt.Dimension getPreferredSize()
+                    {
+                        return new java.awt.Dimension(preferredWidth, preferredHeight);
+                    }
+                    public java.awt.Dimension getMinimumSize()
+                    {
+                        return getPreferredSize();
+                    }
+                }));
+
+                theControlPanelWindow.setLocation(730, 10);
+                theControlPanelWindow.setSize(preferredWidth+34, preferredHeight); // empirical-- will be wrong on another machine, no doubt XXX TODO: can we compute a good preferred size? pack() or something? just want to pack width, not height, I think?
+                theControlPanelWindow.setVisible(false);
+            }
+
+
+            //
+            // Make the help window
+            //
+            {
+                theHelpWindow = new JFrame("SpiralApplet Help");
+                // no need for setDefaultCloseOperation
+                // since the default is HIDE_ON_CLOSE which is what we want
+
+                // TODO: figure out how to make it scroll in response to arrow keys
+
+                if (true)
+                {
+                    // Use a JTextArea made to look like a label so text will be selectable
+                    String text = "";
+                    FORI (i, helpMessage.length)
+                        text += "  " + helpMessage[i] + "  \n";
+                    theHelpWindow.getContentPane().add(
+                        new JScrollPane(
+                            new JTextArea(text) {{
+                                // make it like a JLabel as much as possible, but text selectable
+                                this.setEditable(false);
+                                this.setDisabledTextColor(java.awt.Color.black);
+                                this.setBackground(null); // same as JLabel
+                                this.setBorder(null); // same as JLabel
+                            }}
+                        ) {{
+                            // if we don't do the following, it will screw up
+                            // and pick a width that forces a horizontal scrollbar... lame!
+                            this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+                        }}
+                    );
+                }
+                else
+                {
+                    // Use a JLabel -- text not selectable :-(
+                    String htmlHelpMessage = "<html><pre>";
+                    FORI (i, helpMessage.length)
+                        htmlHelpMessage += helpMessage[i] + "  \n";
+                    htmlHelpMessage += "</pre></html>";
+
+                    theHelpWindow.getContentPane().add(new JScrollPane(new JLabel(htmlHelpMessage)) {{
+
+                        // if we don't do the following, it will screw up
+                        // and pick a width that forces a horizontal scrollbar... lame!
+                        this.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+                    }});
+                }
+
+                theHelpWindow.setLocation(210,30); // XXX do I really want this?  can I center it instead? doing it so the help window doesn't end up in same place as main window.
+                theHelpWindow.pack(); // so that getWidth() will be the preferred width
+                theHelpWindow.setSize(theHelpWindow.getWidth(),700); // XXX heuristic for my screen
+                //theHelpWindow.setVisible(true); // uncomment when debugging
+            }
+        } // SpiralApplet ctor
+
+        static final String helpMessage[] = {
+            "===================================================================",
+            "Mouse:",
+            "Keys:",
+            "===================================================================",
+        }; // helpMessage
+
+        private void help()
+        {
+            theHelpWindow.setState(java.awt.Frame.NORMAL); // not ICONTIFIED
+            theHelpWindow.setVisible(true);
+            theHelpWindow.toFront();
+
+            if (true)
+            {
+                FORI (i, helpMessage.length)
+                    System.out.println(helpMessage[i]);
+            }
+        } // help
+
+        // classNameAncestors
+        private static String classNameAncestors(Class classs)
+        {
+            String text = classs.getName();
+
+            if (text.indexOf("java.lang.") == 0)
+                text = text.substring(10);
+            if (text.indexOf("java.awt.") == 0)
+                text = text.substring(9);
+            if (text.indexOf("javax.swing.J") == 0)
+                text = text.substring(12);
+
+            //if (text.indexOf('$') != -1)
+            if (classs.getSuperclass() != null)
+                text += " > " + classNameAncestors(classs.getSuperclass());
+            return text;
+        } // classNameAncestors
+        private static void dumpComponentHierarchy(java.awt.Component component, int depth, int iChildInParent, int nChildrenInParent)
+        {
+            FORI (i, depth) System.out.print(" ");
+
+            System.out.print(iChildInParent+"/"+nChildrenInParent+" ");
+            System.out.println(classNameAncestors(component.getClass()));
+
+            if (component instanceof java.awt.Container)
+            {
+                java.awt.Container C = (java.awt.Container)component;
+                int n = C.getComponentCount();
+                for (int iChild = 0; iChild < n; ++iChild)
+                {
+                    //FORI (iIndent, depth) System.out.print(" "); System.out.println(iChild+"/"+n);
+                    dumpComponentHierarchy(C.getComponent(iChild), depth+1, iChild, n);
+                }
+                if (n > 0)
+                {
+                    //FORI (iIndent, depth) System.out.print(" "); System.out.println(n+"/"+n);
+                }
+            }
+        } // dumpComponentHierarchy
+
+        private static void randomlyColorize(java.awt.Component c)
+        {
+            c.setBackground(new java.awt.Color((float)Math.random(),
+                                               (float)Math.random(),
+                                               (float)Math.random()));
+            c.setForeground(new java.awt.Color((float)Math.random(),
+                                               (float)Math.random(),
+                                               (float)Math.random()));
+            if (c instanceof java.awt.Container)
+            {
+                java.awt.Container C = (java.awt.Container)c;
+                int n = C.getComponentCount();
+                for (int i = 0; i < n; ++i)
+                    randomlyColorize(C.getComponent(i));
+            }
+        } // randomlyColorize
+
+        public void init()
+        {
+            eventVerbose = getParameterInt("EventVerbose", eventVerbose);
+            if (eventVerbose >= 1) System.out.println("in init");
+
+            graphicsAntiAliasingSetter = new GraphicsAntiAliasingSetter();
+
+            if (eventVerbose >= 1) System.out.println("out init");
+        } // init
+
+        public void start()
+        {
+            if (eventVerbose >= 1) System.out.println("in start");
+            if (eventVerbose >= 1) System.out.println("out start");
+        }
+        public void stop()
+        {
+            if (eventVerbose >= 1) System.out.println("in stop");
+            if (eventVerbose >= 1) System.out.println("out stop");
+        }
+        public void destroy()
+        {
+            if (eventVerbose >= 1) System.out.println("in destroy");
+            if (eventVerbose >= 1) System.out.println("out destroy");
+        }
+
+        //
+        // Button behavor changed incompatibly between Java 1.1 and 1.4
+        // (not sure exactly what version it changed in though).
+        // (I think it was 1.4 since that's when getButton() was added
+        // to MouseEvent).
+        //
+        private static int getButton(java.awt.event.MouseEvent e)
+        {
+            // gag me! we can't even query the java spec version number
+            // since System.getProperty() throws a security exception
+            // in netscape!
+            // so use empirical evidence...
+            int mods = e.getModifiers();
+#if 0 // can't seem to get this to work under IE at all, so don't try for now, it will just be wrong under 1.4
+            boolean is_1_4_or_greater = ((mods & ~0x1fff) != 0);
+            if (is_1_4_or_greater)
+            {
+                try
+                {
+                    return e.getButton();
+                }
+                catch (NoSuchMethodError err)
+                {
+                    // this only happens in IE, not netscape. fall through...
+                }
+            }
+#endif
+
+            if ((mods & java.awt.event.InputEvent.ALT_MASK) != 0)
+                return java_awt_event_MouseEvent_BUTTON2;
+            if ((mods & java.awt.event.InputEvent.META_MASK) != 0)
+                return java_awt_event_MouseEvent_BUTTON3;
+            return java_awt_event_MouseEvent_BUTTON1;
+        } // getButton
+
+        private class TheCanvas
+            extends JPanel
+            implements java.awt.event.MouseListener,
+                       java.awt.event.MouseMotionListener,
+                       java.awt.event.KeyListener
+        {
+            TheCanvas()
+            {
+                // Specify an "event listener" object
+                // to respond to events.
+                // (>= Java 1.1 event model).
+                this.addMouseListener(this);
+                this.addMouseMotionListener(this);
+                this.addKeyListener(this);
+            }
+
+            //
+            // MouseListener and MouseMotionListener methods...
+            //
+            public void mousePressed(java.awt.event.MouseEvent e)
+            {
+                if (eventVerbose >= 1) System.out.println("in mousePressed: "+e);
+                if (eventVerbose >= 1)
+                {
+                    if (getButton(e) == java_awt_event_MouseEvent_BUTTON1)
+                        System.out.println("    (left mouse)");
+                    if (getButton(e) == java_awt_event_MouseEvent_BUTTON2)
+                        System.out.println("    (middle mouse)");
+                    if (getButton(e) == java_awt_event_MouseEvent_BUTTON3)
+                        System.out.println("    (right mouse)");
+                }
+
+                theCanvas.repaint();
+
+                if (eventVerbose >= 1) System.out.println("out mousePressed: "+e);
+            } // mousePressed
+            public void mouseReleased(java.awt.event.MouseEvent e)
+            {
+                if (eventVerbose >= 1) System.out.println("in mouseReleased: "+e);
+
+                theCanvas.repaint();
+
+                if (eventVerbose >= 1) System.out.println("out mouseReleased: "+e);
+            } // mouseReleased
+            public void mouseEntered(java.awt.event.MouseEvent e)
+            {
+                if (eventVerbose >= 1) System.out.println("in mouseEntered: "+e);
+                // steal keyboard focus!
+                requestFocus(); // hey it works! (javac 1.3, runtime 1.6)
+                if (eventVerbose >= 1) System.out.println("out mouseEntered: "+e);
+            }
+            public void mouseExited(java.awt.event.MouseEvent e)
+            {
+                if (eventVerbose >= 1) System.out.println("in mouseExited: "+e);
+                if (eventVerbose >= 1) System.out.println("out mouseExited: "+e);
+            }
+            public void mouseClicked(java.awt.event.MouseEvent e)
+            {
+                if (eventVerbose >= 1) System.out.println("in mouseClicked: "+e);
+                if (eventVerbose >= 1) System.out.println("out mouseClicked: "+e);
+            }
+            public void mouseDragged(java.awt.event.MouseEvent e)
+            {
+                if (eventVerbose >= 2) System.out.println("  in mouseDragged: "+e);
+
+                theCanvas.repaint();
+
+                if (eventVerbose >= 2) System.out.println("  out mouseDragged: "+e);
+            } // mouseDragged
+            public void mouseMoved(java.awt.event.MouseEvent e)
+            {
+                if (eventVerbose >= 3) System.out.println("    in mouseMoved: "+e);
+
+                if (eventVerbose >= 3) System.out.println("    out mouseMoved: "+e);
+            } // mouseMoved
+
+            //
+            // KeyListener methods...
+            //
+            public void keyPressed(java.awt.event.KeyEvent e)
+            {
+                if (eventVerbose >= 1) System.out.println("in keyPressed: "+e);
+
+                switch(e.getKeyCode())
+                {
+                    default:
+                        // don't print anything, or we'll print too much (e.g. Shift, and any keys we handle in keyTyped())
+                        //System.out.println("Unknown keycode "+java.awt.event.KeyEvent.getKeyText(e.getKeyCode())+" ("+e.getKeyCode()+")");
+                        break;
+                }
+                if (eventVerbose >= 1) System.out.println("out keyPressed: "+e);
+            } // keyPressed
+            public void keyReleased(java.awt.event.KeyEvent e)
+            {
+                if (eventVerbose >= 1) System.out.println("in keyReleased: "+e);
+                switch(e.getKeyCode())
+                {
+                    default:
+                        break;
+                }
+                if (eventVerbose >= 1) System.out.println("out keyReleased: "+e);
+            } // keyReleased
+            public void keyTyped(java.awt.event.KeyEvent e)
+            {
+                if (eventVerbose >= 1) System.out.println("in keyTyped: "+e);
+                char c = e.getKeyChar();
+
+                // In java 1.6, apparently ctrl-letter
+                // started coming out as just the letter
+                // (with ke.isControlDown() true).
+                // Detect this and change it to the old behavior...
+                // XXX need to do something else, or nothing at all here, for old javas (1.1) in which isControlDown doesn't exist... or else just stop trying to support 1.1 at all
+                if (c >= 'a' && c <= 'z' && e.isControlDown())
+                {
+                    c -= ('a'-1);
+                }
+
+    #define CTRL(lowerCaseLetter) ((lowerCaseLetter)-'a' + 1)
+                switch (c)
+                {
+                    case '\n':
+                        theCanvas.repaint();
+                        break;
+                    default:
+                        System.out.println("Unknown key '"+c+"'("+(int)e.getKeyChar()+") typed");
+                        break;
+                }
+                if (eventVerbose >= 1) System.out.println("out keyTyped: "+e);
+            } // keyTyped
+
+
+
+
+
+
+            //
+            // Make it so we get keyboard focus on startup,
+            // without having to click first.  Thanks, Melinda!
+            // The state of things seems to be:
+            //      - Buttons and TextFields are apparently "focus traversable"
+            //        by default.  Canvases and Applets aren't,
+            //        implying (not obvious) that you need to click to type
+            //        when the app starts,
+            //        which is almost never the desired behavior.
+            //        You can change this by overriding isFocusTraversable(),
+            //        which we do below.
+            //      - Other approaches using requestFocus():
+            //        A Canvas calling requestFocus() doesn't seem to do
+            //        anything.  An Applet calling requestFocus() doesn't
+            //        do anything during init(), but I think it works
+            //        if you put it in the mouseEntered handler or something,
+            //        though this can lead to various unpredictabilities.
+            //
+            public boolean isFocusTraversable()
+            {
+                return true;
+            }
+
+
+            // PAINT/DISPLAY/DRAW
+            public void paintComponent(java.awt.Graphics g)
+            {
+                if (eventVerbose >= 1) System.out.println("in paint");
+
+                java.awt.Dimension size = getSize();
+
+                double minSize = (double)MIN(size.width, size.height);
+
+                if (implementAntiAliasingInHardware)
+                {
+                    graphicsAntiAliasingSetter.setAntiAliasing(g,
+                                                               antiAliasingFlag,
+                                                               //1
+                                                               eventVerbose
+                                                               );
+                }
+
+
+                //
+                // Clear to black...
+                //
+                g.setColor(java.awt.Color.black);
+                g.fillRect(0,0, size.width,size.height);
+
+                if (theSpiralModel == null)
+                {
+                    // XXX for now, create it on the fly
+                    int n = 1000*1000;
+                    int nPartitions = 90; // must be multiple of 2 currently (should relax this, but need whole different algorithm almost for odd case)
+                    java.util.Random rng = new java.util.Random(1);
+                    theSpiralModel = new SpiralModel(n, nPartitions, SpiralModel.DELTA_ANY, rng);
+                }
+                int pixelsPerIncrement = 2; // must be multiple of 2
+                int time = nPaints;
+                //int time = 2;
+                double focus = 2*(double)time/(double)pixelsPerIncrement; // so it moves 2 pixels per time step
+                PRINT(focus);
+                if (theSpiralView == null)
+                {
+
+                    theSpiralView = new SpiralView(focus);
+                }
+                theSpiralView.focus = focus;
+
+
+                drawTicker(g,
+                           size,
+                           size.width/2,
+                           size.height/2,
+                           pixelsPerIncrement,
+                           theSpiralModel,
+                           theSpiralView);
+
+
+
+                nPaints++;
+                g.setColor(java.awt.Color.white);
+                g.drawString(""+nPaints+" paints",
+                              size.width - 50,
+                              20);
+
+                // swing swaps buffers for us
+
+                // animation. XXX should be an animation thread or something?
+                if (true)
+                {
+                    repaint();
+
+                    if (true)
+                    {
+                        try {
+                            Thread.sleep(1); // any nonzero number of milliseconds seems to be adequate to smooth it out
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                }
+
+                if (eventVerbose >= 1) System.out.println("out paint");
+            } // paint
+
+        } // class TheCanvas
+
+
+
+        // Calculate the angle C, opposite side c,
+        // given side lengths a, b, c,
+        // using c^2 = a^2 + b^2 - 2*a*b*cos(C)
+        private static double triangleAngle(double a, double b, double c)
+        {
+            return Math.acos((a*a + b*b - c*c) / (2*a*b));
+        }
+
+        // Find vertex v2 that completes the triangle with given edge lengths,
+        // such that v0,v1,v2 are CCW.
+        private static double[] completeTriangle(double v0[],
+                                                 double v1[],
+                                                 double dist12,
+                                                 double dist20)
+        {
+            // Make sure has only 2 entries
+            v0 = new double[]{v0[0],v0[1]};
+            v1 = new double[]{v1[0],v1[1]};
+            double ang0 = triangleAngle(VecMath.dist(v0,v1), dist20, dist12);
+            double dir01[] = VecMath.normalize(VecMath.vmv(v1,v0));
+            double v2[] = VecMath.sxvpsxvpsxv(
+                1.,                    v0,
+                dist20*Math.cos(ang0), dir01,
+                dist20*Math.sin(ang0), VecMath.xv2(dir01));
+            return v2;
+        } // completeTriangle
+
+        private static double twiceTriangleArea(double x0, double y0,
+                                                double x1, double y1,
+                                                double x2, double y2)
+        {
+            return (x1-x0)*(y2-y0) - (x2-x0)*(y1-y0);
+        }
+        private static double twiceTriangleArea(double v0[],
+                                           double v1[],
+                                           double v2[])
+        {
+            return twiceTriangleArea(v0[0], v0[1],
+                                     v1[0], v1[1],
+                                     v2[0], v2[1]);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //
+    // App-specific variables...
+    //
+        public class SpiralModel
+        {
+            public int n; // wrap period
+            public int nPartitions;
+            public int theList[/*n*/];
+            public double centers[/*n*/][/*2*/]; // centers[i] is center of theList up through index i, rotated and scaled canonically
+            public double weights[/*n*/]; // weights[i] is area of dual diagram of theList up through index i, rotated and scaled canonically
+            public static final int DELTA_1 = 0;
+            public static final int DELTA_ANY = 1;
+
+            SpiralModel(int n,
+                        int nPartitions,
+                        int deltaStyle, // DELTA_1 or DELTA_ANY
+                        java.util.Random rng)
+            {
+                assert(n >= 2);
+                assert(n % 2 == 0); // doesn't work with odd n
+                this.n = n;
+                this.nPartitions = nPartitions;
+
+                this.theList = new int[n];
+                if (deltaStyle == DELTA_1)
+                {
+                    int maxPasses = 100;
+                    int val = nPartitions/2; // somewhat arbitrary starting point... will turn random on second pass
+                    boolean done = false;
+                    FORI (iPass, maxPasses)
+                    {
+                        FORI (i, n)
+                        {
+                            if (val == 0)
+                                val = 1;
+                            else if (val == nPartitions-1)
+                                val = nPartitions-2;
+                            else if (rng.nextBoolean())
+                                val += 1;
+                            else
+                                val -= 1;
+                            if (iPass >= 1 && val == this.theList[i])
+                            {
+                                done = true;
+                                break;
+                            }
+                            assert(val >= 0 && val < nPartitions);
+                            this.theList[i] = val;
+                        }
+                        if (done)
+                            break;
+                    }
+                    assert(done);
+                }
+                else if (deltaStyle == DELTA_ANY)
+                {
+                    int maxPasses = 100;
+                    int val = nPartitions/2; // somewhat arbitrary starting point... will turn random on second pass
+                    boolean done = false;
+                    int sign = rng.nextBoolean() ? -1 : 1;
+                    int nRemainingThisSign = 0;
+                    FORI (iPass, maxPasses)
+                    {
+                        FORI (i, n)
+                        {
+                            if (nRemainingThisSign == 0)
+                            {
+                                sign = -sign;
+                                if (sign == -1)
+                                {
+                                    assert(val > 0);
+                                    nRemainingThisSign = 1+rng.nextInt(val);
+                                }
+                                else
+                                {
+                                    assert(nPartitions-1-val > 0);
+                                    nRemainingThisSign = 1+rng.nextInt(nPartitions-1-val);
+                                }
+                            }
+                            val += sign;
+                            --nRemainingThisSign;
+                            if (iPass >= 1 && val == this.theList[i])
+                            {
+                                done = true;
+                                break;
+                            }
+                            assert(val >= 0 && val < nPartitions);
+                            this.theList[i] = val;
+                        }
+                        if (done)
+                            break;
+                    }
+                    assert(done);
+                }
+                else
+                    assert(false);
+
+                this.centers = new double[n][2];
+                this.weights = new double[n];
+                if (false)  // XXX fix
+                {
+                    double prevWeight = 0.;
+                    double prevCenter[] = {0.,0.};
+                    double thisWeight = 0.;
+                    double thisCenter[] = {0.,0.};
+
+                    boolean done = false;
+                    FORI (iPass, 2)
+                    {
+                        FORI (i, n)
+                        {
+                            // Compute new weight and center
+                            // from prev weight and center
+                        }
+                    }
+                    assert(done);
+                }
+            }
+        }; // public class SpiralModel
+        public class SpiralView
+        {
+            public double focus; // modulo spiralModel.n
+            public SpiralView(double focus)
+            {
+                this.focus = focus;
+            }
+        }; // public class SpiralView
+        public SpiralModel theSpiralModel = null;
+        public SpiralView theSpiralView = null;
+
+        public void drawSpiral(MyGraphics mg,
+                               double gCenterX, double gCenterY,
+                               int pixelsPerIncrement,
+                               SpiralModel spiralModel,
+                               SpiralView spiralView)
+        {
+            int n = spiralModel.n;
+
+            // the two indices bounding
+            // the focus
+            int i0 = (int)Math.floor(spiralView.focus);
+            double frac = spiralView.focus - i0;
+            i0 = MOD(i0, n);
+            int i1 = (i0+1)%n;
+            int val0 = spiralModel.theList[i0];
+            int val1 = spiralModel.theList[i1];
+            PRINT(val0);
+            PRINT(val1);
+            PRINT(frac);
+            double val = LERP(val0,val1,frac);
+            PRINT(val);
+
+            double dualAng = 0;
+            double primalAng = Math.PI/2 * (1 - (val+.5)/spiralModel.nPartitions);
+            double dualX = Math.cos(dualAng);
+            double dualY = Math.sin(dualAng);
+            double primalX = Math.cos(primalAng);
+            double primalY = Math.sin(primalAng);
+
+            int x0, y0;
+            if (val0 < val1)
+            {
+                // increasing... focus is on a vertical segment,
+                // i.e. in the middle of a primal vertex / dual edge
+                //     /     /
+                //    /\i1  /
+                //   /  |  /
+                //  /  i0\/
+                // /     /
+                System.out.println("increasing... focus is on a vertical segment");
+            }
+            else
+            {
+                // decreasing... focus is on a horizontal segment,
+                // i.e. in the middle of a primal edge / dual vertex
+                //     /     /
+                //    /\    /
+                //   /i0-i1/
+                //  /    \/
+                // /     /
+                System.out.println("decreasing... focus is on a horizontal segment");
+            }
+
+        } // drawSpiral
+
+        public void drawTicker(java.awt.Graphics g,
+                               java.awt.Dimension gsize,
+                               int gCenterX, int gCenterY, // between pixels
+                               int pixelsPerIncrement,
+                               SpiralModel spiralModel,
+                               SpiralView spiralView)
+        {
+            System.out.println("    in drawTicker");
+            int n = spiralModel.n;
+
+            assert(pixelsPerIncrement % 2 == 0); // doesn't work otherwise
+
+            // the two indices bounding
+            // the focus
+            int i0 = (int)Math.floor(spiralView.focus);
+            double frac = spiralView.focus - i0;
+            i0 = MOD(i0, n);
+            int i1 = (i0+1)%n;
+            int val0 = spiralModel.theList[i0];
+            int val1 = spiralModel.theList[i1];
+            PRINT(val0);
+            PRINT(val1);
+            PRINT(frac);
+            double val = LERP(val0,val1,frac);
+            PRINT(val);
+
+            int tickerHeight = pixelsPerIncrement * spiralModel.nPartitions;
+            PRINT(tickerHeight);
+            assert(tickerHeight % 4 == 0);
+
+            java.awt.Color gray128 = new java.awt.Color(128,128,128);
+            java.awt.Color gray64 = new java.awt.Color(64,64,64);
+            java.awt.Color gray32 = new java.awt.Color(32,32,32);
+
+            // draw focus
+            // (diagonal line upper-left to lower-right, across strip)
+            g.setColor(gray32);
+            g.drawLine(gCenterX-tickerHeight/4, gCenterY-tickerHeight/4,
+                       gCenterX+tickerHeight/4-1, gCenterY+tickerHeight/4-1);
+
+            // draw bounds of ticker strip
+            // (diagonal lines lower-left to upper-right).
+            g.setColor(gray128);
+            int gsizeMin = MIN(gsize.width, gsize.height);
+            g.drawLine(gCenterX-tickerHeight/4-1-gsizeMin,gCenterY-tickerHeight/4+gsizeMin,
+                       gCenterX-tickerHeight/4-1+gsizeMin,gCenterY-tickerHeight/4-gsizeMin);
+            g.drawLine(gCenterX+tickerHeight/4-1-gsizeMin,gCenterY+tickerHeight/4+gsizeMin,
+                       gCenterX+tickerHeight/4-1+gsizeMin,gCenterY+tickerHeight/4-gsizeMin);
+            // and center line
+            g.setColor(gray32);
+            g.drawLine(gCenterX-1-gsizeMin,gCenterY+gsizeMin,
+                       gCenterX-1+gsizeMin,gCenterY-gsizeMin);
+
+
+            int x0, y0;
+            if (val0 < val1)
+            {
+                // increasing... focus is on a vertical segment,
+                // i.e. in the middle of a primal vertex / dual edge
+                //     /     /
+                //    /\i1  /
+                //   /  |  /
+                //  /  i0\/
+                // /     /
+                System.out.println("increasing... focus is on a vertical segment");
+                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
+                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
+            }
+            else
+            {
+                // decreasing... focus is on a horizontal segment,
+                // i.e. in the middle of a primal edge / dual vertex
+                //     /     /
+                //    /\    /
+                //   /i0-i1/
+                //  /    \/
+                // /     /
+                System.out.println("decreasing... focus is on a horizontal segment");
+                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
+                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
+            }
+
+            g.setColor(new java.awt.Color(128,128,255)); // light blue
+            {
+                int prevX = x0;
+                int prevY = y0;
+                int prevVal = spiralModel.theList[i0];
+                for (int i = (i0+1)%n; ; i = (i+1)%n)
+                {
+                    int thisVal = spiralModel.theList[i];
+                    int thisX, thisY;
+                    if (thisVal > prevVal)
+                    {
+                        // vertical seg upwards
+                        thisX = prevX;
+                        thisY = prevY - (thisVal-prevVal) * pixelsPerIncrement;
+                    }
+                    else
+                    {
+                        // horizonal seg to right
+                        thisY = prevY;
+                        thisX = prevX + (prevVal-thisVal) * pixelsPerIncrement;
+                    }
+                    g.drawLine(prevX,prevY,thisX,thisY);
+                    if (thisX >= gsize.width || thisY < 0)
+                        break;
+                    prevVal = thisVal;
+                    prevX = thisX;
+                    prevY = thisY;
+                }
+            }
+
+            g.setColor(new java.awt.Color(128,255,128)); // light green
+            {
+                int prevX = x0;
+                int prevY = y0;
+                int prevVal = spiralModel.theList[i0];
+                for (int i = MOD(i0-1,n); ; i = MOD(i-1,n))
+                {
+                    int thisVal = spiralModel.theList[i];
+                    int thisX, thisY;
+                    if (thisVal < prevVal)
+                    {
+                        // vertical seg downwards
+                        thisX = prevX;
+                        thisY = prevY + (prevVal-thisVal) * pixelsPerIncrement;
+                    }
+                    else
+                    {
+                        // horizonal seg to left
+                        thisY = prevY;
+                        thisX = prevX - (thisVal-prevVal) * pixelsPerIncrement;
+                    }
+                    g.drawLine(prevX,prevY,thisX,thisY);
+                    if (thisX < 0 || thisY >= gsize.height)
+                        break;
+                    prevVal = thisVal;
+                    prevX = thisX;
+                    prevY = thisY;
+                }
+            }
+
+            System.out.println("    out drawTicker");
+        } // drawTicker
+
+
+
+
+        private java.awt.Component theCanvas = null;
+        //private java.awt.Component theHelpWindow = null;
+        private JFrame theMainAppletWindow = null;
+        private JFrame theControlPanelWindow = null;
+        private JFrame theHelpWindow = null;
+        private Listenable.String windowTitle = new Listenable.String("Spiral Applet");
+
+
+    //
+    // Applet-generic member variables...
+    //
+        private GraphicsAntiAliasingSetter graphicsAntiAliasingSetter;
+        private int eventVerbose = 0; // can set with eventVerbose=1 on command line
+        private static int nonEventVerbose = 0; // so static classes can refer to it
+        private boolean antiAliasingFlag = false;
+        private boolean implementAntiAliasingInHardware = true; // XXX should have a better name for this-- really mean let java runtime do it
+        private boolean doubleBufferFlag = false; // TODO: swing does this for us... can get rid of it, as soon as I figure out how to do the magnifying glass without it
+        private java.awt.Image backBufferImage = null;
+        private MyGraphics3D mostRecentGraphics = null;
+        private int nPaints = 0;
+
+
+    public static class JTextFieldForString extends JValidatingTextField
+    {
+        private Listenable.Listener listener; // need to keep a strong ref to it for as long as I'm alive
+        public JTextFieldForString(final Listenable.String s)
+        {
+            super(s.get());
+            s.addListener(listener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    setText(s.get());
+                }
+            });
+            addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e)
+                {
+                    s.set(getText());
+                }
+            });
+        }
+    } // JTextFieldForString
+    // Stolen from MC4DControlPanel.java
+    public static class JTextFieldForNumber extends JValidatingTextField
+    {
+        private Listenable.Listener listener; // need to keep a strong ref to it for as long as I'm alive
+        private Listenable.Number f;
+
+        // override super's
+        public boolean validate(String text)
+        {
+            try {
+                // attempt to parse, ignore return value
+                if (f instanceof Listenable.Int)
+                    Integer.parseInt(text);
+                else
+                    Double.parseDouble(text);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        private void updateText(Listenable.Number f)
+        {
+            if (f instanceof Listenable.Int)
+                setText(""+((Listenable.Int)f).get());
+            else if (f instanceof Listenable.Float)
+                setText(""+((Listenable.Float)f).get());
+            else
+                setText(""+(float)((Listenable.Double)f).get()); // XXX ARGH! we lose precision with this (float) cast, but if we don't do it, we can get, for example, 37.092999999999996 which looks lame.  should figure out another way to prevent that.
+        }
+
+        public JTextFieldForNumber(final Listenable.Number f)
+        {
+            super(f instanceof Listenable.Int ? ""+((Listenable.Int)f).max() // XXX not quite right, min may be longer string than max
+                   : "99.99"); // give it enough space for 99.999 (on my computer, always seems to give an extra space, which we don't need)
+            this.f = f;
+            updateText(f);
+            f.addListener(listener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    updateText(f);
+                }
+            });
+            addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e)
+                {
+                    try
+                    {
+                        f.setDouble(Double.valueOf(getText()).doubleValue());
+                    }
+                    catch (java.lang.NumberFormatException nfe)
+                    {
+                        // maybe should print an error message or something
+                        updateText(f);
+                    }
+                }
+            });
+        }
+        public java.awt.Dimension getPreferredSize()
+        {
+            //System.out.println("in JTextFieldForNumber.getPreferredSize()");
+            // default seems taller than necessary
+            // on my computer... and in recent VMs it's even worse
+            // (changed from 29 to 31).
+            // Fudge it a bit...
+            // XXX not sure this will look good on all systems... if it doesn't, we can just remove it
+            // XXX hmm, actually makes things mess up when growing and shrinking, that's weird
+            java.awt.Dimension preferredSize = super.getPreferredSize();
+            //System.out.println("textfield.super.preferredSize() = "+preferredSize);
+            if (true)
+                preferredSize.height -= 2;
+
+            // XXX another hack, wtf?
+            if (true)
+            {
+                if (f instanceof Listenable.Int)
+                    preferredSize.width = 50;
+                else
+                    preferredSize.width = 100;
+            }
+
+            //System.out.println("out JTextFieldForNumber.getPreferredSize(), returning "+preferredSize);
+            return preferredSize;
+        }
+        // weird, the following is called during horizontal shrinking
+        // but not during horizontal expanding... if we don't do this too
+        // then it looks wrong when shrinking.  what a hack...
+        public java.awt.Dimension getMinimumSize()
+        {
+            //System.out.println("in JTextFieldForNumber.getMinimumSize()");
+            java.awt.Dimension minimumSize = super.getMinimumSize();
+            //System.out.println("textfield.super.minimumSize() = "+minimumSize);
+            if (true)
+                minimumSize.height -= 2;
+
+            // XXX another hack, wtf?
+            if (true)
+            {
+                if (f instanceof Listenable.Int)
+                    minimumSize.width = 50;
+                else
+                    minimumSize.width = 100;
+            }
+
+            //System.out.println("out JTextFieldForNumber.getMinimumSize(), returning "+minimumSize);
+            return minimumSize;
+        }
+    } // JTextFieldForNumber
+
+
+    public static class JCheckBoxForBoolean extends JCheckBox
+    {
+        private Listenable.Listener listener; // need to keep a strong ref to it for as long as I'm alive
+        public JCheckBoxForBoolean(String name, final Listenable.Boolean b)
+        {
+            super(name);
+            setSelected(b.get());
+            addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent e)
+                {
+                    b.set(isSelected());
+                }
+            });
+            b.addListener(listener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    setSelected(b.get());
+                }
+            });
+        }
+    } // JCheckBoxForBoolean
+
+    public static class JSliderForFloat extends JSlider
+    {
+        private Listenable.Listener listener; // need to keep a strong ref to it for as long as I'm alive
+
+        // private helper function
+        private void updateThumb(Listenable.Number f)
+        {
+            double value = f.getDouble();
+            double defaultValue = f.defaultDouble();
+            double frac = (value-f.minDouble())/(f.maxDouble()-f.minDouble());
+
+            //setValue((int)(getMinimum() + ((getMaximum()-getVisibleAmount())-getMinimum())*frac));
+            setValue((int)(getMinimum() + (getMaximum()-getMinimum())*frac));
+        }
+
+        public JSliderForFloat(final Listenable.Number f)
+        {
+            // 3 significant digits seems reasonable...
+            /*
+            super(JSlider.HORIZONTAL,
+                  (int)Math.round(f.minDouble()*1000),
+                  (int)Math.round(f.maxDouble()*1000),
+                  (int)Math.round(f.getDouble())*1000);
+            */
+            super(JSlider.HORIZONTAL, 0, 1000, 500);
+
+            if (false)
+            {
+                PRINT(getMinimum());
+                PRINT(getMaximum());
+                PRINT(getValue());
+            }
+
+            setMinorTickSpacing(1);  // .001 units
+            setMajorTickSpacing(10); // .01 units
+            f.addListener(listener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    updateThumb(f);
+                }
+            });
+            addChangeListener(new javax.swing.event.ChangeListener() {
+                public void stateChanged(javax.swing.event.ChangeEvent e)
+                {
+                    if (false)
+                    {
+                        System.out.println("==================");
+                        System.out.println("    min = "+getMinimum());
+                        System.out.println("    max = "+getMaximum());
+                        System.out.println("    max-min = "+(getMaximum()-getMinimum()));
+                        System.out.println("    getValue() = "+getValue());
+                        System.out.println("    getMinorTickSpacing() = "+getMinorTickSpacing());
+                        System.out.println("    getMajorTickSpacing() = "+getMajorTickSpacing());
+                        System.out.println("    getSize() = "+getSize());
+                        System.out.println("    getPreferredSize() = "+getPreferredSize());
+                    }
+                    // Doing the following in double precision makes a difference;
+                    // if we do it in float, we get ugly values in the textfield
+                    double frac = (double)(getValue()-getMinimum())
+                                / (double)(getMaximum()-getMinimum());
+                    f.setDouble(f.minDouble() + frac*(f.maxDouble()-f.minDouble()));
+                    // will trigger valueChanged()
+                    // which will call updateThumb()
+                }
+            });
+            updateThumb(f); // because we fucked it up in the contructor?
+        }
+    } // JSliderForFloat
+
+
+    //
+    // Main...
+    //
+    public static void main(final String args[])
+    {
+        System.out.println("in main");
+        System.out.println("    java "+System.getProperty("java.version"));
+
+
+        final SpiralApplet applet = new SpiralApplet();
+
+        final JFrame frame = new JFrame(applet.windowTitle.get());
+
+        // TODO: what was I thinking?  can't use 1.2 any more?? need to use reflection to see whether I can do this
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // supposedly exists since java 1.4, but I can see starting in 1.3, weird
+        frame.getContentPane().add(applet);
+
+        //dumpComponentHierarchy(frame, 0, 0, 1);
+
+        // the following seems to be necessary, or getParameter() will crash, at least in 1.4.  Want to send params from command line anyway.
+        applet.setStub(new java.applet.AppletStub() {
+             public void appletResize(int width, int height)
+                 { /* should resize frame, but a SpiralApplet never asks to be resized */ }
+             public java.applet.AppletContext getAppletContext() { return null;}
+             public java.net.URL getCodeBase() { return null; }
+             public java.net.URL getDocumentBase() { return null; }
+             public String getParameter(String name)
+             {
+                 // case insensitive... and unfortunately there's no
+                 // startsWithIgnoreCase
+                 String prefix = name.toLowerCase() + "=";
+                 int i;
+                 FOR (i, args.length)
+                     if (args[i].toLowerCase().startsWith(prefix))
+                         return args[i].substring(prefix.length());
+                 return null;
+             }
+             public boolean isActive() { return true; }
+        });
+
+        applet.init();
+        applet.start();
+
+        frame.setLocation(10, 10);
+        frame.setSize(600,600);
+
+        frame.setVisible(true);
+
+        applet.theMainAppletWindow = frame;
+
+
+        // for benefit of any debugging function that wants to loop over frames...
+        applet.theControlPanelWindow.setName("control panel window");
+        applet.theMainAppletWindow.setName("main applet window");
+        applet.theHelpWindow.setName("help");
+
+
+        // why can't we get here in any toolkit ever?
+        System.out.println("out main");
+    } // main
+
+} // class SpiralApplet

@@ -1,0 +1,258 @@
+// 3D Graphics pipeline
+// built on top of MyGraphics.
+#include "macros.h"
+
+import com.donhatchsw.util.MyMath;
+import com.donhatchsw.util.VecMath;
+
+public class MyGraphics3D extends MyGraphics
+{
+    //
+    // How should this work?
+    //         M     V          P        /w                 viewport
+    //    4d    4d    4d         4d         3d                      2d
+    //    homo  homo  homo       homo       (non-normalized)        window/pixel
+    //    model world eye/cam    clip       device                  space
+    //    space space space      space      space
+    //                (lighting) (clipping) [-x0,x1]x[-y0,y1]       [0,width]x[height,0]
+    //
+    // The MyGraphics3D class contains the MVP matrix
+    // (all composed together).
+    // The viewport transformation is handled by the base class (MyGraphics).
+    //
+    // The caller creates the MyGraphics3D from:
+    //     java.awt.Graphics g
+    //     java.awt.Dimension gsize
+    //     x0,x1,y0,y1 bounds of (non-normalized) clip space
+    //     MVP matrix
+    // 
+
+    public MyGraphics3D(java.awt.Graphics g,
+                        java.awt.Dimension gsize,
+                        double x0, double x1, double y0, double y1,
+                        double MVP[][]) // assumed immutable
+    {
+        super(g, gsize, x0,x1,y0,y1);
+        this.xformMat = MVP;
+        this.clipBounds = new double[][] {{x0,x1},{y0,y1}};
+
+        if (this.debugClip)
+        {
+            // debug by setting clip to half what it was
+            VecMath.mxs(clipBounds, clipBounds, .5);
+        }
+    }
+
+    public void drawLine(double x0, double y0, double z0, double w0,
+                         double x1, double y1, double z1, double w1,
+                         boolean antiAlias)
+    {
+        double q0[] = scratch0;
+        double q1[] = scratch1;
+        double dir[] = scratch2;
+        double t0t1[] = scratch3;
+        xformNoDivide(x0,y0,z0,w0, q0);
+        xformNoDivide(x1,y1,z1,w1, q1);
+        VecMath.vmv(dir, q1,q0);
+        clipToBoxHomo(q0, dir, 0., 1.,
+                          this.clipBounds,
+                          t0t1);
+        double t0 = t0t1[0];
+        double t1 = t0t1[1];
+        if (t0 <= t1) // if not completely clipped away
+        {
+            VecMath.vpsxv(q1, q0, t1, dir); // needs original q0, so do this first
+            VecMath.vpsxv(q0, q0, t0, dir); // clobbers q0, so do this second
+            w0 = q0[3];
+            w1 = q1[3];
+            if (w0 != 0. && w1 != 0.) // can be zero if line passes through eye, ouch!
+                super.drawLineNonClipped(q0[0]/w0, q0[1]/w0,
+                                         q1[0]/w1, q1[1]/w1,
+                                         antiAlias);
+        }
+    } // drawLine
+
+    public void drawLine(double x0, double y0, double z0,
+                         double x1, double y1, double z1,
+                         boolean antiAlias)
+    {
+        drawLine(x0, y0, z0, 1.,
+                 x1, y1, z1, 1.,
+                 antiAlias);
+    } // drawLine
+    public void drawPoint(double x, double y, double z, double w, int nPixels)
+    {
+        double q[] = new double[3];
+        double depth = xform(x,y,z,w, q); // TODO: don't divide by w!
+        if (depth <= 0.)
+            return; // culled by eye plane
+
+        super.drawPoint(q[0], q[1], nPixels);
+    }
+    public void drawPoint(double x, double y, double z, int nPixels)
+    {
+        drawPoint(x, y, z, 1., nPixels);
+    }
+    public void drawString(String s, double x, double y, double z, double w,
+                                     double xJustify, // -1,0,1 -> L,C,R
+                                     double yJustify) // -1,0,1 -> T,C,B
+    {
+        double q[] = new double[3];
+        xform(x,y,z,w, q);
+        super.drawString(s, q[0], q[1], xJustify, yJustify);
+    }
+
+    public double xform(double x, double y, double z, double w, double out[/*2 or 3 or 4*/])
+    {
+        assert(w >= 0.); // shouldn't have any inputs that violate this, any more, currently... although we might in the future
+
+        // this gets called zillions of times, so use scratch arrays...
+        double out4[] = scratch0;
+        xformNoDivide(x,y,z,w, out4);
+        double wOut = out4[3];
+        if (wOut == 1.)
+            VecMath.copyvec(out.length, out, out4);
+        else
+            VecMath.vxs(out.length, out, out4, 1./wOut);
+        return wOut;
+    }
+    // trying to move towards more legit homogeneous methods
+    public void xformNoDivide(double x, double y, double z, double w, double out4[/*4*/])
+    {
+        FORI (i, 4)
+            out4[i] = x*xformMat[0][i]
+                    + y*xformMat[1][i]
+                    + z*xformMat[2][i]
+                    + w*xformMat[3][i];
+    }
+
+    //
+    // Utility function to clip x/w,y/w,z/w to [-1,1]x[-1,1]x[-1,1] or [-1,1]x[-1,1]x[-inf,inf]
+    // or whatever, in homogeneous space.
+    // Original segment endpoints are p0=p+t0*dir, p1=p+t1*dir.
+    // Returns clipped t0,t1 (with t1<t0 meaning the line got completely clipped away).
+    // Actually works in any number of dimensions.
+    // TODO: this could actually go into VecMath?  Maybe?
+    //
+    private void clipToBoxHomo(double p[],   // some reference point on the line
+                               double dir[], // not necessarily unit, can even be zero
+                               double t0, double t1, // t0>t1 means clipped away
+                               double clipBounds[/*2 (for just x,y clip) or 3 (for near/far as well)*/][/*2*/],
+                               double answer_t0_t1[]) // answer goes here
+    {
+        /*
+        System.out.println("    in clipToBoxHomo");
+        PRINTVEC(p);
+        PRINTVEC(dir);
+        PRINT(t0);
+        PRINT(t1);
+        PRINTMAT(clipBounds);
+        */
+        if (t0 <= t1)
+        {
+            int nDims = p.length;
+            assert(nDims == dir.length);
+
+            double pw = p[nDims-1];
+            double dirw = dir[nDims-1];
+            double w0 = pw + t0 * dirw; // w coord of clipped p0 so far
+            double w1 = pw + t1 * dirw; // w coord of clipped p1 so far
+            FORI (iDim, clipBounds.length)
+            {
+                double px = p[iDim];
+                double dirx = dir[iDim];
+                double x0 = px + t0 * dirx; // iDim'th coord of clipped p0 so far
+                double x1 = px + t1 * dirx; // iDim'th coord of clipped p1 so far
+                double clip0 = clipBounds[iDim][0]; // typically -1, for 90 degree fov
+                double clip1 = clipBounds[iDim][1]; // typically 1, for 90 degree fov
+
+                //
+                // test against face with normal (0,...,0,-1,0,...,0,clip1)
+                //
+                if (x0 <= clip1*w0 && x1 <= clip1*w1)
+                {
+                    // both in or on boundary; retain the whole thing
+                }
+                else if (x0 >= clip1*w0 && x1 >= clip1*w1)
+                {
+                    // both out or on boundary; clipped away!
+                    // return an inverted interval.
+                    t0 = 1.;
+                    t1 = 0.;
+                    break;
+                }
+                else
+                {
+                    // endpoints lie on strictly opposite sides of the face; clip.
+                    double t = (clip1*pw-px) / (dirx-clip1*dirw);
+                    if (x0 < clip1*w0)
+                    {
+                        // t0 is inside, t1 is outside and gets clipped
+                        t1 = t;
+                        w1 = pw + t1 * dirw;
+                        x1 = px + t1 * dirx;
+                    }
+                    else
+                    {
+                        // t1 is inside, t0 is outside and gets clipped
+                        t0 = t;
+                        w0 = pw + t0 * dirw;
+                        x0 = px + t0 * dirx;
+                    }
+                }
+
+                //
+                // test against face with normal (0,...,0,1,0,...,0,clip0)
+                //
+                if (x0 >= clip0*w0 && x1 >= clip0*w1)
+                {
+                    // both in or on boundary; retain the whole thing
+                }
+                else if (x0 <= clip0*w0 && x1 <= clip0*w1)
+                {
+                    // both out or on boundary; clipped away!
+                    // return an inverted interval.
+                    t0 = 1.;
+                    t1 = 0.;
+                    break;
+                }
+                else
+                {
+                    // endpoints lie on strictly opposite sides of the face; clip.
+                    double t = (clip0*pw-px) / (dirx-clip0*dirw);
+                    if (x0 > clip0*w0)
+                    {
+                        // t0 is inside, t1 is outside and gets clipped
+                        t1 = t;
+                        w1 = pw + t1 * dirw;
+                        // (no need to update x1; we're done with it)
+                    }
+                    else
+                    {
+                        // t1 is inside, t0 is outside and gets clipped
+                        t0 = t;
+                        w0 = pw + t0 * dirw;
+                        // (no need to update x0; we're done with it)
+                    }
+                }
+            } // FORI(iDim, nDims)
+        }
+        answer_t0_t1[0] = t0;
+        answer_t0_t1[1] = t1;
+        /*
+        PRINT(t0);
+        PRINT(t1);
+        System.out.println("    out clipToBoxHomo");
+        */
+    } // clipToBoxHomo
+
+    private MyGraphics mg;
+    private double clipBounds[][];
+    private double xformMat[][]; // 3d-to-2d xform (actually produces 3d points)
+
+    private double scratch0[] = new double[4];
+    private double scratch1[] = new double[4];
+    private double scratch2[] = new double[4];
+    private double scratch3[] = new double[2];
+
+} // class MyGraphics3D

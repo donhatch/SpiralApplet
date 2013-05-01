@@ -1,0 +1,105 @@
+#include "macros.h"
+
+    //
+    // QuarantinedFunctions
+    // contains the functions that use API
+    // that we're not sure exist.
+    // We never access the quarantined functions
+    // directly, only by name;
+    // therefore this class won't be loaded with the applet,
+    // and so even if there are problems loading it,
+    // it won't cause the loading of the applet to fail.
+    //
+    // XXX I tried to make this an inner class but couldn't get
+    // XXX forName to work on it
+    //
+    /* static*/ class GraphicsAntiAliasingSetter_QuarantinedFunctions // not really public but we have to declare it as such so we can look it up by name
+    {
+        public static boolean _setAntiAliasing(java.awt.Graphics g,
+                                               boolean doAntiAliasing,
+                                               int verbose)
+        {
+            java.awt.Graphics2D g2d = (java.awt.Graphics2D)g;
+            g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                doAntiAliasing ? java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                               : java.awt.RenderingHints.VALUE_ANTIALIAS_OFF);
+            if (verbose >= 1)
+            {
+                System.out.println("successfully set antialising to "+doAntiAliasing);
+            }
+            return true; // success XXX is there ever any indication of failure?
+        }
+    }
+
+public class GraphicsAntiAliasingSetter
+{
+    public boolean setAntiAliasing(java.awt.Graphics g,
+                                   boolean doAntiAliasing,
+                                   int verbose)
+    {
+        if (!triedToLoad)
+            tryToLoad(verbose);
+        if (Quarantined_setAntiAliasing != null)
+        {
+            try {
+                Object ret = Quarantined_setAntiAliasing.invoke(
+                                 null, // it's a static method
+                                 new Object[]
+                                 {
+                                     g,
+                                     new Boolean(doAntiAliasing),
+                                     new Integer(verbose)
+                                 });
+                return ((Boolean)ret).booleanValue();
+            }
+            catch (Exception e)
+            {
+                if (verbose >= 1)
+                {
+                    System.out.println("Caught Exception trying to invoke quarantined function for antialiasing (I guess antialiasing is not supported), won't ever try again: "+e);
+                    if (verbose >= 2)
+                        e.printStackTrace();
+                }
+                Quarantined_setAntiAliasing = null; // won't ever try again
+                return false;
+            }
+        }
+        else
+            return false;
+    }
+
+    private void tryToLoad(int verbose)
+    {
+        if (verbose >= 1)
+        {
+            System.out.println("loading quarantined functions for antialiasing");
+        }
+        try
+        {
+            Class QuarantinedFunctionsClass = Class.forName(
+                    "GraphicsAntiAliasingSetter_QuarantinedFunctions");
+            Quarantined_setAntiAliasing = QuarantinedFunctionsClass.getMethod(
+                    "_setAntiAliasing",
+                    new Class[]
+                    {
+                        java.awt.Graphics.class,
+                        boolean.class,
+                        int.class
+                    });
+        }
+        catch (Exception e)
+        {
+            if (verbose >= 1)
+            {
+                System.out.println("Caught Exception trying to load quarantined functions for antialiasing (I guess antialiasing is not supported): "+e);
+                if (verbose >= 2)
+                    e.printStackTrace();
+            }
+        }
+        triedToLoad = true;
+    }
+
+    private boolean triedToLoad = false;
+    public java.lang.reflect.Method Quarantined_setAntiAliasing;
+}
+
