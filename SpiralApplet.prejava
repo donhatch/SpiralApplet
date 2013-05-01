@@ -897,7 +897,7 @@ public class SpiralApplet
                     java.util.Random rng = new java.util.Random(1);
                     theSpiralModel = new SpiralModel(n, nPartitions, SpiralModel.DELTA_ANY, rng);
                 }
-                int pixelsPerIncrement = 2; // must be multiple of 2
+                int pixelsPerIncrement = 4; // must be multiple of 2 currently
                 if (theSpiralView == null)
                 {
                     double focusQuantum = 2./pixelsPerIncrement; // so it moves 2 pixels per time step
@@ -1152,6 +1152,151 @@ public class SpiralApplet
         public SpiralModel theSpiralModel = null;
         public SpiralView theSpiralView = null;
 
+        public void drawTicker(java.awt.Graphics g,
+                               java.awt.Dimension gsize,
+                               int gCenterX, int gCenterY, // between pixels
+                               int pixelsPerIncrement,
+                               SpiralModel spiralModel,
+                               SpiralView spiralView)
+        {
+            System.out.println("    in drawTicker");
+            int n = spiralModel.n;
+
+            assert(pixelsPerIncrement % 2 == 0); // doesn't work otherwise
+
+            // the two indices bounding
+            // the focus
+            int i0 = (int)Math.floor(spiralView.focus);
+            double frac = spiralView.focus - i0;
+            i0 = MOD(i0, n);
+            int i1 = (i0+1)%n;
+            int val0 = spiralModel.theList[i0];
+            int val1 = spiralModel.theList[i1];
+            PRINT(val0);
+            PRINT(val1);
+            PRINT(frac);
+            double val = LERP(val0,val1,frac);
+            PRINT(val);
+
+            int tickerHeight = pixelsPerIncrement * spiralModel.nPartitions;
+            PRINT(tickerHeight);
+            assert(tickerHeight % 4 == 0);
+
+            java.awt.Color gray128 = new java.awt.Color(128,128,128);
+            java.awt.Color gray64 = new java.awt.Color(64,64,64);
+            java.awt.Color gray32 = new java.awt.Color(32,32,32);
+
+            // draw focus
+            // (diagonal line upper-left to lower-right, across strip)
+            g.setColor(gray32);
+            g.drawLine(gCenterX-tickerHeight/4, gCenterY-tickerHeight/4,
+                       gCenterX+tickerHeight/4-1, gCenterY+tickerHeight/4-1);
+
+            // draw bounds of ticker strip
+            // (diagonal lines lower-left to upper-right).
+            g.setColor(gray128);
+            int gsizeMin = MIN(gsize.width, gsize.height);
+            g.drawLine(gCenterX-tickerHeight/4-1-gsizeMin,gCenterY-tickerHeight/4+gsizeMin,
+                       gCenterX-tickerHeight/4-1+gsizeMin,gCenterY-tickerHeight/4-gsizeMin);
+            g.drawLine(gCenterX+tickerHeight/4-1-gsizeMin,gCenterY+tickerHeight/4+gsizeMin,
+                       gCenterX+tickerHeight/4-1+gsizeMin,gCenterY+tickerHeight/4-gsizeMin);
+            // and center line
+            g.setColor(gray32);
+            g.drawLine(gCenterX-1-gsizeMin,gCenterY+gsizeMin,
+                       gCenterX-1+gsizeMin,gCenterY-gsizeMin);
+
+
+            int x0, y0;
+            if (val0 < val1)
+            {
+                // increasing... focus is on a vertical segment,
+                // i.e. in the middle of a primal vertex / dual edge
+                //     /     /
+                //    /\i1  /
+                //   /  |  /
+                //  /  i0\/
+                // /     /
+                System.out.println("increasing... focus is on a vertical segment");
+                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
+                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
+            }
+            else
+            {
+                // decreasing... focus is on a horizontal segment,
+                // i.e. in the middle of a primal edge / dual vertex
+                //     /     /
+                //    /\    /
+                //   /i0-i1/
+                //  /    \/
+                // /     /
+                System.out.println("decreasing... focus is on a horizontal segment");
+                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
+                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
+            }
+
+            g.setColor(new java.awt.Color(128,128,255)); // light blue
+            {
+                int prevX = x0;
+                int prevY = y0;
+                int prevVal = spiralModel.theList[i0];
+                for (int i = (i0+1)%n; ; i = (i+1)%n)
+                {
+                    int thisVal = spiralModel.theList[i];
+                    int thisX, thisY;
+                    if (thisVal > prevVal)
+                    {
+                        // vertical seg upwards
+                        thisX = prevX;
+                        thisY = prevY - (thisVal-prevVal) * pixelsPerIncrement;
+                    }
+                    else
+                    {
+                        // horizonal seg to right
+                        thisY = prevY;
+                        thisX = prevX + (prevVal-thisVal) * pixelsPerIncrement;
+                    }
+                    g.drawLine(prevX,prevY,thisX,thisY);
+                    if (thisX >= gsize.width || thisY < 0)
+                        break;
+                    prevVal = thisVal;
+                    prevX = thisX;
+                    prevY = thisY;
+                }
+            }
+
+            g.setColor(new java.awt.Color(128,255,128)); // light green
+            {
+                int prevX = x0;
+                int prevY = y0;
+                int prevVal = spiralModel.theList[i0];
+                for (int i = MOD(i0-1,n); ; i = MOD(i-1,n))
+                {
+                    int thisVal = spiralModel.theList[i];
+                    int thisX, thisY;
+                    if (thisVal < prevVal)
+                    {
+                        // vertical seg downwards
+                        thisX = prevX;
+                        thisY = prevY + (prevVal-thisVal) * pixelsPerIncrement;
+                    }
+                    else
+                    {
+                        // horizonal seg to left
+                        thisY = prevY;
+                        thisX = prevX - (thisVal-prevVal) * pixelsPerIncrement;
+                    }
+                    g.drawLine(prevX,prevY,thisX,thisY);
+                    if (thisX < 0 || thisY >= gsize.height)
+                        break;
+                    prevVal = thisVal;
+                    prevX = thisX;
+                    prevY = thisY;
+                }
+            }
+
+            System.out.println("    out drawTicker");
+        } // drawTicker
+
         // Exacly one of drawPrimalFlag and drawDualFlag must be true
         public void drawSpiral(MyGraphics mg,
                                SpiralModel spiralModel,
@@ -1360,150 +1505,6 @@ public class SpiralApplet
             System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
         } // drawSpiral
 
-        public void drawTicker(java.awt.Graphics g,
-                               java.awt.Dimension gsize,
-                               int gCenterX, int gCenterY, // between pixels
-                               int pixelsPerIncrement,
-                               SpiralModel spiralModel,
-                               SpiralView spiralView)
-        {
-            System.out.println("    in drawTicker");
-            int n = spiralModel.n;
-
-            assert(pixelsPerIncrement % 2 == 0); // doesn't work otherwise
-
-            // the two indices bounding
-            // the focus
-            int i0 = (int)Math.floor(spiralView.focus);
-            double frac = spiralView.focus - i0;
-            i0 = MOD(i0, n);
-            int i1 = (i0+1)%n;
-            int val0 = spiralModel.theList[i0];
-            int val1 = spiralModel.theList[i1];
-            PRINT(val0);
-            PRINT(val1);
-            PRINT(frac);
-            double val = LERP(val0,val1,frac);
-            PRINT(val);
-
-            int tickerHeight = pixelsPerIncrement * spiralModel.nPartitions;
-            PRINT(tickerHeight);
-            assert(tickerHeight % 4 == 0);
-
-            java.awt.Color gray128 = new java.awt.Color(128,128,128);
-            java.awt.Color gray64 = new java.awt.Color(64,64,64);
-            java.awt.Color gray32 = new java.awt.Color(32,32,32);
-
-            // draw focus
-            // (diagonal line upper-left to lower-right, across strip)
-            g.setColor(gray32);
-            g.drawLine(gCenterX-tickerHeight/4, gCenterY-tickerHeight/4,
-                       gCenterX+tickerHeight/4-1, gCenterY+tickerHeight/4-1);
-
-            // draw bounds of ticker strip
-            // (diagonal lines lower-left to upper-right).
-            g.setColor(gray128);
-            int gsizeMin = MIN(gsize.width, gsize.height);
-            g.drawLine(gCenterX-tickerHeight/4-1-gsizeMin,gCenterY-tickerHeight/4+gsizeMin,
-                       gCenterX-tickerHeight/4-1+gsizeMin,gCenterY-tickerHeight/4-gsizeMin);
-            g.drawLine(gCenterX+tickerHeight/4-1-gsizeMin,gCenterY+tickerHeight/4+gsizeMin,
-                       gCenterX+tickerHeight/4-1+gsizeMin,gCenterY+tickerHeight/4-gsizeMin);
-            // and center line
-            g.setColor(gray32);
-            g.drawLine(gCenterX-1-gsizeMin,gCenterY+gsizeMin,
-                       gCenterX-1+gsizeMin,gCenterY-gsizeMin);
-
-
-            int x0, y0;
-            if (val0 < val1)
-            {
-                // increasing... focus is on a vertical segment,
-                // i.e. in the middle of a primal vertex / dual edge
-                //     /     /
-                //    /\i1  /
-                //   /  |  /
-                //  /  i0\/
-                // /     /
-                System.out.println("increasing... focus is on a vertical segment");
-                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
-                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
-            }
-            else
-            {
-                // decreasing... focus is on a horizontal segment,
-                // i.e. in the middle of a primal edge / dual vertex
-                //     /     /
-                //    /\    /
-                //   /i0-i1/
-                //  /    \/
-                // /     /
-                System.out.println("decreasing... focus is on a horizontal segment");
-                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
-                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
-            }
-
-            g.setColor(new java.awt.Color(128,128,255)); // light blue
-            {
-                int prevX = x0;
-                int prevY = y0;
-                int prevVal = spiralModel.theList[i0];
-                for (int i = (i0+1)%n; ; i = (i+1)%n)
-                {
-                    int thisVal = spiralModel.theList[i];
-                    int thisX, thisY;
-                    if (thisVal > prevVal)
-                    {
-                        // vertical seg upwards
-                        thisX = prevX;
-                        thisY = prevY - (thisVal-prevVal) * pixelsPerIncrement;
-                    }
-                    else
-                    {
-                        // horizonal seg to right
-                        thisY = prevY;
-                        thisX = prevX + (prevVal-thisVal) * pixelsPerIncrement;
-                    }
-                    g.drawLine(prevX,prevY,thisX,thisY);
-                    if (thisX >= gsize.width || thisY < 0)
-                        break;
-                    prevVal = thisVal;
-                    prevX = thisX;
-                    prevY = thisY;
-                }
-            }
-
-            g.setColor(new java.awt.Color(128,255,128)); // light green
-            {
-                int prevX = x0;
-                int prevY = y0;
-                int prevVal = spiralModel.theList[i0];
-                for (int i = MOD(i0-1,n); ; i = MOD(i-1,n))
-                {
-                    int thisVal = spiralModel.theList[i];
-                    int thisX, thisY;
-                    if (thisVal < prevVal)
-                    {
-                        // vertical seg downwards
-                        thisX = prevX;
-                        thisY = prevY + (prevVal-thisVal) * pixelsPerIncrement;
-                    }
-                    else
-                    {
-                        // horizonal seg to left
-                        thisY = prevY;
-                        thisX = prevX - (thisVal-prevVal) * pixelsPerIncrement;
-                    }
-                    g.drawLine(prevX,prevY,thisX,thisY);
-                    if (thisX < 0 || thisY >= gsize.height)
-                        break;
-                    prevVal = thisVal;
-                    prevX = thisX;
-                    prevY = thisY;
-                }
-            }
-
-            System.out.println("    out drawTicker");
-        } // drawTicker
 
 
 
