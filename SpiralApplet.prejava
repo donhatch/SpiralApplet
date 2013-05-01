@@ -11,7 +11,7 @@
 #define java_awt_event_MouseEvent_BUTTON3 3
 
 //import com.donhatchsw.util.Arrays;
-//import com.donhatchsw.util.MyMath;
+import com.donhatchsw.util.MyMath;
 import com.donhatchsw.util.VecMath;
 //import com.donhatchsw.util.SortStuff;
 import com.donhatchsw.util.Listenable;
@@ -757,6 +757,19 @@ public class SpiralApplet
 
                 switch(e.getKeyCode())
                 {
+                    case java.awt.event.KeyEvent.VK_UP:
+                    case java.awt.event.KeyEvent.VK_DOWN:
+                        animationDir = 0.;
+                        theCanvas.repaint();
+                        break;
+                    case java.awt.event.KeyEvent.VK_LEFT:
+                        animationDir = -1.;
+                        theCanvas.repaint();
+                        break;
+                    case java.awt.event.KeyEvent.VK_RIGHT:
+                        animationDir = 1.;
+                        theCanvas.repaint();
+                        break;
                     default:
                         // don't print anything, or we'll print too much (e.g. Shift, and any keys we handle in keyTyped())
                         //System.out.println("Unknown keycode "+java.awt.event.KeyEvent.getKeyText(e.getKeyCode())+" ("+e.getKeyCode()+")");
@@ -793,6 +806,10 @@ public class SpiralApplet
                 switch (c)
                 {
                     case '\n':
+                        theCanvas.repaint();
+                        break;
+                    case 's': // switch animation direction
+                        animationDir *= -1.;
                         theCanvas.repaint();
                         break;
                     default:
@@ -840,6 +857,10 @@ public class SpiralApplet
 
                 double minSize = (double)MIN(size.width, size.height);
 
+                MyGraphics mg = new MyGraphics(g, size,
+                    -size.width/minSize,size.width/minSize,
+                    -size.height/minSize,size.height/minSize);
+
                 if (implementAntiAliasingInHardware)
                 {
                     graphicsAntiAliasingSetter.setAntiAliasing(g,
@@ -864,17 +885,12 @@ public class SpiralApplet
                     java.util.Random rng = new java.util.Random(1);
                     theSpiralModel = new SpiralModel(n, nPartitions, SpiralModel.DELTA_ANY, rng);
                 }
-                int pixelsPerIncrement = 2; // must be multiple of 2
-                int time = nPaints;
-                //int time = 2;
-                double focus = 2*(double)time/(double)pixelsPerIncrement; // so it moves 2 pixels per time step
-                PRINT(focus);
                 if (theSpiralView == null)
                 {
-
-                    theSpiralView = new SpiralView(focus);
+                    theSpiralView = new SpiralView(0.);
                 }
-                theSpiralView.focus = focus;
+                int pixelsPerIncrement = 2; // must be multiple of 2
+                theSpiralView.focus += animationDir * 2./pixelsPerIncrement; // so it moves 2 pixels per time step
 
 
                 drawTicker(g,
@@ -885,6 +901,26 @@ public class SpiralApplet
                            theSpiralModel,
                            theSpiralView);
 
+                if (true)
+                {
+                    // draw primal spiral
+                    drawSpiral(mg,
+                               theSpiralModel,
+                               theSpiralView,
+                               true, // drawPrimalFlag
+                               false, // drawDualFlag
+                               antiAliasingFlag);
+                }
+                if (true)
+                {
+                    // draw dual spiral
+                    drawSpiral(mg,
+                               theSpiralModel,
+                               theSpiralView,
+                               false, // drawPrimalFlag
+                               true, // drawDualFlag
+                               antiAliasingFlag);
+                }
 
 
                 nPaints++;
@@ -895,8 +931,7 @@ public class SpiralApplet
 
                 // swing swaps buffers for us
 
-                // animation. XXX should be an animation thread or something?
-                if (true)
+                if (animationDir != 0.)
                 {
                     repaint();
 
@@ -1099,14 +1134,27 @@ public class SpiralApplet
         }; // public class SpiralView
         public SpiralModel theSpiralModel = null;
         public SpiralView theSpiralView = null;
+        public double animationDir = 0.;
 
+        // Exacly one of drawPrimalFlag and drawDualFlag must be true
         public void drawSpiral(MyGraphics mg,
-                               double gCenterX, double gCenterY,
-                               int pixelsPerIncrement,
                                SpiralModel spiralModel,
-                               SpiralView spiralView)
+                               SpiralView spiralView,
+                               boolean drawPrimalFlag,
+                               boolean drawDualFlag,
+                               boolean antiAliasFlag)
         {
+            // draw exactly one of primal and dual at a time
+            assert(drawPrimalFlag != drawDualFlag);
+            System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
+
+            if (drawPrimalFlag)
+                mg.setColor(new java.awt.Color(128,128,255)); // light blue
+            else
+                mg.setColor(java.awt.Color.white);
+
             int n = spiralModel.n;
+            int nPartitions = spiralModel.nPartitions;
 
             // the two indices bounding
             // the focus
@@ -1116,43 +1164,148 @@ public class SpiralApplet
             int i1 = (i0+1)%n;
             int val0 = spiralModel.theList[i0];
             int val1 = spiralModel.theList[i1];
-            PRINT(val0);
-            PRINT(val1);
-            PRINT(frac);
             double val = LERP(val0,val1,frac);
-            PRINT(val);
 
-            double dualAng = 0;
-            double primalAng = Math.PI/2 * (1 - (val+.5)/spiralModel.nPartitions);
-            double dualX = Math.cos(dualAng);
-            double dualY = Math.sin(dualAng);
-            double primalX = Math.cos(primalAng);
-            double primalY = Math.sin(primalAng);
+            double scale = .1;
 
-            int x0, y0;
-            if (val0 < val1)
+
+            // scanDir=1: the part *after* (bigger than) the focus.
+            // scanDir=-1: the part *before* (smaller than) the focus.
+            int scanDirs[] = {1, -1};
+            FORI (iScanDir, 2)
             {
-                // increasing... focus is on a vertical segment,
-                // i.e. in the middle of a primal vertex / dual edge
-                //     /     /
-                //    /\i1  /
-                //   /  |  /
-                //  /  i0\/
-                // /     /
-                System.out.println("increasing... focus is on a vertical segment");
-            }
-            else
-            {
-                // decreasing... focus is on a horizontal segment,
-                // i.e. in the middle of a primal edge / dual vertex
-                //     /     /
-                //    /\    /
-                //   /i0-i1/
-                //  /    \/
-                // /     /
-                System.out.println("decreasing... focus is on a horizontal segment");
-            }
+                int scanDir = scanDirs[iScanDir];
 
+                if (drawPrimalFlag)
+                {
+                    if (scanDir == -1)
+                        mg.setColor(new java.awt.Color(128,255,128)); // light green
+                    else
+                        mg.setColor(new java.awt.Color(128,128,255)); // light blue
+
+                }
+
+
+                double dualAng = 0;
+                double primalAng = Math.PI/2 * (1 - (val+.5)/spiralModel.nPartitions);
+                double dualR = scale;
+                double primalR = scale;
+
+                double dualX = dualR * Math.cos(dualAng);
+                double dualY = dualR * Math.sin(dualAng);
+                double primalX = primalR * Math.cos(primalAng);
+                double primalY = primalR * Math.sin(primalAng);
+
+
+
+                double prevPrevVal = val;
+                double prevVal = val;
+                for (int i = scanDir==1?i1:i0; ; i = MOD(i+scanDir,n))
+                {
+                    // TODO: combine straight parts, the line will look better
+
+                    int thisVal = spiralModel.theList[i];
+                    if (scanDir==1 ? thisVal > prevVal : thisVal < prevVal)
+                    {
+                        // dual movement, primal turn
+                        //System.out.println("    dual movement, primal turn");
+                        double angleDelta = (double)(thisVal-prevVal)/(double)nPartitions * (Math.PI*.5);
+                        double nextDualAng = dualAng + angleDelta;
+                        if (nextDualAng > Math.PI)
+                            nextDualAng -= 2*Math.PI;
+                        double nextDualR;
+                        {
+                            // use law of sines.
+                            // don't think too hard about the scanDir=-1 case, in which case angleDelta is negative and the triangle is inside out... it just works.
+                            double A = angleDelta;
+                            double C = dualAng+Math.PI - primalAng;
+                            double B = Math.PI - (A+C);
+                            double b = dualR;
+                            double c = b * (Math.sin(C)/Math.sin(B));
+                            nextDualR = c;
+                        }
+                        double nextDualX = nextDualR * Math.cos(nextDualAng);
+                        double nextDualY = nextDualR * Math.sin(nextDualAng);
+
+                        if (drawDualFlag)
+                        {
+                            mg.drawLine(dualX, dualY,
+                                        nextDualX, nextDualY,
+                                        antiAliasFlag);
+                            if ((thisVal>prevVal) != (prevVal>prevPrevVal))
+                                mg.drawPoint(nextDualX, nextDualY, 5);
+                            if (scanDir > 0)
+                            {
+                                if (SQR(nextDualX)+SQR(nextDualY)
+                                   > SQR(1) + SQR(2)) // XXX should be max distance of any corner of window from origin
+                                    break;
+                            }
+                            else
+                            {
+                                if (SQR(nextDualX)+SQR(nextDualY)
+                                   < SQR(1e-3))
+                                    break;
+                            }
+                        }
+
+                        dualAng = nextDualAng;
+                        dualR = nextDualR;
+                        dualX = nextDualX;
+                        dualY = nextDualY;
+                    }
+                    else if (scanDir==1 ? thisVal < prevVal : thisVal > prevVal)
+                    {
+                        // primal movement, dual turn
+                        //System.out.println("    primal movement, dual turn");
+                        double angleDelta = (double)(prevVal-thisVal)/(double)nPartitions * (Math.PI*.5);
+                        double nextPrimalAng = primalAng += angleDelta;
+                        if (nextPrimalAng > Math.PI)
+                            nextPrimalAng -= 2*Math.PI;
+                        double nextPrimalR;
+                        {
+                            // use law of sines.
+                            // don't think too hard about the scanDir=-1 case, in which case angleDelta is negative and the triangle is inside out... it just works.
+                            double A = angleDelta;
+                            double C = primalAng+Math.PI - (dualAng+Math.PI/2);
+                            double B = Math.PI - (A+C);
+                            double b = primalR;
+                            double c = b * (Math.sin(C)/Math.sin(B));
+                            nextPrimalR = c;
+                        }
+                        double nextPrimalX = nextPrimalR * Math.cos(nextPrimalAng);
+                        double nextPrimalY = nextPrimalR * Math.sin(nextPrimalAng);
+
+                        if (drawPrimalFlag)
+                        {
+                            mg.drawLine(primalX, primalY,
+                                        nextPrimalX, nextPrimalY,
+                                        antiAliasFlag);
+                            if (prevPrevVal != prevVal && (thisVal>prevVal) != (prevVal>prevPrevVal))
+                                mg.drawPoint(nextPrimalX, nextPrimalY, 5);
+                            if (scanDir > 0)
+                            {
+                                if (SQR(nextPrimalX)+SQR(nextPrimalY)
+                                   > SQR(1) + SQR(2)) // XXX should be max distance of any corner of window from origin
+                                    break;
+                            }
+                            else
+                            {
+                                if (SQR(nextPrimalX)+SQR(nextPrimalY)
+                                   < SQR(1e-3))
+                                    break;
+                            }
+                        }
+
+                        primalAng = nextPrimalAng;
+                        primalR = nextPrimalR;
+                        primalX = nextPrimalX;
+                        primalY = nextPrimalY;
+                    }
+                    prevPrevVal = prevVal;
+                    prevVal = thisVal;
+                }
+            }
+            System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
         } // drawSpiral
 
         public void drawTicker(java.awt.Graphics g,
