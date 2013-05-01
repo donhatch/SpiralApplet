@@ -475,7 +475,7 @@ public class SpiralApplet
 
                 theControlPanelWindow.setLocation(730, 10);
                 theControlPanelWindow.setSize(preferredWidth+34, preferredHeight); // empirical-- will be wrong on another machine, no doubt XXX TODO: can we compute a good preferred size? pack() or something? just want to pack width, not height, I think?
-                theControlPanelWindow.setVisible(false);
+                theControlPanelWindow.setVisible(true);
             }
 
 
@@ -889,28 +889,11 @@ public class SpiralApplet
                 g.setColor(java.awt.Color.black);
                 g.fillRect(0,0, size.width,size.height);
 
-                if (theSpiralModel == null)
-                {
-                    // XXX for now, create it on the fly
-                    int n = 1000*1000;
-                    int nPartitions = 90; // must be multiple of 2 currently (should relax this, but need whole different algorithm almost for odd case)
-                    java.util.Random rng = new java.util.Random(1);
-                    theSpiralModel = new SpiralModel(n, nPartitions, SpiralModel.DELTA_ANY, rng);
-                }
-                int pixelsPerIncrement = 2; // must be multiple of 2 currently
-                if (theSpiralView == null)
-                {
-                    double focusQuantum = 2./pixelsPerIncrement; // so it moves 2 pixels per time step
-                    theSpiralView = new SpiralView(0., // initial focus
-                                                   focusQuantum);
-                }
-                theSpiralView.focus += theSpiralView.focusAnimationVelocity;
-
                 drawTicker(g,
                            size,
                            size.width/2,
                            size.height/2,
-                           pixelsPerIncrement,
+                           pixelsPerPart.get(),
                            theSpiralModel,
                            theSpiralView);
 
@@ -949,6 +932,8 @@ public class SpiralApplet
 
                 if (theSpiralView.focusAnimationVelocity != 0.)
                 {
+                    theSpiralView.focus += theSpiralView.focusAnimationVelocity;
+
                     repaint();
 
                     if (true)
@@ -1156,14 +1141,14 @@ public class SpiralApplet
         public void drawTicker(java.awt.Graphics g,
                                java.awt.Dimension gsize,
                                int gCenterX, int gCenterY, // between pixels
-                               int pixelsPerIncrement,
+                               int pixelsPerPart,
                                SpiralModel spiralModel,
                                SpiralView spiralView)
         {
             //System.out.println("    in drawTicker");
             int n = spiralModel.n;
 
-            assert(pixelsPerIncrement % 2 == 0); // doesn't work otherwise
+            assert(pixelsPerPart % 2 == 0); // doesn't work otherwise
 
             // the two indices bounding
             // the focus
@@ -1179,7 +1164,7 @@ public class SpiralApplet
             double val = LERP(val0,val1,frac);
             //PRINT(val);
 
-            int tickerHeight = pixelsPerIncrement * spiralModel.nPartitions;
+            int tickerHeight = pixelsPerPart * spiralModel.nPartitions;
             //PRINT(tickerHeight);
             assert(tickerHeight % 4 == 0);
 
@@ -1218,8 +1203,8 @@ public class SpiralApplet
                 //  /  i0\/
                 // /     /
                 //System.out.println("increasing... focus is on a vertical segment");
-                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
-                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
+                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val+.5)*pixelsPerPart/2-.5);
+                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val0+.5)*pixelsPerPart/2-.5);
             }
             else
             {
@@ -1231,8 +1216,8 @@ public class SpiralApplet
                 //  /    \/
                 // /     /
                 //System.out.println("decreasing... focus is on a horizontal segment");
-                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val+.5)*pixelsPerIncrement/2-.5);
-                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val0+.5)*pixelsPerIncrement/2-.5);
+                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val+.5)*pixelsPerPart/2-.5);
+                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val0+.5)*pixelsPerPart/2-.5);
             }
 
             g.setColor(new java.awt.Color(128,128,255)); // light blue
@@ -1248,13 +1233,13 @@ public class SpiralApplet
                     {
                         // vertical seg upwards
                         thisX = prevX;
-                        thisY = prevY - (thisVal-prevVal) * pixelsPerIncrement;
+                        thisY = prevY - (thisVal-prevVal) * pixelsPerPart;
                     }
                     else
                     {
                         // horizonal seg to right
                         thisY = prevY;
-                        thisX = prevX + (prevVal-thisVal) * pixelsPerIncrement;
+                        thisX = prevX + (prevVal-thisVal) * pixelsPerPart;
                     }
                     g.drawLine(prevX,prevY,thisX,thisY);
                     if (thisX >= gsize.width || thisY < 0)
@@ -1278,13 +1263,13 @@ public class SpiralApplet
                     {
                         // vertical seg downwards
                         thisX = prevX;
-                        thisY = prevY + (prevVal-thisVal) * pixelsPerIncrement;
+                        thisY = prevY + (prevVal-thisVal) * pixelsPerPart;
                     }
                     else
                     {
                         // horizonal seg to left
                         thisY = prevY;
-                        thisX = prevX - (thisVal-prevVal) * pixelsPerIncrement;
+                        thisX = prevX - (thisVal-prevVal) * pixelsPerPart;
                     }
                     g.drawLine(prevX,prevY,thisX,thisY);
                     if (thisX < 0 || thisY >= gsize.height)
@@ -1546,13 +1531,16 @@ public class SpiralApplet
     // App-specific variables...
     //
 
-        public SpiralModel theSpiralModel = null;
-        public SpiralView theSpiralView = null;
+        // Hmm, the following are inputs for regeneration
+        public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 1000*1000); // must be multiple of 2
+        public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be multiple of 2 currently (but that will be lifted)
+        public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // muse be multiple of 2 for smooth scrolling
 
+        public Listenable.Double FPSthrottle = new Listenable.Double(0., 1000., 1000.); // turns into 1000/FPSthrottle ms sleep  XXX haphazard API
 
-
-
-
+        public SpiralModel theSpiralModel = new SpiralModel(n.get(), nParts.get(), SpiralModel.DELTA_ANY, new java.util.Random(1));
+        public SpiralView theSpiralView = new SpiralView(0., // initial focus
+                                                         2./pixelsPerPart.get()); // focusQuantum, so it moves 2 pixels per time step
 
 
         private java.awt.Component theCanvas = null;
