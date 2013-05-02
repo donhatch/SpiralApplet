@@ -326,6 +326,10 @@ public class SpiralApplet
                 final java.awt.Insets nomargin = new java.awt.Insets(0,0,0,0);
 
 
+                final java.awt.Color asciiToColor[] = new java.awt.Color[128];
+                asciiToColor[' '] = null;
+                asciiToColor['b'] = java.awt.Color.black;
+
 
                 contentPane.add(new JSeparator(), stretchx);
                 contentPane.add(new JLabel("File/Edit"));
@@ -392,6 +396,7 @@ public class SpiralApplet
                                         applet.theCanvas.repaint();
                                     }
                                 });
+                                setToolTipText("<html>decrement seed</html>");
                             }});
                             add(new JTextFieldForNumber(applet.spiralModelParams.randomSeed));
                             add(new JButton("<html><code>++</code></html>") {{
@@ -403,6 +408,7 @@ public class SpiralApplet
                                         applet.theCanvas.repaint();
                                     }
                                 });
+                                setToolTipText("<html>increment seed</html>");
                             }});
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
                                 setEnabled(false);
@@ -428,17 +434,152 @@ public class SpiralApplet
                 contentPane.add(new JLabel("View"));
                 add(new JRow() {{
                     add(new JLabel("        ")); // indent a bit
-                    add(new JTablePanel() {{
-                        add(new JLabel("Anim sleep ms:"));
-                        add(new JTextFieldForNumber(applet.animSleepMS));
-                        advanceRow();
-#if 0
-                        add(new JLabel("Anim speed:"));
-                        add(new JTextFieldForNumber(applet.animSpeed));
-                        advanceRow();
-#endif
-                        add(new JLabel("Pixels per part:"));
-                        add(new JTextFieldForNumber(applet.pixelsPerPart));
+                    add(new JRow() {{
+                        add(new JRow() {{
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "   b  b",
+                                                          "  bb bb",
+                                                          " bbbbbb",
+                                                          "bbbbbbb",
+                                                          " bbbbbb",
+                                                          "  bb bb",
+                                                          "   b  b",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.accelBackward();
+                                    }
+                                });
+                                setToolTipText("<html>accelerate backward</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "   b bb",
+                                                          "  bb bb",
+                                                          " bbb bb",
+                                                          "bbbb bb",
+                                                          " bbb bb",
+                                                          "  bb bb",
+                                                          "   b bb",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.stepBackward();
+                                    }
+                                });
+                                setToolTipText("<html>step backward</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.pause();
+                                    }
+                                });
+                                setToolTipText("<html>stop</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "bb b   ",
+                                                          "bb bb  ",
+                                                          "bb bbb ",
+                                                          "bb bbbb",
+                                                          "bb bbb ",
+                                                          "bb bb  ",
+                                                          "bb b   ",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.stepForward();
+                                    }
+                                });
+                                setToolTipText("<html>step forward</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "b  b   ",
+                                                          "bb bb  ",
+                                                          "bbbbbb ",
+                                                          "bbbbbbb",
+                                                          "bbbbbb ",
+                                                          "bb bb  ",
+                                                          "b  b   ",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.accelForward();
+                                    }
+                                });
+                                setToolTipText("<html>accelerate forward</html>");
+                            }}, stretchxy);
+                        }});
+                        add(new JLabel("    "));
+                        add(new JTablePanel() {{
+                            add(new JLabel("Anim sleep ms:"));
+                            add(new JTextFieldForNumber(applet.animSleepMS));
+                            advanceRow();
+    #if 0
+                            add(new JLabel("Anim speed:"));
+                            add(new JTextFieldForNumber(applet.animSpeed));
+                            advanceRow();
+    #endif
+                            add(new JLabel("Pixels per part:"));
+                            add(new JTextFieldForNumber(applet.pixelsPerPart));
+                        }});
                     }});
                 }});
                 contentPane.add(new JSeparator(), stretchx);
@@ -856,35 +997,28 @@ public class SpiralApplet
                 {
                     case java.awt.event.KeyEvent.VK_UP:
                     case java.awt.event.KeyEvent.VK_DOWN:
-                        theSpiralView.focusAnimationVelocity = 0.;
-                        theCanvas.repaint();
+                        pause();
                         break;
                     case java.awt.event.KeyEvent.VK_LEFT:
                         if (e.isShiftDown())
                         {
-                            theSpiralView.focusAnimationVelocity -= theSpiralView.focusQuantum;
+                            accelBackward();
                         }
                         else
                         {
-                            theSpiralView.focusAnimationVelocity = 0.;
-                            theSpiralView.focus -= theSpiralView.focusQuantum;
-                            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
+                            stepBackward();
                         }
-                        theCanvas.repaint();
                         break;
 
                     case java.awt.event.KeyEvent.VK_RIGHT:
                         if (e.isShiftDown())
                         {
-                            theSpiralView.focusAnimationVelocity += theSpiralView.focusQuantum;
+                            accelForward();
                         }
                         else
                         {
-                            theSpiralView.focusAnimationVelocity = 0.;
-                            theSpiralView.focus += theSpiralView.focusQuantum;
-                            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
+                            stepForward();
                         }
-                        theCanvas.repaint();
                         break;
                     default:
                         // don't print anything, or we'll print too much (e.g. Shift, and any keys we handle in keyTyped())
@@ -1689,6 +1823,38 @@ public class SpiralApplet
             //System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
         } // drawSpiral
 
+
+        private void accelBackward()
+        {
+            theSpiralView.focusAnimationVelocity -= theSpiralView.focusQuantum;
+            theCanvas.repaint();
+        }
+        private void stepBackward()
+        {
+            theSpiralView.focusAnimationVelocity = 0.;
+            theSpiralView.focus -= theSpiralView.focusQuantum;
+            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
+            theCanvas.repaint();
+        }
+        private void pause()
+        {
+            theSpiralView.focusAnimationVelocity = 0.;
+            theCanvas.repaint();
+        }
+        private void stepForward()
+        {
+            theSpiralView.focusAnimationVelocity = 0.;
+            theSpiralView.focus += theSpiralView.focusQuantum;
+            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
+            theCanvas.repaint();
+        }
+        private void accelForward()
+        {
+            theSpiralView.focusAnimationVelocity += theSpiralView.focusQuantum;
+            theCanvas.repaint();
+        }
+
+
     //
     // App-specific variables...
     //
@@ -1948,6 +2114,43 @@ public class SpiralApplet
             updateThumb(f); // because we fucked it up in the contructor?
         }
     } // JSliderForFloat
+
+    // nice utility, maybe move to donhatchsw
+    public static void drawPixmapCentered(java.awt.Graphics g,
+                                          java.awt.Dimension size,
+                                          java.awt.Color asciiToColor[],
+                                          String[] rows)
+    {
+        if (false)
+        {
+            // hack-- pad with the color at 0,0
+            g.setColor(asciiToColor[rows[0].charAt(0)]);
+            PRINT(size.width);
+            PRINT(size.height);
+            g.fillRect(0,0, size.width,size.height);
+        }
+
+        int x0 = (size.width - rows[0].length())/2;
+        int y0 = (size.height - rows.length)/2;
+        java.awt.Color prevColor = null;
+        FORI (iRow, rows.length)
+        {
+            String row = rows[iRow];
+            int nCols = row.length();
+            FORI (iCol, nCols)
+            {
+                char c = row.charAt(iCol);
+                java.awt.Color color = asciiToColor[c];
+                if (color != prevColor)
+                {
+                    g.setColor(color);
+                    prevColor = color;
+                }
+                if (color != null)
+                    g.fillRect(x0+iCol, y0+iRow, 1, 1);
+            }
+        }
+    } // drawPixmapCentered
 
 
     //
