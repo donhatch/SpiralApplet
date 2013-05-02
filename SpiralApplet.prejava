@@ -451,12 +451,13 @@ public class SpiralApplet
                                         }
                                     });
                                 }}, centerjustify);
-                                /*
-                                add(new JLabel(" focus: "));
-                                add(new JTextFieldForNumber(applet.theSpiralView.focus){{
-                                    makeTextComponentLikeLabel(this);
-                                }});
-                                */
+                                if (true)
+                                {
+                                    add(new JLabel(" focus: "));
+                                    add(new JTextFieldForNumber(applet.theSpiralView.focus){{
+                                        makeTextComponentLikeLabel(this);
+                                    }});
+                                }
                             }});
                             add(new JRow() {{
                                 add(new JRepeatingButton("") {
@@ -729,8 +730,7 @@ public class SpiralApplet
 
                 final boolean useScrollPane = false; // can set this to true if it gets big enough to warrant it
 
-                //final int preferredWidth = 400;
-                final int preferredWidth = 600; // XXX enough to make tooltip not spill over edge-- that causes performance problem forevermore!! (wtf?)
+                final int preferredWidth = 300;
                 final int preferredHeight = 300;
 
 
@@ -2324,7 +2324,7 @@ public class SpiralApplet
                 else
                 {
                     //preferredSize.width = 100;
-                    preferredSize.width = 55; // for this app, this is plenty
+                    preferredSize.width = 20; // for this app, this is plenty, although it's bogus in general
                 }
             }
 
