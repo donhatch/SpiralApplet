@@ -1,4 +1,7 @@
 /*
+    Notes:
+        Uses System.nanoTime which requires java >= 1.4
+
     BUG: on assert fail in paint, displayed line number is too small by a few lines
     BUG: bad ticker anim when pixelsPerIncr = 4
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
@@ -1176,53 +1179,6 @@ public class SpiralApplet
             }
 
 
-            // ring buffer of longs.
-            // O(1) operations:
-            //     size()
-            //     get()
-            //     deleteFirst()
-            //     append() (amortized)
-            private class LongRingBuffer
-            {
-                private int i0 = 0;
-                private int size = 0;
-                private long[] array = new long[1];
-
-                public int size()
-                {
-                    return size;
-                }
-                public long get(int index)
-                {
-                    if (index < 0 || index >= size)
-                        throw new IndexOutOfBoundsException("LongRingBuffer.get: "+index+" out of bounds 0.."+size+"-1");
-                    return array[(i0+index)%array.length];
-                }
-                public void append(long item)
-                {
-                    if (size == array.length)
-                    {
-                        // grow
-                        long newArray[] = new long[array.length*2];
-                        System.arraycopy(array, i0, newArray, 0, size-i0);
-                        System.arraycopy(array, 0, newArray, size-i0, i0);
-                        array = newArray;
-                        i0 = 0;
-                        // and size stays the same... now half of array.length
-                    }
-                    array[(i0+size++)%array.length] = item;
-                }
-                public void deleteFirst()
-                {
-                    if (size == 0)
-                    {
-                        throw new IndexOutOfBoundsException("LongRingBuffer.deleteFirst: buffer is empty");
-                    }
-                    i0 = (i0+1)%array.length;
-                    size--;
-                }
-            } // private class LongRingBuffer
-
 
             // holy mother of god
             private String formatFixedPoint(double d, int prec)
@@ -1253,7 +1209,7 @@ public class SpiralApplet
                 java.awt.Dimension size = getSize();
                 int maxRingBufferSize = size.width + 3; // some slop
 
-                long startTime = System.currentTimeMillis();
+                double startTime = timeMillis();
                 while (startTimes.size() >= maxRingBufferSize) startTimes.deleteFirst();
                 startTimes.append(startTime);
 
@@ -1285,6 +1241,22 @@ public class SpiralApplet
                 //
                 g.setColor(java.awt.Color.black);
                 g.fillRect(0,0, size.width,size.height);
+
+
+                double pixelsPerMilli = 4.;
+                if (showTimingFlag.get())
+                {
+                    // background horizontal lines for timing
+                    g.setColor(java.awt.Color.darkGray);
+                    for (int i = 0; ; i++)
+                    {
+                        int y = size.height-(int)Math.round(i*pixelsPerMilli*1000./60.);
+                        if (y < 0)
+                            break;
+                        g.fillRect(0,y-1,
+                                   size.width,2);
+                    }
+                }
 
                 if (true) // set to false to get timing for just clearing and showing stats
                 {
@@ -1340,6 +1312,45 @@ public class SpiralApplet
                 if (showTimingFlag.get())
                 {
                     {
+                        for (int iCol = 0; iCol < size.width; ++iCol)
+                        {
+                            int x = size.width-1-iCol;
+                            int y = size.height;
+                            if (iCol < startTimes.size() && iCol < endTimes.size())
+                            {
+                                double nonPaintTime = (startTimes.get(startTimes.size()-1-iCol) - endTimes.get(endTimes.size()-1-iCol));
+                                //PRINT(nonPaintTime);
+                                assert(nonPaintTime >= 0.);
+                                g.setColor(java.awt.Color.green);
+                                int barHeight = (int)(nonPaintTime*pixelsPerMilli);
+                                g.fillRect(x,y-barHeight,
+                                           1,barHeight);
+                                y -= barHeight;
+                            }
+                            if (iCol==0)
+                            {
+                                double now = timeMillis();
+                                double paintTimeSoFar = now-startTime;
+                                assert(paintTimeSoFar >= 0.);
+                                //PRINT(paintTimeSoFar);
+                                g.setColor(java.awt.Color.yellow);
+                                int barHeight = (int)(paintTimeSoFar*pixelsPerMilli);
+                                g.fillRect(x,y-barHeight,
+                                           1,barHeight);
+                            }
+                            else if (iCol <= endTimes.size() && iCol < startTimes.size())
+                            {
+                                double paintTime = endTimes.get(endTimes.size()-iCol) - startTimes.get(startTimes.size()-1-iCol);
+                                assert(paintTime >= 0.);
+                                //PRINT(paintTime);
+                                g.setColor(java.awt.Color.red);
+                                int barHeight = (int)(paintTime*pixelsPerMilli);
+                                g.fillRect(x,y-barHeight,
+                                           1,barHeight);
+                            }
+                        }
+                    }
+                    {
                         int frames = startTimes.size()-1;
                         double seconds = (double)(startTimes.get(startTimes.size()-1)-startTimes.get(0)) / 1000.;
                         if (seconds > 0.) // implies frames must be > 0 too
@@ -1361,52 +1372,85 @@ public class SpiralApplet
                                          100);
                         }
                     }
-                    for (int iCol = 0; iCol < size.width; ++iCol)
-                    {
-                        int x = size.width-1-iCol;
-                        int y = size.height;
-                        if (iCol < startTimes.size() && iCol < endTimes.size())
-                        {
-                            int nonPaintTime = (int)(startTimes.get(startTimes.size()-1-iCol) - endTimes.get(endTimes.size()-1-iCol));
-                            //PRINT(nonPaintTime);
-                            g.setColor(java.awt.Color.green);
-                            g.fillRect(x,y-nonPaintTime,
-                                       1,nonPaintTime);
-                            y -= nonPaintTime;
-                        }
-                        if (iCol==0)
-                        {
-                            long now = System.currentTimeMillis();
-                            int paintTimeSoFar = (int)(now-startTime);
-                            //PRINT(paintTimeSoFar);
-                            g.setColor(java.awt.Color.yellow);
-                            g.fillRect(x,y-paintTimeSoFar,
-                                       1,paintTimeSoFar);
-                        }
-                        else if (iCol <= endTimes.size() && iCol < startTimes.size())
-                        {
-                            int paintTime = (int)(endTimes.get(endTimes.size()-iCol) - startTimes.get(startTimes.size()-1-iCol));
-                            //PRINT(paintTime);
-                            g.setColor(java.awt.Color.red);
-                            g.fillRect(x,y-paintTime,
-                                       1,paintTime);
-                        }
-                    }
                 }
 
                 // swing swaps buffers for us
 
                 if (eventVerbose >= 1) System.out.println("out paint");
 
-                long endTime = System.currentTimeMillis();
                 while (endTimes.size() >= maxRingBufferSize) endTimes.deleteFirst();
+                double endTime = timeMillis();
                 endTimes.append(endTime);
             } // paint
 
-            public LongRingBuffer startTimes = new LongRingBuffer();
-            public LongRingBuffer endTimes = new LongRingBuffer();
-
         } // class TheCanvas
+
+
+        // ring buffer of doubles.
+        // O(1) operations:
+        //     size()
+        //     get()
+        //     deleteFirst()
+        //     append() (amortized)
+        private class DoubleRingBuffer
+        {
+            private int i0 = 0;
+            private int size = 0;
+            private double[] array = new double[1];
+
+            public int size()
+            {
+                return size;
+            }
+            public double get(int index)
+            {
+                if (index < 0 || index >= size)
+                    throw new IndexOutOfBoundsException("DoubleRingBuffer.get: "+index+" out of bounds 0.."+size+"-1");
+                return array[(i0+index)%array.length];
+            }
+            public void set(int index, double item)
+            {
+                if (index < 0 || index >= size)
+                    throw new IndexOutOfBoundsException("DoubleRingBuffer.set: "+index+" out of bounds 0.."+size+"-1");
+                array[(i0+index)%array.length] = item;
+            }
+            public void append(double item)
+            {
+                if (size == array.length)
+                {
+                    // grow
+                    double newArray[] = new double[array.length*2];
+                    System.arraycopy(array, i0, newArray, 0, size-i0);
+                    System.arraycopy(array, 0, newArray, size-i0, i0);
+                    array = newArray;
+                    i0 = 0;
+                    // and size stays the same... now half of array.length
+                }
+                array[(i0+size++)%array.length] = item;
+            }
+            public void deleteFirst()
+            {
+                if (size == 0)
+                {
+                    throw new IndexOutOfBoundsException("DoubleRingBuffer.deleteFirst: buffer is empty");
+                }
+                i0 = (i0+1)%array.length;
+                size--;
+            }
+        } // private class DoubleRingBuffer
+
+        public DoubleRingBuffer startTimes = new DoubleRingBuffer();
+        public DoubleRingBuffer endTimes = new DoubleRingBuffer();
+
+        private double timeMillis()
+        {
+            boolean useNanoTime = true;
+            if (useNanoTime)
+                return (double)(System.nanoTime() - nanos0) / 1e6;
+            else
+                return (double)(System.currentTimeMillis() - millis0);
+        }
+
 
 
 
@@ -2160,7 +2204,7 @@ public class SpiralApplet
                 System.out.println("    creating timer");
                 theTimer = new javax.swing.Timer(animSleepMS.get(), new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
-                        //System.out.println("in timer action");
+                        if (eventVerbose >= 1) System.out.println("in timer action");
 
                         // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
                         double focusAnimationVelocitySnapshot;
@@ -2176,7 +2220,14 @@ public class SpiralApplet
 
                         theCanvas.repaint();
                         theTimer.setDelay(animSleepMS.get()); // in case it changed
-                        //System.out.println("out timer action");
+
+                        if (false) // can set this to true to make the timing graph show time between firings
+                        {
+                            double now = timeMillis();
+                            startTimes.set(startTimes.size()-1, now);
+                            endTimes.set(endTimes.size()-1, now);
+                        }
+                        if (eventVerbose >= 1) System.out.println("out timer action");
                     }
                 });
             }
@@ -2562,11 +2613,67 @@ public class SpiralApplet
     } // makeIncrementableTextFieldForNumber
 
 
+    private static long millis0 = System.currentTimeMillis();
+    private static long nanos0 = System.nanoTime();
+
+
     //
     // Main...
     //
     public static void main(final String args[])
     {
+        if (false)
+        {
+            FORI (ii,100)
+            {
+                {
+                    long m0 = System.currentTimeMillis();
+                    long n0 = System.nanoTime();
+                    FORI (i, 999)
+                        System.currentTimeMillis();
+                    long m1 = System.currentTimeMillis();
+                    long n1 = System.nanoTime();
+                    System.out.println("1000 m's and 1 n: "+(m1-m0)+" m");
+                    System.out.println("1000 m's and 1 n: "+(n1-n0)+" n");
+                }
+                {
+                    long n0 = System.nanoTime();
+                    long m0 = System.currentTimeMillis();
+                    FORI (i, 999)
+                        System.currentTimeMillis();
+                    long n1 = System.nanoTime();
+                    long m1 = System.currentTimeMillis();
+                    System.out.println("1000 m's and 1 n: "+(m1-m0)+" m");
+                    System.out.println("1000 m's and 1 n: "+(n1-n0)+" n");
+                }
+            }
+            FORI (ii,100)
+            {
+                {
+                    long m0 = System.currentTimeMillis();
+                    long n0 = System.nanoTime();
+                    FORI (i, 999)
+                        System.nanoTime();
+                    long m1 = System.currentTimeMillis();
+                    long n1 = System.nanoTime();
+                    System.out.println("1 m and 1000 n's: "+(m1-m0)+" m");
+                    System.out.println("1 m and 1000 n's: "+(n1-n0)+" n");
+                }
+                {
+                    long n0 = System.nanoTime();
+                    long m0 = System.currentTimeMillis();
+                    FORI (i, 999)
+                        System.nanoTime();
+                    long n1 = System.nanoTime();
+                    long m1 = System.currentTimeMillis();
+                    System.out.println("1 m and 1000 n's: "+(m1-m0)+" m");
+                    System.out.println("1 m and 1000 n's: "+(n1-n0)+" n");
+                }
+            }
+
+            System.out.println();
+            System.exit(0);
+        }
         if (false)
         {
             // http://stackoverflow.com/questions/12805373/java-modulo-operator
