@@ -31,6 +31,7 @@ import javax.swing.JApplet;
 import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.JRadioButton;
+import javax.swing.text.JTextComponent;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
@@ -258,18 +259,21 @@ public class SpiralApplet
                 getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
                     private void anyUpdate(javax.swing.event.DocumentEvent e)
                     {
-                        if (!getText().equals(committedText)) // TODO: == doesn't work here?  I forget the difference
+                        if (isEditable()) // use this as hint-- if not editable, probably makeTextComponentLikeLabel was called
                         {
-                            if (validate(getText()))
+                            if (!getText().equals(committedText)) // TODO: == doesn't work here?  I forget the difference
                             {
-                                // TODO: if value semantically equals committed value, turn white instead.  hmm, can build this into validate() by having it return a value (Object), maybe?
-                                setBackground(new java.awt.Color(192,255,192)); // light green
+                                if (validate(getText()))
+                                {
+                                    // TODO: if value semantically equals committed value, turn white instead.  hmm, can build this into validate() by having it return a value (Object), maybe?
+                                    setBackground(new java.awt.Color(192,255,192)); // light green
+                                }
+                                else
+                                    setBackground(new java.awt.Color(255,192,192)); // pink
                             }
                             else
-                                setBackground(new java.awt.Color(255,192,192)); // pink
+                                setBackground(java.awt.Color.white);
                         }
-                        else
-                            setBackground(java.awt.Color.white);
                     }
                     public void insertUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
                     public void removeUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
@@ -298,10 +302,13 @@ public class SpiralApplet
             public void setText(String text)
             {
                 super.setText(text);
-                if (validate(getText()))
+                if (isEditable()) // use this as hint-- if not editable, probably makeTextComponentLikeLabel was called
                 {
-                    committedText = getText();
-                    setBackground(java.awt.Color.white);
+                    if (validate(getText()))
+                    {
+                        committedText = getText();
+                        setBackground(java.awt.Color.white);
+                    }
                 }
             }
         } // JValidatingTextField
@@ -321,6 +328,7 @@ public class SpiralApplet
                 final java.awt.GridBagConstraints stretchy = new java.awt.GridBagConstraints(){{fill=VERTICAL;weighty=1.;}};
                 final java.awt.GridBagConstraints stretchxy = new java.awt.GridBagConstraints(){{fill=BOTH;weightx=weighty=1.;}};
                 final java.awt.GridBagConstraints rightjustify = new java.awt.GridBagConstraints(){{anchor=EAST;}};
+                final java.awt.GridBagConstraints centerjustify = new java.awt.GridBagConstraints(){{anchor=CENTER;}};
 
                 // used as arg to setMargin()
                 final java.awt.Insets nomargin = new java.awt.Insets(0,0,0,0);
@@ -350,13 +358,13 @@ public class SpiralApplet
                             add(new JLabel("Period:"));
                             add(new JTextFieldForNumber(applet.spiralModelParams.n));
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.n) {{
-                                setEnabled(false);
+                                makeTextComponentLikeLabel(this);
                             }});
                             advanceRow();
                             add(new JLabel("Number of parts:"));
                             add(new JTextFieldForNumber(applet.spiralModelParams.nParts));
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.nParts) {{
-                                setEnabled(false);
+                                makeTextComponentLikeLabel(this);
                             }});
                         }});
                         add(new JRow() {
@@ -435,7 +443,7 @@ public class SpiralApplet
                                 setToolTipText("<html>increment seed</html>");
                             }});
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
-                                setEnabled(false);
+                                makeTextComponentLikeLabel(this);
                             }});
                         }});
 
@@ -446,7 +454,7 @@ public class SpiralApplet
                                 public void actionPerformed(java.awt.event.ActionEvent e)
                                 {
                                     applet.theSpiralModel.init(applet.spiralModelParams.n.get(), applet.spiralModelParams.nParts.get(), applet.spiralModelParams.deltaStyle.get(), applet.spiralModelParams.randomSeed.get());
-                                    applet.theSpiralView.focus = fmod(applet.theSpiralView.focus, applet.theSpiralModel.params.n.get());
+                                    applet.theSpiralView.focus.set(fmod(applet.theSpiralView.focus.get(), applet.theSpiralModel.params.n.get()));
 
                                     applet.theCanvas.repaint();
                                 }
@@ -459,148 +467,161 @@ public class SpiralApplet
                 add(new JRow() {{
                     add(new JLabel("        ")); // indent a bit
                     add(new JRow() {{
-                        add(new JRow() {{
-                            add(new JRepeatingButton("") {
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                public void paint(java.awt.Graphics g)
-                                {
-                                    super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
-                                                       new String[] {
-                                                          "   b  b",
-                                                          "  bb bb",
-                                                          " bbbbbb",
-                                                          "bbbbbbb",
-                                                          " bbbbbb",
-                                                          "  bb bb",
-                                                          "   b  b",
-                                                       });
-                                }
-                            {
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                        add(new JCol() {{
+                            add(new JRow() {{
+                                add(new JButton("reset") {{
+                                    setMargin(nomargin);
+                                    addActionListener(new java.awt.event.ActionListener() {
+                                        public void actionPerformed(java.awt.event.ActionEvent e)
+                                        {
+                                            applet.theSpiralView.focus.set(0.);
+                                            applet.theCanvas.repaint();
+                                        }
+                                    });
+                                }}, centerjustify);
+                                add(new JLabel(" focus: "));
+                                add(new JTextFieldForNumber(applet.theSpiralView.focus){{
+                                    makeTextComponentLikeLabel(this);
+                                }});
+                            }});
+                            add(new JRow() {{
+                                add(new JRepeatingButton("") {
+                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                    public void paint(java.awt.Graphics g)
                                     {
-                                        applet.accelBackward();
+                                        super.paint(g);
+                                        drawPixmapCentered(g, getSize(), asciiToColor,
+                                                           new String[] {
+                                                              "   b  b",
+                                                              "  bb bb",
+                                                              " bbbbbb",
+                                                              "bbbbbbb",
+                                                              " bbbbbb",
+                                                              "  bb bb",
+                                                              "   b  b",
+                                                           });
                                     }
-                                });
-                                setToolTipText("<html>accelerate backward</html>");
-                            }}, stretchxy);
-                            add(new JRepeatingButton("") {
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                public void paint(java.awt.Graphics g)
                                 {
-                                    super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
-                                                       new String[] {
-                                                          "   b bb",
-                                                          "  bb bb",
-                                                          " bbb bb",
-                                                          "bbbb bb",
-                                                          " bbb bb",
-                                                          "  bb bb",
-                                                          "   b bb",
-                                                       });
-                                }
-                            {
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    addActionListener(new java.awt.event.ActionListener() {
+                                        public void actionPerformed(java.awt.event.ActionEvent e)
+                                        {
+                                            applet.accelBackward();
+                                        }
+                                    });
+                                    setToolTipText("<html>accelerate backward</html>");
+                                }}, stretchxy);
+                                add(new JRepeatingButton("") {
+                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                    public void paint(java.awt.Graphics g)
                                     {
-                                        applet.stepBackward();
+                                        super.paint(g);
+                                        drawPixmapCentered(g, getSize(), asciiToColor,
+                                                           new String[] {
+                                                              "   b bb",
+                                                              "  bb bb",
+                                                              " bbb bb",
+                                                              "bbbb bb",
+                                                              " bbb bb",
+                                                              "  bb bb",
+                                                              "   b bb",
+                                                           });
                                     }
-                                });
-                                setToolTipText("<html>step backward</html>");
-                            }}, stretchxy);
-                            add(new JRepeatingButton("") {
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                public void paint(java.awt.Graphics g)
                                 {
-                                    super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
-                                                       new String[] {
-                                                          "bbb bbb",
-                                                          "bbb bbb",
-                                                          "bbb bbb",
-                                                          "bbb bbb",
-                                                          "bbb bbb",
-                                                          "bbb bbb",
-                                                          "bbb bbb",
-                                                       });
-                                }
-                            {
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    addActionListener(new java.awt.event.ActionListener() {
+                                        public void actionPerformed(java.awt.event.ActionEvent e)
+                                        {
+                                            applet.stepBackward();
+                                        }
+                                    });
+                                    setToolTipText("<html>step backward</html>");
+                                }}, stretchxy);
+                                add(new JRepeatingButton("") {
+                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                    public void paint(java.awt.Graphics g)
                                     {
-                                        applet.pause();
+                                        super.paint(g);
+                                        drawPixmapCentered(g, getSize(), asciiToColor,
+                                                           new String[] {
+                                                              "bbb bbb",
+                                                              "bbb bbb",
+                                                              "bbb bbb",
+                                                              "bbb bbb",
+                                                              "bbb bbb",
+                                                              "bbb bbb",
+                                                              "bbb bbb",
+                                                           });
                                     }
-                                });
-                                setToolTipText("<html>stop</html>");
-                            }}, stretchxy);
-                            add(new JRepeatingButton("") {
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                public void paint(java.awt.Graphics g)
                                 {
-                                    super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
-                                                       new String[] {
-                                                          "bb b   ",
-                                                          "bb bb  ",
-                                                          "bb bbb ",
-                                                          "bb bbbb",
-                                                          "bb bbb ",
-                                                          "bb bb  ",
-                                                          "bb b   ",
-                                                       });
-                                }
-                            {
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    addActionListener(new java.awt.event.ActionListener() {
+                                        public void actionPerformed(java.awt.event.ActionEvent e)
+                                        {
+                                            applet.pause();
+                                        }
+                                    });
+                                    setToolTipText("<html>stop</html>");
+                                }}, stretchxy);
+                                add(new JRepeatingButton("") {
+                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                    public void paint(java.awt.Graphics g)
                                     {
-                                        applet.stepForward();
+                                        super.paint(g);
+                                        drawPixmapCentered(g, getSize(), asciiToColor,
+                                                           new String[] {
+                                                              "bb b   ",
+                                                              "bb bb  ",
+                                                              "bb bbb ",
+                                                              "bb bbbb",
+                                                              "bb bbb ",
+                                                              "bb bb  ",
+                                                              "bb b   ",
+                                                           });
                                     }
-                                });
-                                setToolTipText("<html>step forward</html>");
-                            }}, stretchxy);
-                            add(new JRepeatingButton("") {
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                public void paint(java.awt.Graphics g)
                                 {
-                                    super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
-                                                       new String[] {
-                                                          "b  b   ",
-                                                          "bb bb  ",
-                                                          "bbbbbb ",
-                                                          "bbbbbbb",
-                                                          "bbbbbb ",
-                                                          "bb bb  ",
-                                                          "b  b   ",
-                                                       });
-                                }
-                            {
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    addActionListener(new java.awt.event.ActionListener() {
+                                        public void actionPerformed(java.awt.event.ActionEvent e)
+                                        {
+                                            applet.stepForward();
+                                        }
+                                    });
+                                    setToolTipText("<html>step forward</html>");
+                                }}, stretchxy);
+                                add(new JRepeatingButton("") {
+                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                    public void paint(java.awt.Graphics g)
                                     {
-                                        applet.accelForward();
+                                        super.paint(g);
+                                        drawPixmapCentered(g, getSize(), asciiToColor,
+                                                           new String[] {
+                                                              "b  b   ",
+                                                              "bb bb  ",
+                                                              "bbbbbb ",
+                                                              "bbbbbbb",
+                                                              "bbbbbb ",
+                                                              "bb bb  ",
+                                                              "b  b   ",
+                                                           });
                                     }
-                                });
-                                setToolTipText("<html>accelerate forward</html>");
-                            }}, stretchxy);
+                                {
+                                    addActionListener(new java.awt.event.ActionListener() {
+                                        public void actionPerformed(java.awt.event.ActionEvent e)
+                                        {
+                                            applet.accelForward();
+                                        }
+                                    });
+                                    setToolTipText("<html>accelerate forward</html>");
+                                }}, stretchxy);
+                            }});
                         }});
                         add(new JLabel("    "));
                         add(new JTablePanel() {{
                             add(new JLabel("Anim sleep ms:"));
                             add(new JTextFieldForNumber(applet.animSleepMS));
                             advanceRow();
-    #if 0
-                            add(new JLabel("Anim speed:"));
-                            add(new JTextFieldForNumber(applet.animSpeed));
-                            advanceRow();
-    #endif
                             add(new JLabel("Pixels per part:"));
                             add(new JTextFieldForNumber(applet.pixelsPerPart));
                         }});
@@ -1209,8 +1230,8 @@ public class SpiralApplet
 
                 if (theSpiralView.focusAnimationVelocity != 0.)
                 {
-                    theSpiralView.focus += theSpiralView.focusAnimationVelocity;
-                    theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
+                    theSpiralView.focus.set(theSpiralView.focus.get() + theSpiralView.focusAnimationVelocity);
+                    theSpiralView.focus.set(fmod(theSpiralView.focus.get(), theSpiralModel.params.n.get()));
 
                     repaint();
 
@@ -1443,12 +1464,12 @@ public class SpiralApplet
         }; // public class SpiralModel
         public static class SpiralView
         {
-            public double focus; // modulo spiralModel.params.n
+            public Listenable.Double focus = new Listenable.Double(0.,0., 0.); // modulo spiralModel.params.n
             public double focusQuantum;
             public double focusAnimationVelocity;
             public SpiralView(double focus, double focusQuantum)
             {
-                this.focus = focus;
+                this.focus.set(focus);
                 this.focusQuantum = focusQuantum;
                 this.focusAnimationVelocity = 0.;
             }
@@ -1469,7 +1490,7 @@ public class SpiralApplet
 
             // the two indices bounding
             // the focus
-            double focus = fmod(spiralView.focus, n);
+            double focus = fmod(spiralView.focus.get(), n);
             int i0 = (int)Math.floor(focus);
             double frac = focus - i0;
             i0 = MOD(i0, n);
@@ -1623,7 +1644,7 @@ public class SpiralApplet
 
             // the two indices bounding
             // the focus
-            double focus = fmod(spiralView.focus, n);
+            double focus = fmod(spiralView.focus.get(), n);
             int i0, i1;
             if (true)
             {
@@ -1870,8 +1891,8 @@ public class SpiralApplet
         private void stepBackward()
         {
             theSpiralView.focusAnimationVelocity = 0.;
-            theSpiralView.focus -= theSpiralView.focusQuantum;
-            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
+            theSpiralView.focus.set(theSpiralView.focus.get() - theSpiralView.focusQuantum);
+            theSpiralView.focus.set(fmod(theSpiralView.focus.get(), theSpiralModel.params.n.get()));
             theCanvas.repaint();
         }
         private void pause()
@@ -1882,8 +1903,8 @@ public class SpiralApplet
         private void stepForward()
         {
             theSpiralView.focusAnimationVelocity = 0.;
-            theSpiralView.focus += theSpiralView.focusQuantum;
-            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
+            theSpiralView.focus.set(theSpiralView.focus.get() + theSpiralView.focusQuantum);
+            theSpiralView.focus.set(fmod(theSpiralView.focus.get(), theSpiralModel.params.n.get()));
             theCanvas.repaint();
         }
         private void accelForward()
@@ -1951,6 +1972,9 @@ public class SpiralApplet
             });
         }
     } // JTextFieldForString
+
+
+
     // Stolen from MC4DControlPanel.java
     public static class JTextFieldForNumber extends JValidatingTextField
     {
@@ -1972,6 +1996,7 @@ public class SpiralApplet
             }
         }
 
+        // common code we call in a couple of places
         private void updateText(Listenable.Number f)
         {
             if (f instanceof Listenable.Int)
@@ -2051,7 +2076,7 @@ public class SpiralApplet
             if (true)
             {
                 if (f instanceof Listenable.Int)
-                    minimumSize.width = 50;
+                    minimumSize.width = 55;
                 else
                     minimumSize.width = 100;
             }
@@ -2191,6 +2216,17 @@ public class SpiralApplet
             }
         }
     } // drawPixmapCentered
+
+
+    // make it like a JLabel as much as possible, but text selectable
+    private static void makeTextComponentLikeLabel(JTextComponent textComponent)
+    {
+        textComponent.setEditable(false);
+        textComponent.setDisabledTextColor(java.awt.Color.black);
+        textComponent.setBackground(null); // same as JLabel
+        textComponent.setBorder(null); // same as JLabel
+        textComponent.setEnabled(true); // otherwise not selectable
+    }
 
 
     //
