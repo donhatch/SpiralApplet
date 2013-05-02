@@ -2,7 +2,7 @@
     BUG: on assert fail in paint, displayed line number is too small by a few lines
     BUG: bad ticker anim when pixelsPerIncr = 4
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
-    TODO: gui for pixelsPerPart
+    BUG: as soon as a tooltip is shown, performance went down, forevermore??
     TODO: gui for scale
 */
 
@@ -360,14 +360,14 @@ public class SpiralApplet
                     add(new JCol() {{
                         add(new JTablePanel() {{
                             add(new JLabel("Period:"));
-                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.n, "period"));
+                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.n, "period", 1));
                             add(new JLabel(" "));
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.n) {{
                                 makeTextComponentLikeLabel(this);
                             }});
                             advanceRow();
                             add(new JLabel("Number of parts:"));
-                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.nParts, "number of parts"));
+                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.nParts, "number of parts", 1));
                             add(new JLabel(" "));
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.nParts) {{
                                 makeTextComponentLikeLabel(this);
@@ -375,7 +375,7 @@ public class SpiralApplet
                             advanceRow();
                             add(new JLabel("Random seed:"));
 
-                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.randomSeed, "seed"));
+                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.randomSeed, "seed", 1));
                             add(new JLabel(" "));
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
                                 makeTextComponentLikeLabel(this);
@@ -584,10 +584,10 @@ public class SpiralApplet
                         add(new JCol() {{
                             add(new JTablePanel() {{
                                 add(new JLabel("Anim sleep ms:"));
-                                add(new JTextFieldForNumber(applet.animSleepMS));
+                                add(makeIncrementableTextFieldForInt(applet.animSleepMS, "anim sleep ms", 1));
                                 advanceRow();
                                 add(new JLabel("Pixels per part:"));
-                                add(new JTextFieldForNumber(applet.pixelsPerPart));
+                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, "pixels per part", 2));
                             }});
                             add(new JCheckBoxForBoolean("rungs", applet.theSpiralView.showRungsFlag) {{
                                 setMargin(nomargin);
@@ -600,18 +600,23 @@ public class SpiralApplet
                 add(new JRow() {{
                     add(new JLabel("        ")); // indent a bit
                     add(new JCol() {{
-                        add(new JButton("Dump window positions and sizes") {{
-                            setMargin(nomargin);
-                            addActionListener(new java.awt.event.ActionListener() {
-                                public void actionPerformed(java.awt.event.ActionEvent e)
-                                {
-                                    System.out.println("----------------");
-                                    System.out.println("      main applet: "+applet.theMainAppletWindow.getWidth()+"x"+applet.theMainAppletWindow.getHeight()+"+"+applet.theMainAppletWindow.getX()+"+"+applet.theMainAppletWindow.getY()+"");
-                                    System.out.println("    control panel: "+applet.theControlPanelWindow.getWidth()+"x"+applet.theControlPanelWindow.getHeight()+"+"+applet.theControlPanelWindow.getX()+"+"+applet.theControlPanelWindow.getY()+"");
-                                    System.out.println("             help: "+applet.theHelpWindow.getWidth()+"x"+applet.theHelpWindow.getHeight()+"+"+applet.theHelpWindow.getX()+"+"+applet.theHelpWindow.getY()+"");
-                                    System.out.println("----------------");
-                                }
-                            });
+                        add(new JRow() {{
+                            add(new JButton("Dump window positions and sizes") {{
+                                setMargin(nomargin);
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        System.out.println("----------------");
+                                        System.out.println("      main applet: "+applet.theMainAppletWindow.getWidth()+"x"+applet.theMainAppletWindow.getHeight()+"+"+applet.theMainAppletWindow.getX()+"+"+applet.theMainAppletWindow.getY()+"");
+                                        System.out.println("    control panel: "+applet.theControlPanelWindow.getWidth()+"x"+applet.theControlPanelWindow.getHeight()+"+"+applet.theControlPanelWindow.getX()+"+"+applet.theControlPanelWindow.getY()+"");
+                                        System.out.println("             help: "+applet.theHelpWindow.getWidth()+"x"+applet.theHelpWindow.getHeight()+"+"+applet.theHelpWindow.getX()+"+"+applet.theHelpWindow.getY()+"");
+                                        System.out.println("----------------");
+                                    }
+                                });
+                            }});
+                            add(new JCheckBoxForBoolean("show timing", applet.showTimingFlag) {{
+                                setMargin(nomargin);
+                            }});
                         }});
                         add(new JRow() {{
 
@@ -713,7 +718,7 @@ public class SpiralApplet
 
                 final boolean useScrollPane = false; // can set this to true if it gets big enough to warrant it
 
-                final int preferredWidth = 300;
+                final int preferredWidth = 400;
                 final int preferredHeight = 300;
 
 
@@ -883,6 +888,27 @@ public class SpiralApplet
             graphicsAntiAliasingSetter = new GraphicsAntiAliasingSetter();
 
             theSpiralView.showRungsFlag.addListener(showRungsFlagListener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    theCanvas.repaint();
+                }
+            });
+            theSpiralView.pixelsPerPart.addListener(pixelsPerPartListener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    if (theSpiralView.pixelsPerPart.get() <= 0)
+                    {
+                        // reject!
+                        System.out.println("rejecting change to pixelsPerPart!");
+                        theSpiralView.pixelsPerPart.set(2);
+                        return; // we'll get called again
+                    }
+
+                    theSpiralView.focusQuantum = 2./theSpiralView.pixelsPerPart.get();
+                    theCanvas.repaint();
+                }
+            });
+            showTimingFlag.addListener(showTimingFlagListener = new Listenable.Listener() {
                 public void valueChanged()
                 {
                     theCanvas.repaint();
@@ -1133,12 +1159,87 @@ public class SpiralApplet
             }
 
 
+            // ring buffer of longs.
+            // O(1) operations:
+            //     size()
+            //     get()
+            //     deleteFirst()
+            //     append() (amortized)
+            private class LongRingBuffer
+            {
+                private int i0 = 0;
+                private int size = 0;
+                private long[] array = new long[1];
+
+                public int size()
+                {
+                    return size;
+                }
+                public long get(int index)
+                {
+                    if (index < 0 || index >= size)
+                        throw new IndexOutOfBoundsException("LongRingBuffer.get: "+index+" out of bounds 0.."+size+"-1");
+                    return array[(i0+index)%array.length];
+                }
+                public void append(long item)
+                {
+                    if (size == array.length)
+                    {
+                        // grow
+                        long newArray[] = new long[array.length*2];
+                        System.arraycopy(array, i0, newArray, 0, size-i0);
+                        System.arraycopy(array, 0, newArray, size-i0, i0);
+                        array = newArray;
+                        i0 = 0;
+                        // and size stays the same... now half of array.length
+                    }
+                    array[(i0+size++)%array.length] = item;
+                }
+                public void deleteFirst()
+                {
+                    if (size == 0)
+                    {
+                        throw new IndexOutOfBoundsException("LongRingBuffer.deleteFirst: buffer is empty");
+                    }
+                    i0 = (i0+1)%array.length;
+                    size--;
+                }
+            } // private class LongRingBuffer
+
+
+            // holy mother of god
+            private String formatFixedPoint(double d, int prec)
+            {
+                boolean wasNegative = false;
+                if (d < 0.)
+                {
+                    wasNegative = true;
+                    d = -d;
+                }
+                FORI (i, prec)
+                    d *= 10;
+                long l = (long)Math.round(d);
+                String answer = "";
+                FORI (i, prec)
+                {
+                    answer = l%10 + answer;
+                    l /= 10;
+                }
+                return l + "." + answer;
+            }
+
+
             // PAINT/DISPLAY/DRAW
             public void paintComponent(java.awt.Graphics g)
             {
-                if (eventVerbose >= 1) System.out.println("in paint");
-
                 java.awt.Dimension size = getSize();
+                int maxRingBufferSize = size.width + 3; // some slop
+
+                long startTime = System.currentTimeMillis();
+                while (startTimes.size() >= maxRingBufferSize) startTimes.deleteFirst();
+                startTimes.append(startTime);
+
+                if (eventVerbose >= 1) System.out.println("in paint");
 
                 double minSize = (double)MIN(size.width, size.height);
 
@@ -1166,7 +1267,6 @@ public class SpiralApplet
                            size,
                            size.width/2,
                            size.height/2,
-                           pixelsPerPart.get(),
                            theSpiralModel,
                            theSpiralView);
 
@@ -1197,35 +1297,79 @@ public class SpiralApplet
                 }
 
 
+
+
                 nPaints++;
                 g.setColor(java.awt.Color.white);
                 g.drawString(""+nPaints+" paints",
                               size.width - 75,
                               20);
+
                 g.drawString("focus: "+theSpiralView.focus,
                              10,
                              20);
 
-                // swing swaps buffers for us
 
-                if (theSpiralView.focusAnimationVelocity != 0.)
+
+                if (showTimingFlag.get())
                 {
-                    theSpiralView.focus.set(theSpiralView.focus.get() + theSpiralView.focusAnimationVelocity);
-                    theSpiralView.focus.set(fmod(theSpiralView.focus.get(), theSpiralModel.params.n.get()));
-
-                    repaint();
-
-                    if (true)
                     {
-                        try {
-                            Thread.sleep(animSleepMS.get()); // any nonzero number of milliseconds seems to be adequate to smooth it out
-                        } catch (InterruptedException e) {
+                        int frames = startTimes.size()-1;
+                        double seconds = (double)(startTimes.get(startTimes.size()-1)-startTimes.get(0)) / 1000.;
+                        if (seconds > 0.) // implies frames must be > 0 too
+                        {
+                            g.drawString("fps over "+frames+" frames: "+formatFixedPoint(frames/seconds,3),
+                                         size.width-300,
+                                         40);
+                            g.drawString("spf over "+frames+" frames: "+formatFixedPoint(seconds/frames, 3),
+                                         size.width-300,
+                                         60);
+                        }
+                    }
+                    for (int iCol = 0; iCol < size.width; ++iCol)
+                    {
+                        int x = size.width-1-iCol;
+                        int y = size.height;
+                        if (iCol < startTimes.size() && iCol < endTimes.size())
+                        {
+                            int nonPaintTime = (int)(startTimes.get(startTimes.size()-1-iCol) - endTimes.get(endTimes.size()-1-iCol));
+                            //PRINT(nonPaintTime);
+                            g.setColor(java.awt.Color.green);
+                            g.fillRect(x,y-nonPaintTime,
+                                       1,nonPaintTime);
+                            y -= nonPaintTime;
+                        }
+                        if (iCol==0)
+                        {
+                            long now = System.currentTimeMillis();
+                            int paintTimeSoFar = (int)(now-startTime);
+                            //PRINT(paintTimeSoFar);
+                            g.setColor(java.awt.Color.yellow);
+                            g.fillRect(x,y-paintTimeSoFar,
+                                       1,paintTimeSoFar);
+                        }
+                        else if (iCol <= endTimes.size() && iCol < startTimes.size())
+                        {
+                            int paintTime = (int)(endTimes.get(endTimes.size()-iCol) - startTimes.get(startTimes.size()-1-iCol));
+                            //PRINT(paintTime);
+                            g.setColor(java.awt.Color.red);
+                            g.fillRect(x,y-paintTime,
+                                       1,paintTime);
                         }
                     }
                 }
 
+                // swing swaps buffers for us
+
                 if (eventVerbose >= 1) System.out.println("out paint");
+
+                long endTime = System.currentTimeMillis();
+                while (endTimes.size() >= maxRingBufferSize) endTimes.deleteFirst();
+                endTimes.append(endTime);
             } // paint
+
+            public LongRingBuffer startTimes = new LongRingBuffer();
+            public LongRingBuffer endTimes = new LongRingBuffer();
 
         } // class TheCanvas
 
@@ -1445,15 +1589,16 @@ public class SpiralApplet
         public static class SpiralView
         {
             public Listenable.Double focus = new Listenable.Double(0.,0., 0.); // modulo spiralModel.params.n
+            public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // must be multiple of 2 for smooth scrolling
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
             public double focusQuantum;
-            public double focusAnimationVelocity;
+            public Listenable.Double focusAnimationVelocity = new Listenable.Double(0., 0., 0.);
             public SpiralView(double focus, boolean showRungsFlag, double focusQuantum)
             {
                 this.focus.set(focus);
                 this.showRungsFlag.set(showRungsFlag);
                 this.focusQuantum = focusQuantum;
-                this.focusAnimationVelocity = 0.;
+                this.focusAnimationVelocity.set(0.);
             }
         }; // public class SpiralView
 
@@ -1461,13 +1606,14 @@ public class SpiralApplet
         public void drawTicker(java.awt.Graphics g,
                                java.awt.Dimension gsize,
                                int gCenterX, int gCenterY, // between pixels
-                               int pixelsPerPart,
                                SpiralModel spiralModel,
                                SpiralView spiralView)
         {
             //System.out.println("    in drawTicker");
             int n = spiralModel.params.n.get();
+            int pixelsPerPart = spiralView.pixelsPerPart.get();
 
+            //assert(pixelsPerPart > 0); // we can actually handle this now, but other parts of the app can't
             assert(pixelsPerPart % 2 == 0); // doesn't work otherwise
 
             // the two indices bounding
@@ -1541,63 +1687,66 @@ public class SpiralApplet
                 x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val0+.5)*pixelsPerPart/2-.5);
             }
 
-            g.setColor(new java.awt.Color(128,128,255)); // light blue
+            if (pixelsPerPart > 0)
             {
-                int prevX = x0;
-                int prevY = y0;
-                int prevVal = spiralModel.theList[i0];
-                for (int i = (i0+1)%n; ; i = (i+1)%n)
+                g.setColor(new java.awt.Color(128,128,255)); // light blue
                 {
-                    int thisVal = spiralModel.theList[i];
-                    int thisX, thisY;
-                    if (thisVal > prevVal)
+                    int prevX = x0;
+                    int prevY = y0;
+                    int prevVal = spiralModel.theList[i0];
+                    for (int i = (i0+1)%n; ; i = (i+1)%n)
                     {
-                        // vertical seg upwards
-                        thisX = prevX;
-                        thisY = prevY - (thisVal-prevVal) * pixelsPerPart;
+                        int thisVal = spiralModel.theList[i];
+                        int thisX, thisY;
+                        if (thisVal > prevVal)
+                        {
+                            // vertical seg upwards
+                            thisX = prevX;
+                            thisY = prevY - (thisVal-prevVal) * pixelsPerPart;
+                        }
+                        else
+                        {
+                            // horizonal seg to right
+                            thisY = prevY;
+                            thisX = prevX + (prevVal-thisVal) * pixelsPerPart;
+                        }
+                        g.drawLine(prevX,prevY,thisX,thisY);
+                        if (thisX >= gsize.width || thisY < 0)
+                            break;
+                        prevVal = thisVal;
+                        prevX = thisX;
+                        prevY = thisY;
                     }
-                    else
-                    {
-                        // horizonal seg to right
-                        thisY = prevY;
-                        thisX = prevX + (prevVal-thisVal) * pixelsPerPart;
-                    }
-                    g.drawLine(prevX,prevY,thisX,thisY);
-                    if (thisX >= gsize.width || thisY < 0)
-                        break;
-                    prevVal = thisVal;
-                    prevX = thisX;
-                    prevY = thisY;
                 }
-            }
 
-            g.setColor(new java.awt.Color(128,255,128)); // light green
-            {
-                int prevX = x0;
-                int prevY = y0;
-                int prevVal = spiralModel.theList[i0];
-                for (int i = MOD(i0-1,n); ; i = MOD(i-1,n))
+                g.setColor(new java.awt.Color(128,255,128)); // light green
                 {
-                    int thisVal = spiralModel.theList[i];
-                    int thisX, thisY;
-                    if (thisVal < prevVal)
+                    int prevX = x0;
+                    int prevY = y0;
+                    int prevVal = spiralModel.theList[i0];
+                    for (int i = MOD(i0-1,n); ; i = MOD(i-1,n))
                     {
-                        // vertical seg downwards
-                        thisX = prevX;
-                        thisY = prevY + (prevVal-thisVal) * pixelsPerPart;
+                        int thisVal = spiralModel.theList[i];
+                        int thisX, thisY;
+                        if (thisVal < prevVal)
+                        {
+                            // vertical seg downwards
+                            thisX = prevX;
+                            thisY = prevY + (prevVal-thisVal) * pixelsPerPart;
+                        }
+                        else
+                        {
+                            // horizonal seg to left
+                            thisY = prevY;
+                            thisX = prevX - (thisVal-prevVal) * pixelsPerPart;
+                        }
+                        g.drawLine(prevX,prevY,thisX,thisY);
+                        if (thisX < 0 || thisY >= gsize.height)
+                            break;
+                        prevVal = thisVal;
+                        prevX = thisX;
+                        prevY = thisY;
                     }
-                    else
-                    {
-                        // horizonal seg to left
-                        thisY = prevY;
-                        thisX = prevX - (thisVal-prevVal) * pixelsPerPart;
-                    }
-                    g.drawLine(prevX,prevY,thisX,thisY);
-                    if (thisX < 0 || thisY >= gsize.height)
-                        break;
-                    prevVal = thisVal;
-                    prevX = thisX;
-                    prevY = thisY;
                 }
             }
 
@@ -1929,32 +2078,88 @@ public class SpiralApplet
 
         private void accelBackward()
         {
-            theSpiralView.focusAnimationVelocity -= theSpiralView.focusQuantum;
-            theCanvas.repaint();
+            boolean startAnimationFlag = theSpiralView.focusAnimationVelocity.get() == 0;
+            theSpiralView.focusAnimationVelocity.set(theSpiralView.focusAnimationVelocity.get() - theSpiralView.focusQuantum);
+            if (startAnimationFlag)
+                startTheAnimation();
         }
         private void stepBackward()
         {
-            theSpiralView.focusAnimationVelocity = 0.;
+            theSpiralView.focusAnimationVelocity.set(0.);
             theSpiralView.focus.set(theSpiralView.focus.get() - theSpiralView.focusQuantum);
             theSpiralView.focus.set(fmod(theSpiralView.focus.get(), theSpiralModel.params.n.get()));
             theCanvas.repaint();
         }
         private void pause()
         {
-            theSpiralView.focusAnimationVelocity = 0.;
+            theSpiralView.focusAnimationVelocity.set(0.);
             theCanvas.repaint();
         }
         private void stepForward()
         {
-            theSpiralView.focusAnimationVelocity = 0.;
+            theSpiralView.focusAnimationVelocity.set(0.);
             theSpiralView.focus.set(theSpiralView.focus.get() + theSpiralView.focusQuantum);
             theSpiralView.focus.set(fmod(theSpiralView.focus.get(), theSpiralModel.params.n.get()));
             theCanvas.repaint();
         }
         private void accelForward()
         {
-            theSpiralView.focusAnimationVelocity += theSpiralView.focusQuantum;
-            theCanvas.repaint();
+            boolean startAnimationFlag = theSpiralView.focusAnimationVelocity.get() == 0;
+            theSpiralView.focusAnimationVelocity.set(theSpiralView.focusAnimationVelocity.get() + theSpiralView.focusQuantum);
+            if (startAnimationFlag)
+                startTheAnimation();
+        }
+
+        // actually this should probably be in a listener on focusAnimationVelocity
+        // I probably have the thread-safety all wrong too
+        // but then again I probably have it wrong for paint as well...
+        // XXX paint really needs to take a synchronized snapshot of everything it needs, I think...
+        // and, acquire a lock on the big things that don't change often but that are too expensive to snapshot
+        // (the model).
+        private void startTheAnimation()
+        {
+            if (theSpiralView.focusAnimationVelocity.get() != 0)
+            {
+                Runnable runnable = new Runnable() {
+                    public void run()
+                    {
+                        System.out.println("starting animator thread");
+                        while (true) // while (theSpiralView.focusAnimationVelocity.get()!=0, but synchronized
+                        {
+                            // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
+                            double focusAnimationVelocitySnapshot;
+                            synchronized(theSpiralView.focusAnimationVelocity)
+                            {
+                                focusAnimationVelocitySnapshot = theSpiralView.focusAnimationVelocity.get();
+                            }
+                            if (focusAnimationVelocitySnapshot == 0.)
+                                break;
+
+                            synchronized(theSpiralView.focus)
+                            {
+                                theSpiralView.focus.set(
+                                    fmod(theSpiralView.focus.get() + focusAnimationVelocitySnapshot,
+                                         theSpiralModel.params.n.get()));
+                            }
+
+                            theCanvas.repaint();
+                            if (animSleepMS.get() >= 0)
+                            {
+                                try {
+                                    Thread.sleep(animSleepMS.get());
+                                } catch (InterruptedException e) {
+                                    break;
+                                }
+                            }
+                        }
+                        System.out.println("terminating animator thread");
+                        // XXX TODO: does master thread need to join?
+                    }
+                };
+                Thread animatorThread = new Thread(runnable);
+                animatorThread.setDaemon(true); // make it so the java vm won't wait for it to finish before exiting
+                animatorThread.start();
+            }
         }
 
 
@@ -1973,6 +2178,7 @@ public class SpiralApplet
         public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
 #endif
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 1);
+        public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
 
 
         private java.awt.Component theCanvas = null;
@@ -1983,6 +2189,8 @@ public class SpiralApplet
         private Listenable.String windowTitle = new Listenable.String("Spiral Applet");
 
         private Listenable.Listener showRungsFlagListener = null;
+        private Listenable.Listener pixelsPerPartListener = null;
+        private Listenable.Listener showTimingFlagListener = null;
 
 
     //
@@ -2278,7 +2486,7 @@ public class SpiralApplet
         textComponent.setEnabled(true); // otherwise not selectable
     }
 
-    static JRow makeIncrementableTextFieldForInt(final Listenable.Int f, final String name)
+    static JRow makeIncrementableTextFieldForInt(final Listenable.Int f, final String name, final int increment)
     {
         final java.awt.Color asciiToColor[] = new java.awt.Color[128];
         asciiToColor[' '] = null;
@@ -2299,7 +2507,7 @@ public class SpiralApplet
                 addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
-                        f.set(f.get()-1);
+                        f.set(f.get()-increment);
                     }
                 });
                 setToolTipText("<html>decrement "+name+"</html>");
@@ -2322,7 +2530,7 @@ public class SpiralApplet
                 addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
-                        f.set(f.get()+1);
+                        f.set(f.get()+increment);
                     }
                 });
                 setToolTipText("<html>increment "+name+"</html>");
@@ -2390,7 +2598,6 @@ public class SpiralApplet
 
         frame.setLocation(10, 10);
         frame.setSize(600,600);
-        frame.setSize(300,300);
 
         frame.setVisible(true);
 
