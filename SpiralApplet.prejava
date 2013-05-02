@@ -1,9 +1,9 @@
 /*
     BUG: on assert fail in paint, displayed line number is too small by a few lines
     BUG: bad ticker anim when pixelsPerIncr = 4
+    BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     TODO: gui for pixelsPerPart
     TODO: gui for scale
-    TODO: rungs
 */
 
 #include "macros.h"
@@ -581,12 +581,17 @@ public class SpiralApplet
                             }});
                         }});
                         add(new JLabel("    "));
-                        add(new JTablePanel() {{
-                            add(new JLabel("Anim sleep ms:"));
-                            add(new JTextFieldForNumber(applet.animSleepMS));
-                            advanceRow();
-                            add(new JLabel("Pixels per part:"));
-                            add(new JTextFieldForNumber(applet.pixelsPerPart));
+                        add(new JCol() {{
+                            add(new JTablePanel() {{
+                                add(new JLabel("Anim sleep ms:"));
+                                add(new JTextFieldForNumber(applet.animSleepMS));
+                                advanceRow();
+                                add(new JLabel("Pixels per part:"));
+                                add(new JTextFieldForNumber(applet.pixelsPerPart));
+                            }});
+                            add(new JCheckBoxForBoolean("rungs", applet.theSpiralView.showRungsFlag) {{
+                                setMargin(nomargin);
+                            }});
                         }});
                     }});
                 }});
@@ -877,6 +882,13 @@ public class SpiralApplet
 
             graphicsAntiAliasingSetter = new GraphicsAntiAliasingSetter();
 
+            theSpiralView.showRungsFlag.addListener(showRungsFlagListener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    theCanvas.repaint();
+                }
+            });
+
             if (eventVerbose >= 1) System.out.println("out init");
         } // init
 
@@ -1158,24 +1170,29 @@ public class SpiralApplet
                            theSpiralModel,
                            theSpiralView);
 
+                double scale = .5; // TODO: gui hook for this
                 if (true)
                 {
                     // draw dual spiral
                     drawSpiral(mg,
+                               scale,
                                theSpiralModel,
                                theSpiralView,
                                false, // drawPrimalFlag
                                true, // drawDualFlag
+                               false, // drawRungsFlag
                                antiAliasingFlag);
                 }
                 if (true)
                 {
                     // draw primal spiral
                     drawSpiral(mg,
+                               scale,
                                theSpiralModel,
                                theSpiralView,
                                true, // drawPrimalFlag
                                false, // drawDualFlag
+                               theSpiralView.showRungsFlag.get(), // drawRungsFlag
                                antiAliasingFlag);
                 }
 
@@ -1428,11 +1445,13 @@ public class SpiralApplet
         public static class SpiralView
         {
             public Listenable.Double focus = new Listenable.Double(0.,0., 0.); // modulo spiralModel.params.n
+            public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
             public double focusQuantum;
             public double focusAnimationVelocity;
-            public SpiralView(double focus, double focusQuantum)
+            public SpiralView(double focus, boolean showRungsFlag, double focusQuantum)
             {
                 this.focus.set(focus);
+                this.showRungsFlag.set(showRungsFlag);
                 this.focusQuantum = focusQuantum;
                 this.focusAnimationVelocity = 0.;
             }
@@ -1587,21 +1606,22 @@ public class SpiralApplet
 
         // Exacly one of drawPrimalFlag and drawDualFlag must be true
         public void drawSpiral(MyGraphics mg,
+                               double scale,
                                SpiralModel spiralModel,
                                SpiralView spiralView,
                                boolean drawPrimalFlag,
                                boolean drawDualFlag,
+                               boolean drawRungsFlag,
                                boolean antiAliasFlag)
         {
-            int debugLevel = 0;
-            // draw exactly one of primal and dual at a time
-            assert(drawPrimalFlag != drawDualFlag);
-            if (debugLevel >= 1) System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
+            int debugLevel = 0; // 1 = global, 2 = and some per-increment
 
-            if (drawPrimalFlag)
-                mg.setColor(new java.awt.Color(128,128,255)); // light blue
-            else
-                mg.setColor(java.awt.Color.white);
+            // have to be drawing something
+            assert(drawPrimalFlag || drawDualFlag || drawRungsFlag);
+            // don't draw primal and dual at same time
+            assert(!drawPrimalFlag || !drawDualFlag);
+
+            if (debugLevel >= 1) System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal":"")+(drawDualFlag?"dual":"")+(drawRungsFlag?",rungs":""));
 
             int n = spiralModel.params.n.get();
             int nParts = spiralModel.params.nParts.get();
@@ -1640,11 +1660,11 @@ public class SpiralApplet
                 PRINT(val);
             }
 
-            double scale = .5;
-
             java.awt.Color gray128 = new java.awt.Color(128,128,128);
             java.awt.Color gray64 = new java.awt.Color(64,64,64);
             java.awt.Color gray32 = new java.awt.Color(32,32,32);
+            java.awt.Color pink = new java.awt.Color(255,128,128);
+            java.awt.Color dimPink = new java.awt.Color(128,64,64);
 
             // scanDir=1: the part *after* (bigger than) the focus.
             // scanDir=-1: the part *before* (smaller than) the focus.
@@ -1774,6 +1794,17 @@ public class SpiralApplet
                                     break;
                             }
                         }
+                        if (drawRungsFlag &&
+                            prevPrevVal != prevVal &&
+                            (thisVal>prevVal != (prevVal>prevPrevVal)))
+                        {
+                            java.awt.Color savedColor = mg.getColor();
+                            mg.setColor(dimPink);
+                            mg.drawLine(primalX, primalY,
+                                        dualX, dualY,
+                                        antiAliasFlag);
+                            mg.setColor(savedColor);
+                        }
 
                         primalAng = nextPrimalAng;
                         primalR = nextPrimalR;
@@ -1837,6 +1868,17 @@ public class SpiralApplet
                                     break;
                             }
                         }
+                        if (drawRungsFlag &&
+                            (prevVal!=prevPrevVal &&
+                            (thisVal>prevVal != (prevVal>prevPrevVal))))
+                        {
+                            java.awt.Color savedColor = mg.getColor();
+                            mg.setColor(dimPink);
+                            mg.drawLine(primalX, primalY,
+                                        dualX, dualY,
+                                        antiAliasFlag);
+                            mg.setColor(savedColor);
+                        }
 
                         if (scanDir < 0)
                         {
@@ -1881,7 +1923,7 @@ public class SpiralApplet
                 }
 
             } // for iScanDir
-            if (debugLevel >= 1) System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
+            if (debugLevel >= 1) System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal":"")+(drawDualFlag?"dual":"")+(drawRungsFlag?",rungs":""));
         } // drawSpiral
 
 
@@ -1925,6 +1967,7 @@ public class SpiralApplet
         public SpiralModel.Params spiralModelParams = new SpiralModel.Params(); // gui copy, flushed to model when Regenerate button pressed
         public SpiralModel theSpiralModel = new SpiralModel();
         public SpiralView theSpiralView = new SpiralView(0., // initial focus
+                                                         false, // showRungsFlag
                                                          2./pixelsPerPart.get()); // focusQuantum, so it moves 2 pixels per time step
 #if 0
         public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
@@ -1938,6 +1981,8 @@ public class SpiralApplet
         private JFrame theControlPanelWindow = null;
         private JFrame theHelpWindow = null;
         private Listenable.String windowTitle = new Listenable.String("Spiral Applet");
+
+        private Listenable.Listener showRungsFlagListener = null;
 
 
     //
