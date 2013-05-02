@@ -331,6 +331,7 @@ public class SpiralApplet
                 asciiToColor['b'] = java.awt.Color.black;
 
 
+                /*
                 contentPane.add(new JSeparator(), stretchx);
                 contentPane.add(new JLabel("File/Edit"));
                 add(new JRow() {{
@@ -339,6 +340,7 @@ public class SpiralApplet
                         // ...
                     }});
                 }});
+                */
                 contentPane.add(new JSeparator(), stretchx);
                 contentPane.add(new JLabel("Model"));
                 add(new JRow() {{
@@ -698,18 +700,31 @@ public class SpiralApplet
                 // since the default is HIDE_ON_CLOSE which is what we want
 
 
+                final boolean useScrollPane = false; // can set this to true if it gets big enough to warrant it
+
                 final int preferredWidth = 300;
                 final int preferredHeight = 300;
-                theControlPanelWindow.getContentPane().add(new JScrollPane(new SpiralAppletControlPanel(this) {
+
+
+                java.awt.Component controlPanel = new SpiralAppletControlPanel(this) {
                     public java.awt.Dimension getPreferredSize()
                     {
-                        return new java.awt.Dimension(preferredWidth, preferredHeight);
+                        if (useScrollPane)
+                            return new java.awt.Dimension(preferredWidth, preferredHeight);
+                        else
+                            return super.getPreferredSize();
                     }
                     public java.awt.Dimension getMinimumSize()
                     {
-                        return getPreferredSize();
+                        if (useScrollPane)
+                            return new java.awt.Dimension(preferredWidth, preferredHeight);
+                        else
+                            return super.getMinimumSize();
                     }
-                }));
+                };
+                if (useScrollPane)
+                    controlPanel = new JScrollPane(controlPanel);
+                theControlPanelWindow.getContentPane().add(controlPanel);
 
                 theControlPanelWindow.setLocation(730, 10);
                 theControlPanelWindow.setSize(preferredWidth+34, preferredHeight); // empirical-- will be wrong on another machine, no doubt XXX TODO: can we compute a good preferred size? pack() or something? just want to pack width, not height, I think?
