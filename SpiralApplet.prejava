@@ -942,7 +942,7 @@ public class SpiralApplet
                     theCanvas.repaint();
                 }
             });
-            showFocusInControlPanelFlag.addListener(showNonTimingFlagListener = new Listenable.Listener() {
+            showFocusInControlPanelFlag.addListener(showFocusInControlPanelListener = new Listenable.Listener() {
                 public void valueChanged()
                 {
                     focusInControlPanelRow.setVisible(showFocusInControlPanelFlag.get());
@@ -1222,6 +1222,10 @@ public class SpiralApplet
             }
 
 
+            double lastStartTimePrinted = 0.;
+            int lastNPaintsPrinted = 0;
+
+
             // PAINT/DISPLAY/DRAW
             public void paintComponent(java.awt.Graphics g)
             {
@@ -1234,6 +1238,25 @@ public class SpiralApplet
                 startTimes.append(startTime);
 
                 if (eventVerbose >= 1) System.out.println("in paint");
+
+
+                if (true) // XXX maybe debug control for this
+                {
+                    // Try to print out an idea of how frequent the lapses in vsync
+                    // are happening
+                    int sampleSize = 10;
+                    if (startTimes.size() >= sampleSize+1
+                     && nPaints >= lastNPaintsPrinted + 100
+                     && (startTimes.get(startTimes.size()-1)-startTimes.get(startTimes.size()-1-sampleSize))/sampleSize < .01666*3/4.)
+                    {
+                        if (lastStartTimePrinted == 0.)
+                            System.out.println("Hey! low frame time");
+                        else
+                            System.out.println("Hey! low frame time after "+(startTime-lastStartTimePrinted)+" secs");
+                        lastNPaintsPrinted = nPaints;
+                        lastStartTimePrinted = startTime;
+                    }
+                }
 
                 // TODO: need to synchronize this I think
                 theSpiralView.focus.set(
