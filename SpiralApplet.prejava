@@ -2136,7 +2136,6 @@ public class SpiralApplet
                 startTheAnimation();
         }
 
-        // XXX use javax.swing.Timer!
         // actually this should probably be in a listener on focusAnimationVelocity
         // I probably have the thread-safety all wrong too
         // but then again I probably have it wrong for paint as well...
@@ -2149,6 +2148,7 @@ public class SpiralApplet
             System.out.println("in startTheAnimation");
             if (theTimer == null)
             {
+                System.out.println("    creating timer");
                 theTimer = new javax.swing.Timer(animSleepMS.get(), new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         //System.out.println("in timer action");
@@ -2161,6 +2161,7 @@ public class SpiralApplet
                         }
                         if (focusAnimationVelocitySnapshot == 0.)
                         {
+                            System.out.println("    stopping timer");
                             theTimer.stop();
                         }
 
@@ -2170,6 +2171,7 @@ public class SpiralApplet
                     }
                 });
             }
+            System.out.println("    starting timer");
             theTimer.start();
             System.out.println("out startTheAnimation");
         }
