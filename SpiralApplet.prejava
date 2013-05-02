@@ -432,9 +432,11 @@ public class SpiralApplet
                         add(new JLabel("Anim sleep ms:"));
                         add(new JTextFieldForNumber(applet.animSleepMS));
                         advanceRow();
+#if 0
                         add(new JLabel("Anim speed:"));
                         add(new JTextFieldForNumber(applet.animSpeed));
                         advanceRow();
+#endif
                         add(new JLabel("Pixels per part:"));
                         add(new JTextFieldForNumber(applet.pixelsPerPart));
                     }});
@@ -1697,7 +1699,9 @@ public class SpiralApplet
         public SpiralModel theSpiralModel = new SpiralModel();
         public SpiralView theSpiralView = new SpiralView(0., // initial focus
                                                          2./pixelsPerPart.get()); // focusQuantum, so it moves 2 pixels per time step
+#if 0
         public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
+#endif
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 1);
 
 
