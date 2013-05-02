@@ -356,14 +356,24 @@ public class SpiralApplet
                     add(new JCol() {{
                         add(new JTablePanel() {{
                             add(new JLabel("Period:"));
-                            add(new JTextFieldForNumber(applet.spiralModelParams.n));
+                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.n, "period"));
+                            add(new JLabel(" "));
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.n) {{
                                 makeTextComponentLikeLabel(this);
                             }});
                             advanceRow();
                             add(new JLabel("Number of parts:"));
-                            add(new JTextFieldForNumber(applet.spiralModelParams.nParts));
+                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.nParts, "number of parts"));
+                            add(new JLabel(" "));
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.nParts) {{
+                                makeTextComponentLikeLabel(this);
+                            }});
+                            advanceRow();
+                            add(new JLabel("Random seed:"));
+
+                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.randomSeed, "seed"));
+                            add(new JLabel(" "));
+                            add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
                                 makeTextComponentLikeLabel(this);
                             }});
                         }});
@@ -393,57 +403,6 @@ public class SpiralApplet
                                         // no need to repaint
                                     }
                                 });
-                            }});
-                        }});
-                        add(new JRow() {{
-                            add(new JLabel("Random seed:"));
-                            add(new JButton("") {
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
-                                public void paint(java.awt.Graphics g)
-                                {
-                                    super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
-                                                       new String[] {
-                                                          "bbb bbb",
-                                                       });
-                                }
-                            {
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
-                                    {
-                                        applet.spiralModelParams.randomSeed.set(applet.spiralModelParams.randomSeed.get()-1);
-                                        applet.theCanvas.repaint();
-                                    }
-                                });
-                                setToolTipText("<html>decrement seed</html>");
-                            }});
-                            add(new JTextFieldForNumber(applet.spiralModelParams.randomSeed));
-                            add(new JButton("") {
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
-                                public void paint(java.awt.Graphics g)
-                                {
-                                    super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
-                                                       new String[] {
-                                                          " b   b ",
-                                                          "bbb bbb",
-                                                          " b   b ",
-                                                       });
-                                }
-                            {
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
-                                    {
-                                        applet.spiralModelParams.randomSeed.set(applet.spiralModelParams.randomSeed.get()+1);
-                                        applet.theCanvas.repaint();
-                                    }
-                                });
-                                setToolTipText("<html>increment seed</html>");
-                            }});
-                            add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
-                                makeTextComponentLikeLabel(this);
                             }});
                         }});
 
@@ -2055,7 +2014,10 @@ public class SpiralApplet
                 if (f instanceof Listenable.Int)
                     preferredSize.width = 55; // big enough to hold 1,000,000 comfortably-- bleah
                 else
-                    preferredSize.width = 100;
+                {
+                    //preferredSize.width = 100;
+                    preferredSize.width = 55; // for this app, this is plenty
+                }
             }
 
             //System.out.println("out JTextFieldForNumber.getPreferredSize(), returning "+preferredSize);
@@ -2227,6 +2189,58 @@ public class SpiralApplet
         textComponent.setBorder(null); // same as JLabel
         textComponent.setEnabled(true); // otherwise not selectable
     }
+
+    static JRow makeIncrementableTextFieldForInt(final Listenable.Int f, final String name)
+    {
+        final java.awt.Color asciiToColor[] = new java.awt.Color[128];
+        asciiToColor[' '] = null;
+        asciiToColor['b'] = java.awt.Color.black;
+        return new JRow() {{
+            add(new JRepeatingButton("") {
+                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
+                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
+                public void paint(java.awt.Graphics g)
+                {
+                    super.paint(g);
+                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                       new String[] {
+                                          "bbb bbb",
+                                       });
+                }
+            {
+                addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    {
+                        f.set(f.get()-1);
+                    }
+                });
+                setToolTipText("<html>decrement "+name+"</html>");
+            }});
+            add(new JTextFieldForNumber(f));
+            add(new JRepeatingButton("") {
+                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
+                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
+                public void paint(java.awt.Graphics g)
+                {
+                    super.paint(g);
+                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                       new String[] {
+                                          " b   b ",
+                                          "bbb bbb",
+                                          " b   b ",
+                                       });
+                }
+            {
+                addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    {
+                        f.set(f.get()+1);
+                    }
+                });
+                setToolTipText("<html>increment "+name+"</html>");
+            }});
+        }};
+    } // makeIncrementableTextFieldForNumber
 
 
     //
