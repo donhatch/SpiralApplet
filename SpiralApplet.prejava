@@ -389,8 +389,18 @@ public class SpiralApplet
                         }});
                         add(new JRow() {{
                             add(new JLabel("Random seed:"));
-                            add(new JButton("<html><code>--</code></html>") {{
-                                setMargin(nomargin);
+                            add(new JButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "bbb bbb",
+                                                       });
+                                }
+                            {
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
@@ -401,8 +411,20 @@ public class SpiralApplet
                                 setToolTipText("<html>decrement seed</html>");
                             }});
                             add(new JTextFieldForNumber(applet.spiralModelParams.randomSeed));
-                            add(new JButton("<html><code>++</code></html>") {{
-                                setMargin(nomargin);
+                            add(new JButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          " b   b ",
+                                                          "bbb bbb",
+                                                          " b   b ",
+                                                       });
+                                }
+                            {
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
@@ -973,7 +995,8 @@ public class SpiralApplet
             {
                 if (eventVerbose >= 1) System.out.println("in mouseEntered: "+e);
                 // steal keyboard focus!
-                requestFocus(); // hey it works! (javac 1.3, runtime 1.6)
+                //System.out.println("Requesting focus!");
+                requestFocus(); // hey it works! (javac 1.3, runtime 1.6)  XXX what does "it works" mean?
                 if (eventVerbose >= 1) System.out.println("out mouseEntered: "+e);
             }
             public void mouseExited(java.awt.event.MouseEvent e)
@@ -2156,13 +2179,15 @@ public class SpiralApplet
             {
                 char c = row.charAt(iCol);
                 java.awt.Color color = asciiToColor[c];
-                if (color != prevColor)
-                {
-                    g.setColor(color);
-                    prevColor = color;
-                }
                 if (color != null)
+                {
+                    if (color != prevColor)
+                    {
+                        g.setColor(color);
+                        prevColor = color;
+                    }
                     g.fillRect(x0+iCol, y0+iRow, 1, 1);
+                }
             }
         }
     } // drawPixmapCentered
