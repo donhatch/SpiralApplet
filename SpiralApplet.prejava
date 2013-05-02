@@ -454,13 +454,14 @@ public class SpiralApplet
                                         }
                                     });
                                 }}, centerjustify);
-                                if (true)
-                                {
-                                    add(new JLabel(" focus: "));
-                                    add(new JTextFieldForNumber(applet.theSpiralView.focus){{
-                                        makeTextComponentLikeLabel(this);
+
+                                if (true) // can make it visible/invisible on the fly with the "show focus in control panel" debug checkbox
+                                    add(applet.focusInControlPanelRow = new JRow() {{
+                                        add(new JLabel(" focus: "));
+                                        add(new JTextFieldForNumber(applet.theSpiralView.focus){{
+                                            makeTextComponentLikeLabel(this);
+                                        }});
                                     }});
-                                }
                             }});
                             add(new JRow() {{
                                 add(new JRepeatingButton("") {
@@ -615,6 +616,15 @@ public class SpiralApplet
                 add(new JRow() {{
                     add(new JLabel("        ")); // indent a bit
                     add(new JCol() {{
+                        add(new JCheckBoxForBoolean("show timing", applet.showTimingFlag) {{
+                            setMargin(nomargin);
+                        }});
+                        add(new JCheckBoxForBoolean("show model", applet.showNonTimingFlag) {{
+                            setMargin(nomargin);
+                        }});
+                        add(new JCheckBoxForBoolean("show focus in control panel", applet.showFocusInControlPanelFlag) {{
+                            setMargin(nomargin);
+                        }});
                         add(new JRow() {{
                             add(new JButton("Dump window positions and sizes") {{
                                 setMargin(nomargin);
@@ -628,9 +638,6 @@ public class SpiralApplet
                                         System.out.println("----------------");
                                     }
                                 });
-                            }});
-                            add(new JCheckBoxForBoolean("show timing", applet.showTimingFlag) {{
-                                setMargin(nomargin);
                             }});
                         }});
                         add(new JRow() {{
@@ -733,8 +740,8 @@ public class SpiralApplet
 
                 final boolean useScrollPane = false; // can set this to true if it gets big enough to warrant it
 
-                final int preferredWidth = 300;
-                final int preferredHeight = 300;
+                final int preferredWidth = 600; // XXX big enough so tooltip doesn't spill out, since that causes perf problems forevermore
+                final int preferredHeight = 400;
 
 
                 java.awt.Component controlPanel = new SpiralAppletControlPanel(this) {
@@ -926,6 +933,19 @@ public class SpiralApplet
             showTimingFlag.addListener(showTimingFlagListener = new Listenable.Listener() {
                 public void valueChanged()
                 {
+                    theCanvas.repaint();
+                }
+            });
+            showNonTimingFlag.addListener(showNonTimingFlagListener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    theCanvas.repaint();
+                }
+            });
+            showFocusInControlPanelFlag.addListener(showNonTimingFlagListener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    focusInControlPanelRow.setVisible(showFocusInControlPanelFlag.get());
                     theCanvas.repaint();
                 }
             });
@@ -1209,7 +1229,7 @@ public class SpiralApplet
                 java.awt.Dimension size = getSize();
                 int maxRingBufferSize = size.width + 3; // some slop
 
-                double startTime = timeMillis();
+                double startTime = timeSeconds();
                 while (startTimes.size() >= maxRingBufferSize) startTimes.deleteFirst();
                 startTimes.append(startTime);
 
@@ -1258,7 +1278,7 @@ public class SpiralApplet
                     }
                 }
 
-                if (true) // set to false to get timing for just clearing and showing stats
+                if (showNonTimingFlag.get())
                 {
                     drawTicker(g,
                                size,
@@ -1322,19 +1342,19 @@ public class SpiralApplet
                                 //PRINT(nonPaintTime);
                                 assert(nonPaintTime >= 0.);
                                 g.setColor(java.awt.Color.green);
-                                int barHeight = (int)(nonPaintTime*pixelsPerMilli);
+                                int barHeight = (int)(nonPaintTime*(1000.*pixelsPerMilli));
                                 g.fillRect(x,y-barHeight,
                                            1,barHeight);
                                 y -= barHeight;
                             }
                             if (iCol==0)
                             {
-                                double now = timeMillis();
+                                double now = timeSeconds();
                                 double paintTimeSoFar = now-startTime;
                                 assert(paintTimeSoFar >= 0.);
                                 //PRINT(paintTimeSoFar);
                                 g.setColor(java.awt.Color.yellow);
-                                int barHeight = (int)(paintTimeSoFar*pixelsPerMilli);
+                                int barHeight = (int)(paintTimeSoFar*(1000.*pixelsPerMilli));
                                 g.fillRect(x,y-barHeight,
                                            1,barHeight);
                             }
@@ -1344,7 +1364,7 @@ public class SpiralApplet
                                 assert(paintTime >= 0.);
                                 //PRINT(paintTime);
                                 g.setColor(java.awt.Color.red);
-                                int barHeight = (int)(paintTime*pixelsPerMilli);
+                                int barHeight = (int)(paintTime*(1000.*pixelsPerMilli));
                                 g.fillRect(x,y-barHeight,
                                            1,barHeight);
                             }
@@ -1352,7 +1372,7 @@ public class SpiralApplet
                     }
                     {
                         int frames = startTimes.size()-1;
-                        double seconds = (double)(startTimes.get(startTimes.size()-1)-startTimes.get(0)) / 1000.;
+                        double seconds = (double)(startTimes.get(startTimes.size()-1)-startTimes.get(0));
                         if (seconds > 0.) // implies frames must be > 0 too
                         {
                             g.setColor(java.awt.Color.white);
@@ -1363,11 +1383,11 @@ public class SpiralApplet
                                          size.width-300,
                                          60);
                             g.setColor(java.awt.Color.red);
-                            g.drawString("red is in paintComponent",
+                            g.drawString("red is time in paintComponent",
                                          size.width-300,
                                          80);
                             g.setColor(java.awt.Color.green);
-                            g.drawString("green is outside paintComponent",
+                            g.drawString("green is time outside paintComponent",
                                          size.width-300,
                                          100);
                         }
@@ -1379,7 +1399,7 @@ public class SpiralApplet
                 if (eventVerbose >= 1) System.out.println("out paint");
 
                 while (endTimes.size() >= maxRingBufferSize) endTimes.deleteFirst();
-                double endTime = timeMillis();
+                double endTime = timeSeconds();
                 endTimes.append(endTime);
             } // paint
 
@@ -1441,15 +1461,6 @@ public class SpiralApplet
 
         public DoubleRingBuffer startTimes = new DoubleRingBuffer();
         public DoubleRingBuffer endTimes = new DoubleRingBuffer();
-
-        private double timeMillis()
-        {
-            boolean useNanoTime = true;
-            if (useNanoTime)
-                return (double)(System.nanoTime() - nanos0) / 1e6;
-            else
-                return (double)(System.currentTimeMillis() - millis0);
-        }
 
 
 
@@ -2219,11 +2230,12 @@ public class SpiralApplet
                         }
 
                         theCanvas.repaint();
-                        theTimer.setDelay(animSleepMS.get()); // in case it changed
+                        int animSleepMSvalue = animSleepMS.get();
+                        theTimer.setDelay(MAX(animSleepMSvalue, 0)); // in case it changed
 
                         if (false) // can set this to true to make the timing graph show time between firings
                         {
-                            double now = timeMillis();
+                            double now = timeSeconds();
                             startTimes.set(startTimes.size()-1, now);
                             endTimes.set(endTimes.size()-1, now);
                         }
@@ -2253,6 +2265,9 @@ public class SpiralApplet
 #endif
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 11); // 11 seems to be empirical sweet spot... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showNonTimingFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showFocusInControlPanelFlag = new Listenable.Boolean(true);
+        public JRow focusInControlPanelRow = null;
 
 
         private java.awt.Component theCanvas = null;
@@ -2265,6 +2280,8 @@ public class SpiralApplet
         private Listenable.Listener showRungsFlagListener = null;
         private Listenable.Listener pixelsPerPartListener = null;
         private Listenable.Listener showTimingFlagListener = null;
+        private Listenable.Listener showNonTimingFlagListener = null;
+        private Listenable.Listener showFocusInControlPanelListener = null;
 
 
     //
@@ -2386,7 +2403,7 @@ public class SpiralApplet
                 else
                 {
                     //preferredSize.width = 100;
-                    preferredSize.width = 20; // for this app, this is plenty, although it's bogus in general
+                    preferredSize.width = 50; // for this app, this is plenty, although it's bogus in general
                 }
             }
 
@@ -2613,8 +2630,46 @@ public class SpiralApplet
     } // makeIncrementableTextFieldForNumber
 
 
+
+
+    private static java.lang.reflect.Method nanoTimeMethod = null;
+    {
+        try {
+            nanoTimeMethod = System.class.getMethod("nanoTime", new Class[]{});
+        }
+        catch (NoSuchMethodException e) {System.out.println("no such method exception!");}
+    }
+    // System.nanoTime().
+    // don't call this unless you know nanoTimeMethod != null.
+    private static long System_nanoTime()
+    {
+        try {
+            // object allocation here is a bummer.
+            // maybe better to compile using javac >= 1.4
+            // but with flag saying create class files for earlier jvm?
+            Object answer = nanoTimeMethod.invoke(null, new Object[]{});
+            return ((Long)answer).longValue();
+        }
+        catch (IllegalAccessException e) {assert(false); return 0L;}
+        catch (java.lang.reflect.InvocationTargetException e) {assert(false); return 0L;}
+    }
+
+    // Time in seconds from when we initialize the times,
+    // using System.nanoTime() if it exists (jvm >= 1.4),
+    // otherwise System.currentTimeMillis().
+    private static double timeSeconds()
+    {
+        boolean useNanoTime = (nanoTimeMethod != null);
+        if (useNanoTime)
+            return (double)(System_nanoTime() - nanos0) / 1e9;
+        else
+            return (double)(System.currentTimeMillis() - millis0) / 1e3;
+    }
+
     private static long millis0 = System.currentTimeMillis();
-    private static long nanos0 = System.nanoTime();
+    private static long nanos0 = (nanoTimeMethod!=null ? System_nanoTime() : 0L);
+
+
 
 
     //
@@ -2622,57 +2677,60 @@ public class SpiralApplet
     //
     public static void main(final String args[])
     {
-        if (false)
+        if (false) // turn this on to get a crude little timing test
         {
-            FORI (ii,100)
+            if (nanoTimeMethod != null)
             {
+                FORI (ii,100)
                 {
-                    long m0 = System.currentTimeMillis();
-                    long n0 = System.nanoTime();
-                    FORI (i, 999)
-                        System.currentTimeMillis();
-                    long m1 = System.currentTimeMillis();
-                    long n1 = System.nanoTime();
-                    System.out.println("1000 m's and 1 n: "+(m1-m0)+" m");
-                    System.out.println("1000 m's and 1 n: "+(n1-n0)+" n");
+                    {
+                        long m0 = System.currentTimeMillis();
+                        long n0 = System_nanoTime();
+                        FORI (i, 999)
+                            System.currentTimeMillis();
+                        long m1 = System.currentTimeMillis();
+                        long n1 = System_nanoTime();
+                        System.out.println("1000 m's and 1 n: "+(m1-m0)+" m");
+                        System.out.println("1000 m's and 1 n: "+(n1-n0)+" n");
+                    }
+                    {
+                        long n0 = System_nanoTime();
+                        long m0 = System.currentTimeMillis();
+                        FORI (i, 999)
+                            System.currentTimeMillis();
+                        long n1 = System_nanoTime();
+                        long m1 = System.currentTimeMillis();
+                        System.out.println("1000 m's and 1 n: "+(m1-m0)+" m");
+                        System.out.println("1000 m's and 1 n: "+(n1-n0)+" n");
+                    }
                 }
+                FORI (ii,100)
                 {
-                    long n0 = System.nanoTime();
-                    long m0 = System.currentTimeMillis();
-                    FORI (i, 999)
-                        System.currentTimeMillis();
-                    long n1 = System.nanoTime();
-                    long m1 = System.currentTimeMillis();
-                    System.out.println("1000 m's and 1 n: "+(m1-m0)+" m");
-                    System.out.println("1000 m's and 1 n: "+(n1-n0)+" n");
+                    {
+                        long m0 = System.currentTimeMillis();
+                        long n0 = System_nanoTime();
+                        FORI (i, 999)
+                            System_nanoTime();
+                        long m1 = System.currentTimeMillis();
+                        long n1 = System_nanoTime();
+                        System.out.println("1 m and 1000 n's: "+(m1-m0)+" m");
+                        System.out.println("1 m and 1000 n's: "+(n1-n0)+" n");
+                    }
+                    {
+                        long n0 = System_nanoTime();
+                        long m0 = System.currentTimeMillis();
+                        FORI (i, 999)
+                            System_nanoTime();
+                        long n1 = System_nanoTime();
+                        long m1 = System.currentTimeMillis();
+                        System.out.println("1 m and 1000 n's: "+(m1-m0)+" m");
+                        System.out.println("1 m and 1000 n's: "+(n1-n0)+" n");
+                    }
                 }
-            }
-            FORI (ii,100)
-            {
-                {
-                    long m0 = System.currentTimeMillis();
-                    long n0 = System.nanoTime();
-                    FORI (i, 999)
-                        System.nanoTime();
-                    long m1 = System.currentTimeMillis();
-                    long n1 = System.nanoTime();
-                    System.out.println("1 m and 1000 n's: "+(m1-m0)+" m");
-                    System.out.println("1 m and 1000 n's: "+(n1-n0)+" n");
-                }
-                {
-                    long n0 = System.nanoTime();
-                    long m0 = System.currentTimeMillis();
-                    FORI (i, 999)
-                        System.nanoTime();
-                    long n1 = System.nanoTime();
-                    long m1 = System.currentTimeMillis();
-                    System.out.println("1 m and 1000 n's: "+(m1-m0)+" m");
-                    System.out.println("1 m and 1000 n's: "+(n1-n0)+" n");
-                }
-            }
 
-            System.out.println();
-            System.exit(0);
+                System.out.println();
+                System.exit(0);
+            }
         }
         if (false)
         {
