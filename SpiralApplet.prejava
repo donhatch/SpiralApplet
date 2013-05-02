@@ -1,5 +1,9 @@
 /*
-    TODO: assert fail in paint, displayed line number is too small by a few lines
+    BUG: on assert fail in paint, displayed line number is too small by a few lines
+    BUG: bad ticker anim when pixelsPerIncr = 4
+    TODO: gui for pixelsPerPart
+    TODO: gui for scale
+    TODO: rungs
 */
 
 #include "macros.h"
