@@ -1344,12 +1344,21 @@ public class SpiralApplet
                         double seconds = (double)(startTimes.get(startTimes.size()-1)-startTimes.get(0)) / 1000.;
                         if (seconds > 0.) // implies frames must be > 0 too
                         {
+                            g.setColor(java.awt.Color.white);
                             g.drawString("fps over "+frames+" frames: "+formatFixedPoint(frames/seconds,3),
                                          size.width-300,
                                          40);
                             g.drawString("spf over "+frames+" frames: "+formatFixedPoint(seconds/frames, 5),
                                          size.width-300,
                                          60);
+                            g.setColor(java.awt.Color.red);
+                            g.drawString("red is in paintComponent",
+                                         size.width-300,
+                                         80);
+                            g.setColor(java.awt.Color.green);
+                            g.drawString("green is outside paintComponent",
+                                         size.width-300,
+                                         100);
                         }
                     }
                     for (int iCol = 0; iCol < size.width; ++iCol)
