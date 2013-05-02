@@ -342,20 +342,14 @@ public class SpiralApplet
                     add(new JCol() {{
                         add(new JTablePanel() {{
                             add(new JLabel("Period:"));
-                            add(new JTextFieldForNumber(applet.n));
-                            add(new JTextFieldForNumber(applet.theSpiralModel.n) {{
+                            add(new JTextFieldForNumber(applet.spiralModelParams.n));
+                            add(new JTextFieldForNumber(applet.theSpiralModel.params.n) {{
                                 setEnabled(false);
                             }});
                             advanceRow();
                             add(new JLabel("Number of parts:"));
-                            add(new JTextFieldForNumber(applet.nParts));
-                            add(new JTextFieldForNumber(applet.theSpiralModel.nParts) {{
-                                setEnabled(false);
-                            }});
-                            advanceRow();
-                            add(new JLabel("Pixels per part:"));
-                            add(new JTextFieldForNumber(applet.pixelsPerPart));
-                            add(new JTextFieldForNumber(applet.theSpiralModel.pixelsPerPart) {{
+                            add(new JTextFieldForNumber(applet.spiralModelParams.nParts));
+                            add(new JTextFieldForNumber(applet.theSpiralModel.params.nParts) {{
                                 setEnabled(false);
                             }});
                         }});
@@ -363,24 +357,25 @@ public class SpiralApplet
                             private ButtonGroup buttonGroup = new ButtonGroup();
                         {
                             add(new JLabel("Delta style:"));
-                            add(new JRadioButton("<html>&plusmn;1</html>", applet.deltaStyle.get()==SpiralModel.DELTASTYLE_1) {{
+                            add(new JLabel("  "));
+                            add(new JRadioButton("<html>&plusmn;1</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_1) {{
                                 setMargin(nomargin);
                                 buttonGroup.add(this);
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
-                                        applet.deltaStyle.set(SpiralModel.DELTASTYLE_1);
+                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1);
                                         // no need to repaint
                                     }
                                 });
                             }});
-                            add(new JRadioButton("Any", applet.deltaStyle.get()==SpiralModel.DELTASTYLE_ANY) {{
+                            add(new JRadioButton("Any", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_ANY) {{
                                 setMargin(nomargin);
                                 buttonGroup.add(this);
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
-                                        applet.deltaStyle.set(SpiralModel.DELTASTYLE_ANY);
+                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_ANY);
                                         // no need to repaint
                                     }
                                 });
@@ -393,23 +388,23 @@ public class SpiralApplet
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
-                                        applet.randomSeed.set(applet.randomSeed.get()-1);
+                                        applet.spiralModelParams.randomSeed.set(applet.spiralModelParams.randomSeed.get()-1);
                                         applet.theCanvas.repaint();
                                     }
                                 });
                             }});
-                            add(new JTextFieldForNumber(applet.randomSeed));
+                            add(new JTextFieldForNumber(applet.spiralModelParams.randomSeed));
                             add(new JButton("<html><code>++</code></html>") {{
                                 setMargin(nomargin);
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
-                                        applet.randomSeed.set(applet.randomSeed.get()+1);
+                                        applet.spiralModelParams.randomSeed.set(applet.spiralModelParams.randomSeed.get()+1);
                                         applet.theCanvas.repaint();
                                     }
                                 });
                             }});
-                            add(new JTextFieldForNumber(applet.theSpiralModel.randomSeed) {{
+                            add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
                                 setEnabled(false);
                             }});
                         }});
@@ -420,8 +415,8 @@ public class SpiralApplet
                             addActionListener(new java.awt.event.ActionListener() {
                                 public void actionPerformed(java.awt.event.ActionEvent e)
                                 {
-                                    applet.theSpiralModel.init(applet.n.get(), applet.nParts.get(), applet.deltaStyle.get(), applet.randomSeed.get());
-                                    applet.theSpiralView.focus = fmod(applet.theSpiralView.focus, applet.theSpiralModel.n.get());
+                                    applet.theSpiralModel.init(applet.spiralModelParams.n.get(), applet.spiralModelParams.nParts.get(), applet.spiralModelParams.deltaStyle.get(), applet.spiralModelParams.randomSeed.get());
+                                    applet.theSpiralView.focus = fmod(applet.theSpiralView.focus, applet.theSpiralModel.params.n.get());
 
                                     applet.theCanvas.repaint();
                                 }
@@ -433,15 +428,15 @@ public class SpiralApplet
                 contentPane.add(new JLabel("View"));
                 add(new JRow() {{
                     add(new JLabel("        ")); // indent a bit
-                    add(new JCol() {{
-                        add(new JRow() {{
-                            add(new JLabel("Anim sleep ms:"));
-                            add(new JTextFieldForNumber(applet.animSleepMS));
-                        }});
-                        add(new JRow() {{
-                            add(new JLabel("Anim speed:"));
-                            add(new JTextFieldForNumber(applet.animSpeed));
-                        }});
+                    add(new JTablePanel() {{
+                        add(new JLabel("Anim sleep ms:"));
+                        add(new JTextFieldForNumber(applet.animSleepMS));
+                        advanceRow();
+                        add(new JLabel("Anim speed:"));
+                        add(new JTextFieldForNumber(applet.animSpeed));
+                        advanceRow();
+                        add(new JLabel("Pixels per part:"));
+                        add(new JTextFieldForNumber(applet.pixelsPerPart));
                     }});
                 }});
                 contentPane.add(new JSeparator(), stretchx);
@@ -871,7 +866,7 @@ public class SpiralApplet
                         {
                             theSpiralView.focusAnimationVelocity = 0.;
                             theSpiralView.focus -= theSpiralView.focusQuantum;
-                            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.n.get());
+                            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
                         }
                         theCanvas.repaint();
                         break;
@@ -885,7 +880,7 @@ public class SpiralApplet
                         {
                             theSpiralView.focusAnimationVelocity = 0.;
                             theSpiralView.focus += theSpiralView.focusQuantum;
-                            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.n.get());
+                            theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
                         }
                         theCanvas.repaint();
                         break;
@@ -1041,7 +1036,7 @@ public class SpiralApplet
                 if (theSpiralView.focusAnimationVelocity != 0.)
                 {
                     theSpiralView.focus += theSpiralView.focusAnimationVelocity;
-                    theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.n.get());
+                    theSpiralView.focus = fmod(theSpiralView.focus, theSpiralModel.params.n.get());
 
                     repaint();
 
@@ -1137,24 +1132,29 @@ public class SpiralApplet
             public static final int DELTASTYLE_MAX = 1;
 
 
-            // XXX same thing in applet... should this be a little subclass?
-            public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 1000*1000); // must be multiple of 2
-            public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be multiple of 2 currently (but that will be lifted)
-            public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // muse be multiple of 2 for smooth scrolling
-            public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
-            public Listenable.Int randomSeed = new Listenable.Int(0, (1<<31)-1, 1);
+            public static class Params
+            {
+                // XXX same thing in applet... should this be a little subclass?
+                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 1000*1000); // must be multiple of 2
+                public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be multiple of 2 currently (but that will be lifted)
+                public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
+                public Listenable.Int randomSeed = new Listenable.Int(0, (1<<31)-1, 1);
+            }
+
+            public Params params = new Params();
+
 
 
             public int theList[/*n*/];
             public double centers[/*n*/][/*2*/]; // centers[i] is center of theList up through index i, rotated and scaled canonically
             public double weights[/*n*/]; // weights[i] is area of dual diagram of theList up through index i, rotated and scaled canonically
 
-            SpiralModel(int n,
-                        int nParts,
-                        int deltaStyle, // DELTASTYLE_1 or DELTASTYLE_ANY
-                        int randomSeed)
+            SpiralModel()
             {
-                init(n, nParts, deltaStyle, randomSeed);
+                init(params.n.get(),
+                     params.nParts.get(),
+                     params.deltaStyle.get(),
+                     params.randomSeed.get());
             }
 
             public void init(int n,
@@ -1162,10 +1162,10 @@ public class SpiralApplet
                              int deltaStyle, // DELTASTYLE_1 or DELTASTYLE_ANY
                              int randomSeed)
             {
-                this.n.set(n);
-                this.nParts.set(nParts);
-                this.deltaStyle.set(deltaStyle);
-                this.randomSeed.set(randomSeed);
+                this.params.n.set(n);
+                this.params.nParts.set(nParts);
+                this.params.deltaStyle.set(deltaStyle);
+                this.params.randomSeed.set(randomSeed);
 
                 java.util.Random rng = new java.util.Random(randomSeed);
                 assert(n >= 2);
@@ -1269,7 +1269,7 @@ public class SpiralApplet
         }; // public class SpiralModel
         public static class SpiralView
         {
-            public double focus; // modulo spiralModel.n
+            public double focus; // modulo spiralModel.params.n
             public double focusQuantum;
             public double focusAnimationVelocity;
             public SpiralView(double focus, double focusQuantum)
@@ -1289,7 +1289,7 @@ public class SpiralApplet
                                SpiralView spiralView)
         {
             //System.out.println("    in drawTicker");
-            int n = spiralModel.n.get();
+            int n = spiralModel.params.n.get();
 
             assert(pixelsPerPart % 2 == 0); // doesn't work otherwise
 
@@ -1308,7 +1308,7 @@ public class SpiralApplet
             double val = LERP(val0,val1,frac);
             //PRINT(val);
 
-            int tickerHeight = pixelsPerPart * spiralModel.nParts.get();
+            int tickerHeight = pixelsPerPart * spiralModel.params.nParts.get();
             //PRINT(tickerHeight);
             assert(tickerHeight % 4 == 0);
 
@@ -1444,8 +1444,8 @@ public class SpiralApplet
             else
                 mg.setColor(java.awt.Color.white);
 
-            int n = spiralModel.n.get();
-            int nParts = spiralModel.nParts.get();
+            int n = spiralModel.params.n.get();
+            int nParts = spiralModel.params.nParts.get();
 
             // the two indices bounding
             // the focus
@@ -1691,18 +1691,14 @@ public class SpiralApplet
     // App-specific variables...
     //
 
-        public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 1000*1000); // must be multiple of 2
-        public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be multiple of 2 currently (but that will be lifted)
         public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // muse be multiple of 2 for smooth scrolling
-        public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
-        public Listenable.Int randomSeed = new Listenable.Int(0, (1<<31)-1, 1);
 
-        public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
-        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 1);
-
-        public SpiralModel theSpiralModel = new SpiralModel(n.get(), nParts.get(), deltaStyle.get(), randomSeed.get());
+        public SpiralModel.Params spiralModelParams = new SpiralModel.Params(); // gui copy, flushed to model when Regenerate button pressed
+        public SpiralModel theSpiralModel = new SpiralModel();
         public SpiralView theSpiralView = new SpiralView(0., // initial focus
                                                          2./pixelsPerPart.get()); // focusQuantum, so it moves 2 pixels per time step
+        public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
+        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 1);
 
 
         private java.awt.Component theCanvas = null;
@@ -1805,13 +1801,6 @@ public class SpiralApplet
                 }
             });
         }
-        // this one doesn't install any automatic listeners
-        public JTextFieldForNumber(int i)
-        {
-            super(""+i);
-            System.out.println("in JTextFieldForNumber(int)");
-            System.out.println("out JTextFieldForNumber(int)");
-        }
 
         public java.awt.Dimension getPreferredSize()
         {
@@ -1830,9 +1819,8 @@ public class SpiralApplet
             // XXX another hack, wtf?
             if (true)
             {
-                if (f == null // this is what we get if was constructed with an int
-                 || f instanceof Listenable.Int)
-                    preferredSize.width = 50;
+                if (f instanceof Listenable.Int)
+                    preferredSize.width = 55; // big enough to hold 1,000,000 comfortably-- bleah
                 else
                     preferredSize.width = 100;
             }
