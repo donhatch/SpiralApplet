@@ -22,7 +22,7 @@ import com.donhatchsw.compat.ArrayList;
 import com.donhatchsw.awt.ColLayout;
 import com.donhatchsw.awt.JRow;
 import com.donhatchsw.awt.JCol;
-//import com.donhatchsw.awt.JTablePanel;
+import com.donhatchsw.awt.JTablePanel;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
@@ -340,21 +340,19 @@ public class SpiralApplet
                 add(new JRow() {{
                     add(new JLabel("        ")); // indent a bit
                     add(new JCol() {{
-                        add(new JRow() {{
+                        add(new JTablePanel() {{
                             add(new JLabel("Period:"));
                             add(new JTextFieldForNumber(applet.n));
                             add(new JTextFieldForNumber(applet.theSpiralModel.n) {{
                                 setEnabled(false);
                             }});
-                        }});
-                        add(new JRow() {{
+                            advanceRow();
                             add(new JLabel("Number of parts:"));
                             add(new JTextFieldForNumber(applet.nParts));
                             add(new JTextFieldForNumber(applet.theSpiralModel.nParts) {{
                                 setEnabled(false);
                             }});
-                        }});
-                        add(new JRow() {{
+                            advanceRow();
                             add(new JLabel("Pixels per part:"));
                             add(new JTextFieldForNumber(applet.pixelsPerPart));
                             add(new JTextFieldForNumber(applet.theSpiralModel.pixelsPerPart) {{
@@ -364,8 +362,9 @@ public class SpiralApplet
                         add(new JRow() {
                             private ButtonGroup buttonGroup = new ButtonGroup();
                         {
-                            add(new JLabel("Delta style"));
-                            add(new JRadioButton("1", applet.deltaStyle.get()==SpiralModel.DELTASTYLE_1) {{
+                            add(new JLabel("Delta style:"));
+                            add(new JRadioButton("<html>&plusmn;1</html>", applet.deltaStyle.get()==SpiralModel.DELTASTYLE_1) {{
+                                setMargin(nomargin);
                                 buttonGroup.add(this);
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
@@ -376,6 +375,7 @@ public class SpiralApplet
                                 });
                             }});
                             add(new JRadioButton("Any", applet.deltaStyle.get()==SpiralModel.DELTASTYLE_ANY) {{
+                                setMargin(nomargin);
                                 buttonGroup.add(this);
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
@@ -388,7 +388,7 @@ public class SpiralApplet
                         }});
                         add(new JRow() {{
                             add(new JLabel("Random seed:"));
-                            add(new JButton("--") {{
+                            add(new JButton("<html><code>--</code></html>") {{
                                 setMargin(nomargin);
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
@@ -399,7 +399,7 @@ public class SpiralApplet
                                 });
                             }});
                             add(new JTextFieldForNumber(applet.randomSeed));
-                            add(new JButton("++") {{
+                            add(new JButton("<html><code>++</code></html>") {{
                                 setMargin(nomargin);
                                 addActionListener(new java.awt.event.ActionListener() {
                                     public void actionPerformed(java.awt.event.ActionEvent e)
