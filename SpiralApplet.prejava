@@ -3,7 +3,16 @@
     BUG: bad ticker anim when pixelsPerIncr = 4
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown, performance went down, forevermore??
+    TODO: smooth out animation when going very slowly
     TODO: gui for scale
+    TODO: upgrade to >=1.5 and use templates
+    TODO: upgrade to >=1.4 and use System.nanoTime
+    TODO: check out LWJGL for consistent frame rate?
+    TODO: maybe JavaFX? she says it works well for vsync: http://www.java-gaming.org/index.php?topic=27763.0.  ah good, it's included in jdk 7.
+    TODO: use javax.swing.Timer instead of my own custom thread
+          WHOA! as soon as I switched to a timer, I'm getting consistent timings! nice 60fps. wtf?
+          well except every 5 seconds or so, it gives far faster for a few frames in a row. argh!
+          sleeping for 11 ms seems to be a sweet spot.  screwy.
 */
 
 #include "macros.h"
@@ -442,10 +451,12 @@ public class SpiralApplet
                                         }
                                     });
                                 }}, centerjustify);
+                                /*
                                 add(new JLabel(" focus: "));
                                 add(new JTextFieldForNumber(applet.theSpiralView.focus){{
                                     makeTextComponentLikeLabel(this);
                                 }});
+                                */
                             }});
                             add(new JRow() {{
                                 add(new JRepeatingButton("") {
@@ -718,7 +729,8 @@ public class SpiralApplet
 
                 final boolean useScrollPane = false; // can set this to true if it gets big enough to warrant it
 
-                final int preferredWidth = 400;
+                //final int preferredWidth = 400;
+                final int preferredWidth = 600; // XXX enough to make tooltip not spill over edge-- that causes performance problem forevermore!! (wtf?)
                 final int preferredHeight = 300;
 
 
@@ -977,6 +989,11 @@ public class SpiralApplet
         {
             TheCanvas()
             {
+                // hmm, double buffering doesn't seem to make much difference, on my laptop??
+                super(true); // double buffered
+                //super(false); // not double buffered
+                //PRINT(isDoubleBuffered());
+
                 // Specify an "event listener" object
                 // to respond to events.
                 // (>= Java 1.1 event model).
@@ -1232,6 +1249,7 @@ public class SpiralApplet
             // PAINT/DISPLAY/DRAW
             public void paintComponent(java.awt.Graphics g)
             {
+                //try { Thread.sleep(50); } catch (InterruptedException e) {}
                 java.awt.Dimension size = getSize();
                 int maxRingBufferSize = size.width + 3; // some slop
 
@@ -1240,6 +1258,11 @@ public class SpiralApplet
                 startTimes.append(startTime);
 
                 if (eventVerbose >= 1) System.out.println("in paint");
+
+                // TODO: need to synchronize this I think
+                theSpiralView.focus.set(
+                    fmod(theSpiralView.focus.get() + theSpiralView.focusAnimationVelocity.get(),
+                         theSpiralModel.params.n.get()));
 
                 double minSize = (double)MIN(size.width, size.height);
 
@@ -1263,37 +1286,40 @@ public class SpiralApplet
                 g.setColor(java.awt.Color.black);
                 g.fillRect(0,0, size.width,size.height);
 
-                drawTicker(g,
-                           size,
-                           size.width/2,
-                           size.height/2,
-                           theSpiralModel,
-                           theSpiralView);
+                if (true) // set to false to get timing for just clearing and showing stats
+                {
+                    drawTicker(g,
+                               size,
+                               size.width/2,
+                               size.height/2,
+                               theSpiralModel,
+                               theSpiralView);
 
-                double scale = .5; // TODO: gui hook for this
-                if (true)
-                {
-                    // draw dual spiral
-                    drawSpiral(mg,
-                               scale,
-                               theSpiralModel,
-                               theSpiralView,
-                               false, // drawPrimalFlag
-                               true, // drawDualFlag
-                               false, // drawRungsFlag
-                               antiAliasingFlag);
-                }
-                if (true)
-                {
-                    // draw primal spiral
-                    drawSpiral(mg,
-                               scale,
-                               theSpiralModel,
-                               theSpiralView,
-                               true, // drawPrimalFlag
-                               false, // drawDualFlag
-                               theSpiralView.showRungsFlag.get(), // drawRungsFlag
-                               antiAliasingFlag);
+                    double scale = .5; // TODO: gui hook for this
+                    if (true)
+                    {
+                        // draw dual spiral
+                        drawSpiral(mg,
+                                   scale,
+                                   theSpiralModel,
+                                   theSpiralView,
+                                   false, // drawPrimalFlag
+                                   true, // drawDualFlag
+                                   false, // drawRungsFlag
+                                   antiAliasingFlag);
+                    }
+                    if (true)
+                    {
+                        // draw primal spiral
+                        drawSpiral(mg,
+                                   scale,
+                                   theSpiralModel,
+                                   theSpiralView,
+                                   true, // drawPrimalFlag
+                                   false, // drawDualFlag
+                                   theSpiralView.showRungsFlag.get(), // drawRungsFlag
+                                   antiAliasingFlag);
+                    }
                 }
 
 
@@ -1321,7 +1347,7 @@ public class SpiralApplet
                             g.drawString("fps over "+frames+" frames: "+formatFixedPoint(frames/seconds,3),
                                          size.width-300,
                                          40);
-                            g.drawString("spf over "+frames+" frames: "+formatFixedPoint(seconds/frames, 3),
+                            g.drawString("spf over "+frames+" frames: "+formatFixedPoint(seconds/frames, 5),
                                          size.width-300,
                                          60);
                         }
@@ -2110,56 +2136,42 @@ public class SpiralApplet
                 startTheAnimation();
         }
 
+        // XXX use javax.swing.Timer!
         // actually this should probably be in a listener on focusAnimationVelocity
         // I probably have the thread-safety all wrong too
         // but then again I probably have it wrong for paint as well...
         // XXX paint really needs to take a synchronized snapshot of everything it needs, I think...
         // and, acquire a lock on the big things that don't change often but that are too expensive to snapshot
         // (the model).
+        private javax.swing.Timer theTimer = null;
         private void startTheAnimation()
         {
-            if (theSpiralView.focusAnimationVelocity.get() != 0)
+            System.out.println("in startTheAnimation");
+            if (theTimer == null)
             {
-                Runnable runnable = new Runnable() {
-                    public void run()
-                    {
-                        System.out.println("starting animator thread");
-                        while (true) // while (theSpiralView.focusAnimationVelocity.get()!=0, but synchronized
+                theTimer = new javax.swing.Timer(animSleepMS.get(), new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        //System.out.println("in timer action");
+
+                        // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
+                        double focusAnimationVelocitySnapshot;
+                        synchronized(theSpiralView.focusAnimationVelocity)
                         {
-                            // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
-                            double focusAnimationVelocitySnapshot;
-                            synchronized(theSpiralView.focusAnimationVelocity)
-                            {
-                                focusAnimationVelocitySnapshot = theSpiralView.focusAnimationVelocity.get();
-                            }
-                            if (focusAnimationVelocitySnapshot == 0.)
-                                break;
-
-                            synchronized(theSpiralView.focus)
-                            {
-                                theSpiralView.focus.set(
-                                    fmod(theSpiralView.focus.get() + focusAnimationVelocitySnapshot,
-                                         theSpiralModel.params.n.get()));
-                            }
-
-                            theCanvas.repaint();
-                            if (animSleepMS.get() >= 0)
-                            {
-                                try {
-                                    Thread.sleep(animSleepMS.get());
-                                } catch (InterruptedException e) {
-                                    break;
-                                }
-                            }
+                            focusAnimationVelocitySnapshot = theSpiralView.focusAnimationVelocity.get();
                         }
-                        System.out.println("terminating animator thread");
-                        // XXX TODO: does master thread need to join?
+                        if (focusAnimationVelocitySnapshot == 0.)
+                        {
+                            theTimer.stop();
+                        }
+
+                        theCanvas.repaint();
+                        theTimer.setDelay(animSleepMS.get()); // in case it changed
+                        //System.out.println("out timer action");
                     }
-                };
-                Thread animatorThread = new Thread(runnable);
-                animatorThread.setDaemon(true); // make it so the java vm won't wait for it to finish before exiting
-                animatorThread.start();
+                });
             }
+            theTimer.start();
+            System.out.println("out startTheAnimation");
         }
 
 
@@ -2177,7 +2189,7 @@ public class SpiralApplet
 #if 0
         public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
 #endif
-        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 1);
+        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 11); // 11 seems to be empirical sweet spot... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
 
 
