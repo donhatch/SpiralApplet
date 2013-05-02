@@ -1589,9 +1589,10 @@ public class SpiralApplet
                                boolean drawDualFlag,
                                boolean antiAliasFlag)
         {
+            int debugLevel = 0;
             // draw exactly one of primal and dual at a time
             assert(drawPrimalFlag != drawDualFlag);
-            //System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
+            if (debugLevel >= 1) System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
 
             if (drawPrimalFlag)
                 mg.setColor(new java.awt.Color(128,128,255)); // light blue
@@ -1620,10 +1621,20 @@ public class SpiralApplet
 
             double frac = focus - i0;
 
-
             int val0 = spiralModel.theList[i0];
             int val1 = spiralModel.theList[i1];
             double val = LERP(val0,val1,frac);
+
+            if (debugLevel >= 1)
+            {
+                PRINT(focus);
+                PRINT(i0);
+                PRINT(i1);
+                PRINT(frac);
+                PRINT(val0);
+                PRINT(val1);
+                PRINT(val);
+            }
 
             double scale = .5;
 
@@ -1637,17 +1648,18 @@ public class SpiralApplet
             FORI (iScanDir, 2)
             {
                 int scanDir = scanDirs[iScanDir];
+                if (debugLevel >= 1) System.out.println("        scanDir = "+scanDir);
 
                 if (drawPrimalFlag)
                 {
-                    if (scanDir == -1)
+                    if (scanDir < 0)
                         mg.setColor(new java.awt.Color(128,255,128)); // light green
                     else
                         mg.setColor(new java.awt.Color(128,128,255)); // light blue
                 }
                 else
                 {
-                    if (scanDir == -1)
+                    if (scanDir < 0)
                         mg.setColor(java.awt.Color.white);
                     else
                         mg.setColor(gray64);
@@ -1663,6 +1675,14 @@ public class SpiralApplet
                 double dualY = dualR * Math.sin(dualAng);
                 double primalX = primalR * Math.cos(primalAng);
                 double primalY = primalR * Math.sin(primalAng);
+
+                if (debugLevel >= 1 && scanDir > 0)
+                {
+                    PRINT(RTOD(primalAng));
+                    PRINT(RTOD(dualAng));
+                    PRINT(primalX);
+                    PRINT(primalY);
+                }
 
 
 
@@ -1683,11 +1703,15 @@ public class SpiralApplet
                     if (scanDir==1 ? thisVal < prevVal : thisVal > prevVal)
                     {
                         // primal movement, dual turn
-                        //System.out.println("    primal movement, dual turn");
+                        if (debugLevel >= 2 && scanDir > 0) System.out.println("            primal movement, dual turn");
                         double angleDelta = (double)(prevVal-thisVal)/(double)nParts * (Math.PI*.5);
-                        double nextPrimalAng = primalAng += angleDelta;
+                        if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(angleDelta));
+                        double nextPrimalAng = primalAng + angleDelta;
                         if (nextPrimalAng > Math.PI)
                             nextPrimalAng -= 2*Math.PI;
+                        else if (nextPrimalAng < -Math.PI)
+                            nextPrimalAng += 2*Math.PI;
+                        if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(nextPrimalAng));
                         double nextPrimalR;
                         {
                             // use law of sines.
@@ -1698,9 +1722,22 @@ public class SpiralApplet
                             double b = primalR;
                             double c = b * (Math.sin(C)/Math.sin(B));
                             nextPrimalR = c;
+
+                            if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(primalAng));
+                            if (debugLevel >= 2 && scanDir > 0) PRINT(dualAng);
+
+                            if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(A));
+                            if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(C));
+                            if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(B));
+                            if (debugLevel >= 2 && scanDir > 0) PRINT(b);
+                            if (debugLevel >= 2 && scanDir > 0) PRINT(c);
+                            if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalR);
                         }
                         double nextPrimalX = nextPrimalR * Math.cos(nextPrimalAng);
                         double nextPrimalY = nextPrimalR * Math.sin(nextPrimalAng);
+                        if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalR);
+                        if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalX);
+                        if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalY);
 
                         if (drawPrimalFlag)
                         {
@@ -1742,11 +1779,13 @@ public class SpiralApplet
                     else if (scanDir==1 ? thisVal > prevVal : thisVal < prevVal)
                     {
                         // dual movement, primal turn
-                        //System.out.println("    dual movement, primal turn");
+                        if (debugLevel >= 2 && scanDir > 0) System.out.println("            dual movement, primal turn");
                         double angleDelta = (double)(thisVal-prevVal)/(double)nParts * (Math.PI*.5);
                         double nextDualAng = dualAng + angleDelta;
                         if (nextDualAng > Math.PI)
                             nextDualAng -= 2*Math.PI;
+                        else if (nextDualAng < -Math.PI)
+                            nextDualAng += 2*Math.PI;
                         double nextDualR;
                         {
                             // use law of sines.
@@ -1838,7 +1877,7 @@ public class SpiralApplet
                 }
 
             } // for iScanDir
-            //System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
+            if (debugLevel >= 1) System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal" : "dual"));
         } // drawSpiral
 
 
@@ -2302,6 +2341,7 @@ public class SpiralApplet
 
         frame.setLocation(10, 10);
         frame.setSize(600,600);
+        frame.setSize(300,300);
 
         frame.setVisible(true);
 
