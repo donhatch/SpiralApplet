@@ -625,6 +625,10 @@ public class SpiralApplet
                         add(new JCheckBoxForBoolean("show focus in control panel", applet.showFocusInControlPanelFlag) {{
                             setMargin(nomargin);
                         }});
+                        add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
+                            setMargin(nomargin);
+                            setToolTipText("<html>if this is set, print whenever vsync lapse seems to be happening (assumes mostly 60hz framerate)</html>");
+                        }});
                         add(new JRow() {{
                             add(new JButton("Dump window positions and sizes") {{
                                 setMargin(nomargin);
@@ -1240,7 +1244,7 @@ public class SpiralApplet
                 if (eventVerbose >= 1) System.out.println("in paint");
 
 
-                if (true) // XXX maybe debug control for this
+                if (showVsyncLapsesFlag.get())
                 {
                     // Try to print out an idea of how frequent the lapses in vsync
                     // are happening
@@ -1256,6 +1260,11 @@ public class SpiralApplet
                         lastNPaintsPrinted = nPaints;
                         lastStartTimePrinted = startTime;
                     }
+                }
+                else
+                {
+                    lastStartTimePrinted = 0L;
+                    lastNPaintsPrinted = 0;
                 }
 
                 // TODO: need to synchronize this I think
@@ -1359,17 +1368,6 @@ public class SpiralApplet
                         {
                             int x = size.width-1-iCol;
                             int y = size.height;
-                            if (iCol < startTimes.size() && iCol < endTimes.size())
-                            {
-                                double nonPaintTime = (startTimes.get(startTimes.size()-1-iCol) - endTimes.get(endTimes.size()-1-iCol));
-                                //PRINT(nonPaintTime);
-                                assert(nonPaintTime >= 0.);
-                                g.setColor(java.awt.Color.green);
-                                int barHeight = (int)(nonPaintTime*(1000.*pixelsPerMilli));
-                                g.fillRect(x,y-barHeight,
-                                           1,barHeight);
-                                y -= barHeight;
-                            }
                             if (iCol==0)
                             {
                                 double now = timeSeconds();
@@ -1377,19 +1375,32 @@ public class SpiralApplet
                                 assert(paintTimeSoFar >= 0.);
                                 //PRINT(paintTimeSoFar);
                                 g.setColor(java.awt.Color.yellow);
-                                int barHeight = (int)(paintTimeSoFar*(1000.*pixelsPerMilli));
+                                int barHeight = (int)(.5+paintTimeSoFar*(1000.*pixelsPerMilli));
                                 g.fillRect(x,y-barHeight,
                                            1,barHeight);
+                                y -= barHeight;
                             }
                             else if (iCol <= endTimes.size() && iCol < startTimes.size())
                             {
                                 double paintTime = endTimes.get(endTimes.size()-iCol) - startTimes.get(startTimes.size()-1-iCol);
                                 assert(paintTime >= 0.);
                                 //PRINT(paintTime);
-                                g.setColor(java.awt.Color.red);
-                                int barHeight = (int)(paintTime*(1000.*pixelsPerMilli));
+                                g.setColor(java.awt.Color.green);
+                                int barHeight = (int)(.5+paintTime*(1000.*pixelsPerMilli));
                                 g.fillRect(x,y-barHeight,
                                            1,barHeight);
+                                y -= barHeight;
+                            }
+                            if (iCol>=1 && (iCol-1) < startTimes.size() && (iCol-1) < endTimes.size())
+                            {
+                                double nonPaintTime = (startTimes.get(startTimes.size()-1-(iCol-1)) - endTimes.get(endTimes.size()-1-(iCol-1)));
+                                //PRINT(nonPaintTime);
+                                assert(nonPaintTime >= 0.);
+                                g.setColor(java.awt.Color.red);
+                                int barHeight = (int)(.5+nonPaintTime*(1000.*pixelsPerMilli));
+                                g.fillRect(x,y-barHeight,
+                                           1,barHeight);
+                                y -= barHeight;
                             }
                         }
                     }
@@ -1406,11 +1417,11 @@ public class SpiralApplet
                                          size.width-300,
                                          60);
                             g.setColor(java.awt.Color.red);
-                            g.drawString("red is time in paintComponent",
+                            g.drawString("red is time outside paintComponent",
                                          size.width-300,
                                          80);
                             g.setColor(java.awt.Color.green);
-                            g.drawString("green is time outside paintComponent",
+                            g.drawString("green is time in paintComponent",
                                          size.width-300,
                                          100);
                         }
@@ -2289,7 +2300,8 @@ public class SpiralApplet
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 11); // 11 seems to be empirical sweet spot... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showNonTimingFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showFocusInControlPanelFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showFocusInControlPanelFlag = new Listenable.Boolean(false); // seems like a bad idea in general
+        public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
 
