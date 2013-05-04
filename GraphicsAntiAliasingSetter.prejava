@@ -25,7 +25,7 @@
                                : java.awt.RenderingHints.VALUE_ANTIALIAS_OFF);
             if (verbose >= 1)
             {
-                System.out.println("successfully set antialising to "+doAntiAliasing);
+                System.out.println("    successfully set antialising to "+doAntiAliasing);
             }
             return true; // success XXX is there ever any indication of failure?
         }

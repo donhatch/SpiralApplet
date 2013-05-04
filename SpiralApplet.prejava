@@ -930,7 +930,9 @@ public class SpiralApplet
                         return; // we'll get called again
                     }
 
+                    // XXX should this be in SpiralView? hmm
                     theSpiralView.focusQuantum = 2./theSpiralView.pixelsPerPart.get();
+
                     theCanvas.repaint();
                 }
             });
@@ -1314,13 +1316,14 @@ public class SpiralApplet
                 {
                     drawTicker(g,
                                size,
-                               size.width/2,
-                               size.height/2,
+                               size.width/2.,
+                               size.height/2.,
                                theSpiralModel,
                                theSpiralView);
 
+
                     double scale = .5; // TODO: gui hook for this
-                    if (true)
+                    if (false)
                     {
                         // draw dual spiral
                         drawSpiral(mg,
@@ -1332,7 +1335,7 @@ public class SpiralApplet
                                    false, // drawRungsFlag
                                    antiAliasingFlag);
                     }
-                    if (true)
+                    if (false)
                     {
                         // draw primal spiral
                         drawSpiral(mg,
@@ -1427,6 +1430,27 @@ public class SpiralApplet
                         }
                     }
                 }
+
+                if (true)
+                {
+                    // draw dot at exact center of window,
+                    // for debugging.
+                    g.setColor(java.awt.Color.red);
+                    // 1 -> 0..1
+                    // 2 -> 0..2
+                    // 3 -> 1..2
+                    // 4 -> 1..3
+                    // 5 -> 2..3
+                    // 6 -> 2..4
+                    int x0 = (size.width-1)/2;
+                    int x1 = (size.width+2)/2;
+                    int y0 = (size.height-1)/2;
+                    int y1 = (size.height+2)/2;
+                    g.fillRect(x0,y0,
+                               x1-x0,y1-y0);
+                }
+
+
 
                 // swing swaps buffers for us
 
@@ -1578,8 +1602,8 @@ public class SpiralApplet
             public static class Params
             {
                 // XXX same thing in applet... should this be a little subclass?
-                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 1000*1000); // must be multiple of 2
-                public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be multiple of 2 currently (but that will be lifted)
+                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 2); // must be multiple of 2
+                public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 2);
                 public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
                 public Listenable.Int randomSeed = new Listenable.Int(0, (1<<31)-1, 1);
             }
@@ -1618,7 +1642,9 @@ public class SpiralApplet
                 if (deltaStyle == DELTASTYLE_1)
                 {
                     int maxPasses = 100;
-                    int val = nParts/2; // somewhat arbitrary starting point... will turn random on second pass
+                    int val = (nParts+1)/4*2; // somewhat arbitrary even starting point... will turn random (but still even) on second pass.
+                    assert(val >= 0 && val < nParts && val%2 == 0);
+
                     boolean done = false;
                     FORI (iPass, maxPasses)
                     {
@@ -1648,7 +1674,10 @@ public class SpiralApplet
                 else if (deltaStyle == DELTASTYLE_ANY)
                 {
                     int maxPasses = 100;
-                    int val = nParts/2; // somewhat arbitrary starting point... will turn random on second pass
+                    int val = (nParts+1)/4*2; // somewhat arbitrary even starting point... will turn random (but still even) on second pass.
+                    PRINT(nParts);
+                    assert(val >= 0 && val < nParts && val%2 == 0);
+
                     boolean done = false;
                     int sign = rng.nextBoolean() ? -1 : 1;
                     int nRemainingThisSign = 0;
@@ -1713,32 +1742,122 @@ public class SpiralApplet
         public static class SpiralView
         {
             public Listenable.Double focus = new Listenable.Double(0.,0., 0.); // modulo spiralModel.params.n
-            public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // must be multiple of 2 for smooth scrolling
+            public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2);
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
             public double focusQuantum;
             public Listenable.Double focusAnimationVelocity = new Listenable.Double(0., 0., 0.);
-            public SpiralView(double focus, boolean showRungsFlag, double focusQuantum)
+            public SpiralView()
             {
-                this.focus.set(focus);
-                this.showRungsFlag.set(showRungsFlag);
-                this.focusQuantum = focusQuantum;
-                this.focusAnimationVelocity.set(0.);
+                this.focusQuantum = 2./pixelsPerPart.get(); // and needs to be kept updated
             }
         }; // public class SpiralView
 
 
         public void drawTicker(java.awt.Graphics g,
                                java.awt.Dimension gsize,
-                               int gCenterX, int gCenterY, // between pixels
+                               double gCenterX, double gCenterY, // in pixels from upper-left corner of window
                                SpiralModel spiralModel,
                                SpiralView spiralView)
         {
-            //System.out.println("    in drawTicker");
+            System.out.println("    in drawTicker");
+            PRINT(gCenterX);
+            PRINT(gCenterY);
             int n = spiralModel.params.n.get();
+            int nParts = spiralModel.params.nParts.get();
             int pixelsPerPart = spiralView.pixelsPerPart.get();
 
-            //assert(pixelsPerPart > 0); // we can actually handle this now, but other parts of the app can't
-            assert(pixelsPerPart % 2 == 0); // doesn't work otherwise
+            assert(n > 0);
+            assert(pixelsPerPart > 0);
+            assert(n % 2 == 0); // whole thing doesn't work otherwise
+
+
+            java.awt.Color gray128 = new java.awt.Color(128,128,128);
+            java.awt.Color gray64 = new java.awt.Color(64,64,64);
+            java.awt.Color gray32 = new java.awt.Color(32,32,32);
+
+
+            // figure out where to draw rails, i.e. bounds of ticker strip.
+            // this should be the same regardless of focus.
+            int pixelsBetweenRails = (pixelsPerPart%2==1 ? pixelsPerPart*nParts+1
+                                                         : pixelsPerPart*nParts);
+            int ixLowerRail, iyLowerRail;
+            {
+                PRINT(pixelsBetweenRails);
+                assert(pixelsBetweenRails >= 2);
+                double x = gCenterX;
+                double y = gCenterY+pixelsBetweenRails*.5;
+                PRINT(x);
+                PRINT(y);
+                // round x to closest pixel-center-or-pixel-corner (but not pixel side center!)
+                double u = (x+y);
+                double v = (x-y);
+                PRINT(u);
+                PRINT(v);
+                u = Math.round(u);
+                v = Math.round(v);
+                PRINT(u);
+                PRINT(v);
+                x = (u+v)*.5;
+                y = (u-v)*.5;
+                PRINT(x);
+                PRINT(y);
+                // now either both x,y are int, or both x,y are int+.5.
+                assert((double)(int)(2*x) == 2*x);
+                assert((double)(int)(2*y) == 2*y);
+                assert(Math.floor(x-y) == x-y);
+                if ((int)x == x)
+                {
+                    // on pixel corner-- move down and left, to pixel center
+                    x -= .5;
+                    y += .5;
+                }
+                PRINT(x);
+                PRINT(y);
+                // x,y are now the exact pixel coords of a pixel center
+                // on the lower rail. convert to integer indices.
+                ixLowerRail = (int)(x-.5);
+                iyLowerRail = (int)(y-.5);
+                PRINT(ixLowerRail);
+                PRINT(iyLowerRail);
+            }
+
+            {
+                // draw the rails...
+                // (diagonal lines lower-left to upper-right).
+                g.setColor(gray128);
+                int gsizeMin = MIN(gsize.width, gsize.height);
+                g.drawLine(ixLowerRail-gsizeMin,iyLowerRail+gsizeMin,
+                           ixLowerRail+gsizeMin,iyLowerRail-gsizeMin);
+                g.drawLine(ixLowerRail-gsizeMin,iyLowerRail+gsizeMin-pixelsBetweenRails,
+                           ixLowerRail+gsizeMin,iyLowerRail-gsizeMin-pixelsBetweenRails);
+                // and the center line...
+                g.setColor(gray32);
+                if (pixelsBetweenRails%2 == 0)
+                {
+                    // one diagonal line halfway between rails
+                    g.drawLine(ixLowerRail-gsizeMin,iyLowerRail+gsizeMin-pixelsBetweenRails/2,
+                               ixLowerRail+gsizeMin,iyLowerRail-gsizeMin-pixelsBetweenRails/2);
+                }
+                else
+                {
+                    // two diagonal lines
+                    g.drawLine(ixLowerRail-gsizeMin,iyLowerRail+gsizeMin-(pixelsBetweenRails-1)/2,
+                               ixLowerRail+gsizeMin,iyLowerRail-gsizeMin-(pixelsBetweenRails-1)/2);
+                    g.drawLine(ixLowerRail-gsizeMin,iyLowerRail+gsizeMin-(pixelsBetweenRails+1)/2,
+                               ixLowerRail+gsizeMin,iyLowerRail-gsizeMin-(pixelsBetweenRails+1)/2);
+                }
+                // draw focus
+                // (diagonal line upper-left to lower-right, across strip)
+                g.setColor(gray32);
+                // XXX TODO: draw the focus line!
+            }
+
+            if (true)
+            {
+                g.setColor(java.awt.Color.yellow);
+                g.fillRect(ixLowerRail,iyLowerRail,1,1);
+            }
+
 
             // the two indices bounding
             // the focus
@@ -1755,68 +1874,77 @@ public class SpiralApplet
             double val = LERP(val0,val1,frac);
             //PRINT(val);
 
-            int tickerHeight = pixelsPerPart * spiralModel.params.nParts.get();
-            //PRINT(tickerHeight);
-            assert(tickerHeight % 4 == 0);
-
-            java.awt.Color gray128 = new java.awt.Color(128,128,128);
-            java.awt.Color gray64 = new java.awt.Color(64,64,64);
-            java.awt.Color gray32 = new java.awt.Color(32,32,32);
-
-            // draw focus
-            // (diagonal line upper-left to lower-right, across strip)
-            g.setColor(gray32);
-            g.drawLine(gCenterX-tickerHeight/4, gCenterY-tickerHeight/4,
-                       gCenterX+tickerHeight/4-1, gCenterY+tickerHeight/4-1);
-
-            // draw bounds of ticker strip
-            // (diagonal lines lower-left to upper-right).
-            g.setColor(gray128);
-            int gsizeMin = MIN(gsize.width, gsize.height);
-            g.drawLine(gCenterX-tickerHeight/4-1-gsizeMin,gCenterY-tickerHeight/4+gsizeMin,
-                       gCenterX-tickerHeight/4-1+gsizeMin,gCenterY-tickerHeight/4-gsizeMin);
-            g.drawLine(gCenterX+tickerHeight/4-1-gsizeMin,gCenterY+tickerHeight/4+gsizeMin,
-                       gCenterX+tickerHeight/4-1+gsizeMin,gCenterY+tickerHeight/4-gsizeMin);
-            // and center line
-            g.setColor(gray32);
-            g.drawLine(gCenterX-1-gsizeMin,gCenterY+gsizeMin,
-                       gCenterX-1+gsizeMin,gCenterY-gsizeMin);
 
 
-            int x0, y0;
-            if (val0 < val1)
+            // Now we need to figure out
+            // the exact pixel at which to place the vertex i0.
+            // Everything else will be computed exactly relative to that.
+            int ix0, iy0;
             {
-                // increasing... focus is on a vertical segment,
-                // i.e. in the middle of a primal vertex / dual edge
-                //     /     /
-                //    /\i1  /
-                //   /  |  /
-                //  /  i0\/
-                // /     /
-                //System.out.println("increasing... focus is on a vertical segment");
-                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val+.5)*pixelsPerPart/2-.5);
-                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val0+.5)*pixelsPerPart/2-.5);
-            }
-            else
-            {
-                // decreasing... focus is on a horizontal segment,
-                // i.e. in the middle of a primal edge / dual vertex
-                //     /     /
-                //    /\    /
-                //   /i0-i1/
-                //  /    \/
-                // /     /
-                //System.out.println("decreasing... focus is on a horizontal segment");
-                y0 = (int)Math.round(gCenterY + tickerHeight/4 - (val+.5)*pixelsPerPart/2-.5);
-                x0 = (int)Math.round(gCenterX + tickerHeight/4 - (val0+.5)*pixelsPerPart/2-.5);
+                double x0exact, y0exact;
+                if (val0 < val1)
+                {
+                    // increasing... focus is on a vertical segment,
+                    // i.e. in the middle of a primal vertex / dual edge
+                    //     /     /
+                    //    /\i1  /
+                    //   /  |  /
+                    //  /  i0\/
+                    // /     /
+                    //System.out.println("increasing... focus is on a vertical segment");
+
+                    x0exact = gCenterX + pixelsBetweenRails/4. - (val+.5)*(pixelsPerPart/2.);
+                    y0exact = gCenterX + pixelsBetweenRails/4. - (val0+.5)*(pixelsPerPart/2.);
+                }
+                else
+                {
+                    // decreasing... focus is on a horizontal segment,
+                    // i.e. in the middle of a primal edge / dual vertex
+                    //     /     /
+                    //    /\    /
+                    //   /i0-i1/
+                    //  /    \/
+                    // /     /
+                    //System.out.println("decreasing... focus is on a horizontal segment");
+                    y0exact = gCenterY + pixelsBetweenRails/4. - (val+.5)*(pixelsPerPart/2.);
+                    x0exact = gCenterX + pixelsBetweenRails/4. - (val0+.5)*(pixelsPerPart/2.);
+                }
+
+                // okay x0exact,y0exact are now *exact* coords of where vert i0 would be.
+                // round it to integer indices x0,y0 in such a way
+                // that its distance from the lower rail is the proper parity,
+                // so that when focus changes it will always be pure diagonal motion.
+
+                // ppp=1 -> 1
+                // ppp=2 -> 1
+                // ppp=3 -> 2
+                // ppp=4 -> 2
+                // ppp=5 -> 3
+                int pixelsFromLowerRailToLowestPossibleVert = (pixelsPerPart+1)/2;
+                int parityOfI0FromLowerRail = (pixelsFromLowerRailToLowestPossibleVert + i0*pixelsPerPart) % 2;
+                int parityOfLowerRail = (ixLowerRail+iyLowerRail) % 2;
+                int parityOfI0 = (parityOfLowerRail+parityOfI0FromLowerRail) % 2;
+
+                if (parityOfI0 == 0)
+                {
+                    // round x0exact,y0exact to closest pixel indices with x0,y0 both even
+                    ix0 = 2*(int)Math.round((x0exact-.5)*.5);
+                    iy0 = 2*(int)Math.round((y0exact-.5)*.5);
+                }
+                else
+                {
+                    // round x0exact,y0exact to closest pixel indices with x0,y0 both odd
+                    ix0 = 2*(int)Math.round(x0exact*.5)-1;
+                    iy0 = 2*(int)Math.round(y0exact*.5)-1;
+                }
             }
 
-            if (pixelsPerPart > 0)
+            if (true)
             {
                 g.setColor(new java.awt.Color(128,128,255)); // light blue
                 {
-                    int prevX = x0;
-                    int prevY = y0;
+                    int prevX = ix0;
+                    int prevY = iy0;
                     int prevVal = spiralModel.theList[i0];
                     for (int i = (i0+1)%n; ; i = (i+1)%n)
                     {
@@ -1845,8 +1973,8 @@ public class SpiralApplet
 
                 g.setColor(new java.awt.Color(128,255,128)); // light green
                 {
-                    int prevX = x0;
-                    int prevY = y0;
+                    int prevX = ix0;
+                    int prevY = iy0;
                     int prevVal = spiralModel.theList[i0];
                     for (int i = MOD(i0-1,n); ; i = MOD(i-1,n))
                     {
@@ -1874,7 +2002,7 @@ public class SpiralApplet
                 }
             }
 
-            //System.out.println("    out drawTicker");
+            System.out.println("    out drawTicker");
         } // drawTicker
 
         // Exacly one of drawPrimalFlag and drawDualFlag must be true
@@ -2287,13 +2415,10 @@ public class SpiralApplet
     // App-specific variables...
     //
 
-        public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // muse be multiple of 2 for smooth scrolling
 
         public SpiralModel.Params spiralModelParams = new SpiralModel.Params(); // gui copy, flushed to model when Regenerate button pressed
         public SpiralModel theSpiralModel = new SpiralModel();
-        public SpiralView theSpiralView = new SpiralView(0., // initial focus
-                                                         false, // showRungsFlag
-                                                         2./pixelsPerPart.get()); // focusQuantum, so it moves 2 pixels per time step
+        public SpiralView theSpiralView = new SpiralView();
 #if 0
         public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
 #endif
@@ -2820,7 +2945,7 @@ public class SpiralApplet
         applet.start();
 
         frame.setLocation(10, 10);
-        frame.setSize(600,600);
+        frame.setSize(601,600);
 
         frame.setVisible(true);
 

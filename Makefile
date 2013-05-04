@@ -24,6 +24,9 @@ JAVAROOT=c:/jdk1.3.1_20
 #JAVAC=javac1.6
 #JAVAROOT="c:/Program Files (x86)/Java/jdk1.6.0_17"
 
+#JAVAC=javac1.7
+#JAVAROOT="c:/Program Files/Java/jdk1.7.0_21"
+
 
 uname := $(shell uname -o)
 #dummy := $(warning uname = $(uname))
