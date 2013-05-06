@@ -1601,8 +1601,8 @@ public class SpiralApplet
             public static class Params
             {
                 // XXX same thing in applet... should this be a little subclass?
-                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 100); // must be positive multiple of 2
-                public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 3); // must be >= 2
+                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 1000000); // must be positive multiple of 2
+                public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be >= 2
                 public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
                 public Listenable.Int randomSeed = new Listenable.Int(0, (1<<31)-1, 1);
             }
@@ -1642,7 +1642,7 @@ public class SpiralApplet
                 if (deltaStyle == DELTASTYLE_1)
                 {
                     int maxPasses = 100;
-                    int val = (nParts+1)/4*2; // somewhat arbitrary even starting point... will turn random (but still even) on second pass.
+                    int val = nParts/4*2; // somewhat arbitrary even starting point... will turn random (but still even, since n is even) on second pass.
                     assert(val >= 0 && val < nParts && val%2 == 0);
 
                     boolean done = false;
@@ -1650,6 +1650,14 @@ public class SpiralApplet
                     {
                         FORI (i, n)
                         {
+                            if (iPass >= 1 && val == this.theList[i])
+                            {
+                                done = true;
+                                break;
+                            }
+                            assert(val >= 0 && val < nParts);
+                            this.theList[i] = val;
+
                             if (val == 0)
                                 val = 1;
                             else if (val == nParts-1)
@@ -1658,13 +1666,6 @@ public class SpiralApplet
                                 val += 1;
                             else
                                 val -= 1;
-                            if (iPass >= 1 && val == this.theList[i])
-                            {
-                                done = true;
-                                break;
-                            }
-                            assert(val >= 0 && val < nParts);
-                            this.theList[i] = val;
                         }
                         if (done)
                             break;
@@ -1842,27 +1843,48 @@ public class SpiralApplet
                 }
                 // draw focus
                 // (diagonal line upper-left to lower-right, across strip)
-                g.setColor(gray32);
-                // XXX TODO: draw the focus line!
+                g.setColor(gray128);
+                if (pixelsPerPart%2 == 0)
+                    FORI (iPart, nParts)
+                        g.fillRect(ixBase-iPart*pixelsPerPart/2,
+                                   iyBase-iPart*pixelsPerPart/2,1,1);
+                else
+                    FORI (iPart, nParts)
+                    {
+                        if (iPart%2==0)
+                        {
+                            g.setColor(gray128);
+                            g.fillRect(ixBase-iPart*pixelsPerPart/2,
+                                       iyBase-iPart*pixelsPerPart/2,1,1);
+                        }
+                        else
+                        {
+                            g.setColor(gray64);
+                            g.fillRect(ixBase-(iPart*pixelsPerPart+1)/2,
+                                       iyBase-(iPart*pixelsPerPart-1)/2,1,1);
+                            g.fillRect(ixBase-(iPart*pixelsPerPart-1)/2,
+                                       iyBase-(iPart*pixelsPerPart+1)/2,1,1);
+                        }
+                    }
             }
 
-            if (true)
+            if (false) // can change to true for debugging
             {
-                // blue for base
-                g.setColor(java.awt.Color.blue);
-                FORI (iPart, nParts)
+                if (false)
                 {
-                    g.fillRect(ixBase,iyBase-iPart*pixelsPerPart,1,1);
+                    // blue for base
+                    g.setColor(java.awt.Color.blue);
+                    FORI (iPart, nParts)
+                        g.fillRect(ixBase,iyBase-iPart*pixelsPerPart,1,1);
                 }
-                g.drawLine(ixBase,
-                           iyBase,
-                           ixBase-(nParts-1)*pixelsPerPart/2,
-                           iyBase-(nParts-1)*pixelsPerPart/2);
 
-                // yellow for rail
-                g.setColor(java.awt.Color.yellow);
-                g.fillRect(ixLowerRail,iyLowerRail,1,1);
-                g.fillRect(ixUpperRail,iyUpperRail,1,1);
+                if (true)
+                {
+                    // yellow for rail
+                    g.setColor(java.awt.Color.yellow);
+                    g.fillRect(ixLowerRail,iyLowerRail,1,1);
+                    g.fillRect(ixUpperRail,iyUpperRail,1,1);
+                }
             }
 
 
