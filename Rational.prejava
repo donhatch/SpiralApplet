@@ -1,0 +1,428 @@
+#include "macros.h"
+
+public class Rational
+{
+    public int n, d;
+
+    // Constructors
+    public Rational()
+    {
+        set(0,0); // NaN
+    }
+    public Rational(int n, int d)
+    {
+        set(n, d);
+    }
+    public Rational(Rational that)
+    {
+        set(that.n, that.d);
+    }
+    public Rational set(Rational that)
+    {
+        return set(that.n, that.d);
+    }
+
+
+
+    // Basic utilities, that take all args in n,d form
+    // and put the result in an existing Rational,
+    // and reduce it.
+    public Rational set(int n, int d)
+    {
+        this.n = n;
+        this.d = d;
+        reduce();
+        return this;
+    }
+    public Rational equalsPlus(int n0, int d0, int n1, int d1)
+    {
+        return set(n0*d1+n1*d0, d0*d1);
+    }
+    public Rational equalsMinus(int n0, int d0, int n1, int d1)
+    {
+        return set(n0*d1-n1*d0, d0*d1);
+    }
+    public Rational equalsTimes(int n0, int d0, int n1, int d1)
+    {
+        return set(n0*n1, d0*d1);
+    }
+    public Rational equalsDiv(int n0, int d0, int n1, int d1)
+    {
+        return set(n0*d1, d0*n1);
+    }
+    // note no equalsMod... would need to do what modEquals currently does, but without allocating anything
+    public Rational equalsMod(int n0, int d0, int n1, int d1)
+    {
+        assert(n1 > 0);
+        assert(d1 > 0);
+        // a%b = frac(a/b)*b
+        // where frac(a/b) = a/b - floor(a/b)
+        return set(n0,d0).divEquals(n1,d1).fracEquals().timesEquals(n1,d1);
+    }
+    // lerp(x0,x1,t) = x0 + (x1-x0)*t
+    public Rational equalsLerp(int n0, int d0, int n1, int d1, int nt, int dt)
+    {
+        return this.equalsMinus(n1,d1,n0,d0).times(nt,dt).plus(n0,d0);
+    }
+    public Rational equalsNeg(int n, int d)
+    {
+        return set(-n,d);
+    }
+    public Rational equalsAbs(int n, int d)
+    {
+        return set(ABS(n),ABS(d));
+    }
+    // frac(x) = x - floor(x)
+    public Rational equalsFrac(int n, int d)
+    {
+        return set(n,d).minusEquals(floor(n,d),1);
+    }
+
+
+    // Accumulation functions with RHS in n/d form.
+    // Answer goes back into this, with no memory allocations.
+    public Rational plusEquals(int n, int d)
+    {
+        return this.equalsPlus(this.n,this.d, n,d);
+    }
+    public Rational minusEquals(int n, int d)
+    {
+        return this.equalsMinus(this.n,this.d, n,d);
+    }
+    public Rational timesEquals(int n, int d)
+    {
+        return this.equalsTimes(this.n,this.d, n,d);
+    }
+    public Rational divEquals(int n, int d)
+    {
+        return this.equalsDiv(this.n,this.d, n,d);
+    }
+    public Rational modEquals(int n, int d)
+    {
+        return this.equalsMod(this.n,this.d, n,d);
+    }
+    public Rational lerpEquals(int n1, int d1, int nt, int dt)
+    {
+        return this.equalsLerp(this.n,this.d, n1,d1, nt,dt);
+    }
+    public Rational negEquals()
+    {
+        return this.equalsNeg(this.n,this.d);
+    }
+    public Rational absEquals()
+    {
+        return this.equalsAbs(this.n,this.d);
+    }
+    public Rational fracEquals()
+    {
+        return this.equalsFrac(this.n,this.d);
+    }
+
+
+    // Accumulation functions with RHS in Rational form.
+    // Answer goes back into this, with no memory allocations.
+    public Rational plusEquals(Rational that)
+    {
+        return this.plusEquals(that.n, that.d);
+    }
+    public Rational minusEquals(Rational that)
+    {
+        return this.minusEquals(that.n, that.d);
+    }
+    public Rational timesEquals(Rational that)
+    {
+        return this.timesEquals(that.n, that.d);
+    }
+    public Rational divEquals(Rational that)
+    {
+        return this.divEquals(that.n, that.d);
+    }
+    public Rational modEquals(Rational that)
+    {
+        return this.modEquals(that.n, that.d);
+    }
+    public Rational lerpEquals(Rational that, Rational t)
+    {
+        return this.equalsLerp(this.n,this.d, that.n,that.d,t. n,t.d);
+    }
+
+
+
+
+    // Static functions allocating answer, with LHS and RHS in n/d form.
+    public static Rational plus(int n0, int d0, int n1, int d1)
+    {
+        return new Rational(n0,d0).plusEquals(n1,d1);
+    }
+    public static Rational minus(int n0, int d0, int n1, int d1)
+    {
+        return new Rational(n0,d0).minusEquals(n1,d1);
+    }
+    public static Rational times(int n0, int d0, int n1, int d1)
+    {
+        return new Rational(n0,d0).timesEquals(n1,d1);
+    }
+    public static Rational div(int n0, int d0, int n1, int d1)
+    {
+        return new Rational(n0,d0).divEquals(n1,d1);
+    }
+    public static Rational mod(int n0, int d0, int n1, int d1)
+    {
+        return new Rational(n0,d0).modEquals(n1,d1);
+    }
+
+
+
+    // Functions allocating answer, with RHS in n/d form.
+    public Rational plus(int n, int d)
+    {
+        return new Rational(this).plusEquals(n,d);
+    }
+    public Rational minus(int n, int d)
+    {
+        return new Rational(this).minusEquals(n,d);
+    }
+    public Rational times(int n, int d)
+    {
+        return new Rational(this).timesEquals(n,d);
+    }
+    public Rational div(int n, int d)
+    {
+        return new Rational(this).divEquals(n,d);
+    }
+    public Rational mod(int n, int d)
+    {
+        return new Rational(this).modEquals(n,d);
+    }
+    public Rational neg()
+    {
+        return new Rational(this).negEquals();
+    }
+    public Rational abs()
+    {
+        return new Rational(this).absEquals();
+    }
+    public Rational frac()
+    {
+        return new Rational(this).fracEquals();
+    }
+
+
+    // Functions allocating answer, with RHS in Rational form.
+    public Rational plus(Rational that)
+    {
+        return plus(that.n, that.d);
+    }
+    public Rational minus(Rational that)
+    {
+        return minus(that.n, that.d);
+    }
+    public Rational times(Rational that)
+    {
+        return times(that.n, that.d);
+    }
+    public Rational div(Rational that)
+    {
+        return div(that.n, that.d);
+    }
+    public Rational mod(Rational that)
+    {
+        return mod(that.n, that.d);
+    }
+
+
+
+    // Static functions returning int, taking arg in n/d form.
+    public static int floor(int n, int d)
+    {
+        assert(d > 0);
+        if (n >= 0)
+            return n/d;
+        else
+            return -(-n+d-1)/d; // work around stupid negative division semantics
+    }
+    public static int ceil(int n, int d)
+    {
+        assert(d > 0);
+        if (n >= 0)
+            return (n+d-1)/d;
+        else
+            return -(-n/d); // work around stupid negative division semantics
+    }
+    public static int round(int n, int d)
+    {
+        return floor(2*n+d,2*d); // floor(x + 1/2)
+    }
+
+    // Member functions returning int.
+    public int floor()
+    {
+        return floor(n,d);
+    }
+    public int ceil()
+    {
+        return ceil(n,d);
+    }
+    public int round()
+    {
+        return round(n,d);
+    }
+
+    public Rational floorEquals()
+    {
+        n = floor();
+        d = 1;
+        // no need for reduce
+        return this;
+    }
+    public Rational ceilEquals()
+    {
+        n = ceil();
+        d = 1;
+        // no need for reduce
+        return this;
+    }
+    public Rational roundEquals()
+    {
+        n = round();
+        d = 1;
+        // no need for reduce
+        return this;
+    }
+
+
+
+    public double toDouble()
+    {
+        return (double)n/(double)d;
+    }
+    public String toString()
+    {
+        if (false)
+        {
+            if (d == 1)
+                return ""+n;
+            return n+"/"+d;
+        }
+        else
+        {
+            int n = this.n;
+            if (d == 1)
+                return ""+n;
+            assert(n != 0);
+            String answer;
+            if (n < 0)
+            {
+                answer = "-";
+                n = -n;
+            }
+            else
+            {
+                answer = "";
+            }
+            if (n/d != 0)
+                answer += n/d + " ";
+            answer += n%d + "/" + d;
+            return answer;
+        }
+    }
+
+
+    // reduce to lowest terms, with non-negative denominator.
+    private void reduce()
+    {
+        assert(d != 0);
+        if (d < 0)
+        {
+            n = -n;
+            d = -d;
+        }
+        int g = gcd(n,d);
+        n /= g;
+        d /= g;
+    }
+
+    // private restricted implementation of greatest-common-divisor.
+    // b must be >= 0.
+    private int gcd(int a, int b)
+    {
+        assert(b >= 0);
+        if (a < 0)
+            a = -a;
+        while (true)
+        {
+            if (a == 0)
+                return b;
+            b %= a;
+            if (b == 0)
+                return a;
+            a %= b;
+        }
+    }
+
+
+    // XXX does this belong in MyMath or something?
+    // only used in confidence test
+    public static double fmod(double a, double b)
+    {
+        /*  this doesn't work-- roundoff error!
+        double temp = a / b;
+        return (temp - Math.floor(temp)) * b;
+        */
+        a %= b;
+        if (a < 0.) // retarded
+            a += b;
+        return a;
+    }
+
+
+    public static void confidenceTest()
+    {
+        System.out.println("in Rational.confidenceTest");
+        for (int n0 = -4; n0 <= 4; ++n0)
+        for (int d0 = 1; d0 <= 4; ++d0)
+        {
+            Rational a = new Rational(n0,d0);
+            assert(EQ(a.toDouble(), 1.*n0/d0, 1e-6));
+
+            assert(a.floor() == (int)Math.floor(a.toDouble()));
+            assert(a.ceil() == (int)Math.ceil(a.toDouble()));
+            assert(a.round() == (int)Math.round(a.toDouble()));
+            assert(a.abs().toDouble() == ABS(a.toDouble()));
+            assert(a.neg().toDouble() == -a.toDouble());
+
+            for (int n1 = -4; n1 <= 4; ++n1)
+            for (int d1 = 1; d1 <= 4; ++d1)
+            {
+                Rational b = new Rational(n1,d1);
+
+                assert(EQ(b.toDouble(), 1.*n1/d1, 1e-6));
+
+                assert(EQ(a.plus(b).toDouble(), (1.*n0/d0) + (1.*n1/d1), 1e-6));
+
+                assert(EQ(a.minus(b).toDouble(), (1.*n0/d0) - (1.*n1/d1), 1e-6));
+
+                assert(EQ(a.times(b).toDouble(), (1.*n0/d0) * (1.*n1/d1), 1e-6));
+
+                if (n1 != 0)
+                {
+                    assert(EQ(a.div(b).toDouble(), (1.*n0/d0) / (1.*n1/d1), 1e-6));
+                }
+
+                if (n1 > 0
+                 && d0 != 3 && d0 != -3 && d1 != 3 && d1 != -3) // if nonexact, can run into trouble with very slighly negative numbers, this is expected
+                {
+                    assert(EQ(a.mod(b).toDouble(), fmod((1.*n0/d0) , (1.*n1/d1)), 1e-6));
+                }
+            }
+        }
+        System.out.println("out Rational.confidenceTest");
+    }
+
+    public static void main(String args[])
+    {
+        confidenceTest();
+    }
+} // Rational
+
+
