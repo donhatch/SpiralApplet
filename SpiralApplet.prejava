@@ -1751,8 +1751,8 @@ public class SpiralApplet
         public static class SpiralView
         {
             public Rational focus = new Rational(0,1); // always modulo spiralModel.params.n
-            public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 3); // must be >= 1
-            public Listenable.Int quantaPerPart = new Listenable.Int(2, 1024, 3); // must be >= 1
+            public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // must be >= 1
+            public Listenable.Int quantaPerPart = new Listenable.Int(2, 1024, 1); // must be >= 1
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
             public Rational focusQuantum = new Rational(1,quantaPerPart.get());
             public Rational focusAnimationVelocity = new Rational(0,1);
