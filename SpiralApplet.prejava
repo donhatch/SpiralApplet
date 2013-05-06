@@ -2976,7 +2976,6 @@ public class SpiralApplet
 
         frame.setLocation(10, 10);
         frame.setSize(601,600);
-        frame.setSize(601,300);
 
         frame.setVisible(true);
 
