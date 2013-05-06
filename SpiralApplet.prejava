@@ -598,6 +598,9 @@ public class SpiralApplet
                                 advanceRow();
                                 add(new JLabel("Pixels per part:"));
                                 add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, "pixels per part", 1));
+                                advanceRow();
+                                add(new JLabel("Time quanta per part:"));
+                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.quantaPerPart, "time quanta per part", 1));
                             }});
                             add(new JCheckBoxForBoolean("rungs", applet.theSpiralView.showRungsFlag) {{
                                 setMargin(nomargin);
@@ -925,12 +928,27 @@ public class SpiralApplet
                         return; // we'll get called again
                     }
 
+                    theCanvas.repaint();
+                }
+            });
+            theSpiralView.quantaPerPart.addListener(quantaPerPartListener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    if (theSpiralView.quantaPerPart.get() <= 0)
+                    {
+                        // reject!
+                        System.out.println("rejecting change to quantaPerPart!");
+                        theSpiralView.quantaPerPart.set(2);
+                        return; // we'll get called again
+                    }
+
                     // XXX should this be in SpiralView? hmm
-                    theSpiralView.focusQuantum.set(2,theSpiralView.pixelsPerPart.get());
+                    theSpiralView.focusQuantum.set(1,theSpiralView.quantaPerPart.get());
 
                     theCanvas.repaint();
                 }
             });
+
             showTimingFlag.addListener(showTimingFlagListener = new Listenable.Listener() {
                 public void valueChanged()
                 {
@@ -1317,7 +1335,7 @@ public class SpiralApplet
 
 
                     double scale = .5; // TODO: gui hook for this
-                    if (false)
+                    if (true)
                     {
                         // draw dual spiral
                         drawSpiral(mg,
@@ -1329,7 +1347,7 @@ public class SpiralApplet
                                    false, // drawRungsFlag
                                    antiAliasingFlag);
                     }
-                    if (false)
+                    if (true)
                     {
                         // draw primal spiral
                         drawSpiral(mg,
@@ -1733,8 +1751,9 @@ public class SpiralApplet
         {
             public Rational focus = new Rational(0,1); // always modulo spiralModel.params.n
             public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 3); // must be >= 1
+            public Listenable.Int quantaPerPart = new Listenable.Int(2, 1024, 3); // must be >= 1
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
-            public Rational focusQuantum = new Rational(2,pixelsPerPart.get());
+            public Rational focusQuantum = new Rational(1,quantaPerPart.get());
             public Rational focusAnimationVelocity = new Rational(0,1);
             public SpiralView()
             {}
@@ -1835,6 +1854,10 @@ public class SpiralApplet
                 {
                     g.fillRect(ixBase,iyBase-iPart*pixelsPerPart,1,1);
                 }
+                g.drawLine(ixBase,
+                           iyBase,
+                           ixBase-(nParts-1)*pixelsPerPart/2,
+                           iyBase-(nParts-1)*pixelsPerPart/2);
 
                 // yellow for rail
                 g.setColor(java.awt.Color.yellow);
@@ -1850,7 +1873,7 @@ public class SpiralApplet
             //PRINT(focus);
             int i0 = focus.floor();
             //PRINT(i0);
-            Rational frac = new Rational(focus); frac.minusEquals(i0,1); // frac = focus - i0, before modding i0
+            Rational frac = focus.minus(i0,1); // frac = focus - i0, before modding i0 by n
             i0 = MOD(i0, n);
             //PRINT(i0);
             int i1 = (i0+1)%n;
@@ -1859,7 +1882,7 @@ public class SpiralApplet
             //PRINT(val0);
             //PRINT(val1);
             //PRINT(frac);
-            Rational val = new Rational(val0,1).lerp(new Rational(val1,1),frac); // LERP(val0,val1,frac)   XXX make this cleaner
+            Rational val = new Rational(val0,1).lerpEquals(val1,1, frac.n,frac.d); // val = lerp(val0,val1,frac)
             //PRINT(val);
 
 
@@ -2012,20 +2035,20 @@ public class SpiralApplet
             // the focus
             spiralView.focus.modEquals(n,1); // make sure
             Rational focus = spiralView.focus;
-            //PRINT(focus);
+            if (debugLevel >= 1) PRINT(focus);
             int i0 = focus.floor();
-            //PRINT(i0);
-            Rational frac = new Rational(0,1); frac.minusEquals(i0,1); // frac = focus - i0, before modding i0
+            if (debugLevel >= 1) PRINT(i0);
+            Rational frac = focus.minus(i0,1); // frac = focus - i0, before modding i0 by n
             i0 = MOD(i0, n);
-            //PRINT(i0);
+            if (debugLevel >= 1) PRINT(i0);
             int i1 = (i0+1)%n;
             int val0 = spiralModel.theList[i0];
             int val1 = spiralModel.theList[i1];
-            //PRINT(val0);
-            //PRINT(val1);
-            //PRINT(frac);
-            double val = LERP(val0,val1,frac.toDouble()); // XXX TODO: use rational arithmetic all the way through
-            //PRINT(val);
+            if (debugLevel >= 1) PRINT(val0);
+            if (debugLevel >= 1) PRINT(val1);
+            if (debugLevel >= 1) PRINT(frac);
+            double val = LERP(val0,val1,frac.toDouble()); // XXX TODO: use rational arithmetic all the way through... maybe? actually might not be necessary in this function
+            if (debugLevel >= 1) PRINT(val);
 
             if (debugLevel >= 1)
             {
@@ -2297,7 +2320,7 @@ public class SpiralApplet
                     {
                         System.out.println("HEY! centerY is "+centerY);
                     }
-                    assert(centerY > 0.);
+                    //assert(centerY > 0.);
                 }
 
             } // for iScanDir
@@ -2417,6 +2440,7 @@ public class SpiralApplet
         private Listenable.Listener showRungsFlagListener = null;
         private Listenable.Listener focusListener = null;
         private Listenable.Listener pixelsPerPartListener = null;
+        private Listenable.Listener quantaPerPartListener = null;
         private Listenable.Listener showTimingFlagListener = null;
         private Listenable.Listener showNonTimingFlagListener = null;
         private Listenable.Listener showFocusInControlPanelListener = null;
@@ -2930,6 +2954,7 @@ public class SpiralApplet
 
         frame.setLocation(10, 10);
         frame.setSize(601,600);
+        frame.setSize(601,300);
 
         frame.setVisible(true);
 
