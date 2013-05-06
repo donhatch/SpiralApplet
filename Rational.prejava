@@ -9,6 +9,7 @@ public class Rational
     {
         set(0,0); // NaN
     }
+    // gets reduced to lowest terms, with non-negative denominator.
     public Rational(int n, int d)
     {
         set(n, d);

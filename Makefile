@@ -45,6 +45,7 @@ CLASSES = \
         MyGraphics.class \
         MyGraphics3D.class \
         GraphicsAntiAliasingSetter.class \
+        Rational.class \
         SpiralApplet.class
         ${NULL}
 JAR_DEPENDS_ON = ${CLASSES}      macros.h Makefile javacpp javarenumber README
@@ -96,6 +97,7 @@ renumber: $(JARFILE).is_renumbered
 MyGraphics.class: macros.h Makefile donhatchsw.jar
 MyGraphics3D.class: macros.h Makefile donhatchsw.jar
 GraphicsAntiAliasingSetter.class: macros.h Makefile donhatchsw.jar
+Rational.class: macros.h Makefile
 SpiralApplet.class: macros.h Makefile donhatchsw.jar
 
 SENDFILES = index.php $(JARFILE)
