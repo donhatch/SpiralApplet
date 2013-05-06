@@ -429,7 +429,9 @@ public class SpiralApplet
                                 public void actionPerformed(java.awt.event.ActionEvent e)
                                 {
                                     applet.theSpiralModel.init(applet.spiralModelParams.n.get(), applet.spiralModelParams.nParts.get(), applet.spiralModelParams.deltaStyle.get(), applet.spiralModelParams.randomSeed.get());
-                                    applet.theSpiralView.focus.set(fmod(applet.theSpiralView.focus.get(), applet.theSpiralModel.params.n.get()));
+
+                                    applet.theSpiralView.focus.modEquals(
+                                        applet.theSpiralModel.params.n.get(), 1);
 
                                     applet.theCanvas.repaint();
                                 }
@@ -449,19 +451,11 @@ public class SpiralApplet
                                     addActionListener(new java.awt.event.ActionListener() {
                                         public void actionPerformed(java.awt.event.ActionEvent e)
                                         {
-                                            applet.theSpiralView.focus.set(0.);
+                                            applet.theSpiralView.focus.set(0,1);
                                             applet.theCanvas.repaint();
                                         }
                                     });
                                 }}, centerjustify);
-
-                                if (true) // can make it visible/invisible on the fly with the "show focus in control panel" debug checkbox
-                                    add(applet.focusInControlPanelRow = new JRow() {{
-                                        add(new JLabel(" focus: "));
-                                        add(new JTextFieldForNumber(applet.theSpiralView.focus){{
-                                            makeTextComponentLikeLabel(this);
-                                        }});
-                                    }});
                             }});
                             add(new JRow() {{
                                 add(new JRepeatingButton("") {
@@ -920,20 +914,6 @@ public class SpiralApplet
                 }
             });
 
-            theSpiralView.focus.addListener(focusListener = new Listenable.Listener() {
-                public void valueChanged()
-                {
-                    // polish the value: if it's almost exactly 0 mod .125, round it
-                    double value = theSpiralView.focus.get();
-                    double roundedValue = Math.round(value*8)*.125;
-                    if (roundedValue != value
-                     && ABS(value-roundedValue) < 1e-6)
-                    {
-                        System.out.println("rounding focus from "+value+" to "+roundedValue);
-                        theSpiralView.focus.set(roundedValue);
-                    }
-                }
-            });
             theSpiralView.pixelsPerPart.addListener(pixelsPerPartListener = new Listenable.Listener() {
                 public void valueChanged()
                 {
@@ -946,7 +926,7 @@ public class SpiralApplet
                     }
 
                     // XXX should this be in SpiralView? hmm
-                    theSpiralView.focusQuantum = 2./3./theSpiralView.pixelsPerPart.get();
+                    theSpiralView.focusQuantum.set(2,theSpiralView.pixelsPerPart.get());
 
                     theCanvas.repaint();
                 }
@@ -1285,9 +1265,8 @@ public class SpiralApplet
                 }
 
                 // TODO: need to synchronize this I think
-                theSpiralView.focus.set(
-                    fmod(theSpiralView.focus.get() + theSpiralView.focusAnimationVelocity.get(),
-                         theSpiralModel.params.n.get()));
+                theSpiralView.focus.plusEquals(theSpiralView.focusAnimationVelocity);
+                theSpiralView.focus.modEquals(theSpiralModel.params.n.get(), 1);
 
                 double minSize = (double)MIN(size.width, size.height);
 
@@ -1580,19 +1559,6 @@ public class SpiralApplet
                                      v2[0], v2[1]);
         }
 
-        // XXX does this belong in MyMath or something?
-        public static double fmod(double a, double b)
-        {
-            /*   oh no! roundoff error!
-            double temp = a / b;
-            return (temp - Math.floor(temp)) * b;
-            */
-            a %= b;
-            if (a < 0.) // retarded
-                a += b;
-            return a;
-        }
-
 
 
 
@@ -1765,15 +1731,13 @@ public class SpiralApplet
         }; // public class SpiralModel
         public static class SpiralView
         {
-            public Listenable.Double focus = new Listenable.Double(0.,0., 0.); // modulo spiralModel.params.n
+            public Rational focus = new Rational(0,1); // always modulo spiralModel.params.n
             public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 3); // must be >= 1
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
-            public double focusQuantum;
-            public Listenable.Double focusAnimationVelocity = new Listenable.Double(0., 0., 0.);
+            public Rational focusQuantum = new Rational(2,pixelsPerPart.get());
+            public Rational focusAnimationVelocity = new Rational(0,1);
             public SpiralView()
-            {
-                this.focusQuantum = 2./3./pixelsPerPart.get(); // and needs to be kept updated
-            }
+            {}
         }; // public class SpiralView
 
 
@@ -1783,7 +1747,7 @@ public class SpiralApplet
                                SpiralModel spiralModel,
                                SpiralView spiralView)
         {
-            //System.out.println("    in drawTicker");
+            System.out.println("    in drawTicker");
             int n = spiralModel.params.n.get();
             int nParts = spiralModel.params.nParts.get();
             int pixelsPerPart = spiralView.pixelsPerPart.get();
@@ -1881,21 +1845,22 @@ public class SpiralApplet
 
             // the two indices bounding
             // the focus
-            double focus = fmod(spiralView.focus.get(), n);
-            //PRINT(focus);
-            int i0 = (int)Math.floor(focus);
-            //PRINT(i0);
-            double frac = focus - i0;
+            spiralView.focus.modEquals(n,1); // make sure
+            Rational focus = spiralView.focus;
+            PRINT(focus);
+            int i0 = focus.floor();
+            PRINT(i0);
+            Rational frac = new Rational(focus); frac.minusEquals(i0,1); // frac = focus - i0, before modding i0
             i0 = MOD(i0, n);
-            //PRINT(i0);
+            PRINT(i0);
             int i1 = (i0+1)%n;
             int val0 = spiralModel.theList[i0];
             int val1 = spiralModel.theList[i1];
-            //PRINT(val0);
-            //PRINT(val1);
-            //PRINT(frac);
-            double val = LERP(val0,val1,frac);
-            //PRINT(val);
+            PRINT(val0);
+            PRINT(val1);
+            PRINT(frac);
+            Rational val = new Rational(val0,1).lerp(new Rational(val1,1),frac); // LERP(val0,val1,frac)   XXX make this cleaner
+            PRINT(val);
 
 
             // Now we need to figure out
@@ -1922,26 +1887,43 @@ public class SpiralApplet
             {
                 // figure out how many pixels from base to i0
 
-                double upperLeftOffset = val0*(pixelsPerPart*.5);
-                double lowerLeftOffset = ABS(val-val0)*(pixelsPerPart*.5);
+                Rational upperLeftOffset = new Rational(val0*pixelsPerPart, 2);
+                Rational lowerLeftOffset = val.minus(val0,1).abs().times(pixelsPerPart,2);
+                PRINT(upperLeftOffset);
+                PRINT(lowerLeftOffset);
 
                 // upperLeftOffset is now a multiple of .5.
                 // adjust lowerLeftOffset to nearest value that's the same as upperLeftOffset mod 1.
 
-                if ((int)upperLeftOffset == upperLeftOffset)
-                    lowerLeftOffset = (int)Math.round(lowerLeftOffset);
+                if (upperLeftOffset.d == 1) // i.e. if it's an integer
+                {
+                    System.out.println("it was an integer");
+                    lowerLeftOffset = new Rational(lowerLeftOffset.round(),1); // XXX make this more efficient and clear
+                }
                 else
-                    lowerLeftOffset = (int)Math.round(lowerLeftOffset+.5)-.5;
+                {
+                    System.out.println("it was not an integer");
+                    lowerLeftOffset = new Rational(lowerLeftOffset.plus(1,2).round(),1).minus(1,2); // XXX make this more efficient and clear
+                }
+                PRINT(lowerLeftOffset);
 
-                double xOffset = (-upperLeftOffset - lowerLeftOffset);
-                double yOffset = (-upperLeftOffset + lowerLeftOffset);
-                assert((double)(int)xOffset == xOffset);
-                assert((double)(int)yOffset == yOffset);
+                //double xOffset = (-upperLeftOffset - lowerLeftOffset);
+                //double yOffset = (-upperLeftOffset + lowerLeftOffset);
+                //assert((double)(int)xOffset == xOffset);
+                //assert((double)(int)yOffset == yOffset);
 
-                ix0 = ixBase + (int)xOffset;
-                iy0 = iyBase + (int)yOffset;
-                //PRINT(ix0);
-                //PRINT(iy0);
+                Rational xOffset = upperLeftOffset.times(-1,1).minus(lowerLeftOffset);
+                Rational yOffset = upperLeftOffset.times(-1,1).plus(lowerLeftOffset);
+                PRINT(xOffset);
+                PRINT(yOffset);
+                assert(xOffset.d == 1);
+                assert(yOffset.d == 1);
+
+
+                ix0 = ixBase + xOffset.n;
+                iy0 = iyBase + yOffset.n;
+                PRINT(ix0);
+                PRINT(iy0);
             }
 
             if (true)
@@ -2007,7 +1989,7 @@ public class SpiralApplet
                 }
             }
 
-            //System.out.println("    out drawTicker");
+            System.out.println("    out drawTicker");
         } // drawTicker
 
         // Exacly one of drawPrimalFlag and drawDualFlag must be true
@@ -2034,26 +2016,22 @@ public class SpiralApplet
 
             // the two indices bounding
             // the focus
-            double focus = fmod(spiralView.focus.get(), n);
-            int i0, i1;
-            if (true)
-            {
-                i0 = (int)Math.floor(focus);
-                i0 = MOD(i0, n);
-                i1 = (i0+1)%n;
-            }
-            else
-            {
-                i1 = (int)Math.ceil(focus);
-                i1 = MOD(i1, n);
-                i0 = MOD(i1-1,n);
-            }
-
-            double frac = focus - i0;
-
+            spiralView.focus.modEquals(n,1); // make sure
+            Rational focus = spiralView.focus;
+            //PRINT(focus);
+            int i0 = focus.floor();
+            //PRINT(i0);
+            Rational frac = new Rational(0,1); frac.minusEquals(i0,1); // frac = focus - i0, before modding i0
+            i0 = MOD(i0, n);
+            //PRINT(i0);
+            int i1 = (i0+1)%n;
             int val0 = spiralModel.theList[i0];
             int val1 = spiralModel.theList[i1];
-            double val = LERP(val0,val1,frac);
+            //PRINT(val0);
+            //PRINT(val1);
+            //PRINT(frac);
+            double val = LERP(val0,val1,frac.toDouble()); // XXX TODO: use rational arithmetic all the way through
+            //PRINT(val);
 
             if (debugLevel >= 1)
             {
@@ -2335,34 +2313,34 @@ public class SpiralApplet
 
         private void accelBackward()
         {
-            boolean startAnimationFlag = theSpiralView.focusAnimationVelocity.get() == 0;
-            theSpiralView.focusAnimationVelocity.set(theSpiralView.focusAnimationVelocity.get() - theSpiralView.focusQuantum);
+            boolean startAnimationFlag = theSpiralView.focusAnimationVelocity.n == 0;
+            theSpiralView.focusAnimationVelocity.minusEquals(theSpiralView.focusQuantum);
             if (startAnimationFlag)
                 startTheAnimation();
         }
         private void stepBackward()
         {
-            theSpiralView.focusAnimationVelocity.set(0.);
-            theSpiralView.focus.set(theSpiralView.focus.get() - theSpiralView.focusQuantum);
-            theSpiralView.focus.set(fmod(theSpiralView.focus.get(), theSpiralModel.params.n.get()));
+            theSpiralView.focusAnimationVelocity.set(0,1);
+            theSpiralView.focus.minusEquals(theSpiralView.focusQuantum);
+            theSpiralView.focus.modEquals(theSpiralModel.params.n.get(), 1);
             theCanvas.repaint();
         }
         private void pause()
         {
-            theSpiralView.focusAnimationVelocity.set(0.);
+            theSpiralView.focusAnimationVelocity.set(0,1);
             theCanvas.repaint();
         }
         private void stepForward()
         {
-            theSpiralView.focusAnimationVelocity.set(0.);
-            theSpiralView.focus.set(theSpiralView.focus.get() + theSpiralView.focusQuantum);
-            theSpiralView.focus.set(fmod(theSpiralView.focus.get(), theSpiralModel.params.n.get()));
+            theSpiralView.focusAnimationVelocity.set(0,1);
+            theSpiralView.focus.plusEquals(theSpiralView.focusQuantum);
+            theSpiralView.focus.modEquals(theSpiralModel.params.n.get(), 1);
             theCanvas.repaint();
         }
         private void accelForward()
         {
-            boolean startAnimationFlag = theSpiralView.focusAnimationVelocity.get() == 0;
-            theSpiralView.focusAnimationVelocity.set(theSpiralView.focusAnimationVelocity.get() + theSpiralView.focusQuantum);
+            boolean startAnimationFlag = theSpiralView.focusAnimationVelocity.n == 0;
+            theSpiralView.focusAnimationVelocity.plusEquals(theSpiralView.focusQuantum);
             if (startAnimationFlag)
                 startTheAnimation();
         }
@@ -2385,12 +2363,12 @@ public class SpiralApplet
                         if (eventVerbose >= 1) System.out.println("in timer action");
 
                         // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
-                        double focusAnimationVelocitySnapshot;
+                        boolean focusAnimationVelocityIsZero;
                         synchronized(theSpiralView.focusAnimationVelocity)
                         {
-                            focusAnimationVelocitySnapshot = theSpiralView.focusAnimationVelocity.get();
+                            focusAnimationVelocityIsZero = (theSpiralView.focusAnimationVelocity.n == 0);
                         }
-                        if (focusAnimationVelocitySnapshot == 0.)
+                        if (focusAnimationVelocityIsZero)
                         {
                             System.out.println("    stopping timer");
                             theTimer.stop();
@@ -2797,6 +2775,305 @@ public class SpiralApplet
 
 
 
+    public static class Rational
+    {
+        public int n, d;
+        public Rational(int n, int d)
+        {
+            set(n, d);
+        }
+        public Rational(Rational that)
+        {
+            set(that.n, that.d);
+        }
+        public void set(Rational that)
+        {
+            set(that.n, that.d);
+        }
+        public void set(int n, int d)
+        {
+            assert(d > 0);
+            this.n = n;
+            this.d = d;
+            reduce();
+        }
+        public void plusEquals(int n, int d)
+        {
+            assert(d > 0);
+            set(this.n*d + n*this.d, this.d*d);
+            reduce();
+        }
+        public void minusEquals(int n, int d)
+        {
+            assert(d > 0);
+            set(this.n*d - n*this.d, this.d*d);
+            reduce();
+        }
+        public void timesEquals(int n, int d)
+        {
+            assert(d > 0);
+            set(this.n*n, this.d*d);
+            reduce();
+        }
+        public void divEquals(int n, int d)
+        {
+            assert(d > 0);
+            assert(n != 0);
+            if (n > 0)
+                set(this.n*d, this.d*n);
+            else
+                set(-this.n*d, -this.d*n);
+            reduce();
+        }
+        public void modEquals(int n, int d)
+        {
+            assert(d > 0);
+            assert(n > 0);
+            divEquals(n,d); // asserts n!=0
+            minusEquals(floor(),1);
+            timesEquals(n,d);
+        }
+
+        public void plusEquals(Rational that)
+        {
+            plusEquals(that.n, that.d);
+        }
+        public void minusEquals(Rational that)
+        {
+            minusEquals(that.n, that.d);
+        }
+        public void timesEquals(Rational that)
+        {
+            timesEquals(that.n, that.d);
+        }
+        public void divEquals(Rational that)
+        {
+            divEquals(that.n, that.d);
+        }
+        public void modEquals(Rational that)
+        {
+            modEquals(that.n, that.d);
+        }
+        public void negEquals()
+        {
+            n = -n;
+        }
+        public void absEquals()
+        {
+            n = ABS(n);
+        }
+
+        public Rational plus(int n, int d)
+        {
+            Rational answer = new Rational(this);
+            answer.plusEquals(n, d);
+            return answer;
+        }
+        public Rational minus(int n, int d)
+        {
+            Rational answer = new Rational(this);
+            answer.minusEquals(n, d);
+            return answer;
+        }
+        public Rational times(int n, int d)
+        {
+            Rational answer = new Rational(this);
+            answer.timesEquals(n, d);
+            return answer;
+        }
+        public Rational div(int n, int d)
+        {
+            Rational answer = new Rational(this);
+            answer.divEquals(n, d);
+            return answer;
+        }
+        public Rational mod(int n, int d)
+        {
+            Rational answer = new Rational(this);
+            answer.modEquals(n, d);
+            return answer;
+        }
+
+        public Rational neg()
+        {
+            Rational answer = new Rational(this);
+            answer.negEquals();
+            return answer;
+        }
+        public Rational abs()
+        {
+            Rational answer = new Rational(this);
+            answer.absEquals();
+            return answer;
+        }
+
+        public Rational plus(Rational that)
+        {
+            return plus(that.n, that.d);
+        }
+        public Rational minus(Rational that)
+        {
+            return minus(that.n, that.d);
+        }
+        public Rational times(Rational that)
+        {
+            return times(that.n, that.d);
+        }
+        public Rational div(Rational that)
+        {
+            return div(that.n, that.d);
+        }
+        public Rational mod(Rational that)
+        {
+            return mod(that.n, that.d);
+        }
+
+
+        public Rational lerp(Rational that, Rational t)
+        {
+            // this + (that-this)*t
+            return this.plus(that.minus(this).times(t));
+        }
+
+        public int floor()
+        {
+            if (n >= 0)
+                return n/d;
+            else
+                return -(-n+d-1)/d; // work around stupid negative division semantics
+        }
+        public int ceil()
+        {
+            if (n >= 0)
+                return (n+d-1)/d;
+            else
+                return -(-n/d); // work around stupid negative division semantics
+        }
+        public int round()
+        {
+            return this.plus(1,2).floor(); // XXX get rid of memory allocation
+        }
+        public void reduce()
+        {
+            int g = gcd(n,d);
+            n /= g;
+            d /= g;
+        }
+        public double toDouble()
+        {
+            return (double)n/(double)d;
+        }
+        public String toString()
+        {
+            if (false)
+            {
+                if (d == 1)
+                    return ""+n;
+                return n+"/"+d;
+            }
+            else
+            {
+                int n = this.n;
+                if (d == 1)
+                    return ""+n;
+                assert(n != 0);
+                String answer;
+                if (n < 0)
+                {
+                    answer = "-";
+                    n = -n;
+                }
+                else
+                {
+                    answer = "";
+                }
+                if (n/d != 0)
+                    answer += n/d + " ";
+                answer += n%d + "/" + d;
+                return answer;
+            }
+        }
+
+        // private restricted implementation of greatest-common-divisor.
+        // b must be >= 0.
+        private int gcd(int a, int b)
+        {
+            assert(b >= 0);
+            if (a < 0)
+                a = -a;
+            while (true)
+            {
+                if (a == 0)
+                    return b;
+                b %= a;
+                if (b == 0)
+                    return a;
+                a %= b;
+            }
+        }
+
+
+        // XXX does this belong in MyMath or something?
+        // only used in confidence test
+        public static double fmod(double a, double b)
+        {
+            /*   oh no! roundoff error!
+            double temp = a / b;
+            return (temp - Math.floor(temp)) * b;
+            */
+            a %= b;
+            if (a < 0.) // retarded
+                a += b;
+            return a;
+        }
+
+
+        public static void confidenceTest()
+        {
+            System.out.println("in Rational.confidenceTest");
+            for (int n0 = -4; n0 <= 4; ++n0)
+            for (int d0 = 1; d0 <= 4; ++d0)
+            {
+                Rational a = new Rational(n0,d0);
+                assert(EQ(a.toDouble(), 1.*n0/d0, 1e-6));
+
+                assert(a.floor() == (int)Math.floor(a.toDouble()));
+                assert(a.ceil() == (int)Math.ceil(a.toDouble()));
+                assert(a.round() == (int)Math.round(a.toDouble()));
+                assert(a.abs().toDouble() == ABS(a.toDouble()));
+                assert(a.neg().toDouble() == -a.toDouble());
+
+                for (int n1 = -4; n1 <= 4; ++n1)
+                for (int d1 = 1; d1 <= 4; ++d1)
+                {
+                    Rational b = new Rational(n1,d1);
+
+                    assert(EQ(b.toDouble(), 1.*n1/d1, 1e-6));
+
+                    assert(EQ(a.plus(b).toDouble(), (1.*n0/d0) + (1.*n1/d1), 1e-6));
+
+                    assert(EQ(a.minus(b).toDouble(), (1.*n0/d0) - (1.*n1/d1), 1e-6));
+
+                    assert(EQ(a.times(b).toDouble(), (1.*n0/d0) * (1.*n1/d1), 1e-6));
+
+                    if (n1 != 0)
+                    {
+                        assert(EQ(a.div(b).toDouble(), (1.*n0/d0) / (1.*n1/d1), 1e-6));
+                    }
+
+                    if (n1 > 0
+                     && d0 != 3 && d0 != -3 && d1 != 3 && d1 != -3) // if nonexact, can run into trouble with very slighly negative numbers, this is expected
+                    {
+                        assert(EQ(a.mod(b).toDouble(), fmod((1.*n0/d0) , (1.*n1/d1)), 1e-6));
+                    }
+                }
+            }
+            System.out.println("out Rational.confidenceTest");
+        }
+    } // Rational
+
+
+
 
     private static java.lang.reflect.Method nanoTimeMethod = null;
     {
@@ -2843,6 +3120,10 @@ public class SpiralApplet
     //
     public static void main(final String args[])
     {
+        if (true)
+        {
+            Rational.confidenceTest();
+        }
         if (false) // turn this on to get a crude little timing test
         {
             if (nanoTimeMethod != null)
@@ -2902,7 +3183,7 @@ public class SpiralApplet
         {
             // http://stackoverflow.com/questions/12805373/java-modulo-operator
             // surprising!
-            PRINT(fmod(5.59, 2));
+            //PRINT(fmod(5.59, 2));
             PRINT(5.59 % 2); // 1.5899999999999999
             PRINT(5.59 - 2); // 3.59
             PRINT(5.59 - 4); // 1.5899999999999999
