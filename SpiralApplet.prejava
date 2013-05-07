@@ -1610,7 +1610,8 @@ public class SpiralApplet
                                 // primalAng is increasing.
                                 // this shrinks the canonical representation of the primal,
                                 // thereby shrinking the center accordingly.
-                                // nothing happens to the weight.
+                                // nothing happens to the weight,
+                                // nor to the direction from origin to center.
                                 double shrink = Math.cos(primalAng)
                                               / Math.cos(prevPrimalAng);
                                 assert(shrink < 1.);
@@ -2123,6 +2124,7 @@ public class SpiralApplet
                                 prevPrevVal != prevVal &&
                                 (thisVal>prevVal) != (prevVal>prevPrevVal))
                             {
+                                // draw point at larger-index endpoint of the line
                                 if (scanDir < 0)
                                 {
                                     mg.drawPoint(primalX, primalY, 5);
@@ -2227,6 +2229,7 @@ public class SpiralApplet
                         if (scanDir < 0)
                         {
                             double areaIncr = twiceTriangleArea(0.,0., dualX,dualY, nextDualX,nextDualY);
+                            assert(areaIncr <= 0.); // area triangle is negative since scanning backwards
                             areaIncr = ABS(areaIncr);
 
                             if (area+areaIncr == area)
@@ -2251,6 +2254,27 @@ public class SpiralApplet
                         dualX = nextDualX;
                         dualY = nextDualY;
                     }
+
+                    if (drawDualFlag // actually maybe should be another flag for this?
+                     && scanDir < 0)
+                    {
+                        // actually just want normalized, but we'll divide by dualR later instead
+                        double m[][] = {
+                            {dualX,dualY},
+                            {-dualY,dualX},
+                        };
+                        double center[] = VecMath.vxm(spiralModel.centers[i], m);
+                        VecMath.vxs(center, center, primalR/dualR); // divide by dualR because we should never have multiplied by it
+                        //VecMath.vxs(center, center, 2.); // XXX I don't understand this
+                        java.awt.Color savedColor = mg.getColor();
+                        mg.setColor(java.awt.Color.yellow);
+
+                        boolean big = (spiralModel.theList[i] < spiralModel.theList[(i+1)%n])
+                                 && !(spiralModel.theList[MOD(i-1,n)] < spiralModel.theList[i]);
+                        mg.drawPoint(center[0], center[1], big?3:1);
+                        mg.setColor(savedColor);
+                    }
+
                     prevPrevVal = prevVal;
                     prevVal = thisVal;
                 }
@@ -2265,8 +2289,12 @@ public class SpiralApplet
                     }
                     //assert(centerY > 0.);
 
+                    /*
+                    // actually bogus to be drawing these here but...
+                    mg.setColor(java.awt.Color.red);
                     mg.drawPoint(spiralModel.centers[i0][0], spiralModel.centers[i0][1], 3);
                     mg.drawPoint(spiralModel.centers[i1][0], spiralModel.centers[i1][1], 3);
+                    */
                 }
 
             } // for iScanDir
