@@ -1576,23 +1576,120 @@ public class SpiralApplet
 
                 this.centers = new double[n][2];
                 this.weights = new double[n];
-                if (false)  // XXX fix
+                if (true)
                 {
+                    // compute all cumulative centers and weights
+
                     double prevWeight = 0.;
                     double prevCenter[] = {0.,0.};
                     double thisWeight = 0.;
                     double thisCenter[] = {0.,0.};
 
                     boolean done = false;
+
+                    double prevVal = theList[n-1];
                     FORI (iPass, 2)
                     {
                         FORI (i, n)
                         {
                             // Compute new weight and center
                             // from prev weight and center
+
+                            // val is (proportional to) 90+dualAng-primalAng.
+                            // when val increases, it means dualAng is increasing.
+                            // when val decreases, it means primalAng is increasing.
+                            // but, we always keep it canonicalized so that dualAng is 0.
+                            double val = theList[i];
+                            double prevPrimalAng = Math.PI/2 * (1 - (prevVal+.5)/nParts);
+                            double primalAng = Math.PI/2 * (1 - (val+.5)/nParts);
+                            if (primalAng > prevPrimalAng)
+                            {
+                                // primalAng is increasing.
+                                // this shrinks the canonical representation of the primal,
+                                // thereby shrinking the center accordingly.
+                                // nothing happens to the weight.
+                                double shrink = Math.cos(primalAng)
+                                              / Math.cos(prevPrimalAng);
+                                assert(shrink < 1.);
+                                VecMath.vxs(thisCenter, prevCenter, shrink);
+                                thisWeight = prevWeight;
+                            }
+                            else
+                            {
+                                // dualAng is increasing...
+                                // decrease primalAng to compensate,
+                                // so dualAng ends up zero.
+                                // the formula for shrink is magic, worked out on paper
+                                double shrink = Math.sin(primalAng)
+                                              / Math.sin(prevPrimalAng);
+                                assert(shrink <= 1.);
+
+                                double weightIncr = shrink*Math.sin(prevPrimalAng-primalAng);
+                                assert(weightIncr >= 0.);
+                                double prevWeightShrunk = prevWeight * SQR(shrink);
+                                thisWeight = prevWeightShrunk + weightIncr;
+
+                                // angle to rotate previous picture by (CW, so it's negative)
+                                double t = primalAng-prevPrimalAng;
+                                assert(t <= 0.);
+                                double ct = Math.cos(t);
+                                double st = Math.sin(t);
+                                double m[][] = {
+                                    {ct,st},
+                                    {-st,ct},
+                                };
+                                VecMath.vxm(thisCenter, prevCenter, m);
+                                if (thisWeight == 0.)
+                                    assert(weightIncr == 0.);
+                                else
+                                {
+                                    VecMath.lerp(thisCenter,thisCenter, new double[]{Math.cos(primalAng),Math.sin(primalAng)}, weightIncr/thisWeight);
+                                }
+                            }
+
+                            if (done)
+                            {
+                                assert(VecMath.equalsExactly(this.centers[i], thisCenter));
+                                assert(this.weights[i] == thisWeight);
+                            }
+                            else if (iPass > 0
+                                  && VecMath.equalsExactly(this.centers[i], thisCenter)
+                                  && this.weights[i] == thisWeight)
+                            {
+                                System.out.println("centers and weights stabilized at iPass="+iPass+" i="+i);
+                                done = true;
+                            }
+                            else
+                            {
+                                if (iPass==1 && i == n-1)
+                                {
+                                    // oh no, didn't stabilize.. print out the damage
+                                    PRINTVEC(this.centers[i]);
+                                    PRINT(this.weights[i]);
+                                    PRINTVEC(thisCenter);
+                                    PRINT(thisWeight);
+                                }
+
+                                VecMath.copyvec(this.centers[i], thisCenter);
+                                this.weights[i] = thisWeight;
+                            }
+
+                            prevCenter[0] = thisCenter[0];
+                            prevCenter[1] = thisCenter[1];
+                            prevWeight = thisWeight;
+                            prevVal = val;
                         }
                     }
                     assert(done);
+                }
+
+                if (false) // maybe don't do this here? not sure, it's hard to debug here.
+                {
+                    // sanity check-- all centers should have strictly positive y coord.
+                    FORI (i, n)
+                    {
+                        assert(centers[i][1] > 0.);
+                    }
                 }
             }
         }; // public class SpiralModel
@@ -2191,6 +2288,9 @@ public class SpiralApplet
                         System.out.println("HEY! centerY is "+centerY);
                     }
                     //assert(centerY > 0.);
+
+                    mg.drawPoint(spiralModel.centers[i0][0], spiralModel.centers[i0][1], 3);
+                    mg.drawPoint(spiralModel.centers[i1][0], spiralModel.centers[i1][1], 3);
                 }
 
             } // for iScanDir
@@ -2870,7 +2970,9 @@ public class SpiralApplet
         applet.start();
 
         frame.setLocation(10, 10);
+        frame.setLocation(520, 10);
         frame.setSize(601,600);
+        frame.setSize(200,600);
 
         frame.setVisible(true);
 
