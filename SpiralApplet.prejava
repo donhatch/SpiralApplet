@@ -17,6 +17,7 @@
           and a few days later, it's not happening any more... it's going full speed again, even with the timer.  wtf??
           but then a few minutes later, it's throttled again.  weird weird weird.
           actually maybe when non-throttled, I'd been running it for a while?
+    TODO: allow saving/restoring window positions, but in a discoverable non-evil way
 */
 
 #include "macros.h"
@@ -1699,7 +1700,7 @@ public class SpiralApplet
         }; // public class SpiralModel
         public static class SpiralView
         {
-            public Rational focus = new Rational(0,1); // always modulo spiralModel.params.n
+            public Rational focus = new Rational(636,1); // always modulo spiralModel.params.n
             public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // must be >= 1
             public Listenable.Int quantaPerPart = new Listenable.Int(2, 1024, 1); // must be >= 1
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
@@ -2974,9 +2975,8 @@ public class SpiralApplet
         applet.start();
 
         frame.setLocation(10, 10);
-        frame.setLocation(520, 10);
         frame.setSize(601,600);
-        frame.setSize(200,600);
+        frame.setSize(965,797);
 
         frame.setVisible(true);
 
