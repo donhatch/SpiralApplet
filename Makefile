@@ -1,3 +1,14 @@
+# Cheat sheet:
+# ( http://www.rgagnon.com/javadetails/java-0544.html seems to be wrong...
+# but I think that's maybe because they don't bump the class version number
+# if the format is compatible.
+#       java version -> class version
+#                1.2.2    -> 45.3 (web page says 46)
+#                1.3.1_20 -> 45.3 (web page says 47)
+#                1.6.0_17 -> ?    (web page says 50)
+#                1.7.0_21 -> 51.0
+
+
 
 # Uncomment one of the following pairs.
 
