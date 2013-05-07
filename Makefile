@@ -18,14 +18,15 @@
 #JAVAC=javac1.2
 #JAVAROOT=c:/jdk1.2.2
 
-JAVAC=javac1.3
-JAVAROOT=c:/jdk1.3.1_20
+#JAVAC=javac1.3
+#JAVAROOT=c:/jdk1.3.1_20
 
 #JAVAC=javac1.6
 #JAVAROOT="c:/Program Files (x86)/Java/jdk1.6.0_17"
 
-#JAVAC=javac1.7
-#JAVAROOT="c:/Program Files/Java/jdk1.7.0_21"
+# Have to use this one, if using javafx
+JAVAC=javac1.7
+JAVAROOT="c:/Program Files/Java/jdk1.7.0_21"
 
 
 uname := $(shell uname -o)
@@ -72,7 +73,7 @@ CPPFLAGS += -Wall -Werror
 
 .SUFFIXES: .prejava .java .class
 .prejava.class:
-	javacpp ${CPPFLAGS} ${JAVAC} -deprecation -classpath ".$(CLASSPATHSEP)./donhatchsw.jar" $*.prejava
+	javacpp ${CPPFLAGS} ${JAVAC} -deprecation -classpath ".$(CLASSPATHSEP)c:/Program Files/Java/jdk1.7.0_21/jre/lib/jfxrt.jar$(CLASSPATHSEP)./donhatchsw.jar" $*.prejava
 ifneq ($(uname),Cygwin)
 	javarenumber -v 0 $*.class
         # too slow... only do this in the production version
