@@ -373,7 +373,7 @@ public class SpiralApplet
                     add(new JCol() {{
                         add(new JTablePanel() {{
                             add(new JLabel("Period:"));
-                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.n, "period", 1));
+                            add(makeIncrementableTextFieldForInt(applet.spiralModelParams.n, "period", 2));
                             add(new JLabel(" "));
                             add(new JTextFieldForNumber(applet.theSpiralModel.params.n) {{
                                 makeTextComponentLikeLabel(this);
@@ -1588,7 +1588,10 @@ public class SpiralApplet
                     boolean done = false;
 
                     double prevVal = theList[n-1];
-                    FORI (iPass, 2)
+
+                    int maxPasses = 2 + 10000/n; // really should be, roughly, one complete pass plus some fixed number of iterations
+                    PRINT(maxPasses);
+                    FORI (iPass, maxPasses)
                     {
                         FORI (i, n)
                         {
@@ -1683,12 +1686,12 @@ public class SpiralApplet
                     assert(done);
                 }
 
-                if (false) // maybe don't do this here? not sure, it's hard to debug here.
+                // sanity check-- all centers should have strictly positive y coord.
+                FORI (i, n)
                 {
-                    // sanity check-- all centers should have strictly positive y coord.
-                    FORI (i, n)
+                    if (!(centers[i][1] > 0.))
                     {
-                        assert(centers[i][1] > 0.);
+                        System.out.println("Oh no! centers["+i+"] = "+centers[i][1]+" < 0!");
                     }
                 }
             }
