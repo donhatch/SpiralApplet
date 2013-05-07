@@ -2266,7 +2266,8 @@ public class SpiralApplet
 
                             theCanvas.repaint();
                             int animSleepMSvalue = animSleepMS.get();
-                            theTimer.setDelay(MAX(animSleepMSvalue, 0)); // in case it changed
+                            if (animSleepMSvalue >= 0)
+                                theTimer.setDelay(animSleepMSvalue);
 
                             if (false) // can set this to true to make the timing graph show time between firings
                             {
@@ -2339,7 +2340,7 @@ public class SpiralApplet
 #if 0
         public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
 #endif
-        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 11); // 11 seems to be empirical sweet spot... still speeds up for a few frames every 5 seconds or so
+        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showNonTimingFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
