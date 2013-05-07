@@ -649,7 +649,10 @@ public class SpiralApplet
                         add(new JCheckBoxForBoolean("show timing", applet.showTimingFlag) {{
                             setMargin(nomargin);
                         }});
-                        add(new JCheckBoxForBoolean("show model", applet.showNonTimingFlag) {{
+                        add(new JCheckBoxForBoolean("show model ticker", applet.showTickerFlag) {{
+                            setMargin(nomargin);
+                        }});
+                        add(new JCheckBoxForBoolean("show model spiral", applet.showSpiralFlag) {{
                             setMargin(nomargin);
                         }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
@@ -1003,7 +1006,13 @@ public class SpiralApplet
                     theCanvas.repaint();
                 }
             });
-            showNonTimingFlag.addListener(showNonTimingFlagListener = new Listenable.Listener() {
+            showTickerFlag.addListener(showTickerFlagListener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    theCanvas.repaint();
+                }
+            });
+            showSpiralFlag.addListener(showSpiralFlagListener = new Listenable.Listener() {
                 public void valueChanged()
                 {
                     theCanvas.repaint();
@@ -1335,7 +1344,7 @@ public class SpiralApplet
                 }
 
                 int nItersPrimal=0, nItersDual=0;
-                if (showNonTimingFlag.get())
+                if (showTickerFlag.get())
                 {
                     drawTicker(g,
                                size,
@@ -1343,8 +1352,9 @@ public class SpiralApplet
                                size.height/2.,
                                theSpiralModel,
                                theSpiralView);
-
-
+                }
+                if (showSpiralFlag.get())
+                {
                     double scale = .95; // TODO: gui hook for this
                     if (true)
                     {
@@ -2539,7 +2549,8 @@ public class SpiralApplet
 #endif
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showNonTimingFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
@@ -2557,7 +2568,8 @@ public class SpiralApplet
         private Listenable.Listener pixelsPerPartListener = null;
         private Listenable.Listener quantaPerPartListener = null;
         private Listenable.Listener showTimingFlagListener = null;
-        private Listenable.Listener showNonTimingFlagListener = null;
+        private Listenable.Listener showTickerFlagListener = null;
+        private Listenable.Listener showSpiralFlagListener = null;
 
 
     //
@@ -3070,7 +3082,7 @@ public class SpiralApplet
 
         frame.setLocation(10, 10);
         frame.setSize(601,600);
-        frame.setSize(965,797);
+        frame.setSize(718,583);
 
         frame.setVisible(true);
 
