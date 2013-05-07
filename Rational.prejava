@@ -361,19 +361,19 @@ public class Rational
         return this.equalsGeneralFrac(this.n,this.d, bn,bd, cn,cd);
     }
 
-    public Rational generalFloorEquals(Rational b, Rational c, Rational d)
+    public Rational generalFloorEquals(Rational b, Rational c)
     {
         return this.generalFloorEquals(b.n,b.d, c.n,c.d);
     }
-    public Rational generalCeilEquals(Rational b, Rational c, Rational d)
+    public Rational generalCeilEquals(Rational b, Rational c)
     {
         return this.generalCeilEquals(b.n,b.d, c.n,c.d);
     }
-    public Rational generalRoundEquals(Rational b, Rational c, Rational d)
+    public Rational generalRoundEquals(Rational b, Rational c)
     {
         return this.generalRoundEquals(b.n,b.d, c.n,c.d);
     }
-    public Rational generalFracEquals(Rational b, Rational c, Rational d)
+    public Rational generalFracEquals(Rational b, Rational c)
     {
         return this.generalFracEquals(b.n,b.d, c.n,c.d);
     }
