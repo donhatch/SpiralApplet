@@ -45,6 +45,7 @@ CLASSES = \
         MyGraphics.class \
         MyGraphics3D.class \
         GraphicsAntiAliasingSetter.class \
+        TimingGraph.class \
         Rational.class \
         SpiralApplet.class
         ${NULL}
@@ -97,6 +98,7 @@ renumber: $(JARFILE).is_renumbered
 MyGraphics.class: macros.h Makefile donhatchsw.jar
 MyGraphics3D.class: macros.h Makefile donhatchsw.jar
 GraphicsAntiAliasingSetter.class: macros.h Makefile donhatchsw.jar
+TimingGraph.class: macros.h Makefile
 Rational.class: macros.h Makefile
 SpiralApplet.class: macros.h Makefile donhatchsw.jar
 
