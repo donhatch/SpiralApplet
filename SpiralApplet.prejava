@@ -655,6 +655,9 @@ public class SpiralApplet
                         add(new JCheckBoxForBoolean("show model spiral", applet.showSpiralFlag) {{
                             setMargin(nomargin);
                         }});
+                        add(new JCheckBoxForBoolean("show model stats", applet.showStatsFlag) {{
+                            setMargin(nomargin);
+                        }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
                             setMargin(nomargin);
                             setToolTipText("<html>if this is set, print whenever vsync lapse seems to be happening (assumes mostly 60hz framerate)</html>");
@@ -1013,6 +1016,12 @@ public class SpiralApplet
                 }
             });
             showSpiralFlag.addListener(showSpiralFlagListener = new Listenable.Listener() {
+                public void valueChanged()
+                {
+                    theCanvas.repaint();
+                }
+            });
+            showStatsFlag.addListener(showStatsFlagListener = new Listenable.Listener() {
                 public void valueChanged()
                 {
                     theCanvas.repaint();
@@ -1380,6 +1389,12 @@ public class SpiralApplet
                                    theSpiralView.showRungsFlag.get(), // drawRungsFlag
                                    antiAliasingFlag);
                     }
+                }
+                if (showStatsFlag.get())
+                {
+                    drawStats(g,
+                              size,
+                              theSpiralModel);
                 }
 
 
@@ -1807,6 +1822,12 @@ public class SpiralApplet
         }; // public class SpiralView
 
 
+        public void drawStats(java.awt.Graphics g,
+                              java.awt.Dimension gsize,
+                              SpiralModel spiralModel)
+        {
+            
+        }
         public void drawTicker(java.awt.Graphics g,
                                java.awt.Dimension gsize,
                                double gCenterX, double gCenterY, // in pixels from upper-left corner of window
@@ -2551,6 +2572,7 @@ public class SpiralApplet
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
@@ -2570,6 +2592,7 @@ public class SpiralApplet
         private Listenable.Listener showTimingFlagListener = null;
         private Listenable.Listener showTickerFlagListener = null;
         private Listenable.Listener showSpiralFlagListener = null;
+        private Listenable.Listener showStatsFlagListener = null;
 
 
     //
