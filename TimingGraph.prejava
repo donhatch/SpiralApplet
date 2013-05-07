@@ -1,0 +1,226 @@
+#include "macros.h"
+
+class TimingGraph
+{
+    public DoubleRingBuffer startTimes = new DoubleRingBuffer();
+    public DoubleRingBuffer endTimes = new DoubleRingBuffer();
+
+    public void recordPaintStartTime(int maxRingBufferSize)
+    {
+        double startTime = timeSeconds();
+        while (startTimes.size() >= maxRingBufferSize) startTimes.deleteFirst();
+        startTimes.append(startTime);
+    }
+    public void recordPaintEndTime(int maxRingBufferSize)
+    {
+        while (endTimes.size() >= maxRingBufferSize) endTimes.deleteFirst();
+        double endTime = timeSeconds();
+        endTimes.append(endTime);
+    }
+
+    public void preDraw(java.awt.Graphics g,
+                        java.awt.Dimension size,
+                        double pixelsPerMilli)
+    {
+        // background horizontal lines for timing
+        g.setColor(java.awt.Color.darkGray);
+        for (int i = 0; ; i++)
+        {
+            int y = size.height-(int)Math.round(i*pixelsPerMilli*1000./60.);
+            if (y < 0)
+                break;
+            g.fillRect(0,y-1,
+                       size.width,2);
+        }
+    }
+    public void draw(java.awt.Graphics g,
+                     java.awt.Dimension size,
+                     double pixelsPerMilli)
+    {
+        {
+            double now = timeSeconds();
+            double startTime = startTimes.get(startTimes.size()-1);
+            for (int iCol = 0; iCol < size.width; ++iCol)
+            {
+                int x = size.width-1-iCol;
+                int y = size.height;
+                if (iCol==0)
+                {
+                    double paintTimeSoFar = now-startTime;
+                    assert(paintTimeSoFar >= 0.);
+                    //PRINT(paintTimeSoFar);
+                    g.setColor(java.awt.Color.yellow);
+                    int barHeight = (int)(.5+paintTimeSoFar*(1000.*pixelsPerMilli));
+                    g.fillRect(x,y-barHeight,
+                               1,barHeight);
+                    y -= barHeight;
+                }
+                else if (iCol <= endTimes.size() && iCol < startTimes.size())
+                {
+                    double paintTime = endTimes.get(endTimes.size()-iCol) - startTimes.get(startTimes.size()-1-iCol);
+                    assert(paintTime >= 0.);
+                    //PRINT(paintTime);
+                    g.setColor(java.awt.Color.green);
+                    int barHeight = (int)(.5+paintTime*(1000.*pixelsPerMilli));
+                    g.fillRect(x,y-barHeight,
+                               1,barHeight);
+                    y -= barHeight;
+                }
+                if (iCol>=1 && (iCol-1) < startTimes.size() && (iCol-1) < endTimes.size())
+                {
+                    double nonPaintTime = (startTimes.get(startTimes.size()-1-(iCol-1)) - endTimes.get(endTimes.size()-1-(iCol-1)));
+                    //PRINT(nonPaintTime);
+                    assert(nonPaintTime >= 0.);
+                    g.setColor(java.awt.Color.red);
+                    int barHeight = (int)(.5+nonPaintTime*(1000.*pixelsPerMilli));
+                    g.fillRect(x,y-barHeight,
+                               1,barHeight);
+                    y -= barHeight;
+                }
+            }
+        }
+        {
+            int frames = startTimes.size()-1;
+            double seconds = (double)(startTimes.get(startTimes.size()-1)-startTimes.get(0));
+            if (seconds > 0.) // implies frames must be > 0 too
+            {
+                g.setColor(java.awt.Color.white);
+                g.drawString("fps over "+frames+" frames: "+formatFixedPoint(frames/seconds,3),
+                             size.width-300,
+                             40);
+                g.drawString("spf over "+frames+" frames: "+formatFixedPoint(seconds/frames, 5),
+                             size.width-300,
+                             60);
+                g.setColor(java.awt.Color.red);
+                g.drawString("red is time outside paintComponent",
+                             size.width-300,
+                             80);
+                g.setColor(java.awt.Color.green);
+                g.drawString("green is time in paintComponent",
+                             size.width-300,
+                             100);
+            }
+        }
+
+
+    } // drawTimingGraph
+
+
+    // holy mother of god
+    private static String formatFixedPoint(double d, int prec)
+    {
+        boolean wasNegative = false;
+        if (d < 0.)
+        {
+            wasNegative = true;
+            d = -d;
+        }
+        FORI (i, prec)
+            d *= 10;
+        long l = (long)Math.round(d);
+        String answer = "";
+        FORI (i, prec)
+        {
+            answer = l%10 + answer;
+            l /= 10;
+        }
+        return (wasNegative ? "-" : "") + l + "." + answer;
+    }
+
+
+
+
+
+    // ring buffer of doubles.
+    // O(1) operations:
+    //     size()
+    //     get()
+    //     deleteFirst()
+    //     append() (amortized)
+    public static class DoubleRingBuffer
+    {
+        private int i0 = 0;
+        private int size = 0;
+        private double[] array = new double[1];
+
+        public int size()
+        {
+            return size;
+        }
+        public double get(int index)
+        {
+            if (index < 0 || index >= size)
+                throw new IndexOutOfBoundsException("DoubleRingBuffer.get: "+index+" out of bounds 0.."+size+"-1");
+            return array[(i0+index)%array.length];
+        }
+        public void set(int index, double item)
+        {
+            if (index < 0 || index >= size)
+                throw new IndexOutOfBoundsException("DoubleRingBuffer.set: "+index+" out of bounds 0.."+size+"-1");
+            array[(i0+index)%array.length] = item;
+        }
+        public void append(double item)
+        {
+            if (size == array.length)
+            {
+                // grow
+                double newArray[] = new double[array.length*2];
+                System.arraycopy(array, i0, newArray, 0, size-i0);
+                System.arraycopy(array, 0, newArray, size-i0, i0);
+                array = newArray;
+                i0 = 0;
+                // and size stays the same... now half of array.length
+            }
+            array[(i0+size++)%array.length] = item;
+        }
+        public void deleteFirst()
+        {
+            if (size == 0)
+            {
+                throw new IndexOutOfBoundsException("DoubleRingBuffer.deleteFirst: buffer is empty");
+            }
+            i0 = (i0+1)%array.length;
+            size--;
+        }
+    } // private class DoubleRingBuffer
+
+
+    private static java.lang.reflect.Method nanoTimeMethod = null;
+    {
+        try {
+            nanoTimeMethod = System.class.getMethod("nanoTime", new Class[]{});
+        }
+        catch (NoSuchMethodException e) {System.out.println("no such method exception!");}
+    }
+    // System.nanoTime().
+    // don't call this unless you know nanoTimeMethod != null.
+    private static long System_nanoTime()
+    {
+        try {
+            // object allocation here is a bummer.
+            // maybe better to compile using javac >= 1.4
+            // but with flag saying create class files for earlier jvm?
+            Object answer = nanoTimeMethod.invoke(null, new Object[]{});
+            return ((Long)answer).longValue();
+        }
+        catch (IllegalAccessException e) {assert(false); return 0L;}
+        catch (java.lang.reflect.InvocationTargetException e) {assert(false); return 0L;}
+    }
+
+    // Time in seconds from when we initialize the times,
+    // using System.nanoTime() if it exists (jvm >= 1.4),
+    // otherwise System.currentTimeMillis().
+    public static double timeSeconds()
+    {
+        boolean useNanoTime = (nanoTimeMethod != null);
+        if (useNanoTime)
+            return (double)(System_nanoTime() - nanos0) / 1e9;
+        else
+            return (double)(System.currentTimeMillis() - millis0) / 1e3;
+    }
+
+    private static long millis0 = System.currentTimeMillis();
+    private static long nanos0 = (nanoTimeMethod!=null ? System_nanoTime() : 0L);
+
+} // class TimingGraph
+
