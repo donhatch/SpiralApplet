@@ -620,9 +620,6 @@ public class SpiralApplet
                         add(new JCheckBoxForBoolean("show model", applet.showNonTimingFlag) {{
                             setMargin(nomargin);
                         }});
-                        add(new JCheckBoxForBoolean("show focus in control panel", applet.showFocusInControlPanelFlag) {{
-                            setMargin(nomargin);
-                        }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
                             setMargin(nomargin);
                             setToolTipText("<html>if this is set, print whenever vsync lapse seems to be happening (assumes mostly 60hz framerate)</html>");
@@ -682,6 +679,7 @@ public class SpiralApplet
             final java.awt.GridBagConstraints stretchxy = new java.awt.GridBagConstraints(){{fill=BOTH;weightx=weighty=1.;}};
 
             contentPane.add(theCanvas = new TheCanvas() {}, stretchxy);
+
 
             //
             // Make the menu bar
@@ -962,13 +960,6 @@ public class SpiralApplet
                     theCanvas.repaint();
                 }
             });
-            showFocusInControlPanelFlag.addListener(showFocusInControlPanelListener = new Listenable.Listener() {
-                public void valueChanged()
-                {
-                    focusInControlPanelRow.setVisible(showFocusInControlPanelFlag.get());
-                    theCanvas.repaint();
-                }
-            });
 
             if (eventVerbose >= 1) System.out.println("out init");
         } // init
@@ -1195,6 +1186,7 @@ public class SpiralApplet
 
 
 
+#if 0 // no longer works in 1.7, and emits deprecation warning, so fuck it
             //
             // Make it so we get keyboard focus on startup,
             // without having to click first.  Thanks, Melinda!
@@ -1217,6 +1209,7 @@ public class SpiralApplet
             {
                 return true;
             }
+#endif
 
 
 
@@ -2246,44 +2239,90 @@ public class SpiralApplet
         // and, acquire a lock on the big things that don't change often but that are too expensive to snapshot
         // (the model).
         private javax.swing.Timer theTimer = null;
+        javafx.animation.AnimationTimer theAnimationTimer = null;
         private void startTheAnimation()
         {
             System.out.println("in startTheAnimation");
-            if (theTimer == null)
+            if (!useJavaFX)
             {
-                System.out.println("    creating timer");
-                theTimer = new javax.swing.Timer(animSleepMS.get(), new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        if (eventVerbose >= 1) System.out.println("in timer action");
+                if (theTimer == null)
+                {
+                    System.out.println("    creating timer");
+                    theTimer = new javax.swing.Timer(animSleepMS.get(), new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent e) {
+                            if (eventVerbose >= 1) System.out.println("in timer action");
 
-                        // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
-                        boolean focusAnimationVelocityIsZero;
-                        synchronized(theSpiralView.focusAnimationVelocity)
-                        {
-                            focusAnimationVelocityIsZero = (theSpiralView.focusAnimationVelocity.n == 0);
-                        }
-                        if (focusAnimationVelocityIsZero)
-                        {
-                            System.out.println("    stopping timer");
-                            theTimer.stop();
-                        }
+                            // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
+                            boolean focusAnimationVelocityIsZero;
+                            synchronized(theSpiralView.focusAnimationVelocity)
+                            {
+                                focusAnimationVelocityIsZero = (theSpiralView.focusAnimationVelocity.n == 0);
+                            }
+                            if (focusAnimationVelocityIsZero)
+                            {
+                                System.out.println("    stopping timer");
+                                theTimer.stop();
+                            }
 
-                        theCanvas.repaint();
-                        int animSleepMSvalue = animSleepMS.get();
-                        theTimer.setDelay(MAX(animSleepMSvalue, 0)); // in case it changed
+                            theCanvas.repaint();
+                            int animSleepMSvalue = animSleepMS.get();
+                            theTimer.setDelay(MAX(animSleepMSvalue, 0)); // in case it changed
 
-                        if (false) // can set this to true to make the timing graph show time between firings
-                        {
-                            double now = timingGraph.timeSeconds();
-                            timingGraph.startTimes.set(timingGraph.startTimes.size()-1, now);
-                            timingGraph.endTimes.set(timingGraph.endTimes.size()-1, now);
+                            if (false) // can set this to true to make the timing graph show time between firings
+                            {
+                                double now = timingGraph.timeSeconds();
+                                timingGraph.startTimes.set(timingGraph.startTimes.size()-1, now);
+                                timingGraph.endTimes.set(timingGraph.endTimes.size()-1, now);
+                            }
+                            if (eventVerbose >= 1) System.out.println("out timer action");
                         }
-                        if (eventVerbose >= 1) System.out.println("out timer action");
-                    }
-                });
+                    });
+                }
+                System.out.println("    starting timer");
+                theTimer.start();
             }
-            System.out.println("    starting timer");
-            theTimer.start();
+            if (useJavaFX)
+            {
+                if (theAnimationTimer == null)
+                {
+                    // interesting, see http://www.javamex.com/tutorials/threads/sleep.shtml for issues and bugs
+                    System.out.println("    creating javafx animation timer");
+                    theAnimationTimer = new javafx.animation.AnimationTimer() {
+                        public void handle(long nanos)
+                        {
+                            if (eventVerbose >= 1) System.out.println("in timer action");
+
+                            // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
+                            boolean focusAnimationVelocityIsZero;
+                            synchronized(theSpiralView.focusAnimationVelocity)
+                            {
+                                focusAnimationVelocityIsZero = (theSpiralView.focusAnimationVelocity.n == 0);
+                            }
+                            if (focusAnimationVelocityIsZero)
+                            {
+                                System.out.println("    stopping javafx animation timer");
+                                theAnimationTimer.stop();
+                            }
+
+
+                            int animSleepMSvalue = animSleepMS.get();
+                            try { Thread.sleep(MAX(animSleepMSvalue,0)); } catch (InterruptedException e) {}
+                            theCanvas.repaint();
+
+
+                            if (false) // can set this to true to make the timing graph show time between firings
+                            {
+                                double now = timingGraph.timeSeconds();
+                                timingGraph.startTimes.set(timingGraph.startTimes.size()-1, now);
+                                timingGraph.endTimes.set(timingGraph.endTimes.size()-1, now);
+                            }
+                            if (eventVerbose >= 1) System.out.println("out timer action");
+                        }
+                    };
+                }
+                System.out.println("    starting timer");
+                theAnimationTimer.start();
+            }
             System.out.println("out startTheAnimation");
         }
 
@@ -2293,6 +2332,7 @@ public class SpiralApplet
     //
 
 
+        public static boolean useJavaFX = true;
         public SpiralModel.Params spiralModelParams = new SpiralModel.Params(); // gui copy, flushed to model when Regenerate button pressed
         public SpiralModel theSpiralModel = new SpiralModel();
         public SpiralView theSpiralView = new SpiralView();
@@ -2302,12 +2342,12 @@ public class SpiralApplet
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 11); // 11 seems to be empirical sweet spot... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showNonTimingFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showFocusInControlPanelFlag = new Listenable.Boolean(false); // seems like a bad idea in general
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
 
         private java.awt.Component theCanvas = null;
+        private javafx.scene.image.ImageView theImageView = null;
         //private java.awt.Component theHelpWindow = null;
         private JFrame theMainAppletWindow = null;
         private JFrame theControlPanelWindow = null;
@@ -2320,7 +2360,6 @@ public class SpiralApplet
         private Listenable.Listener quantaPerPartListener = null;
         private Listenable.Listener showTimingFlagListener = null;
         private Listenable.Listener showNonTimingFlagListener = null;
-        private Listenable.Listener showFocusInControlPanelListener = null;
 
 
     //
@@ -2842,6 +2881,31 @@ public class SpiralApplet
         applet.theMainAppletWindow.setName("main applet window");
         applet.theHelpWindow.setName("help");
 
+        if (useJavaFX)
+        {
+            // creating a JFXPanel implicitly starts the JavaFX runtime.
+            // unless we do this, the AnimationTimer will be non-functional!
+            new javafx.embed.swing.JFXPanel();
+        }
+
+
+        // do the timing workaround suggested in http://www.javamex.com/tutorials/threads/sleep_issues.shtml
+        if (true)
+        {
+            Thread thread = new Thread(new Runnable() {
+                public void run()
+                {
+                    System.out.println("in thread run");
+                    System.out.println("    sleeping forever");
+                    try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException e) {}
+                    assert(false);
+                    System.out.println("out thread run");
+                    System.exit(1);
+                }
+            });
+            thread.setDaemon(true); // make it so the java vm won't wait for it to finish before exiting
+            thread.start();
+        }
 
         // why can't we get here in any toolkit ever?
         System.out.println("out main");
