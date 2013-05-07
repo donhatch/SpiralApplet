@@ -110,4 +110,3 @@ send: renumber
 .PHONY: clean
 clean:
 	rm -f core ${JARFILE} *.class *.java.lines *.java
-

@@ -8,9 +8,7 @@
     BUG: as soon as a tooltip is shown, performance went down, forevermore??
     TODO: smooth out animation when going very slowly
     TODO: gui for scale
-    TODO: upgrade to >=1.5 and use templates
-    TODO: upgrade to >=1.4 and use System.nanoTime
-    TODO: check out LWJGL for consistent frame rate?
+    todo: check out LWJGL for consistent frame rate?
     TODO: maybe JavaFX? she says it works well for vsync: http://www.java-gaming.org/index.php?topic=27763.0.  ah good, it's included in jdk 7.
     TODO: use javax.swing.Timer instead of my own custom thread
           WHOA! as soon as I switched to a timer, I'm getting consistent timings! nice 60fps. wtf?
