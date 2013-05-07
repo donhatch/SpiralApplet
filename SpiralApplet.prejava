@@ -1979,7 +1979,6 @@ public class SpiralApplet
             //System.out.println("    out drawTicker");
         } // drawTicker
 
-        // Exacly one of drawPrimalFlag and drawDualFlag must be true
         public void drawSpiral(MyGraphics mg,
                                double scale,
                                SpiralModel spiralModel,
@@ -2081,7 +2080,7 @@ public class SpiralApplet
 
 
 
-                // Accumulate center of curvature, if scanDir  is -1
+                // Accumulate and draw center of curvature, if scanDir  is -1
                 double centerX = 0.;
                 double centerY = 0.;
                 double area = 0.;
@@ -2107,27 +2106,8 @@ public class SpiralApplet
                         else if (nextPrimalAng < -Math.PI)
                             nextPrimalAng += 2*Math.PI;
                         if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(nextPrimalAng));
-                        double nextPrimalR;
-                        {
-                            // use law of sines.
-                            // don't think too hard about the scanDir=-1 case, in which case angleDelta is negative and the triangle is inside out... it just works.
-                            double A = angleDelta;
-                            double C = primalAng+Math.PI - (dualAng+Math.PI/2);
-                            double B = Math.PI - (A+C);
-                            double b = primalR;
-                            double c = b * (Math.sin(C)/Math.sin(B));
-                            nextPrimalR = c;
-
-                            if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(primalAng));
-                            if (debugLevel >= 2 && scanDir > 0) PRINT(dualAng);
-
-                            if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(A));
-                            if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(C));
-                            if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(B));
-                            if (debugLevel >= 2 && scanDir > 0) PRINT(b);
-                            if (debugLevel >= 2 && scanDir > 0) PRINT(c);
-                            if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalR);
-                        }
+                        double nextPrimalR = primalR * Math.cos(primalAng-dualAng)
+                                                     / Math.cos(nextPrimalAng-dualAng);
                         double nextPrimalX = nextPrimalR * Math.cos(nextPrimalAng);
                         double nextPrimalY = nextPrimalR * Math.sin(nextPrimalAng);
                         if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalR);
@@ -2192,17 +2172,10 @@ public class SpiralApplet
                             nextDualAng -= 2*Math.PI;
                         else if (nextDualAng < -Math.PI)
                             nextDualAng += 2*Math.PI;
-                        double nextDualR;
-                        {
-                            // use law of sines.
-                            // don't think too hard about the scanDir=-1 case, in which case angleDelta is negative and the triangle is inside out... it just works.
-                            double A = angleDelta;
-                            double C = dualAng+Math.PI - primalAng;
-                            double B = Math.PI - (A+C);
-                            double b = dualR;
-                            double c = b * (Math.sin(C)/Math.sin(B));
-                            nextDualR = c;
-                        }
+                        // worked this out on paper.
+                        // don't think too hard about the scanDir=-1 case, in which case angleDelta is negative and the triangle is inside out... it just works.
+                        double nextDualR= dualR * Math.sin(primalAng-dualAng)
+                                                / Math.sin(primalAng-nextDualAng);
                         double nextDualX = nextDualR * Math.cos(nextDualAng);
                         double nextDualY = nextDualR * Math.sin(nextDualAng);
 
