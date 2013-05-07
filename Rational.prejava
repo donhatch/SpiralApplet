@@ -84,7 +84,10 @@ public class Rational
         // note, the assertions inside divEquals and timesEquals
         // guarantee that n1>0 and d1>0,
         // however failure isn't exactly obvious...
-        // maybe it would be better to assert that explicitly here?
+        // so assert that explicitly here too.
+        assert(n1 > 0);
+        assert(d1 > 0);
+
 
         // a%b = frac(a/b)*b
         // where frac(a/b) = a/b - floor(a/b)
@@ -107,7 +110,7 @@ public class Rational
     public Rational equalsFrac(int n, int d)
     {
         this.set(n,d).minusEquals(floor(n,d),1);
-        assert(n >= 0);
+        assert(this.n >= 0);
         return this;
     }
 
@@ -558,10 +561,15 @@ public class Rational
     public static void confidenceTest()
     {
         System.out.println("in Rational.confidenceTest");
-        for (int n0 = -4; n0 <= 4; ++n0)
-        for (int d0 = 1; d0 <= 4; ++d0)
+        int nMin = -4;
+        int nMax = 4;
+        int dMin = 1;
+        int dMax = 4;
+        for (int n0 = nMin; n0 <= nMax; ++n0)
+        for (int d0 = dMin; d0 <= dMax; ++d0)
         {
-            Rational a = new Rational(n0,d0);
+            //Rational a = new Rational(n0,d0); // can't do this since not reduced  XXX weird, maybe change this
+            Rational a = new Rational(n0,1).divEquals(d0,1);
             assert(EQ(a.toDouble(), 1.*n0/d0, 1e-6));
 
             assert(a.floor() == (int)Math.floor(a.toDouble()));
@@ -570,10 +578,11 @@ public class Rational
             assert(a.abs().toDouble() == ABS(a.toDouble()));
             assert(a.neg().toDouble() == -a.toDouble());
 
-            for (int n1 = -4; n1 <= 4; ++n1)
-            for (int d1 = 1; d1 <= 4; ++d1)
+            for (int n1 = nMin; n1 <= nMax; ++n1)
+            for (int d1 = dMin; d1 <= dMax; ++d1)
             {
-                Rational b = new Rational(n1,d1);
+                //Rational b = new Rational(n0,d0); // can't do this since not reduced  XXX weird, maybe change this
+                Rational b = new Rational(n1,1).divEquals(d1,1);
 
                 assert(EQ(b.toDouble(), 1.*n1/d1, 1e-6));
 
@@ -589,11 +598,14 @@ public class Rational
                 }
 
                 if (n1 > 0
-                 && d0 != 3 && d0 != -3 && d1 != 3 && d1 != -3) // if nonexact, can run into trouble with very slighly negative numbers, this is expected
+                 && d0 != 3 && d0 != -3 && d1 != 3 && d1 != -3) // if nonexact, can run into trouble where floating point results in slightly negative numbers, resulting in wildly different answer from exact one... this is expected
                 {
                     assert(EQ(a.mod(b).toDouble(), fmod((1.*n0/d0) , (1.*n1/d1)), 1e-6));
                 }
             }
+
+            // the following is prone to overflowing an int if done naively
+            assert(new Rational(2149,1).mod(new Rational(1000*1000,1)).toDouble() == 2149);
         }
         System.out.println("out Rational.confidenceTest");
     }
