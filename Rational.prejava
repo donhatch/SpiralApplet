@@ -322,7 +322,7 @@ public class Rational
         return this.equalsMinus(an,ad,cn,cd).divEquals(bn,bd).ceilEquals().timesEquals(bn,bd).plusEquals(cn,cd);
     }
     // round a to c mod b
-    // round(a) = generalRound(a,1,0)
+    // i.e. find the number equal to c mod b that's as close as possible to a.
     public Rational equalsGeneralRound(int an, int ad, int bn, int bd, int cn, int cd)
     {
         // generalRound(a,b,c) = round((a-c)/b)*b+c
@@ -377,6 +377,29 @@ public class Rational
     {
         return this.generalFracEquals(b.n,b.d, c.n,c.d);
     }
+
+    // XXX somewhat hacky-- add more with default c=0.
+    // this made it easier for a caller, but I'm not sure I like this--
+    // it makes the "c" parameter less discoverable,
+    // and if we do it here, shouldn't we do it everyhwere?
+    public Rational generalFloorEquals(Rational b)
+    {
+        return this.generalFloorEquals(b.n,b.d, 0,1);
+    }
+    public Rational generalCeilEquals(Rational b)
+    {
+        return this.generalCeilEquals(b.n,b.d, 0,1);
+    }
+    public Rational generalRoundEquals(Rational b)
+    {
+        return this.generalRoundEquals(b.n,b.d, 0,1);
+    }
+    public Rational generalFracEquals(Rational b)
+    {
+        return this.generalFracEquals(b.n,b.d, 0,1);
+    }
+
+
 
     public static Rational generalFloor(int an, int ad, int bn, int bd, int cn, int cd)
     {
