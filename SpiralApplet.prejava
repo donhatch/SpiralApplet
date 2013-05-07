@@ -987,7 +987,7 @@ public class SpiralApplet
                         //System.out.println("rounding focus to multiple of focusQuantum!");
                         //PRINT(theSpiralView.focus);
                         //PRINT(theSpiralView.focusQuantum);
-                        theSpiralView.focus.generalRoundEquals(theSpiralView.focusQuantum,new Rational(0,1));
+                        theSpiralView.focus.generalRoundEquals(theSpiralView.focusQuantum);
                         //PRINT(theSpiralView.focus);
                         //OUT("");
                     }
@@ -1334,6 +1334,7 @@ public class SpiralApplet
                     timingGraph.preDraw(g,size,pixelsPerMilli);
                 }
 
+                int nItersPrimal=0, nItersDual=0;
                 if (showNonTimingFlag.get())
                 {
                     drawTicker(g,
@@ -1348,7 +1349,7 @@ public class SpiralApplet
                     if (true)
                     {
                         // draw dual spiral
-                        drawSpiral(mg,
+                        nItersDual = drawSpiral(mg,
                                    scale,
                                    theSpiralModel,
                                    theSpiralView,
@@ -1360,7 +1361,7 @@ public class SpiralApplet
                     if (true)
                     {
                         // draw primal spiral
-                        drawSpiral(mg,
+                        nItersPrimal = drawSpiral(mg,
                                    scale,
                                    theSpiralModel,
                                    theSpiralView,
@@ -1387,9 +1388,17 @@ public class SpiralApplet
 
 
                 if (showTimingFlag.get())
+                {
+                    g.drawString("dual iterations: "+nItersDual,
+                                 10,
+                                 60);
+                    g.drawString("primal iterations: "+nItersPrimal,
+                                 10,
+                                 80);
                     timingGraph.draw(g,
                                      size,
                                      pixelsPerMilli);
+                }
 
 
 
@@ -1777,7 +1786,7 @@ public class SpiralApplet
         public static class SpiralView
         {
             public Listenable.Int resetFocusTo = new Listenable.Int(0,0, 636);
-            public Rational focus = new Rational(636,resetFocusTo.get()); // always modulo spiralModel.params.n
+            public Rational focus = new Rational(resetFocusTo.get(),1); // always modulo spiralModel.params.n
             public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // must be >= 1
             public Listenable.Int quantaPerPart = new Listenable.Int(2, 1024, 1); // must be >= 1
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
@@ -2058,14 +2067,15 @@ public class SpiralApplet
             //System.out.println("    out drawTicker");
         } // drawTicker
 
-        public void drawSpiral(MyGraphics mg,
-                               double scale,
-                               SpiralModel spiralModel,
-                               SpiralView spiralView,
-                               boolean drawPrimalFlag,
-                               boolean drawDualFlag,
-                               boolean drawRungsFlag,
-                               boolean antiAliasFlag)
+        // returns number of inner loop iterations.
+        public int drawSpiral(MyGraphics mg,
+                              double scale,
+                              SpiralModel spiralModel,
+                              SpiralView spiralView,
+                              boolean drawPrimalFlag,
+                              boolean drawDualFlag,
+                              boolean drawRungsFlag,
+                              boolean antiAliasFlag)
         {
             int debugLevel = 0; // 1 = global, 2 = and some per-increment
 
@@ -2114,6 +2124,8 @@ public class SpiralApplet
             java.awt.Color gray32 = new java.awt.Color(32,32,32);
             java.awt.Color pink = new java.awt.Color(255,128,128);
             java.awt.Color dimPink = new java.awt.Color(128,64,64);
+
+            int returnValue = 0;
 
             // scanDir=1: the part *after* (bigger than) the focus.
             // scanDir=-1: the part *before* (smaller than) the focus.
@@ -2170,6 +2182,8 @@ public class SpiralApplet
                 double prevVal = val;
                 for (int i = scanDir==1?i1:i0; ; i = MOD(i+scanDir,n))
                 {
+                    returnValue++;
+
                     // TODO: combine straight parts, the line will look better
 
                     int thisVal = spiralModel.theList[i];
@@ -2377,6 +2391,7 @@ public class SpiralApplet
 
             } // for iScanDir
             if (debugLevel >= 1) System.out.println("    out drawSpiral "+(drawPrimalFlag?"primal":"")+(drawDualFlag?"dual":"")+(drawRungsFlag?",rungs":""));
+            return returnValue;
         } // drawSpiral
 
 
