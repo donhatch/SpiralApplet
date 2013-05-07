@@ -4,61 +4,91 @@ public class Rational
 {
     public int n, d;
 
-    // Constructors
-    public Rational()
-    {
-        set(0,0); // NaN
-    }
     // gets reduced to lowest terms, with non-negative denominator.
     public Rational(int n, int d)
     {
-        set(n, d);
+        this.set(n, d);
     }
     public Rational(Rational that)
     {
-        set(that.n, that.d);
+        this.set(that.n, that.d);
     }
     public Rational set(Rational that)
     {
-        return set(that.n, that.d);
+        return this.set(that.n, that.d);
     }
 
 
 
     // Basic utilities, that take all args in n,d form
+    // (which must be already reduced)
     // and put the result in an existing Rational,
-    // and reduce it.
+    // reducing it further if necessary,
+    // and return that Rational (for chaining).
     public Rational set(int n, int d)
     {
+        assert(isReduced(n,d));
         this.n = n;
         this.d = d;
-        reduce();
         return this;
     }
     public Rational equalsPlus(int n0, int d0, int n1, int d1)
     {
-        return set(n0*d1+n1*d0, d0*d1);
+        assert(isReduced(n0,d0));
+        assert(isReduced(n1,d1));
+        this.n = n0*d1 + n1*d0;
+        this.d = d0*d1;
+        reduce();
+        return this;
     }
     public Rational equalsMinus(int n0, int d0, int n1, int d1)
     {
-        return set(n0*d1-n1*d0, d0*d1);
+        assert(isReduced(n0,d0));
+        assert(isReduced(n1,d1));
+        this.n = n0*d1 - n1*d0;
+        this.d = d0*d1;
+        reduce();
+        return this;
     }
     public Rational equalsTimes(int n0, int d0, int n1, int d1)
     {
-        return set(n0*n1, d0*d1);
+        assert(isReduced(n0,d0));
+        assert(isReduced(n1,d1));
+
+        // need to be careful, e.g. (2149/1000000) * (1000000/1)
+        // will overflow if we naively wait til end to reduce.
+        int g01 = gcd(n0,d1);
+        n0 /= g01;
+        d1 /= g01;
+        int g10 = gcd(n1,d0);
+        n1 /= g10;
+        d0 /= g10;
+
+        this.n = n0*n1;
+        this.d = d0*d1;
+        assert(isReduced(this.n,this.d));
+        return this;
     }
     public Rational equalsDiv(int n0, int d0, int n1, int d1)
     {
-        return set(n0*d1, d0*n1);
+        // so that isReduced(d1,n1) doesn't get violated in equalsTimes...
+        if (n1 < 0)
+        {
+            n1 = -n1;
+            d1 = -d1;
+        }
+        return this.equalsTimes(n0,d0, d1,n1);
     }
-    // note no equalsMod... would need to do what modEquals currently does, but without allocating anything
     public Rational equalsMod(int n0, int d0, int n1, int d1)
     {
-        assert(n1 > 0);
-        assert(d1 > 0);
+        // note, the assertions inside divEquals and timesEquals
+        // guarantee that n1>0 and d1>0,
+        // however failure isn't exactly obvious...
+        // maybe it would be better to assert that explicitly here?
+
         // a%b = frac(a/b)*b
         // where frac(a/b) = a/b - floor(a/b)
-        return set(n0,d0).divEquals(n1,d1).fracEquals().timesEquals(n1,d1);
+        return this.set(n0,d0).divEquals(n1,d1).fracEquals().timesEquals(n1,d1);
     }
     // lerp(x0,x1,t) = x0 + (x1-x0)*t
     public Rational equalsLerp(int n0, int d0, int n1, int d1, int nt, int dt)
@@ -67,16 +97,18 @@ public class Rational
     }
     public Rational equalsNeg(int n, int d)
     {
-        return set(-n,d);
+        return this.set(-n,d);
     }
     public Rational equalsAbs(int n, int d)
     {
-        return set(ABS(n),ABS(d));
+        return this.set(ABS(n),ABS(d));
     }
     // frac(x) = x - floor(x)
     public Rational equalsFrac(int n, int d)
     {
-        return set(n,d).minusEquals(floor(n,d),1);
+        this.set(n,d).minusEquals(floor(n,d),1);
+        assert(n >= 0);
+        return this;
     }
 
 
@@ -171,84 +203,225 @@ public class Rational
     {
         return new Rational(n0,d0).modEquals(n1,d1);
     }
+    public static Rational neg(int n0, int d0)
+    {
+        return new Rational(n0,d0).negEquals();
+    }
+    public static Rational abs(int n0, int d0)
+    {
+        return new Rational(n0,d0).absEquals();
+    }
+    public static Rational frac(int n0, int d0)
+    {
+        return new Rational(n0,d0).fracEquals();
+    }
 
 
 
     // Functions allocating answer, with RHS in n/d form.
     public Rational plus(int n, int d)
     {
-        return new Rational(this).plusEquals(n,d);
+        return plus(this.n,this.d, n,d);
     }
     public Rational minus(int n, int d)
     {
-        return new Rational(this).minusEquals(n,d);
+        return minus(this.n,this.d, n,d);
     }
     public Rational times(int n, int d)
     {
-        return new Rational(this).timesEquals(n,d);
+        return times(this.n,this.d, n,d);
     }
     public Rational div(int n, int d)
     {
-        return new Rational(this).divEquals(n,d);
+        return div(this.n,this.d, n,d);
     }
     public Rational mod(int n, int d)
     {
-        return new Rational(this).modEquals(n,d);
+        return mod(this.n,this.d, n,d);
     }
     public Rational neg()
     {
-        return new Rational(this).negEquals();
+        return neg(this.n,this.d);
     }
     public Rational abs()
     {
-        return new Rational(this).absEquals();
+        return abs(this.n,this.d);
     }
     public Rational frac()
     {
-        return new Rational(this).fracEquals();
+        return frac(this.n,this.d);
     }
 
 
     // Functions allocating answer, with RHS in Rational form.
     public Rational plus(Rational that)
     {
-        return plus(that.n, that.d);
+        return this.plus(that.n, that.d);
     }
     public Rational minus(Rational that)
     {
-        return minus(that.n, that.d);
+        return this.minus(that.n, that.d);
     }
     public Rational times(Rational that)
     {
-        return times(that.n, that.d);
+        return this.times(that.n, that.d);
     }
     public Rational div(Rational that)
     {
-        return div(that.n, that.d);
+        return this.div(that.n, that.d);
     }
     public Rational mod(Rational that)
     {
-        return mod(that.n, that.d);
+        return this.mod(that.n, that.d);
+    }
+    // neg,abs,frac have no RHS so already handled by RHS-in-n/d form
+
+
+
+
+    // round a down to c mod b.
+    // floor(a) = generalFloor(a,1,0)
+    public Rational equalsGeneralFloor(int an, int ad, int bn, int bd, int cn, int cd)
+    {
+        return this.equalsMinus(an,ad,cn,cd).divEquals(bn,bd).floorEquals().timesEquals(bn,bd).plusEquals(cn,cd);
+    }
+    // round a up to c mod b
+    // ceil(a) = generalCeil(a,1,0)
+    public Rational equalsGeneralCeil(int an, int ad, int bn, int bd, int cn, int cd)
+    {
+        // generalCeil(a,b,c) = ceil((a-c)/b)*b+c
+        return this.equalsMinus(an,ad,cn,cd).divEquals(bn,bd).ceilEquals().timesEquals(bn,bd).plusEquals(cn,cd);
+    }
+    // round a to c mod b
+    // round(a) = generalRound(a,1,0)
+    public Rational equalsGeneralRound(int an, int ad, int bn, int bd, int cn, int cd)
+    {
+        // generalRound(a,b,c) = round((a-c)/b)*b+c
+        return this.equalsMinus(an,ad,cn,cd).divEquals(bn,bd).roundEquals().timesEquals(bn,bd).plusEquals(cn,cd);
+    }
+    // a - generalFloor(a,b,c)
+    // frac(a) = generalFrac(a,1,0)
+    public Rational equalsGeneralFrac(int an, int ad, int bn, int bd, int cn, int cd)
+    {
+        return equalsGeneralFloor(an,ad, bn,bd, cn,cd).minusEquals(an,ad).negEquals();
+
+    }
+
+    // 6 groups of functions, e.g.
+    //     equalsPlus(int,int,int,int)
+    //         plusEquals(int,int)
+    //             plusEquals(Rational)
+    //             static plus(int,int,int,int)  (allocates new)
+    //                 plus(int,int)
+    //                     plus(Rational) // could also implement by allocating new and calling plusEquals(Rational)
+
+    public Rational generalFloorEquals(int bn, int bd, int cn, int cd)
+    {
+        return this.equalsGeneralFloor(this.n,this.d, bn,bd, cn,cd);
+    }
+    public Rational generalCeilEquals(int bn, int bd, int cn, int cd)
+    {
+        return this.equalsGeneralCeil(this.n,this.d, bn,bd, cn,cd);
+    }
+    public Rational generalRoundEquals(int bn, int bd, int cn, int cd)
+    {
+        return this.equalsGeneralRound(this.n,this.d, bn,bd, cn,cd);
+    }
+    public Rational generalFracEquals(int bn, int bd, int cn, int cd)
+    {
+        return this.equalsGeneralFrac(this.n,this.d, bn,bd, cn,cd);
+    }
+
+    public Rational generalFloorEquals(Rational b, Rational c, Rational d)
+    {
+        return this.generalFloorEquals(b.n,b.d, c.n,c.d);
+    }
+    public Rational generalCeilEquals(Rational b, Rational c, Rational d)
+    {
+        return this.generalCeilEquals(b.n,b.d, c.n,c.d);
+    }
+    public Rational generalRoundEquals(Rational b, Rational c, Rational d)
+    {
+        return this.generalRoundEquals(b.n,b.d, c.n,c.d);
+    }
+    public Rational generalFracEquals(Rational b, Rational c, Rational d)
+    {
+        return this.generalFracEquals(b.n,b.d, c.n,c.d);
+    }
+
+    public static Rational generalFloor(int an, int ad, int bn, int bd, int cn, int cd)
+    {
+        return new Rational(an,ad).generalFloorEquals(bn,bd, cn,cd);
+    }
+    public static Rational generalCeil(int an, int ad, int bn, int bd, int cn, int cd)
+    {
+        return new Rational(an,ad).generalCeilEquals(bn,bd, cn,cd);
+    }
+    public static Rational generalRound(int an, int ad, int bn, int bd, int cn, int cd)
+    {
+        return new Rational(an,ad).generalRoundEquals(bn,bd, cn,cd);
+    }
+    public static Rational generalFrac(int an, int ad, int bn, int bd, int cn, int cd)
+    {
+        return new Rational(an,ad).generalFracEquals(bn,bd, cn,cd);
+    }
+
+    public Rational generalFloor(int bn, int bd, int cn, int cd)
+    {
+        return generalFloor(this.n,this.d, bn,bd, cn,cd);
+    }
+    public Rational generalCeil(int bn, int bd, int cn, int cd)
+    {
+        return generalCeil(this.n,this.d, bn,bd, cn,cd);
+    }
+    public Rational generalRound(int bn, int bd, int cn, int cd)
+    {
+        return generalRound(this.n,this.d, bn,bd, cn,cd);
+    }
+    public Rational generalFrac(int bn, int bd, int cn, int cd)
+    {
+        return generalFrac(this.n,this.d, bn,bd, cn,cd);
+    }
+
+    public Rational generalFloor(Rational b, Rational c)
+    {
+        return generalFloor(b.n,b.d, c.n,c.d);
+    }
+    public Rational generalCeil(Rational b, Rational c)
+    {
+        return generalCeil(b.n,b.d, c.n,c.d);
+    }
+    public Rational generalRound(Rational b, Rational c)
+    {
+        return generalRound(b.n,b.d, c.n,c.d);
+    }
+    public Rational generalFrac(Rational b, Rational c)
+    {
+        return generalFrac(b.n,b.d, c.n,c.d);
     }
 
 
+    private static int intmod(int a, int b)
+    {
+        assert(b > 0);
+        int answer = a % b;
+        // work around stupid semantics for when a<0
+        if (! (answer >= 0))
+        {
+            answer += b;
+            assert(answer >= 0);
+        }
+        return answer;
+    }
 
     // Static functions returning int, taking arg in n/d form.
     public static int floor(int n, int d)
     {
-        assert(d > 0);
-        if (n >= 0)
-            return n/d;
-        else
-            return -(-n+d-1)/d; // work around stupid negative division semantics
+        return (n-intmod(n,d))/d;
     }
     public static int ceil(int n, int d)
     {
-        assert(d > 0);
-        if (n >= 0)
-            return (n+d-1)/d;
-        else
-            return -(-n/d); // work around stupid negative division semantics
+        return floor(n+d-1, d);
     }
     public static int round(int n, int d)
     {
@@ -258,36 +431,33 @@ public class Rational
     // Member functions returning int.
     public int floor()
     {
-        return floor(n,d);
+        return floor(this.n,this.d);
     }
     public int ceil()
     {
-        return ceil(n,d);
+        return ceil(this.n,this.d);
     }
     public int round()
     {
-        return round(n,d);
+        return round(this.n,this.d);
     }
 
     public Rational floorEquals()
     {
-        n = floor();
-        d = 1;
-        // no need for reduce
+        this.n = floor();
+        this.d = 1; // so no need for reduce()
         return this;
     }
     public Rational ceilEquals()
     {
-        n = ceil();
-        d = 1;
-        // no need for reduce
+        this.n = ceil();
+        this.d = 1; // so no need for reduce()
         return this;
     }
     public Rational roundEquals()
     {
-        n = round();
-        d = 1;
-        // no need for reduce
+        this.n = round();
+        this.d = 1; // so no need for reduce()
         return this;
     }
 
@@ -295,10 +465,12 @@ public class Rational
 
     public double toDouble()
     {
+        assert(isReduced(this.n,this.d));
         return (double)n/(double)d;
     }
     public String toString()
     {
+        assert(isReduced(this.n,this.d));
         if (false)
         {
             if (d == 1)
@@ -330,22 +502,28 @@ public class Rational
 
 
     // reduce to lowest terms, with non-negative denominator.
+    // the only place this is used is at the end of equalsPlus() and equalsMinus();
+    // in all other places, Rationals are kept in reduced form throughout.
     private void reduce()
     {
-        assert(d != 0);
-        if (d < 0)
+        assert(this.d != 0);
+        if (this.d < 0)
         {
-            n = -n;
-            d = -d;
+            this.n = -this.n;
+            this.d = -this.d;
         }
-        int g = gcd(n,d);
-        n /= g;
-        d /= g;
+        int g = gcd(this.n,this.d);
+        this.n /= g;
+        this.d /= g;
+    }
+    private static boolean isReduced(int n, int d)
+    {
+        return d > 0 && gcd(n,d) == 1;
     }
 
     // private restricted implementation of greatest-common-divisor.
     // b must be >= 0.
-    private int gcd(int a, int b)
+    private static int gcd(int a, int b)
     {
         assert(b >= 0);
         if (a < 0)
