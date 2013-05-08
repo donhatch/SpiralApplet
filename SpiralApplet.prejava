@@ -1394,7 +1394,8 @@ public class SpiralApplet
                 {
                     drawStats(g,
                               size,
-                              theSpiralModel);
+                              theSpiralModel,
+                              theSpiralView);
                 }
 
 
@@ -1427,7 +1428,8 @@ public class SpiralApplet
 
 
 
-                if (true)
+                if (!showStatsFlag.get()
+                 && !showTimingFlag.get())
                 {
                     // draw dot at exact center of window,
                     // for debugging.
@@ -1824,10 +1826,132 @@ public class SpiralApplet
 
         public void drawStats(java.awt.Graphics g,
                               java.awt.Dimension gsize,
-                              SpiralModel spiralModel)
+                              SpiralModel spiralModel,
+                              SpiralView spiralView)
         {
+            // momentAng-dualAng vs. primalAng-dualAng graph
+            {
+                int nParts = spiralModel.params.nParts.get();
+                int pixelsPerPart = spiralView.pixelsPerPart.get();
+                int pixelsInPlot = nParts * pixelsPerPart + 1;
+
+                int x0 = (gsize.width-pixelsInPlot)/2;
+                int x1 = x0 + pixelsInPlot;
+                int y1 = gsize.height/2 - 60;
+                int y0 = y1 - pixelsInPlot;
+
+                // frame
+                g.setColor(java.awt.Color.white);
+                g.drawLine(x0,y0,x1-1,y0); // top
+                g.drawLine(x0,y1-1,x1-1,y1-1); // bottom
+                g.drawLine(x0,y0+1,x0,y1-2); // left
+                g.drawLine(x1-1,y0+1,x1-1,y1-2); // right
+
+                // grid lines
+                g.setColor(new java.awt.Color(64,64,64));
+                int nMajor = 9;
+                FORI (iMajor, nMajor+1)
+                {
+                    int x = (int)LERP(x0,x1-1,(double)iMajor/(double)nMajor); // position of vertical line
+                    int y = (int)LERP(y0,y1-1,(double)iMajor/(double)nMajor); // position of horizontal line
+                    g.drawString(iMajor==0 ? "   0" : ""+(90*iMajor/nMajor),
+                                 x-6, y1+20);
+                    g.drawString(iMajor==nMajor ? "   0" : ""+(90-90*iMajor/nMajor),
+                                 x0-20, y+5);
+                    if (iMajor != 0 && iMajor != nMajor)
+                    {
+                        g.drawLine(x,y0+1,x,y1-2); // vertical
+                        g.drawLine(x0+1,y,x1-2,y); // horizontal
+                    }
+                }
+                g.drawString("primalAng-dualAng", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
+                g.drawString("momentAng-dualAng", x0-30-114, (y0+y1)/2+4); // string width is 114 empirically
+
+                g.setColor(java.awt.Color.red);
+                int n = spiralModel.params.n.get();
+                FORI (i, n)
+                {
+                    int val = spiralModel.theList[i];
+                    double center[] = spiralModel.centers[i];
+                    double weight = spiralModel.weights[i];
+                    double primalAng = (1.-(val+.5)/nParts) * (Math.PI*.5);
+                    int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
+                    double momentAng = Math.atan2(center[1],center[0]);
+                    int y = (int)LERP(y1-1,y0, momentAng/(Math.PI*.5));
+                    g.fillRect(x,y,1,1);
+
+                    double maybeTopMomentAng = primalAng;
+                    int maybeTopY = (int)LERP(y1-1,y0,maybeTopMomentAng/(Math.PI*.5));
+                    g.setColor(java.awt.Color.green);
+                    g.fillRect(x,maybeTopY-2,1,1); // should leave exactly 1 pixel gap
+                    g.setColor(java.awt.Color.red);
+                }
+            }
+
+
+            // |moment|/(primalR*dualR^2) vs. primalAng-dualAng graph
+            {
+                int nParts = spiralModel.params.nParts.get();
+                int pixelsPerPart = spiralView.pixelsPerPart.get();
+                int pixelsInPlot = nParts * pixelsPerPart + 1;
+
+                int x0 = (gsize.width-pixelsInPlot)/2;
+                int x1 = x0 + pixelsInPlot;
+                int y0 = gsize.height/2 + 10;
+                int y1 = gsize.height - 50;
+
+                // frame
+                g.setColor(java.awt.Color.white);
+                g.drawLine(x0,y0,x1-1,y0); // top
+                g.drawLine(x0,y1-1,x1-1,y1-1); // bottom
+                g.drawLine(x0,y0+1,x0,y1-2); // left
+                g.drawLine(x1-1,y0+1,x1-1,y1-2); // right
+
+                // grid lines and labels
+                g.setColor(new java.awt.Color(64,64,64));
+                int nMajor = 9;
+                FORI (iMajor, nMajor+1)
+                {
+                    int x = (int)LERP(x0,x1-1,(double)iMajor/(double)nMajor); // position of vertical line
+                    int y = (int)LERP(y0,y1-1,(double)iMajor/(double)nMajor); // position of horizontal line
+                    g.drawString(iMajor==0 ? "   0" : ""+(90*iMajor/nMajor),
+                                 x-6, y1+20);
+                    /*
+                    g.drawString(iMajor==nMajor ? "   0" : ""+(90-90*iMajor/nMajor),
+                                 x0-20, y+5);
+                    */
+                    if (iMajor != 0 && iMajor != nMajor)
+                    {
+                        g.drawLine(x,y0+1,x,y1-2); // vertical
+                        g.drawLine(x0+1,y,x1-2,y); // horizontal
+                    }
+                }
+                g.drawString("primalAng-dualAng", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
+                g.drawString("|moment| / (primalR*dualR^2)", x0-30-161, (y0+y1)/2+4); // string width is 155 empirically
+
+                g.setColor(java.awt.Color.red);
+                int n = spiralModel.params.n.get();
+                FORI (i, n)
+                {
+                    int val = spiralModel.theList[i];
+                    double center[] = spiralModel.centers[i];
+                    double weight = spiralModel.weights[i];
+                    double primalAng = (1.-(val+.5)/nParts) * (Math.PI*.5);
+                    int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
+                    double momentR = VecMath.norm(center) * weight;
+                    int y = (int)LERP(y1-1,y0, momentR);
+                    g.fillRect(x,y,1,1);
+
+                    double maybeTopMomentR = .5*Math.sin(2*primalAng);
+                    int maybeTopY = (int)LERP(y1-1,y0,maybeTopMomentR);
+                    g.setColor(java.awt.Color.green);
+                    g.fillRect(x,maybeTopY-2,1,1); // should leave exactly 1 pixel gap
+                    g.setColor(java.awt.Color.red);
+                }
+            }
+
             
-        }
+        } // drawStats
         public void drawTicker(java.awt.Graphics g,
                                java.awt.Dimension gsize,
                                double gCenterX, double gCenterY, // in pixels from upper-left corner of window
@@ -2565,14 +2689,11 @@ public class SpiralApplet
         public SpiralModel.Params spiralModelParams = new SpiralModel.Params(); // gui copy, flushed to model when Regenerate button pressed
         public SpiralModel theSpiralModel = new SpiralModel();
         public SpiralView theSpiralView = new SpiralView();
-#if 0
-        public Listenable.Int animSpeed = new Listenable.Int(0, 1000*1000, 0);
-#endif
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
@@ -3121,7 +3242,9 @@ public class SpiralApplet
         {
             // creating a JFXPanel implicitly starts the JavaFX runtime.
             // unless we do this, the AnimationTimer will be non-functional!
+            System.out.println("initializing javafx...");
             new javafx.embed.swing.JFXPanel();
+            System.out.println("done.");
         }
 
 
