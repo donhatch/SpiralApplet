@@ -1,2 +1,188 @@
 Visualizing an infinite spiral
 to try to prove the every-lagoon-has-at-most-two-good-exits conjecture.
+
+
+Priscilla and Dudley take a walk counterclockwise
+all the way around the primal and dual perimeter respectively,
+in such a way that whenever Priscilla is moving along an edge of the primal,
+Dudley is stopped at the corresponding vertex of the dual,
+and when Dudley is moving along an edge of the dual,
+Priscilla is stopped at the corresponding vertex of the primal.
+Exactly one of Priscilla and Dudley are moving at any particular time.
+
+Denote D and P's positions, in rectangular and polar coordinates,
+by the following, all continuous functions of time t:
+    r_p,theta_p, x_p, y_p
+    r_d,theta_d, x_d, y_d
+
+    x_p = r_p cos(theta_p)  y_p = r_p sin(theta_p)
+    x_d = r_d cos(theta_d)  y_d = r_d sin(theta_d)
+
+Priscilla's and Dudley's paces are such that the one who's moving
+always does so at unit rotation speed around the origin
+while the other stays still.
+So their positions are continuous piecewise differentiable functions of time,
+with 
+    (d theta_p + d theta_d) / dt = 1 wherever both are differentiable.
+
+Since the combined rotational speed is 1 and the compned rotational distance
+is 4 pi, it will take 4 pi units of time for Priscilla and Dudley
+to complete on revolution and arrive back at their starting configuration;
+if we fix Priscilla's starting point <x_p,y_p>(t=0)
+in the interior (not endpoint) of some primal side, this forces Dudley
+to start at the dual vertex <x_d,y_d>(t=0)
+corresponding to that initial primal edge,
+and the entire walk is thus determined.
+They will arrive back at <x_p,y_p, x_d,y_d> at time t = 4 pi.
+
+Priscilla and Dudley's walk is defined (modulo the choice of starting point)
+no matter what the polygon.
+Let's apply it to the case of interest: a polygon
+with only one good lagoon exit.
+
+Since the primal polygon is bounded by straight lines,
+points on the boundary at local maximum and local minimum distance
+from the polygon's cc are isolated,
+and they alternate, with exactly the same number of local maxima
+as local minima.
+Furthermore by assumption there's exactly one local maximum
+(at some farthest vertex);
+therefore there's exactly one local minumum
+(somewhere along the nearest side, *not* at a vertex),
+which is therefore the unique global minimum.
+We'll work in a coordinate system such that the cc
+is at the origin <0,0>,
+and the nearest point on the perimeter
+is one unit below it, at <0,-1>.
+For the dual (n another universe, at unrelated scale),
+place the central vertex at the origin.
+Then the dual edge corresponding to the primal edge closest to the origin
+in primal space starts at the origin in dual space
+and lies along the -y axis;
+choose a scale so that it ends at <0,-1>.
+Having chosen the position and scale of the dual,
+the entire dual diagram (triangle complex) is thus determined.
+It consists of n triangles, each having one vertex at the origin.
+
+We'll number the primal features in CCW order:
+primal edges have even indices and primal vertices have odd indices:
+    e_0 = the bottom horizontal edge passing through 0,-1
+    v_1 = right endpoint of e_0
+    e_2 = next edge CCW
+    v_3 = next vertex CCW
+    ...
+    e_{2 n - 2} = edge CW from e_0
+    v_{2 n - 1} = left endpoint of e_0
+
+Let m be the (odd) index of the vertex
+that is the global maximum distance from the origin
+of the entire primal polygon perimeter.
+So v_m is the only good exit,
+and distance-from=origin is strictly increasing
+from <0,-1> around CCW to v_m,
+and then strictly decreasing from v_m
+back around CCW to <0,-1>.
+
+Consider the directions of the "quill" emanating
+from each vertex of this primal polygon.
+Since v_m is the only good exit,
+every quill *except* the one at v_m
+points more towards the origin than away from it
+(more precisely, the quill i's direction's dot product
+with v_i is < 0), so it can't point directly out from the origin,
+it must lean > 90 degrees from that, CW or CCW.
+For v_i with i<m, distance from origin to perimeter is increasing,
+so the quill at v_i can't lean CCW
+(or it would point into the polygon's interior)
+so it must lean at least 90 degrees CW from straight out.
+Similarly for v_i with i>m, the quill at v_i
+must lean at least 90 degrees CCW from straight out.
+
+There is no apparent contradiction in anything described so far;
+some possible cases are shown in Figures 1(a-e).
+
+    Figure 1(a): 212
+                        |  
+                        *v5
+                       / \
+                    e6/   \e4
+                     /     \
+                  v7*       *v3
+                   /|       |\
+                    |e8   e2| 
+                    |       |  
+                  v9*---=---*v1
+                    |   e0  |
+        (XXX Need to tweak it a bit from this to give quills slop)
+
+    Figure 1(b): 112
+                   \
+                    *v5
+                    | \_
+                    |   \e4
+                    |     \_
+                  e6|       *v3
+                    |       | \
+                    |       |  
+                    |       |
+                    |       |e2
+                    |       |
+                    |       |
+                    |       |
+                  v7*---=---*v1
+                    |   e0  |
+        (XXX Need to tweak it a bit from this to give quills slop)
+        or maybe:
+                   \
+                    |
+                    *v5
+                    |\
+                    | \
+                    |  \
+                    |   \e4
+                    |    \
+                    |     \
+                    |      \
+                  e6|       *v3
+                    |       |  \
+                    |       |e2
+                    |       |
+                  v7*---=---*v1
+                    |   e0  |
+
+    Figure 1(c): 013
+
+
+                        __/
+                     __/
+                  __*v5
+               __/   \
+            __/       \
+         __/           \
+                        \e4
+                         \
+                          \
+                           \
+                            *v3
+                            | \
+           __/              |e2
+        __/                 |
+       *---- ... -------=---*v1
+                            |
+
+    Figure 1(d): mild spiral
+    
+    Figure 1(e): steep spiral
+
+
+
+
+
+
+
+
+
+
+
+
+
