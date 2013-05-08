@@ -2329,7 +2329,7 @@ public class SpiralApplet
                 // Accumulate and draw center of curvature, if scanDir  is -1
                 double centerX = 0.;
                 double centerY = 0.;
-                double area = 0.;
+                double twiceArea = 0.;
                 boolean centerHasStabilized = false;
 
 
@@ -2475,24 +2475,24 @@ public class SpiralApplet
 
                         if (scanDir < 0)
                         {
-                            double areaIncr = twiceTriangleArea(0.,0., dualX,dualY, nextDualX,nextDualY);
-                            assert(areaIncr <= 0.); // area triangle is negative since scanning backwards
-                            areaIncr = ABS(areaIncr);
+                            double twiceAreaIncr = twiceTriangleArea(0.,0., dualX,dualY, nextDualX,nextDualY);
+                            assert(twiceAreaIncr <= 0.); // area triangle is negative since scanning backwards
+                            twiceAreaIncr = ABS(twiceAreaIncr);
 
-                            if (area+areaIncr == area)
+                            if (twiceArea+twiceAreaIncr == twiceArea)
                             {
                                 centerHasStabilized = true;
                                 // don't break til it's all visually small enough too
                             }
                             //if (dualY != 0.) // experimenting-- if we omit first one, should sometimes assert-fail due to center being too low. seems to work.
                             {
-                                area += areaIncr;
+                                twiceArea += twiceAreaIncr;
 
-                                centerX = LERP(centerX, primalX, areaIncr/area);
-                                centerY = LERP(centerY, primalY, areaIncr/area);
-                                //PRINT(areaIncr);
-                                //PRINT(areaIncr*primalX);
-                                //PRINT(areaIncr*primalY);
+                                centerX = LERP(centerX, primalX, twiceAreaIncr/twiceArea);
+                                centerY = LERP(centerY, primalY, twiceAreaIncr/twiceArea);
+                                //PRINT(twiceAreaIncr);
+                                //PRINT(twiceAreaIncr*primalX);
+                                //PRINT(twiceAreaIncr*primalY);
                             }
                         }
 
