@@ -277,7 +277,7 @@ XXX why? need to be more specific
 Lemma:
 During Priscilla and Dudley walk around the primal (from e_0 to e_{l+1}) and dual
 as described above, at all times strictly after the first event:
-    (A) 0 < r_m < r_p r_d^2 sin(2*(t_p-t_d))/4
+    (A) 0 < r_m < r_p r_d^2 sin(t_p-t_d) cos(t_p-t_d) / 2
     (B) t_d <  t_m
     (C)     <= t_p
     (D)     <  t_d+pi/2.
@@ -365,17 +365,15 @@ as follows:
         = 1/2 x_d y_d
         = 1/2 (r_d cos(t_d)) (r_d sin(t_d))
         = 1/2 (r_d sin(pi/2-t_d)) (r_d cos(pi/2-t_d))
-        = 1/2 r_d^2 sin(pi/2-t_d) cos(pi/2-t_d)
-        = r_d^2 (2*sin(pi/2-t_d)*cos(pi/2-t_d)) / 4
-(3)     = r_d^2 sin(2*(pi/2-t_d)) / 4              by double-angle identity
+(3)     = 1/2 r_d^2 sin(pi/2-t_d) cos(pi/2-t_d)
 
 Recalling (2),
      m = (Dudley's triangle area so far)*(Priscilla's position)
        = (Dudley's triangle area so far)*p
 Taking magnitude of both sides,
    r_m = r_p * (Dudley's triangle area so far)
-       < r_p * r_d^2 sin(2*(pi/2-t_d)) / 4         by (3)
-       = r_p * r_d^2 sin(2*(t_p-t_d)) / 4          since t_p = pi/2
+       < r_p * (1/2 r_d^2 sin(pi/2-t_d) cos(pi/2-t_d)) by (3)
+       = r_p r_d^2 sin(pi/2-t_d) cos(pi/2-t_d) / 2
 and so we've shown the second part of (A),
 completing the proof of the base case.
 
@@ -394,7 +392,7 @@ at the previous event (XXX actually in the case of the first event, slightly aft
     _d_ = <_r_d_ cos(_t_d_), _r_d_ sin(_t_d_)>
     _m_ = <_m_p_ cos(_m_p_), _r_p_ sin(_m_p_)>
 the inductive hypothesis is:
-    (_A_) 0 < _r_m_ < _r_p_ _r_d_^2 sin(2*(_t_p_-_t_d_))/4
+    (_A_) 0 < _r_m_ < _r_p_ _r_d_^2 sin(_t_p_-_t_d_) cos(_t_p_-_t_d_) / 2
     (_B_) _t_d_ <  _t_m_
     (_C_)       <= _t_p_
     (_D_)       <  _t_d_+pi/2.
@@ -415,14 +413,14 @@ nor did the moment (since the moment only changes when Dudley moves):
 Priscilla's angle increased, but stayed less than pi/2:
     (9)    0 < _t_p_ < t_p < pi/2               XXX WRONG unless we rotate first!
    (10)    0 < sin(_t_p_) < sin(t_p) < 1    (follows from (9) since sin is increasing in this range)
-  (10.5)   0 < cos(t_p) < cos(_t_p_) < 1    (follows from (9) since cos is decreasing in this range)
+   (11)    0 < cos(t_p) < cos(_t_p_) < 1    (follows from (9) since cos is decreasing in this range)
 
 Expressing the horizontal distance from the origin to the edge Priscilla is on
 in two ways:  (XXX need to rotate first)
          _r_p_ cos(_t_p_) = _x_p_
                           = x_p
                           = r_p cos(t_p)
-    (11) _r_p_ cos(_t_p_) = r_p cos(t_p)
+    (12) _r_p_ cos(_t_p_) = r_p cos(t_p)
 
 For (B),
     t_d = _t_d_  by (6)
@@ -441,7 +439,8 @@ as shown in Figure 4.
 As in the base case, this temporary rotation of the picture
 does not change the statement of (A) that we are trying to prove
 (even though t_p and t_d have changed-- specifically, t_d is now 0).
-            The following scale looked nice:
+
+            (The following scale looked nice on paper:)
             ....*
             ....|
             ....|
@@ -470,20 +469,20 @@ does not change the statement of (A) that we are trying to prove
 The first inequality of (A) is easily proved:
     r_m = _r_m_  by (7)
         > 0 by (_A_)
+
 Proceeding now to prove the second inequality of (A):
     r_m = _r_m_  by (7)
-        < _r_p_ _r_d_^2 sin(2*(_t_p_-_t_d_)) / 4  by (_A_)
-        = _r_p_ r_d^2 sin(2*(_t_p_-_t_d_)) / 4  by (5)
-        = _r_p_ r_d^2 sin(2*(_t_p_)) / 4  since _t_d_=0 in this temporarily rotated picture (XXX maybe use carats instead?)
-        = _r_p_ r_d^2 (2*sin(_t_p_)*cos(_t_p_)) / 4  by double-angle formula
+        < _r_p_ _r_d_^2 sin(_t_p_-_t_d_) cos(_t_p_-_t_d_) / 2  by (_A_)
+        < _r_p_ r_d^2 sin(_t_p_-_t_d_) cos(_t_p_-_t_d_) / 2  by (5)
+        < _r_p_ r_d^2 sin(_t_p_) cos(_t_p_) / 2  since _t_d_=0 in this temporarily rotated picture (XXX maybe use carats instead?)
         = (_r_p_ cos(_t_p_)) r_d^2 sin(_t_p_)/2      (just rearranging terms)
-        = (r_p cos(t_p)) r_d^2 sin(_t_p_)/2  by (11)
-        < (r_p cos(t_p)) r_d^2 sin(t_p)/2  by (10), since all factors positive (by 10 and 10.5)
-        = r_p r_d^2 (2*sin(t_p)*cos(t_p))/4 (just rearranging terms)
-        = r_p r_d^2 (sin(2*t_p))/4 (just rearranging terms)
-        = r_p r_d^2 (sin(2*(t_p-t_d))) / 4  since t_d=0 in this rotated picture
+        = (r_p cos(t_p)) r_d^2 sin(_t_p_)/2  by (12)
+        < (r_p cos(t_p)) r_d^2 sin(t_p)/2  by (10), since all factors are positive (by (10) and (11))
+        = r_p r_d^2 sin(t_p) cos(t_p) / 2  (just rearranging terms)
+        = r_p r_d^2 sin(t_p-t_d) cos(t_p-t_d) / 2  since t_d=0 in this rotated picture
 and so the second inequality of (A) is proved,
 completing Case 1 of the inductive step.
+
 
 
 Case 2: In the time since the previous event,
