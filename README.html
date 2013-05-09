@@ -474,7 +474,7 @@ In other words (since Priscilla's outward normal vector
 is in the direction of Dudley's position vector, by definition)
     $$(1)    \theta_d \lt \theta_p \lt \theta_d+\pi/2,$$
 so (D) is always satisfied during any walk on any primal polygon
-containing the origin.
+containing the origin.  (XXX wait, that's not true! argh! need to adjust this... say a true statement, and I think the only reason t_d < t_p is that we're in this spiral situation)
 We prove the other parts, (A),(B),(C) by induction on the number of events
 (as defined earlier) encountered so far.
 <p>
@@ -668,11 +668,11 @@ Dudley didn't move:
 nor did the moment (since the moment only changes when Dudley moves):
     $$(7) \;\; \overline{r_m} = \underline{r_m}$$
     $$(8) \;\; \overline{\theta_m} = \underline{\theta_m}  \;\; \text{(assuming $\underline{\theta_m}$ is well-defined-- which it is, by inductive hypothesis)}$$
-Priscilla moved purely upwards, within the first quadrant:
+Priscilla moved purely upwards, within the first quadrant: (XXX may need to make very clear why this is true! it follows from B and/or C but it's a bit of a train wreck at the moment :-( )
                $$0 \lt \underline{y_p} \lt \overline{y_p}$$
     $$(9) \;\; 0 \lt \underline{x_p} = \overline{x_p}$$
 so her angle increased, but stayed less than $\pi/2$:
-    $$(10) \;\; 0 \lt \underline{\theta_p} \lt \overline{\theta_p} \lt \pi/2  \;\; \text{(XXX do we need to argue that $\underline{\theta_p}$ is strictly positive first?}$$
+    $$(10) \;\; 0 \lt \underline{\theta_p} \lt \overline{\theta_p} \lt \pi/2$$
    $$(11) \;\; 0 \lt \sin(\underline{\theta_p}) \lt \sin(\overline{\theta_p}) \lt 1  \;\; \text{(follows from (10) since $\sin$ is increasing in this range)}$$
    $$(12) \;\; 0 \lt \cos(\overline{\theta_p}) \lt \cos(\underline{\theta_p}) \lt 1  \;\; \text{(follows from (10) since $\cos$ is decreasing in this range)}$$
 <p>
