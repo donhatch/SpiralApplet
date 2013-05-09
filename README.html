@@ -8,6 +8,18 @@
         \: for medium space
         \, for thin space
         \! for negative thin space
+
+    Can't seem to adjust print font size by user :-(
+    so messing with it in the style sheet here.
+    Font sizes:
+        xx-small
+        x-small
+        small
+        medium
+        large
+        x-large
+        xx-large
+
     TODO: default zoom trigger not working?
     TODO: areaTri?
     TODO: it would be awesome if it were possible to start typesetting
@@ -16,6 +28,38 @@
 -->
 <head>
 <title>There's No Single-Exit Lagoon</title>
+<style type="text/css">
+    p.breakhere {page-break-before:always;}
+
+    // increase default font size.  Im getting old.
+    // (user can do this using ctrl-{+,-,0}
+    //@media screen {
+    //    body {font-size:xx-small;}
+    //}
+    // increase the font size even more when printing--
+    // for some reason it comes out really tiny otherwise.
+    // I havent figured out any way to tell chrome to do that otherwise.
+    //@media print {
+    //    body {font-size:x-large;}
+    //}
+
+    // ARGH! anything media-specific causes corrupt output, it seems.
+    // so, make a global setting of the setting I want for print.
+    body {font-size:x-large;}
+</style>
+
+<!-- note, using the @media directive seems to make chrome (and maybe others) go crazy. so we do it this way instead. -->
+<!--
+BLEAH! screen media's settings affect print media, corrupting it! argh!
+<style type="text/css" media="screen">
+    body {font-size:x-small;}
+</style>
+
+<style type="text/css" media="print">
+    body {font-size:x-large;}
+</style>
+-->
+
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
         tex2jax: {
@@ -40,7 +84,7 @@
 <body>
 <hr> <!--============================================================-->
 Visualizing an infinite spiral
-to try to prove the every-lagoon-has-at-most-two-good-exits conjecture.
+to try to prove the every-lagoon-has-at-least-two-good-exits conjecture.
 <p>
 Priscilla and Dudley take a walk counterclockwise
 all the way around the primal and dual perimeter respectively,
@@ -121,15 +165,18 @@ It consists of
 $n$
 triangles, each having one vertex at the origin.
 <p>
+<span id="youarehere"/>
 We'll number the primal features in CCW order:
 primal edges have even indices and primal vertices have odd indices:
-    $$e_0 = the bottom horizontal edge passing through 0,-1$$
-    $$v_1 = right endpoint of e_0$$
-    $$e_2 = next edge CCW$$
-    $$v_3 = next vertex CCW$$
-    $$...$$
-    $$e_{2 n - 2} = edge CW from e_0$$
-    $$v_{2 n - 1} = left endpoint of e_0$$
+\begin{align}
+            e_0 = & \text{the bottom horizontal edge passing through $\langle 0,-1 \rangle$} \\
+            v_1 = & \text{right endpoint of $e_0$} \\
+            e_2 = & \text{next edge CCW} \\
+            v_3 = & \text{next vertex CCW} \\
+                ... & \\
+    e_{2 n - 2} = & \text{edge CW from e_0} \\
+    v_{2 n - 1} = & \text{left endpoint of e_0} \\
+\end{align}
 <p>
 Let
 $m$
@@ -697,7 +744,6 @@ The first inequality of ($\overline{A}$) is easy:
                    & \gt 0  \;\; \text{by} (\underline{A})
 \end{align}
 <p>
-<span id="youarehere"/>
 Proceeding now to prove the second inequality of ($\overline{A}$):
 \begin{align}
     \overline{r_m} & = \underline{r_m}  \;\; \text{by (7)} \\
