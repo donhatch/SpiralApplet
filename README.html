@@ -24,8 +24,9 @@
             // make it so that hovering over an equation zooms it
             // (right click on an equation to see how to alter this
             // within a session)
+            // XXX this isn't working?
             zoom: 'hover'
-        }
+        },
     });
 </script>
 <script type="text/javascript"
@@ -33,6 +34,7 @@
 </script>
 </head>
 <body>
+\$300
 When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are
 $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
 <hr> <!--============================================================-->
@@ -77,7 +79,7 @@ $ \langle x_d,y_d \rangle (t=0)$
 corresponding to that initial primal edge,
 and the entire walk is thus determined.
 They will arrive back at
-$ {<}x_p,y_p{>},{<}x_d,y_d{>} $ at time
+$ \langle x_p,y_p\rangle,\langle x_d,y_d\rangle $ at time
 $t = 4 \pi$.
 <p>
 Priscilla and Dudley's walk is defined (modulo the choice of starting point)
@@ -99,11 +101,11 @@ therefore there's exactly one local minumum
 which is therefore the unique global minimum.
 We'll work in a coordinate system such that the cc
 is at the origin
-${<}0,0{>}$,
+$\langle 0,0 \rangle$,
 and the nearest point on the perimeter
 is one unit below it, at
-${<}0,-1{>}$.
-For the dual (in another universe, at unrelated scale),
+$\langle 0,-1\rangle$.
+For the dual (at unrelated scale),
 place the central vertex at the origin.
 Then the dual edge corresponding to the primal edge closest to the origin
 in primal space starts at the origin in dual space
@@ -111,7 +113,7 @@ and lies along the
 $-y$
 axis;
 choose a scale so that it ends at
-${<}0,-1{>}$.
+$\langle 0,-1\rangle$.
 Having chosen the position and scale of the dual,
 the entire dual diagram (triangle complex) is thus determined.
 It consists of
@@ -138,11 +140,11 @@ $v_m$
 is the only good exit,
 and distance-from=origin is strictly increasing
 from
-${<}0,-1{>}$
+$\langle 0,-1\rangle$
 around CCW to v_m,
 and then strictly decreasing from v_m
 back around CCW to
-${<}0,-1{>}$.
+$\langle 0,-1\rangle$.
 <p>
 Consider the directions of the "quill" emanating
 from each vertex of this primal polygon.
@@ -162,7 +164,7 @@ degrees from that, CW or CCW.
 For
 $v_i$
 with
-$i{<}m$,
+$i \lt m$,
 distance from origin to perimeter is increasing,
 so the quill at
 $v_i$
@@ -312,67 +314,70 @@ e_{l+1}
 emerges north or northwest out of
 $v_l$).
 Let
-r
+$r$
 be the highest-numbered (most CCW) index such that
-v_{r-1}'s
-x
-coord
-is
-\ge
+$v_{r-1}$'s
+$x$
+coord is
+$\ge$
 that of
 $v_r$'s.
 <p>
 Since
-e_{l+1}
+$e_{l+1}$
 emerges north or northwest from
-v_l
+$v_l$
 and the quill at
-v_l
+$v_l$
 leans CW by more than
-90 degrees
+$90^{\circ}$
 from outward,
 it must be that
-v_l
+$v_l$
 has positive
-y
+$y$
 coord
-(otherwise the angle formed by the quill and e_{l+1}
-would be greater than 180 degrees, which is illegal).
+(otherwise the angle formed by the quill and
+$e_{l+1}$
+would be greater than
+$180^{\circ}$,
+which is illegal).
+<span id="youarehere"/>
 Similarly
-v_r
+$v_r$
 has positive
-y
+$y$
 coord,
 and similarly all vertices between them,
-v_{l+2}, ..., v_{r-2}
+$v_{l+2}, ..., v_{r-2}$
 have positive
-y
+$y$
 coord as well.
 <p>
 The crux of this proof is to show that the cc of all the vertices
-v_1..v_r
+$v_1..v_r$
 has positive
-y
+$y$
 coord, or equivalently,
 that their moment (cc times total curvature) has positive
-y
+$y$
 coord.
 <p>
 Then by symmetric reasoning,
 the cc (or equivalently the moment) of
-v_l..v{2n-1}
+$v_l..v{2n-1}$
 also has positive
-y
+$y$
 coord;
 furthermore as previously mentioned, each of the vertices
-v_{l+2}..v_{r-2}
+$v_{l+2}..v_{r-2}$
 has positive
-y
+$y$
 coord as well, so:
 \begin{align}
-    \text{moment}(v_1..v_{2n-1}) &amp;=&amp;\text{moment}(v_1..v_l) \\
-                                 &amp;+&amp;\text{moment}(v_{l+2}..v_{r-2}) \\
-                                 &amp;+&amp;\text{moment}(v_r..v_{2n-1})
+    \text{moment}(v_1..v_{2n-1}) = & \text{moment}(v_1..v_l) \\
+                                 + & \text{moment}(v_{l+2}..v_{r-2}) \\
+                                 + & \text{moment}(v_r..v_{2n-1})
 \end{align}
 being the sum of three quantities each with positive y coord,
 has positive y coord as well, and we are done.
@@ -456,7 +461,7 @@ convexity of the primal polygon and the fact that it contains the origin
 in its interior implies that, at all times,
 Priscilla's position vector and her outward normal (right) vector
 are strictly within
-90 degrees
+$90^{\circ}$
 of each other.
 In other words (since Priscilla's outward normal vector
 is in the direction of Dudley's position vector, by definition)
@@ -648,7 +653,6 @@ Priscilla's angle increased, but stayed less than $\pi/2$:
    $$(10)    0 < \sin(\underline{\theta_p}) < \sin(\theta_p) < 1    \text{(follows from (9) since $\sin$ is increasing in this range)}$$
    $$(11)    0 < \cos(\theta_p) < \cos(\underline{\theta_p}) < 1    \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
 <p>
-<span id="youarehere"/>
 Expressing the horizontal distance from the origin to the edge Priscilla is on
 in two ways:
 \begin{align}
