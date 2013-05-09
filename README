@@ -290,7 +290,8 @@ This clause is necessary because,
 up to and including the first event
 (Priscilla stopping at v_1 and Dudley starting moving),
 r_m = |m| = 0,
-and so (A) doesn't hold and t_m isn't even defined.
+and so (A) doesn't hold
+(and (B),(C) don't even make sense since t_m isn't even defined).
 
 (XXX this can be moved out of the lemma and proof, it can just be an observation earlier)
 In any of Priscilla and Dudley's walks,
@@ -413,10 +414,12 @@ nor did the moment (since the moment only changes when Dudley moves):
     (8)    t_m = _t_m_ (assuming _t_m_ is well-defined-- which it is, by inductive hypothesis)
 Priscilla's angle increased:
     (9)    0 < _t_p_ < t_p < pi/2
-   (10)    0 < sin(_t_p_) < sin(t_p) < 1    (this follows from (9) since sin is increasing in this range)
+   (10)    0 < sin(_t_p_) < sin(t_p) < 1    (follows from (9) since sin is increasing in this range)
+   (10.5)   0 < cos(t_p) < cos(_t_p_) < 1    (follows from (9) since cos is decreasing in this range)
 and her distance-from-origin increased in the following way:
            r_p/_r_p_ = sec(t_p-t_d)/sec(_t_p_-_t_d_) > 1, i.e.
-   (11)    r_p/_r_p_ = cos(_t_p_-_t_d_)/cos(t_p-t_d) > 1.
+   (11)    r_p/_r_p_ = cos(_t_p_-_t_d_)/cos(t_p-t_d) > 1, i.e.
+   (11)    _r_p_ cos(_t_p_-_t_d_) = r_p cos(t_p-t_d)
 
 For (B),
     t_d = _t_d_  by (6)
@@ -477,21 +480,17 @@ Proceeding now to prove the second inequality of (A):
         = r_p r_d^2 (sin(2*t_p)) / 4       by double-angle formula
         = r_p r_d^2 (sin(2*(t_p-t_d))) / 4  since t_d=0 in this rotated picture
 
-
-
-
-        or rearrange, expand double-angle first and use:
-            _r_p_ cos(_t_p_) = r_p cos(t_p)
-        yes I think that's clearer!
-
-   (11)    r_p/_r_p_ = cos(_t_p_-_t_d_)/cos(t_p-t_d) > 1.
-
-
-        =======
-
-
-    (_A_) 0 < _r_m_ < _r_p_ _r_d_^2 sin(2*(_t_p_-_t_d_))/4
-
+    r_m = _r_m_  by (7)
+        < _r_p_ _r_d_^2 sin(2*(_t_p_-_t_d_)) / 4  by (_A_)
+        = _r_p_ r_d^2 sin(2*(_t_p_-_t_d_)) / 4  by (5)
+        = _r_p_ r_d^2 sin(2*(_t_p_)) / 4  since _t_d_=0 in this temporarily rotated picture (XXX maybe use carats instead?)
+        = _r_p_ r_d^2 (2*sin(_t_p_)*cos(_t_p_)) / 4  by double-angle formula
+        = (_r_p_ cos(_t_p_)) r_d^2 sin(_t_p_)/2      (just rearranging terms)
+        = (r_p cos(t_p)) r_d^2 sin(_t_p_)/2  by (11)
+        < (r_p cos(t_p)) r_d^2 sin(t_p)/2  by (10), since all factors positive (by 10 and 10.5)
+        = r_p r_d^2 (2*sin(t_p)*cos(t_p))/4 (just rearranging terms)
+        = r_p r_d^2 (sin(2*t_p))/4 (just rearranging terms)
+        = r_p r_d^2 (sin(2*(t_p-t_d))) / 4  since t_d=0 in this rotated picture
 
 
 Case 2: In the time since the previous event,
