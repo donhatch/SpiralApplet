@@ -8,7 +8,11 @@
         \: for medium space
         \, for thin space
         \! for negative thin space
-    Q: can I set the default zoom trigger so I don't have to re-set it every time I reload the page?
+    TODO: default zoom trigger not working?
+    TODO: areaTri?
+    TODO: it would be awesome if it were possible to start typesetting
+          at a particular place in the page, right after the anchor 
+          we started loading the page at
 -->
 <head>
 <title>There's No Single-Exit Lagoon</title>
@@ -342,7 +346,6 @@ $e_{l+1}$
 would be greater than
 $180^{\circ}$,
 which is illegal).
-<span id="youarehere"/>
 Similarly
 $v_r$
 has positive
@@ -384,16 +387,17 @@ has positive y coord as well, and we are done.
 <p>
 So, we just need to show that the moment
 of the initial vertices
-v_1..v_l
+$v_1..v_l$
 has positive
-y
+$y$
 coord.
 <p>
 We let Priscilla and Dudley compute the moment
 by doing their walk around the primal and dual.
-Priscilla starts anywhere in the interior of edge e_0
+Priscilla starts anywhere in the interior of edge
+$e_0$
 and ends anywhere in the interior of edge
-e_{l+1}.
+$e_{l+1}$.
 Dudley starts and ends at the respective dual vertices.
 (XXX maybe call them $v'_0$ and $v'_{l+1}$? yes I think so)
 <p>
@@ -415,14 +419,14 @@ at each event at which Dudley has been moving,
 Dudley computes the area of the triangle formed by
 his previous event position, his current position, and the origin,
 and adds
-    $$(Dudley's triangle area)*(Priscilla's position)$$
+    $$(\text{Dudley's triangle area})*(\text{Priscilla's position})$$
 to the moment vector being accumulated.
 <p>
 We'll prove the desired result
 (that the moment of
 $v_1..v_l$
 has positive
-y
+$y$
 coord)
 by inductively proving that a stronger statement holds
 at each moment in Priscilla and Dudley's walk.
@@ -431,7 +435,11 @@ statement (B) at the end of the walk.
 XXX why? need to be more specific
 <p>
 Lemma:
-During Priscilla and Dudley walk around the primal (from e_0 to e_{l+1}) and dual
+During Priscilla and Dudley walk around the primal (from
+$e_0$
+to
+$e_{l+1}$)
+and dual
 as described above, at all times strictly after the first event:
 \begin{align}
     &amp; (A) 0 &amp; < r_m &amp;&lt; r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2 \\
@@ -447,12 +455,12 @@ in the Lemma statement.
 This clause is necessary because,
 up to and including the first event
 (Priscilla stopping at
-v_1
+$v_1$
 and Dudley starting moving),
-r_m = |m| = 0,
+$r_m = |m| = 0$,
 and so (A) doesn't hold
 (and (B),(C) don't even make sense since
-\theta_m
+$\theta_m$
 isn't even defined).
 <p>
 (XXX this can be moved out of the lemma and proof, it can just be an observation earlier)
@@ -477,18 +485,22 @@ the number of *previous* events encountered is
 (This includes all times strictly after the first event
 up to and including the second event.)
 That is, Priscilla has stopped moving at
-v_1
+$v_1$
 (that was the first event)
 and Dudley has been moving along the corresponding edge
-e'_1
+$e'_1$
 in the dual diagram.
 At this time,
-    $$(2)    m = (Dudley's triangle area so far)*(Priscilla's position)$$
+    $$(2)    m = (\text{Dudley's triangle area so far})*(\text{Priscilla's position})$$
 which is a nonzero scalar times the nonzero vector
-p=v_1,
-so r_m = |m| > 0
-(so the first part of (A) is satisfied, and \theta_m is well-defined),
-and \theta_m = \theta_p.
+$p=v_1$,
+so
+$r_m = |m| > 0$
+(so the first part of (A) is satisfied, and
+$\theta_m$
+is well-defined),
+and
+$\theta_m = \theta_p$.
 Combining this with (1), we have:
     $$\theta_d < \theta_m = \theta_p < \theta_d+\pi/2$$
 and so (B),(C),(D) are satisfied.
@@ -497,26 +509,29 @@ We still have to prove that the second part of (A) holds in the base case.
 For this base case,
 we temporarily rotate the entire picture
 so that Priscilla's position
-p
+$p$
 is on the
-+y
+$+y$
 axis,
 and so Dudley is traveling upwards along the now-vertical dual edge
-e'_1,
+$e'_1$,
 as shown in Figure 3.
 Note that this temporary rotation of the picture
-does not change the statement of (A) that we are trying to prove,
+does not change the truth or falsity of (A) that we are trying to prove,
 since all of the quantities
-r_m, r_p, r_d, \theta_p-\theta_d
+$r_m$,
+$r_p$,
+$r_d$,
+$\theta_p-\theta_d$
 are invariant under this rotation
 (even though
-\theta_p
+$\theta_p$
 and
-\theta_d
+$\theta_d$
 have changed-- specifically,
-\theta_p
+$\theta_p$
 is now
-\pi/2).
+$\pi/2$).
 (XXX Alternatively, could denote these rotated coords by carat'ing them)
 <pre>
       Priscilla
@@ -539,28 +554,29 @@ is now
 
         Fig. 3: base case in temporarily rotated coord system
 </pre>
+<span id="youarehere"/>
 We can get an upper bound on the area of Dudley's triangle so far,
 as follows:
-    Dudley's triangle area so far
 \begin{align}
-        &amp;= \text{areaTri}(0,v'_0,d) \\
-        &amp;&lt; \text{areaTri}(0,&lt;x_d,0&gt;,d) \text{since the former triangle is included in the latter, since v'_0 has y coord &gt; 0 (XXX prove this!)} \\
-        &amp;= x_d y_d / 2 \\
-        &amp;= (r_d \cos(\theta_d)) (r_d \sin(\theta_d)) / 2\\
-        &amp;= (r_d \sin(\pi/2-\theta_d)) (r_d \cos(\pi/2-\theta_d)) / 2\\
-(3)     &amp;= r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2
+    & \text{Dudley's triangle area so far} \\
+    & \;\; = \text{area}(\triangle(0,v'_0,d)) \\
+    & \;\; &lt; \text{area}(\triangle(0,\langle x_d,0\rangle,d)) \text{since the former triangle is included in the latter, since v'_0 has y coord &gt; 0 (XXX prove this!)} \\
+    & \;\; = x_d y_d / 2 \\
+    & \;\; = (r_d \cos(\theta_d)) (r_d \sin(\theta_d)) / 2\\
+    & \;\; = (r_d \sin(\pi/2-\theta_d)) (r_d \cos(\pi/2-\theta_d)) / 2\\
+(3) & \;\; = r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2
 \end{align}
 <p>
 Recalling (2),
 \begin{align}
-     m &amp;=&amp; (\text{Dudley's triangle area so far})&amp;*&amp;(\text{Priscilla's position}) \\
-       &amp;=&amp; (\text{Dudley's triangle area so far})&amp;*&amp;p
+     m &amp;= (\text{Dudley's triangle area so far})*(\text{Priscilla's position}) \\
+       &amp;= (\text{Dudley's triangle area so far})*p
 \end{align}
 Taking magnitude of both sides,
 \begin{align}
-   r_m &amp;=&amp; r_p * (\text{Dudley's triangle area so far}) \\
-       &amp;&lt;&amp; r_p * (r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2 )  by (3) \\
-       &amp;=&amp; r_p r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2
+   r_m &amp; = (\text{Dudley's triangle area so far}) * r_p \\
+       &amp; &lt; (r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2 ) * r_p  \;\; by (3) \\
+       &amp; = r_p r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2
 \end{align}
 and so we've shown the second part of (A),
 completing the proof of the base case.
@@ -578,11 +594,11 @@ Using underbars to denote the respective values
 at the previous event (XXX actually in the case of the first event, slightly after it) (XXX actually this is silly, why don't we just make the lemma talk about only events
 $\ge 2$, I think that will simplify things?)
 
-$$\begin{align}
+\begin{align}
     \underline{p} &amp; = \langle \underline{r_p} \cos \underline{\theta_p}, \; \underline{r_p} \sin \underline{\theta_p} \rangle \\
     \underline{d} &amp; = \langle \underline{r_d} \cos \underline{\theta_d}, \; \underline{r_d} \sin \underline{\theta_d} \rangle \\
     \underline{m} &amp; = \langle \underline{r_m} \cos \underline{\theta_m}, \; \underline{r_m} \sin \underline{\theta_m} \rangle
-\end{align}$$
+\end{align}
 
 The inductive hypothesis is:
 \begin{alignat*}{3}
