@@ -709,57 +709,57 @@ $0$).
 In this case we have the following relationships between the previous event's values
 and the current values.
 Dudley didn't move:
-    $$(5) \;\; \overline{r_d} = \underline{r_d}$$
-    $$(6) \;\; \overline{\theta_d} = \underline{\theta_d} = 0$$
+    $$(4) \;\; \overline{r_d} = \underline{r_d}$$
+    $$(5) \;\; \overline{\theta_d} = \underline{\theta_d} = 0$$
 nor did the moment (since the moment only changes when Dudley moves):
-    $$(7) \;\; \overline{r_m} = \underline{r_m}$$
-    $$(8) \;\; \overline{\theta_m} = \underline{\theta_m}  \;\; \text{(assuming $\underline{\theta_m}$ is well-defined-- which it is, by inductive hypothesis)}$$
+    $$(6) \;\; \overline{r_m} = \underline{r_m}$$
+    $$(7) \;\; \overline{\theta_m} = \underline{\theta_m}  \;\; \text{(assuming $\underline{\theta_m}$ is well-defined-- which it is, by inductive hypothesis)}$$
 <span id="youarehere"/>
 Priscilla moved purely upwards, within the first quadrant: (XXX may need to make very clear why this is true! it follows from B and/or C but it's a bit of a train wreck at the moment :-( )
 \begin{align}
              0 & \lt \underline{y_p} \lt \overline{y_p} \\
-    (9) \;\; 0 & \lt \underline{x_p} = \overline{x_p}
+    (8) \;\; 0 & \lt \underline{x_p} = \overline{x_p}
 \end{align}
 so her angle increased, but stayed less than $\pi/2$:
-    $$(10) \;\; 0 \lt \underline{\theta_p} \lt \overline{\theta_p} \lt \pi/2$$
-   $$(11) \;\; 0 \lt \sin(\underline{\theta_p}) \lt \sin(\overline{\theta_p}) \lt 1  \;\; \text{(follows from (10) since $\sin$ is increasing in this range)}$$
-   $$(12) \;\; 0 \lt \cos(\overline{\theta_p}) \lt \cos(\underline{\theta_p}) \lt 1  \;\; \text{(follows from (10) since $\cos$ is decreasing in this range)}$$
+    $$(9) \;\; 0 \lt \underline{\theta_p} \lt \overline{\theta_p} \lt \pi/2$$
+   $$(10) \;\; 0 \lt \sin(\underline{\theta_p}) \lt \sin(\overline{\theta_p}) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
+   $$(11) \;\; 0 \lt \cos(\overline{\theta_p}) \lt \cos(\underline{\theta_p}) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
 <p>
 Proving ($\overline{B}$) is easy:
 \begin{align}
-    \overline{\theta_d} & = \underline{\theta_d}  \;\; \text{by (6)} \\
+    \overline{\theta_d} & = \underline{\theta_d}  \;\; \text{by (5)} \\
                         & \lt \underline{\theta_m}  \;\; \text{by} (\underline{B}) \\
-                        & = \overline{\theta_m}  \;\; \text{by (8).}
+                        & = \overline{\theta_m}  \;\; \text{by (7).}
 \end{align}
 Proving ($\overline{C}$) is easy:
 \begin{align}
-    \overline{\theta_m} & = \underline{\theta_m}  \;\; \text{by (8)} \\
+    \overline{\theta_m} & = \underline{\theta_m}  \;\; \text{by (7)} \\
                         & \leq \underline{\theta_p}  \;\; \text{by} (\underline{C}) \\
-                        & \lt \overline{\theta_p}  \;\; \text{by (10)}
+                        & \lt \overline{\theta_p}  \;\; \text{by (9)}
 \end{align}
 And (D) is always satisfied (recall it's not part of the induction). (XXX remove it from the inductive hypothesis and inductive step!)
 <p>
 We must prove ($\overline{A}$).
 The first inequality of ($\overline{A}$) is easy:
 \begin{align}
-    \overline{r_m} & = \underline{r_m}  \;\; \text{by (7)} \\
+    \overline{r_m} & = \underline{r_m}  \;\; \text{by (6)} \\
                    & \gt 0  \;\; \text{by} (\underline{A})
 \end{align}
 <p>
 Proceeding now to prove the second inequality of ($\overline{A}$):
 \begin{align}
-    \overline{r_m} & = \underline{r_m}  \;\; \text{by (7)} \\
+    \overline{r_m} & = \underline{r_m}  \;\; \text{by (6)} \\
                    & \lt \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
-                   & = \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (6)} \\
-                   & = \underline{r_p} \, \overline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
+                   & = \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
+                   & = \underline{r_p} \, \overline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (4)} \\
                    & = (\underline{r_p} \cos(\underline{\theta_p})) \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{(just rearranging terms)} \\
 
                    & = \underline{x_p} \, \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
-                   & = \overline{x_p} \, \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{by (9)} \\
+                   & = \overline{x_p} \, \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{by (8)} \\
                    & = (\overline{r_p} \cos(\overline{\theta_p})) \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
-                   & \lt (\overline{r_p} \cos(\theta_p)) \overline{r_d}^2 \sin(\overline{\theta_p})/2  \;\; \text{by (11), since all factors are positive (by (11) and (12))} \\
+                   & \lt (\overline{r_p} \cos(\theta_p)) \overline{r_d}^2 \sin(\overline{\theta_p})/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
                    & = \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}) \cos(\overline{\theta_p}) / 2   \;\; \text{(just rearranging terms)} \\
-                   & = \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2  \;\; \text{by (6)}
+                   & = \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2  \;\; \text{by (5)}
 \end{align}
 and so the second inequality of ($\overline{A}$) is proved,
 completing Case 1 of the inductive step.
