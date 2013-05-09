@@ -165,7 +165,6 @@ It consists of
 $n$
 triangles, each having one vertex at the origin.
 <p>
-<span id="youarehere"/>
 We'll number the primal features in CCW order:
 primal edges have even indices and primal vertices have odd indices:
 \begin{align}
@@ -488,7 +487,7 @@ as described above, at all times strictly after the first event:
 <!-- the unnecessary curly braces are simply from copying this section over
 from the corresponding "\underline" section and removing the "\underline"s -->
 \begin{alignat*}{3}
-    & ({A}) \;\;  &  0                   &  &  & \lt {r_m} \lt {r_p} {r_d}^2 \sin({\theta_p}-{\theta_d}) \cos({\theta_p}-{\theta_d}) / 2 \\
+    & ({A}) \;\;  &  0                   &  &  & \lt {r_m} \lt {r_p} \, {r_d}^2 \sin({\theta_p}-{\theta_d}) \cos({\theta_p}-{\theta_d}) / 2 \\
     & ({B}) \;\;  & {\theta_d} &  &  & \lt  {\theta_m} \\
     & ({C}) \;\;  &                      &  &  & \leq {\theta_p} \\
     & ({D}) \;\;  &                      &  &  & \lt {\theta_d}+\pi/2.
@@ -641,14 +640,14 @@ Using underbars and overbars to denote the respective values
 at times $\underline{t}$ and $\overline{t}$,
 the inductive hypothesis is that the Lemma holds at $\underline{t}$:
 \begin{alignat*}{3}
-    & (\underline{A}) \;\;  &  0                   &  &  & \lt \underline{r_m} \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2 \\
+    & (\underline{A}) \;\;  &  0                   &  &  & \lt \underline{r_m} \lt \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2 \\
     & (\underline{B}) \;\;  & \underline{\theta_d} &  &  & \lt  \underline{\theta_m} \\
     & (\underline{C}) \;\;  &                      &  &  & \leq \underline{\theta_p} \\
     & (\underline{D}) \;\;  &                      &  &  & \lt \underline{\theta_d}+\pi/2.
 \end{alignat*}
 and, from that, we must prove that it holds at $\overline{t}$:
 \begin{alignat*}{3}
-    & (\overline{A}) \;\;  &  0                   &  &  & \lt \overline{r_m} \lt \overline{r_p} \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2 \\
+    & (\overline{A}) \;\;  &  0                   &  &  & \lt \overline{r_m} \lt \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2 \\
     & (\overline{B}) \;\;  & \overline{\theta_d} &  &  & \lt  \overline{\theta_m} \\
     & (\overline{C}) \;\;  &                      &  &  & \leq \overline{\theta_p} \\
     & (\overline{D}) \;\;  &                      &  &  & \lt \overline{\theta_d}+\pi/2.
@@ -744,20 +743,21 @@ The first inequality of ($\overline{A}$) is easy:
                    & \gt 0  \;\; \text{by} (\underline{A})
 \end{align}
 <p>
+<span id="youarehere"/>
 Proceeding now to prove the second inequality of ($\overline{A}$):
 \begin{align}
     \overline{r_m} & = \underline{r_m}  \;\; \text{by (7)} \\
-                   & \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
-                   & = \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (6)} \\
-                   & = \underline{r_p} \overline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
+                   & \lt \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
+                   & = \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (6)} \\
+                   & = \underline{r_p} \, \overline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
                    & = (\underline{r_p} \cos(\underline{\theta_p})) \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{(just rearranging terms)} \\
 
-                   & = \underline{x_p} \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
+                   & = \underline{x_p} \, \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
                    & = \overline{x_p} \, \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{by (9)} \\
                    & = (\overline{r_p} \cos(\overline{\theta_p})) \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
                    & \lt (\overline{r_p} \cos(\theta_p)) \overline{r_d}^2 \sin(\overline{\theta_p})/2  \;\; \text{by (11), since all factors are positive (by (11) and (12))} \\
-                   & = \overline{r_p} \overline{r_d}^2 \sin(\overline{\theta_p}) \cos(\overline{\theta_p}) / 2   \;\; \text{(just rearranging terms)} \\
-                   & = \overline{r_p} \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2  \;\; \text{by (6)}
+                   & = \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}) \cos(\overline{\theta_p}) / 2   \;\; \text{(just rearranging terms)} \\
+                   & = \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2  \;\; \text{by (6)}
 \end{align}
 and so the second inequality of ($\overline{A}$)) is proved,
 completing Case 1 of the inductive step.
