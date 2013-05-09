@@ -38,9 +38,6 @@
 </script>
 </head>
 <body>
-\$300
-When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) and they are
-$$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
 <hr> <!--============================================================-->
 Visualizing an infinite spiral
 to try to prove the every-lagoon-has-at-most-two-good-exits conjecture.
@@ -497,14 +494,14 @@ At this time,
 which is a nonzero scalar times the nonzero vector
 $p=v_1$,
 so
-$r_m = |m| > 0$
+$r_m = |m| \gt 0$
 (so the first part of (A) is satisfied, and
 $\theta_m$
 is well-defined),
 and
 $\theta_m = \theta_p$.
 Combining this with (1), we have:
-    $$\theta_d < \theta_m = \theta_p < \theta_d+\pi/2$$
+    $$\theta_d \lt \theta_m = \theta_p \lt \theta_d+\pi/2$$
 and so (B),(C),(D) are satisfied.
 We still have to prove that the second part of (A) holds in the base case.
 <p>
@@ -585,7 +582,7 @@ completing the proof of the base case.
 
 For the inductive step,
 we will show that, given two times
-$\underline{t} < \overline{t}$
+$\underline{t} \lt \overline{t}$
 during the walk,
 if only Priscilla moves or only Dudley moves during the that time interval,
 and if the Lemma holds at $\underline{t}$, then it also holds at $\overline{t}$.
@@ -615,15 +612,14 @@ There are two cases.
 Case 1: In the time since the previous event,
 Priscilla has moved (in a straight line) and Dudley has stayed still.
 <p>
-<span id="youarehere"/>
 This time we temporarily rotate the picture
 so that Dudley's (stationary) position is on the
 $+x$
 axis,
 and so Priscilla has travelled upwards along a now-vertical primal edge,
 as shown in Figure 4.
-As in the base case, this temporary rotation of the picture
-does not change the truth or falsity of the Lemma at
+As in the base case, this is simply a change of coordinate system
+that does not change the truth or falsity of the Lemma at
 $\underline{t}$
 or
 $\overline{t}$
@@ -646,57 +642,58 @@ $0$).
             .....
             .....
             *....
-                    *p=<x_p,y_p>
+                    *$\overline{p}=<\overline{x_p},\overline{y_p}>$
                     |
                   . |
                     | ^
                  .  | |
-                    | | Priscilla walks from $\underline{p}$ to p
+                    | | Priscilla walks from $\underline{p}$ to $\overline{p}$
                 .   | | (perpendicular to Dudley's stationary position)
                     | |
                .    | 
                     |  
-              .     *\underline{p}=<\underline{x_p},\underline{y_p}>
+              .     *$\underline{p}=<\underline{x_p},\underline{y_p}>$
                   .  
              .  .    
               .             Dudley
-           0*----------------*d=\underline{d}
+           0*----------------*$\underline{d}=\overline{d}$
 
         Fig. 4: Inductive step, Case 1: Priscilla has moved
 </pre>
 In this case we have the following relationships between the previous event's values
 and the current values.
 Dudley didn't move:
-    $$(5)    r_d = \underline{r_d}$$
-    $$(6)    \theta_d = \underline{\theta_d} = 0$$
+    $$(5)    \overline{r_d} = \underline{r_d}$$
+    $$(6)    \overline{\theta_d} = \underline{\theta_d} = 0$$
 nor did the moment (since the moment only changes when Dudley moves):
-    $$(7)    r_m = \underline{r_m}$$
-    $$(8)    \theta_m = \underline{\theta_m} \text{(assuming $\underline{\theta_m}$ is well-defined-- which it is, by inductive hypothesis)}$$
+    $$(7)    \overline{r_m} = \underline{r_m}$$
+    $$(8)    \overline{\theta_m} = \underline{\theta_m}  \;\; \text{(assuming $\underline{\theta_m}$ is well-defined-- which it is, by inductive hypothesis)}$$
 Priscilla's angle increased, but stayed less than $\pi/2$:
-    $$(9)    0 < \underline{\theta_p} < \theta_p < \pi/2       \text{(XXX do we need to argue that $\underline{p}$ is strictly positive first?}$$
-   $$(10)    0 < \sin(\underline{\theta_p}) < \sin(\theta_p) < 1    \text{(follows from (9) since $\sin$ is increasing in this range)}$$
-   $$(11)    0 < \cos(\theta_p) < \cos(\underline{\theta_p}) < 1    \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
+    $$(9)    0 \lt \underline{\theta_p} \lt \overline{\theta_p} \lt \pi/2  \;\; \text{(XXX do we need to argue that $\underline{\theta_p}$ is strictly positive first?}$$
+   $$(10)    0 \lt \sin(\underline{\theta_p}) \lt \sin(\overline{\theta_p}) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
+   $$(11)    0 \lt \cos(\overline{\theta_p}) \lt \cos(\underline{\theta_p}) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
 <p>
+<span id="youarehere"/>
 Expressing the horizontal distance from the origin to the edge Priscilla is on
 in two ways:
 \begin{align}
-         \underline{r_p} \cos(\underline{\theta_p}) & = \underline{x_p} \\
-                          & = x_p \\
-                          & = r_p \cos(\theta_p) \\
-    (12) \underline{r_p} \cos(\underline{\theta_p}) & = r_p \cos(\theta_p)
+              \underline{r_p} \cos(\underline{\theta_p}) & = \underline{x_p} \\
+                                                         & = x_p \\
+                                                         & = r_p \cos(\theta_p) \\
+    (12) \;\; \underline{r_p} \cos(\underline{\theta_p}) & = r_p \cos(\theta_p)
 \end{align}
 <p>
 Proving (B) is easy:
 \begin{align}
-    \theta_d & = \underline{\theta_d}  \text{by (6)} \\
-             & < \underline{\theta_m}  \text{by} (\underline{B}) \\
+    \theta_d & = \underline{\theta_d}  \;\; \text{by (6)} \\
+             & \lt \underline{\theta_m}  \;\; \text{by} (\underline{B}) \\
              & = \theta_m    \text{by (8).}
 \end{align}
 Proving (C) is easy:
 \begin{align}
     \theta_m & = \underline{\theta_m}  \;\; \text{by (8)} \\
              & \leq \underline{\theta_p}  \;\; \text{by} (\underline{C}) \\
-             & < \theta_p  \;\; \text{by (9)}
+             & \lt \theta_p  \;\; \text{by (9)}
 \end{align}
 And (D) is always satisfied (recall it's not part of the induction).
 <p>
@@ -704,18 +701,18 @@ We must prove (A).
 The first inequality of (A) is easily proved:
 \begin{align}
     r_m & = \underline{r_m}  \;\; \text{by (7)} \\
-        & > 0  \;\; \text{by} (\underline{A})
+        & \gt 0  \;\; \text{by} (\underline{A})
 \end{align}
 <p>
 Proceeding now to prove the second inequality of (A):
 \begin{align}
     r_m & = \underline{r_m}  \;\; \text{by (7)} \\
-        & < \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
-        & < \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{since $\underline{\theta_d}=0$ in this temporarily rotated picture (XXX maybe use carats instead?)} \\
-        & < \underline{r_p} r_d^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
+        & \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
+        & \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{since $\underline{\theta_d}=0$ in this temporarily rotated picture (XXX maybe use carats instead?)} \\
+        & \lt \underline{r_p} r_d^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
         & = (\underline{r_p} \cos(\underline{\theta_p})) r_d^2 \sin(\underline{\theta_p})/2   \;\; \text{(just rearranging terms)} \\
         & = (r_p \cos(\theta_p)) r_d^2 \sin(\underline{\theta_p})/2  \;\; \text{by (12)} \\
-        & < (r_p \cos(\theta_p)) r_d^2 \sin(\theta_p)/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
+        & \lt (r_p \cos(\theta_p)) r_d^2 \sin(\theta_p)/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
         & = r_p r_d^2 \sin(\theta_p) \cos(\theta_p) / 2   \;\; \text{(just rearranging terms)} \\
         & = r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2  \;\; \text{since $\theta_d=0$ in this rotated picture} \\
 \end{align}
