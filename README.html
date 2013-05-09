@@ -31,6 +31,8 @@
 <style type="text/css">
     p.breakhere {page-break-before:always;}
 
+    body {font-size:x-large;}
+
     // increase default font size.  Im getting old.
     // (user can do this using ctrl-{+,-,0}
     //@media screen {
@@ -45,7 +47,13 @@
 
     // ARGH! anything media-specific causes corrupt output, it seems.
     // so, make a global setting of the setting I want for print.
-    body {font-size:x-large;}
+    
+    // XXX wait a minute, somethings fucked...
+    // are comments not working like I expected?
+    // the font-size directive works when above this comment, but not below it??
+    // the following works when
+
+
 </style>
 
 <!-- note, using the @media directive seems to make chrome (and maybe others) go crazy. so we do it this way instead. -->
