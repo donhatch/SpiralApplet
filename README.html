@@ -8,14 +8,23 @@
         \: for medium space
         \, for thin space
         \! for negative thin space
+    Q: can I set the default zoom trigger so I don't have to re-set it every time I reload the page?
 -->
 <head>
 <title>There's No Single-Exit Lagoon</title>
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
         tex2jax: {
+            // make '$' delimit inline math
             inlineMath: [['$','$'], ['\\(','\\)']],
+            // make \$ give a real dollar sign, even in non-math mode
             processEscapes: true
+        },
+        menuSettings: {
+            // make it so that hovering over an equation zooms it
+            // (right click on an equation to see how to alter this
+            // within a session)
+            zoom: 'hover'
         }
     });
 </script>
@@ -571,12 +580,12 @@ $$\begin{align}
     \underline{m} &amp; = \lt \underline{r_m} \cos \underline{t_m}, \underline{r_m} \sin \underline{t_m} \gt
 \end{align}$$
 
-the inductive hypothesis is:
+The inductive hypothesis is:
 \begin{align}
-    (_A_) 0 &amp;<&amp; _r_m_ &lt; _r_p_ _r_d_^2 \sin(_t_p_-_t_d_) \cos(_t_p_-_t_d_) / 2 \\
-    (_B_) _t_d_ &amp;<&amp;  _t_m_ \\
-    (_C_)       &amp;\leq&amp; _t_p_ \\
-    (_D_)       &amp;<&amp;  _t_d_+\pi/2.
+    &amp;(\underline{A}) 0 &amp;\lt \underline{r_m} \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{t_p}-\underline{t_d}) \cos(\underline{t_p}-\underline{t_d}) / 2 \\
+    &amp;(\underline{B}) \underline{t_d} &amp;\lt  \underline{t_m} \\
+    &amp;(\underline{C})       &amp;\leq \underline{t_p} \\
+    &amp;(\underline{D})       &amp;\lt \underline{t_d}+\pi/2.
 \end{align}
 <p>
 There are two cases.
@@ -605,61 +614,61 @@ does not change the truth or falsity of the lemma
                   . |
                     | ^
                  .  | |
-                    | | Priscilla walks from _p_ to p
+                    | | Priscilla walks from \underline{p} to p
                 .   | | (perpendicular to Dudley's stationary position)
                     | |
                .    | 
                     |  
-              .     *_p_=<_x_p_,_y_p_>
+              .     *\underline{p}=<\underline{x_p},\underline{y_p}>
                   .  
              .  .    
               .             Dudley
-           0*----------------*d=_d_
+           0*----------------*d=\underline{d_
 
         Fig. 4: Inductive step, Case 1: Priscilla has moved
 </pre>
 In this case we have the following relationships between the previous event's values
 and the current values.
 Dudley didn't move:
-    (5)    r_d = _r_d_
-    (6)    \theta_d = _t_d_ = 0
+    (5)    r_d = \underline{r_d_
+    (6)    \theta_d = \underline{t_d} = 0
 nor did the moment (since the moment only changes when Dudley moves):
-    (7)    r_m = _r_m_
-    (8)    \theta_m = _t_m_ (assuming _t_m_ is well-defined-- which it is, by inductive hypothesis)
+    (7)    r_m = \underline{r_m_
+    (8)    \theta_m = \underline{t_m} (assuming \underline{t_m} is well-defined-- which it is, by inductive hypothesis)
 Priscilla's angle increased, but stayed less than \pi/2:
-    (9)    0 < _t_p_ < \theta_p < \pi/2       (XXX do we need to argue that _p_ is strictly positive first?
-   (10)    0 < \sin(_t_p_) < \sin(\theta_p) < 1    (follows from (9) since \sin is increasing in this range)
-   (11)    0 < \cos(\theta_p) < \cos(_t_p_) < 1    (follows from (9) since \cos is decreasing in this range)
+    (9)    0 < \underline{t_p} < \theta_p < \pi/2       (XXX do we need to argue that \underline{p} is strictly positive first?
+   (10)    0 < \sin(\underline{t_p}) < \sin(\theta_p) < 1    (follows from (9) since \sin is increasing in this range)
+   (11)    0 < \cos(\theta_p) < \cos(\underline{t_p}) < 1    (follows from (9) since \cos is decreasing in this range)
 <p>
 Expressing the horizontal distance from the origin to the edge Priscilla is on
 in two ways:
-         _r_p_ \cos(_t_p_) = _x_p_
+         \underline{r_p} \cos(\underline{t_p}) = \underline{x_p_
                           = x_p
                           = r_p \cos(\theta_p)
-    (12) _r_p_ \cos(_t_p_) = r_p \cos(\theta_p)
+    (12) \underline{r_p} \cos(\underline{t_p}) = r_p \cos(\theta_p)
 <p>
 Proving (B) is easy:
-    \theta_d = _t_d_  by (6)
-        < _t_m_  by (_B_)
+    \theta_d = \underline{t_d}  by (6)
+        < \underline{t_m}  by (\underline{B})
         = \theta_m    by (8).
 Proving (C) is easy:
-    \theta_m = _t_m_  by (8)
-       \leq _t_p_  by (_C_)
+    \theta_m = \underline{t_m}  by (8)
+       \leq \underline{t_p}  by (\underline{C})
         < \theta_p    by (9)
 And (D) is always satisfied (recall it's not part of the induction).
 <p>
 We must prove (A).
 The first inequality of (A) is easily proved:
-    r_m = _r_m_  by (7)
-        > 0 by (_A_)
+    r_m = \underline{r_m}  by (7)
+        > 0 by (\underline{A})
 <p>
 Proceeding now to prove the second inequality of (A):
-    r_m = _r_m_  by (7)
-        < _r_p_ _r_d_^2 \sin(_t_p_-_t_d_) \cos(_t_p_-_t_d_) / 2  by (_A_)
-        < _r_p_ r_d^2 \sin(_t_p_-_t_d_) \cos(_t_p_-_t_d_) / 2  by (5)
-        < _r_p_ r_d^2 \sin(_t_p_) \cos(_t_p_) / 2  since _t_d_=0 in this temporarily rotated picture (XXX maybe use carats instead?)
-        = (_r_p_ \cos(_t_p_)) r_d^2 \sin(_t_p_)/2      (just rearranging terms)
-        = (r_p \cos(\theta_p)) r_d^2 \sin(_t_p_)/2  by (12)
+    r_m = \underline{r_m}  by (7)
+        < \underline{r_p} \underline{r_d}^2 \sin(\underline{t_p}-\underline{t_d}) \cos(\underline{t_p}-\underline{t_d}) / 2  by (\underline{A})
+        < \underline{r_p} r_d^2 \sin(\underline{t_p}-\underline{t_d}) \cos(\underline{t_p}-\underline{t_d}) / 2  by (5)
+        < \underline{r_p} r_d^2 \sin(\underline{t_p}) \cos(\underline{t_p}) / 2  since \underline{t_d}=0 in this temporarily rotated picture (XXX maybe use carats instead?)
+        = (\underline{r_p} \cos(\underline{t_p})) r_d^2 \sin(\underline{t_p})/2      (just rearranging terms)
+        = (r_p \cos(\theta_p)) r_d^2 \sin(\underline{t_p})/2  by (12)
         < (r_p \cos(\theta_p)) r_d^2 \sin(\theta_p)/2  by (10), since all factors are positive (by (10) and (11))
         = r_p r_d^2 \sin(\theta_p) \cos(\theta_p) / 2  (just rearranging terms)
         = r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2  since \theta_d=0 in this rotated picture
