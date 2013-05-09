@@ -441,12 +441,14 @@ to
 $e_{l+1}$)
 and dual
 as described above, at all times strictly after the first event:
-\begin{align}
-    &amp; (A) 0 &amp; < r_m &amp;&lt; r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2 \\
-    &amp; (B) \theta_d &amp;&lt;  \theta_m \\
-    &amp; (C)          &amp;&lt; = \theta_p$$ \\
-    &amp; (D)          &amp;&lt;  \theta_d+\pi/2. \\
-\end{align}
+<!-- the unnecessary curly braces are simply from copying this section over
+from the corresponding "\underline" section and removing the "\underline"s -->
+\begin{alignat*}{3}
+    & ({A}) \;\;  &  0                   &  &  & \lt {r_m} \lt {r_p} {r_d}^2 \sin({\theta_p}-{\theta_d}) \cos({\theta_p}-{\theta_d}) / 2 \\
+    & ({B}) \;\;  & {\theta_d} &  &  & \lt  {\theta_m} \\
+    & ({C}) \;\;  &                      &  &  & \leq {\theta_p} \\
+    & ({D}) \;\;  &                      &  &  & \lt {\theta_d}+\pi/2.
+\end{alignat*}
 <p>
 Proof:
 <p>
@@ -554,7 +556,6 @@ $\pi/2$).
 
         Fig. 3: base case in temporarily rotated coord system
 </pre>
-<span id="youarehere"/>
 We can get an upper bound on the area of Dudley's triangle so far,
 as follows:
 \begin{align}
@@ -581,33 +582,35 @@ Taking magnitude of both sides,
 and so we've shown the second part of (A),
 completing the proof of the base case.
 <p>
-For the inductive hypothesis,
-assume the statement of the lemma was true
-at the (strictly) previous event;
-we will show it's true now
-(this argument will hold not only when "now" is the following event,
-which completes the finite induction,
-but also when "now" is between events,
-which is needed since the statement of the Lemma is not limited
-to just events, it also holds at all times between events.)
-Using underbars to denote the respective values
-at the previous event (XXX actually in the case of the first event, slightly after it) (XXX actually this is silly, why don't we just make the lemma talk about only events
-$\ge 2$, I think that will simplify things?)
 
-\begin{align}
-    \underline{p} &amp; = \langle \underline{r_p} \cos \underline{\theta_p}, \; \underline{r_p} \sin \underline{\theta_p} \rangle \\
-    \underline{d} &amp; = \langle \underline{r_d} \cos \underline{\theta_d}, \; \underline{r_d} \sin \underline{\theta_d} \rangle \\
-    \underline{m} &amp; = \langle \underline{r_m} \cos \underline{\theta_m}, \; \underline{r_m} \sin \underline{\theta_m} \rangle
-\end{align}
+<span id="youarehere"/>
+For the inductive step,
+we will show that, given two times
+$\underline{t} < \overline{t}$
+during the walk,
+if only Priscilla moves or only Dudley moves during the that time interval,
+and if the Lemma holds at $\underline{t}$, then it also holds at $\overline{t}$.
+Since the walk leading to any desired target time
+can be expressed as a finite number of steps of this form,
+this will prove that the Lemma holds at all times.
 
-The inductive hypothesis is:
+Using underbars and overbars to denote the respective values
+at times $\underline{t}$ and $\overline{t}$,
+the inductive hypothesis is that the Lemma holds at $\underline{t}$:
 \begin{alignat*}{3}
-    & (\underline{A}) & & 0               & & \lt \underline{r_m} \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2 \\
-    & (\underline{B}) & & \underline{\theta_d} & & \lt  \underline{\theta_m} \\
-    & (\underline{C}) & &                 & & \leq \underline{\theta_p} \\
-    & (\underline{D}) & &                 & & \lt \underline{\theta_d}+\pi/2.
+    & (\underline{A}) \;\;  &  0                   &  &  & \lt \underline{r_m} \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2 \\
+    & (\underline{B}) \;\;  & \underline{\theta_d} &  &  & \lt  \underline{\theta_m} \\
+    & (\underline{C}) \;\;  &                      &  &  & \leq \underline{\theta_p} \\
+    & (\underline{D}) \;\;  &                      &  &  & \lt \underline{\theta_d}+\pi/2.
 \end{alignat*}
-<p>
+and, from that, we must prove that it holds at $\overline{t}$:
+\begin{alignat*}{3}
+    & (\overline{A}) \;\;  &  0                   &  &  & \lt \overline{r_m} \lt \overline{r_p} \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2 \\
+    & (\overline{B}) \;\;  & \overline{\theta_d} &  &  & \lt  \overline{\theta_m} \\
+    & (\overline{C}) \;\;  &                      &  &  & \leq \overline{\theta_p} \\
+    & (\overline{D}) \;\;  &                      &  &  & \lt \overline{\theta_d}+\pi/2.
+\end{alignat*}
+
 There are two cases.
 <p>
 Case 1: In the time since the previous event,
@@ -703,7 +706,6 @@ Proceeding now to prove the second inequality of (A):
 \begin{align}
     r_m & = \underline{r_m}  \;\; \text{by (7)} \\
         & < \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
-
         & < \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{since $\underline{\theta_d}=0$ in this temporarily rotated picture (XXX maybe use carats instead?)} \\
         & < \underline{r_p} r_d^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
         & = (\underline{r_p} \cos(\underline{\theta_p})) r_d^2 \sin(\underline{\theta_p})/2   \;\; \text{(just rearranging terms)} \\
