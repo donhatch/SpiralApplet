@@ -609,7 +609,7 @@ and, from that, we must prove that it holds at $\overline{t}$:
 
 There are two cases.
 <p>
-Case 1: In the time since the previous event,
+Case 1: In the time from $\underline{t}$ to $\overline{t}$,
 Priscilla has moved (in a straight line) and Dudley has stayed still.
 <p>
 This time we temporarily rotate the picture
@@ -668,19 +668,13 @@ Dudley didn't move:
 nor did the moment (since the moment only changes when Dudley moves):
     $$(7) \;\; \overline{r_m} = \underline{r_m}$$
     $$(8) \;\; \overline{\theta_m} = \underline{\theta_m}  \;\; \text{(assuming $\underline{\theta_m}$ is well-defined-- which it is, by inductive hypothesis)}$$
-Priscilla's angle increased, but stayed less than $\pi/2$:
+Priscilla moved purely upwards, within the first quadrant:
+               $$0 \lt \underline{y_p} \lt \overline{y_p}$$
+    $$(8.5) \;\; 0 \lt \underline{x_p} = \overline{x_p}$$
+so her angle increased, but stayed less than $\pi/2$:
     $$(9) \;\; 0 \lt \underline{\theta_p} \lt \overline{\theta_p} \lt \pi/2  \;\; \text{(XXX do we need to argue that $\underline{\theta_p}$ is strictly positive first?}$$
    $$(10) \;\; 0 \lt \sin(\underline{\theta_p}) \lt \sin(\overline{\theta_p}) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
    $$(11) \;\; 0 \lt \cos(\overline{\theta_p}) \lt \cos(\underline{\theta_p}) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
-<p>
-Expressing the horizontal distance from the origin to the edge Priscilla is on
-in two ways:
-\begin{align}
-              \underline{r_p} \cos(\underline{\theta_p}) & = \underline{x_p} \\
-                                                         & = \overline{x_p} \\
-                                                         & = \overline{r_p} \cos(\overline{\theta_p}) \\
-    (12) \;\; \underline{r_p} \cos(\underline{\theta_p}) & = \overline{r_p} \cos(\overline{\theta_p})
-\end{align}
 <p>
 Proving ($\overline{B}$) is easy:
 \begin{align}
@@ -708,18 +702,21 @@ Proceeding now to prove the second inequality of ($\overline{A}$):
 \begin{align}
     \overline{r_m} & = \underline{r_m}  \;\; \text{by (7)} \\
                    & \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
-                   & \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{since $\underline{\theta_d}=0$ in this temporarily rotated picture} \\
-                   & \lt \underline{r_p} r_d^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
-                   & = (\underline{r_p} \cos(\underline{\theta_p})) r_d^2 \sin(\underline{\theta_p})/2   \;\; \text{(just rearranging terms)} \\
-                   & = (r_p \cos(\theta_p)) r_d^2 \sin(\underline{\theta_p})/2  \;\; \text{by (12)} \\
-                   & \lt (r_p \cos(\theta_p)) r_d^2 \sin(\theta_p)/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
-                   & = r_p r_d^2 \sin(\theta_p) \cos(\theta_p) / 2   \;\; \text{(just rearranging terms)} \\
-                   & = r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2  \;\; \text{since $\theta_d=0$ in this rotated picture} \\
+                   & = \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (6)} \\
+                   & = \underline{r_p} \overline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
+                   & = (\underline{r_p} \cos(\underline{\theta_p})) \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{(just rearranging terms)} \\
+
+                   & = \underline{x_p} \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
+                   & = \overline{x_p} \, \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{by (8.5)} \\
+                   & = (\overline{r_p} \cos(\overline{\theta_p})) \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
+                   & \lt (\overline{r_p} \cos(\theta_p)) \overline{r_d}^2 \sin(\overline{\theta_p})/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
+                   & = \overline{r_p} \overline{r_d}^2 \sin(\overline{\theta_p}) \cos(\overline{\theta_p}) / 2   \;\; \text{(just rearranging terms)} \\
+                   & = \overline{r_p} \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2  \;\; \text{by (6)}
 \end{align}
-and so the second inequality of (\overline{A})) is proved,
+and so the second inequality of ($\overline{A}$)) is proved,
 completing Case 1 of the inductive step.
 <p>
-Case 2: In the time since the previous event,
+Case 2: In the time from $\underline{t}$ to $\overline{t}$,
 Dudley has moved (in a straight line) and Priscilla has stayed still.
 <p>
 <red>TODO fill this in!</red>
