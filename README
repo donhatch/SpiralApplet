@@ -410,7 +410,7 @@ Dudley didn't move:
     (6)    t_d = _t_d_
 nor did the moment (since the moment only changes when Dudley moves):
     (7)    r_m = _r_m_
-    (8)    t_m = _t_m_ (in particular, t_m is well-defined since _t_m_ was by inductive hypothesis)
+    (8)    t_m = _t_m_ (assuming _t_m_ is well-defined-- which it is, by inductive hypothesis)
 Priscilla's angle increased:
     (9)    0 < _t_p_ < t_p < pi/2
    (10)    0 < sin(_t_p_) < sin(t_p) < 1    (this follows from (9) since sin is increasing in this range)
@@ -466,8 +466,28 @@ The first inequality of (A) is easily proved:
         > 0 by (_A_)
 Proceeding now to prove the second inequality of (A):
     r_m = _r_m_  by (7)
-        < _r_p_ _r_d_^2 sin(2*(_t_p_-_t_d_)) / 4     (XXX maybe didn't really need to rotate? not sure)
-        = _r_p_ _r_d_^2 sin(2*_t_p_) / 4       sinc _t_d_ is 0, in this temporarily rotated picture
+        < _r_p_ _r_d_^2 sin(2*(_t_p_-_t_d_)) / 4  by (_A_)
+        = _r_p_ r_d^2 sin(2*(_t_p_-_t_d_)) / 4  by (5)
+        = (r_p cos(t_p-t_d)/cos(_t_p_-_t_d_)) r_d^2 sin(2*(_t_p_-_t_d_)) / 4  by (11)
+        = (r_p cos(t_p)/cos(_t_p_)) r_d^2 sin(2*_t_p_) / 4  since t_d=_t_d_=0, in this temporarily rotated picture (XXX maybe use carats instead?)
+        = (r_p cos(t_p)/cos(_t_p_)) r_d^2 (2*sin(_t_p_)*cos(_t_p_)) / 4  by double-angle formula
+        = r_p r_d^2 sin(_t_p_) cos(t_p) / 2   (just rearranging)
+        < r_p r_d^2 sin(t_p) cos(t_p) / 2  by (10), since all factors positive
+        = r_p r_d^2 (2*sin(t_p)*cos(t_p)) / 4
+        = r_p r_d^2 (sin(2*t_p)) / 4       by double-angle formula
+        = r_p r_d^2 (sin(2*(t_p-t_d))) / 4  since t_d=0 in this rotated picture
+
+
+
+
+        or rearrange, expand double-angle first and use:
+            _r_p_ cos(_t_p_) = r_p cos(t_p)
+        yes I think that's clearer!
+
+   (11)    r_p/_r_p_ = cos(_t_p_-_t_d_)/cos(t_p-t_d) > 1.
+
+
+        =======
 
 
     (_A_) 0 < _r_m_ < _r_p_ _r_d_^2 sin(2*(_t_p_-_t_d_))/4
