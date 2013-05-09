@@ -70,10 +70,10 @@ $4 \pi$
 units of time for Priscilla and Dudley
 to complete one revolution and arrive back at their starting configuration;
 if we fix Priscilla's starting point
-$ \lt x_p,y_p \gt (t=0)$
+$ \langle x_p,y_p \rangle (t=0)$
 in the interior (not endpoint) of some primal side, this forces Dudley
 to start at the dual vertex
-$ \lt x_d,y_d \gt (t=0)$
+$ \langle x_d,y_d \rangle (t=0)$
 corresponding to that initial primal edge,
 and the entire walk is thus determined.
 They will arrive back at
@@ -560,7 +560,6 @@ Taking magnitude of both sides,
 and so we've shown the second part of (A),
 completing the proof of the base case.
 <p>
-<span id="youarehere"/>
 For the inductive hypothesis,
 assume the statement of the lemma was true
 at the (strictly) previous event;
@@ -575,17 +574,17 @@ at the previous event (XXX actually in the case of the first event, slightly aft
 $\ge 2$, I think that will simplify things?)
 
 $$\begin{align}
-    \underline{p} &amp; = \lt \underline{r_p} \cos \underline{t_p}, \underline{r_p} \sin \underline{t_p} \gt \\
-    \underline{d} &amp; = \lt \underline{r_d} \cos \underline{t_d}, \underline{r_d} \sin \underline{t_d} \gt \\
-    \underline{m} &amp; = \lt \underline{r_m} \cos \underline{t_m}, \underline{r_m} \sin \underline{t_m} \gt
+    \underline{p} &amp; = \langle \underline{r_p} \cos \underline{\theta_p}, \; \underline{r_p} \sin \underline{\theta_p} \rangle \\
+    \underline{d} &amp; = \langle \underline{r_d} \cos \underline{\theta_d}, \; \underline{r_d} \sin \underline{\theta_d} \rangle \\
+    \underline{m} &amp; = \langle \underline{r_m} \cos \underline{\theta_m}, \; \underline{r_m} \sin \underline{\theta_m} \rangle
 \end{align}$$
 
 The inductive hypothesis is:
 \begin{alignat*}{3}
-    & (\underline{A}) & & 0               & & \lt \underline{r_m} \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{t_p}-\underline{t_d}) \cos(\underline{t_p}-\underline{t_d}) / 2 \\
-    & (\underline{B}) & & \underline{t_d} & & \lt  \underline{t_m} \\
-    & (\underline{C}) & &                 & & \leq \underline{t_p} \\
-    & (\underline{D}) & &                 & & \lt \underline{t_d}+\pi/2.
+    & (\underline{A}) & & 0               & & \lt \underline{r_m} \lt \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2 \\
+    & (\underline{B}) & & \underline{\theta_d} & & \lt  \underline{\theta_m} \\
+    & (\underline{C}) & &                 & & \leq \underline{\theta_p} \\
+    & (\underline{D}) & &                 & & \lt \underline{\theta_d}+\pi/2.
 \end{alignat*}
 <p>
 There are two cases.
@@ -594,12 +593,21 @@ Case 1: In the time since the previous event,
 Priscilla has moved (in a straight line) and Dudley has stayed still.
 <p>
 This time we temporarily rotate the picture so that Dudley's position
-is on the +x axis,
-and so Priscilla is traveling upwards along a now-vertical primal edge,
+is on the
++x
+axis,
+and so Priscilla has travelled upwards along a now-vertical primal edge,
 as shown in Figure 4.
 As in the base case, this temporary rotation of the picture
 does not change the truth or falsity of the lemma
-(even though \theta_p and \theta_d have changed-- specifically, \theta_d is now 0).
+(even though
+\theta_p
+and
+\theta_d
+have changed-- specifically,
+\theta_d
+is now
+0).
 <pre>
             (The following scale looked nice on paper:)
             ....*
@@ -614,7 +622,7 @@ does not change the truth or falsity of the lemma
                   . |
                     | ^
                  .  | |
-                    | | Priscilla walks from \underline{p} to p
+                    | | Priscilla walks from $\underline{p}$ to p
                 .   | | (perpendicular to Dudley's stationary position)
                     | |
                .    | 
@@ -623,55 +631,67 @@ does not change the truth or falsity of the lemma
                   .  
              .  .    
               .             Dudley
-           0*----------------*d=\underline{d_
+           0*----------------*d=\underline{d}
 
         Fig. 4: Inductive step, Case 1: Priscilla has moved
 </pre>
 In this case we have the following relationships between the previous event's values
 and the current values.
 Dudley didn't move:
-    (5)    r_d = \underline{r_d_
-    (6)    \theta_d = \underline{t_d} = 0
+    $$(5)    r_d = \underline{r_d}$$
+    $$(6)    \theta_d = \underline{\theta_d} = 0$$
 nor did the moment (since the moment only changes when Dudley moves):
-    (7)    r_m = \underline{r_m_
-    (8)    \theta_m = \underline{t_m} (assuming \underline{t_m} is well-defined-- which it is, by inductive hypothesis)
-Priscilla's angle increased, but stayed less than \pi/2:
-    (9)    0 < \underline{t_p} < \theta_p < \pi/2       (XXX do we need to argue that \underline{p} is strictly positive first?
-   (10)    0 < \sin(\underline{t_p}) < \sin(\theta_p) < 1    (follows from (9) since \sin is increasing in this range)
-   (11)    0 < \cos(\theta_p) < \cos(\underline{t_p}) < 1    (follows from (9) since \cos is decreasing in this range)
+    $$(7)    r_m = \underline{r_m}$$
+    $$(8)    \theta_m = \underline{\theta_m} \text{(assuming $\underline{\theta_m}$ is well-defined-- which it is, by inductive hypothesis)}$$
+Priscilla's angle increased, but stayed less than $\pi/2$:
+    $$(9)    0 < \underline{\theta_p} < \theta_p < \pi/2       \text{(XXX do we need to argue that $\underline{p}$ is strictly positive first?}$$
+   $$(10)    0 < \sin(\underline{\theta_p}) < \sin(\theta_p) < 1    \text{(follows from (9) since $\sin$ is increasing in this range)}$$
+   $$(11)    0 < \cos(\theta_p) < \cos(\underline{\theta_p}) < 1    \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
 <p>
+<span id="youarehere"/>
 Expressing the horizontal distance from the origin to the edge Priscilla is on
 in two ways:
-         \underline{r_p} \cos(\underline{t_p}) = \underline{x_p_
-                          = x_p
-                          = r_p \cos(\theta_p)
-    (12) \underline{r_p} \cos(\underline{t_p}) = r_p \cos(\theta_p)
+\begin{align}
+         \underline{r_p} \cos(\underline{\theta_p}) & = \underline{x_p} \\
+                          & = x_p \\
+                          & = r_p \cos(\theta_p) \\
+    (12) \underline{r_p} \cos(\underline{\theta_p}) & = r_p \cos(\theta_p)
+\end{align}
 <p>
 Proving (B) is easy:
-    \theta_d = \underline{t_d}  by (6)
-        < \underline{t_m}  by (\underline{B})
-        = \theta_m    by (8).
+\begin{align}
+    \theta_d & = \underline{\theta_d}  \text{by (6)} \\
+             & < \underline{\theta_m}  \text{by} (\underline{B}) \\
+             & = \theta_m    \text{by (8).}
+\end{align}
 Proving (C) is easy:
-    \theta_m = \underline{t_m}  by (8)
-       \leq \underline{t_p}  by (\underline{C})
-        < \theta_p    by (9)
+\begin{align}
+    \theta_m & = \underline{\theta_m}  \;\; \text{by (8)} \\
+             & \leq \underline{\theta_p}  \;\; \text{by} (\underline{C}) \\
+             & < \theta_p  \;\; \text{by (9)}
+\end{align}
 And (D) is always satisfied (recall it's not part of the induction).
 <p>
 We must prove (A).
 The first inequality of (A) is easily proved:
-    r_m = \underline{r_m}  by (7)
-        > 0 by (\underline{A})
+\begin{align}
+    r_m & = \underline{r_m}  \;\; \text{by (7)} \\
+        & > 0  \;\; \text{by} (\underline{A})
+\end{align}
 <p>
 Proceeding now to prove the second inequality of (A):
-    r_m = \underline{r_m}  by (7)
-        < \underline{r_p} \underline{r_d}^2 \sin(\underline{t_p}-\underline{t_d}) \cos(\underline{t_p}-\underline{t_d}) / 2  by (\underline{A})
-        < \underline{r_p} r_d^2 \sin(\underline{t_p}-\underline{t_d}) \cos(\underline{t_p}-\underline{t_d}) / 2  by (5)
-        < \underline{r_p} r_d^2 \sin(\underline{t_p}) \cos(\underline{t_p}) / 2  since \underline{t_d}=0 in this temporarily rotated picture (XXX maybe use carats instead?)
-        = (\underline{r_p} \cos(\underline{t_p})) r_d^2 \sin(\underline{t_p})/2      (just rearranging terms)
-        = (r_p \cos(\theta_p)) r_d^2 \sin(\underline{t_p})/2  by (12)
-        < (r_p \cos(\theta_p)) r_d^2 \sin(\theta_p)/2  by (10), since all factors are positive (by (10) and (11))
-        = r_p r_d^2 \sin(\theta_p) \cos(\theta_p) / 2  (just rearranging terms)
-        = r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2  since \theta_d=0 in this rotated picture
+\begin{align}
+    r_m & = \underline{r_m}  \;\; \text{by (7)} \\
+        & < \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
+
+        & < \underline{r_p} \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{since $\underline{\theta_d}=0$ in this temporarily rotated picture (XXX maybe use carats instead?)} \\
+        & < \underline{r_p} r_d^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
+        & = (\underline{r_p} \cos(\underline{\theta_p})) r_d^2 \sin(\underline{\theta_p})/2   \;\; \text{(just rearranging terms)} \\
+        & = (r_p \cos(\theta_p)) r_d^2 \sin(\underline{\theta_p})/2  \;\; \text{by (12)} \\
+        & < (r_p \cos(\theta_p)) r_d^2 \sin(\theta_p)/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
+        & = r_p r_d^2 \sin(\theta_p) \cos(\theta_p) / 2   \;\; \text{(just rearranging terms)} \\
+        & = r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2  \;\; \text{since $\theta_d=0$ in this rotated picture} \\
+\end{align}
 and so the second inequality of (A) is proved,
 completing Case 1 of the inductive step.
 <p>
@@ -684,12 +704,15 @@ Dudley has moved (in a straight line) and Priscilla has stayed still.
 <hr> <!--============================================================-->
 
 
+<pre>
+extra scratch stuff
 Lemma:  Given a polygon as previously described,
 for each odd i in {1,3,...l},
     XXX MAYBE, but different language
     (C) moment(v_1..v_i) dot (v_{i+2}-v_i) > 0
     (A) ||moment(v_1..v_i)|| < ||v_i|| {r_d}^2 \sin(\theta_p-\theta_d)     XXX how the fuck did r_d get in here?
     (B) d^perpdot dot moment{v_1..v_i} > 0                              XXX how the fuck did d get in here?  actually need to talk about constructing the dual I think?
+</pre>
 
 
 
