@@ -26,6 +26,7 @@
           at a particular place in the page, right after the anchor 
           we started loading the page at
     TODO: figure out how to validate?
+    TODO: can't seem to get asciimath to work?  oh wait! it's working, from the web page http://cdn.mathjax.org/mathjax/2.1-latest/test/sample-asciimath.html .  EEK, works over the web but not locally?? hmm.  wonder if I need to put something locally? or enable something?  weird
 -->
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -72,26 +73,36 @@
                 // make '$' delimit inline math
                 inlineMath: [['$','$'], ['\\(','\\)']],
                 // make \$ give a real dollar sign, even in non-math mode
-                processEscapes: true
+                processEscapes: true,
+            },
+            asciimath2jax: {
+                delimiters: [['`','`']],
             },
             menuSettings: {
                 // make it so that hovering over an equation zooms it
                 // (right click on an equation to see how to alter this
                 // within a session)
                 // XXX this isn't working?
-                zoom: 'hover'
+                zoom: 'hover',
             },
             "HTML-CSS": {
-                // oh hmm, there's something special about STIX I think. any attempt to use anything else here results in a javascript error, I think that's a bug
+                // oh hmm, it's complicated... see http://docs.mathjax.org/en/latest/options/HTML-CSS.html  .  not sure how to get a font I want.
                 preferredFont: "STIX",
             },
         });
     </script>
+    <!-- note, the particular config used below allows
+         both tex (using $...$)
+         and asciimath (using `...`) on same page -->
     <script type="text/javascript"
-      src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+      src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML.js">
     </script>
 </head>
 <body>
+<span id="youarehere"></span>
+<hr> <!--============================================================-->
+... when `x &lt; y^2` we have ...
+... when $x &lt; y^2$ we have ...
 <hr> <!--============================================================-->
 Visualizing an infinite spiral
 to try to prove the every-lagoon-has-at-least-two-good-exits conjecture.
@@ -609,7 +620,6 @@ $\pi/2$).
 
         Fig. 3: base case in temporarily rotated coord system
 </pre>
-<span id="youarehere"></span>
 We can get an upper bound on the area of Dudley's triangle so far,
 as follows:
 \begin{align}
