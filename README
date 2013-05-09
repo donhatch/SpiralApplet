@@ -402,42 +402,12 @@ There are two cases.
 Case 1: In the time since the previous event,
 Priscilla has moved (in a straight line) and Dudley has stayed still.
 
-In this case we have the following relationships between the previous event's values
-and the current values.
-Dudley didn't move:
-    (5)    r_d = _r_d_
-    (6)    t_d = _t_d_
-nor did the moment (since the moment only changes when Dudley moves):
-    (7)    r_m = _r_m_
-    (8)    t_m = _t_m_ (assuming _t_m_ is well-defined-- which it is, by inductive hypothesis)
-Priscilla's angle increased, but stayed less than pi/2:
-    (9)    0 < _t_p_ < t_p < pi/2               XXX WRONG unless we rotate first!
-   (10)    0 < sin(_t_p_) < sin(t_p) < 1    (follows from (9) since sin is increasing in this range)
-   (11)    0 < cos(t_p) < cos(_t_p_) < 1    (follows from (9) since cos is decreasing in this range)
-
-Expressing the horizontal distance from the origin to the edge Priscilla is on
-in two ways:  (XXX need to rotate first)
-         _r_p_ cos(_t_p_) = _x_p_
-                          = x_p
-                          = r_p cos(t_p)
-    (12) _r_p_ cos(_t_p_) = r_p cos(t_p)
-
-For (B),
-    t_d = _t_d_  by (6)
-        < _t_m_  by (_B_)
-        = t_m    by (8).
-For (C),
-    t_m = _t_m_  by (8)
-       <= _t_p_  by (_C_)
-        < t_p    by (9)
-(D) is always satisfied (recall it's not part of the induction).
-
-We must prove (A).
-This time we temporarily rotate the picture so that Dudley's position is on the +x axis,
+This time we temporarily rotate the picture so that Dudley's position
+is on the +x axis,
 and so Priscilla is traveling upwards along a now-vertical primal edge,
 as shown in Figure 4.
 As in the base case, this temporary rotation of the picture
-does not change the statement of (A) that we are trying to prove
+does not change the truth or falsity of the lemma
 (even though t_p and t_d have changed-- specifically, t_d is now 0).
 
             (The following scale looked nice on paper:)
@@ -466,6 +436,37 @@ does not change the statement of (A) that we are trying to prove
 
         Fig. 4: Inductive step, Case 1: Priscilla has moved
 
+In this case we have the following relationships between the previous event's values
+and the current values.
+Dudley didn't move:
+    (5)    r_d = _r_d_
+    (6)    t_d = _t_d_ = 0
+nor did the moment (since the moment only changes when Dudley moves):
+    (7)    r_m = _r_m_
+    (8)    t_m = _t_m_ (assuming _t_m_ is well-defined-- which it is, by inductive hypothesis)
+Priscilla's angle increased, but stayed less than pi/2:
+    (9)    0 < _t_p_ < t_p < pi/2       (XXX do we need to argue that _p_ is strictly positive first?
+   (10)    0 < sin(_t_p_) < sin(t_p) < 1    (follows from (9) since sin is increasing in this range)
+   (11)    0 < cos(t_p) < cos(_t_p_) < 1    (follows from (9) since cos is decreasing in this range)
+
+Expressing the horizontal distance from the origin to the edge Priscilla is on
+in two ways:
+         _r_p_ cos(_t_p_) = _x_p_
+                          = x_p
+                          = r_p cos(t_p)
+    (12) _r_p_ cos(_t_p_) = r_p cos(t_p)
+
+Proving (B) is easy:
+    t_d = _t_d_  by (6)
+        < _t_m_  by (_B_)
+        = t_m    by (8).
+Proving (C) is easy:
+    t_m = _t_m_  by (8)
+       <= _t_p_  by (_C_)
+        < t_p    by (9)
+And (D) is always satisfied (recall it's not part of the induction).
+
+We must prove (A).
 The first inequality of (A) is easily proved:
     r_m = _r_m_  by (7)
         > 0 by (_A_)
