@@ -12,7 +12,12 @@
 <head>
 <title>There's No Single-Exit Lagoon</title>
 <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [['$','$'], ['\\(','\\)']],
+            processEscapes: true
+        }
+    });
 </script>
 <script type="text/javascript"
   src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
@@ -520,7 +525,6 @@ is now
 
         Fig. 3: base case in temporarily rotated coord system
 </pre>
-<span id="youarehere"/>
 We can get an upper bound on the area of Dudley's triangle so far,
 as follows:
     Dudley's triangle area so far
@@ -541,12 +545,13 @@ Recalling (2),
 Taking magnitude of both sides,
 \begin{align}
    r_m &amp;=&amp; r_p * (\text{Dudley's triangle area so far}) \\
-       &amp;<&amp; r_p * (r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2 )  by (3) \\
+       &amp;&lt;&amp; r_p * (r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2 )  by (3) \\
        &amp;=&amp; r_p r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2
 \end{align}
 and so we've shown the second part of (A),
 completing the proof of the base case.
 <p>
+<span id="youarehere"/>
 For the inductive hypothesis,
 assume the statement of the lemma was true
 at the (strictly) previous event;
@@ -557,15 +562,22 @@ but also when "now" is between events,
 which is needed since the statement of the Lemma is not limited
 to just events, it also holds at all times between events.)
 Using underbars to denote the respective values
-at the previous event (XXX actually in the case of the first event, slightly after it) (XXX actually this is silly, why don't we just make the lemma talk about only events >= 2, I think that will simplify things?)
-    _p_ = <_r_p_ \cos(_t_p_), _r_p_ \sin(_t_p_)>
-    _d_ = <_r_d_ \cos(_t_d_), _r_d_ \sin(_t_d_)>
-    _m_ = <_m_p_ \cos(_m_p_), _r_p_ \sin(_m_p_)>
+at the previous event (XXX actually in the case of the first event, slightly after it) (XXX actually this is silly, why don't we just make the lemma talk about only events
+$\ge 2$, I think that will simplify things?)
+
+$$\begin{align}
+    \underline{p} &amp; = \lt \underline{r_p} \cos \underline{t_p}, \underline{r_p} \sin \underline{t_p} \gt \\
+    \underline{d} &amp; = \lt \underline{r_d} \cos \underline{t_d}, \underline{r_d} \sin \underline{t_d} \gt \\
+    \underline{m} &amp; = \lt \underline{r_m} \cos \underline{t_m}, \underline{r_m} \sin \underline{t_m} \gt
+\end{align}$$
+
 the inductive hypothesis is:
-    (_A_) 0 < _r_m_ < _r_p_ _r_d_^2 \sin(_t_p_-_t_d_) \cos(_t_p_-_t_d_) / 2
-    (_B_) _t_d_ <  _t_m_
-    (_C_)       \leq _t_p_
-    (_D_)       <  _t_d_+\pi/2.
+\begin{align}
+    (_A_) 0 &amp;<&amp; _r_m_ &lt; _r_p_ _r_d_^2 \sin(_t_p_-_t_d_) \cos(_t_p_-_t_d_) / 2 \\
+    (_B_) _t_d_ &amp;<&amp;  _t_m_ \\
+    (_C_)       &amp;\leq&amp; _t_p_ \\
+    (_D_)       &amp;<&amp;  _t_d_+\pi/2.
+\end{align}
 <p>
 There are two cases.
 <p>
