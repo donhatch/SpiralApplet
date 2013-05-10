@@ -1906,17 +1906,17 @@ public class SpiralApplet
 
                                      int gX0OuterFrameWidth, int gX0LabelWidth, int gX0InnerFrameWidth, // in pixels
                                      int gX0, int gX1, // in pixels-- may be in either order
-                                     int gX1OuterFrameWidth, int gX1LabelWidth, int gX1InnerFrameWidth, // in pixels
+                                     int gX1InnerFrameWidth, int gX1LabelWidth, int gX1OuterFrameWidth, // in pixels
                                      String gX0Label, String gX1Label,
 
                                      int gY0OuterFrameWidth, int gY0LabelWidth, int gY0InnerFrameWidth, // in pixels
                                      int gY0, int gY1, // in pixels-- may be in either order
-                                     int gY1OuterFrameWidth, int gY1LabelWidth, int gY1InnerFrameWidth, // in pixels
+                                     int gY1InnerFrameWidth, int gY1LabelWidth, int gY1OuterFrameWidth, // in pixels
                                      String gY0Label, String gY1Label,
 
                                      double x0, double x1, // values to put at gX0,gX1
                                      double y0, double y1, // values to put at gY0,gY1
-                                     int nPartsMajorX, int nPartsMajorY, // for major grid lines
+                                     int nMajorX, int nMajorY, // for major grid lines
 
                                      java.awt.Color outerFrameColor,
                                      java.awt.Color innerFrameColor,
@@ -1929,6 +1929,7 @@ public class SpiralApplet
                                      DataFetcher dataFetcher)
 
         {
+            System.out.println("in drawOnePlot");
             assumpt(gX0 < gX1);
             assumpt(gY0 != gY1);
             if (gY0 > gY1)
@@ -1936,42 +1937,54 @@ public class SpiralApplet
                 int temp;
                 SWAP(gY0OuterFrameWidth, gY1OuterFrameWidth, temp);
                 SWAP(gY0LabelWidth, gY1LabelWidth, temp);
-                SWAP(gY0, gY1, temp);
                 SWAP(gY0InnerFrameWidth, gY1InnerFrameWidth, temp);
+                SWAP(gY0, gY1, temp);
+                double tempDouble;
+                SWAP(y0, y1, tempDouble);
+                String tempString;
+                SWAP(gY0Label, gY1Label, tempString);
             }
             assert(gY0 < gY1);
 
 
+            // make a MyGraphics, without changing coords,
+            // for nice string positioning,
+            // and also for positioning points in double precision
+            MyGraphics mg = new MyGraphics(g, gsize, 0, gsize.width,
+                                                     gsize.height, 0); // wtf? that was unexpected, actually
+
+
+
+            //  +-----------------+ - gY0000
+            //  |   outer frame   |
+            //  |+---------------+| - gY000
+            //  ||               ||
+            //  || +-----------+ || - gY00
+            //  || |inner frame| ||
+            //  || |+---------+| || - gY0
+            //  || ||         || ||
+            //  || |+---------+| || - gY1
+            //  || +-----------+ || - gY11
+            //  ||               ||
+            //  |+---------------+| - gY111
+            //  +-----------------+ - gY1111
+
+            int gX00 = gX0-gX0InnerFrameWidth;
+            int gX000 = gX00-gX0LabelWidth;
+            int gX0000 = gX000-gX0OuterFrameWidth;
+            int gX11 = gX1+gX1InnerFrameWidth;
+            int gX111 = gX11+gX1LabelWidth;
+            int gX1111 = gX111+gX1OuterFrameWidth;
+
+            int gY00 = gY0-gY0InnerFrameWidth;
+            int gY000 = gY00-gY0LabelWidth;
+            int gY0000 = gY000-gY0OuterFrameWidth;
+            int gY11 = gY1+gY1InnerFrameWidth;
+            int gY111 = gY11+gY1LabelWidth;
+            int gY1111 = gY111+gY1OuterFrameWidth;
+
             if (true)
             {
-                //  +-----------------+ - gY0000
-                //  |   outer frame   |
-                //  |+---------------+| - gY000
-                //  ||               ||
-                //  || +-----------+ || - gY00
-                //  || |inner frame| ||
-                //  || |+---------+| || - gY0
-                //  || ||         || ||
-                //  || |+---------+| || - gY1
-                //  || +-----------+ || - gY11
-                //  ||               ||
-                //  |+---------------+| - gY111
-                //  +-----------------+ - gY1111
-
-                int gX00 = gX0-gX0InnerFrameWidth;
-                int gX000 = gX00-gX0LabelWidth;
-                int gX0000 = gX000-gX0OuterFrameWidth;
-                int gX11 = gX1+gX1InnerFrameWidth;
-                int gX111 = gX11+gX1LabelWidth;
-                int gX1111 = gX111+gX1OuterFrameWidth;
-
-                int gY00 = gY0-gY0InnerFrameWidth;
-                int gY000 = gY00-gY0LabelWidth;
-                int gY0000 = gY000-gY0OuterFrameWidth;
-                int gY11 = gY1+gY1InnerFrameWidth;
-                int gY111 = gY11+gY1LabelWidth;
-                int gY1111 = gY111+gY1OuterFrameWidth;
-
                 // draw outer frame
                 g.setColor(outerFrameColor);
                 g.fillRect(gX0000,gY0000, gX1111-gX0000,gY000-gY0000); // top
@@ -1990,18 +2003,88 @@ public class SpiralApplet
                 
             // draw major grid lines (after frames, to make sure bounds are right)
             g.setColor(majorGridColor);
+            FORI (iMajorX, nMajorX+1)
+            {
+                int gX = (int)LERP(gX0,gX1-1,(double)iMajorX/(double)nMajorX);
+                g.fillRect(gX,gY0,
+                           1,gY1-gY0);
+                double x = LERP(x0,x1,(double)iMajorX/(double)nMajorX);
+                String labelText = ""+x;
+                if (labelText.endsWith(".0"))
+                    labelText = labelText.substring(0,labelText.length()-2);
+                mg.drawString(labelText,
+                             gX, gY11+5,
+                             -0., -1.,
+                             null);
+            }
+            FORI (iMajorY, nMajorY+1)
+            {
+                int gY = (int)LERP(gY0,gY1-1,(double)iMajorY/(double)nMajorY);
+                g.fillRect(gX0,gY,
+                           gX1-gX0,1);
+                double y = LERP(y0,y1,(double)iMajorY/(double)nMajorY);
+                String labelText = ""+y;
+                if (labelText.endsWith(".0"))
+                    labelText = labelText.substring(0,labelText.length()-2);
+                mg.drawString(labelText,
+                             gX00-5, gY,
+                             1., 0.,
+                             null);
+            }
+
             // draw labels
             g.setColor(labelColor);
+
+            if (gX0Label != null)
+                mg.drawString(gX0Label,
+                              gX00-5-12-5, // XXX 12 is hard coded estimate of tic label width
+                              (gY0+gY1)/2,
+                              1., 0.,
+                              null);
+            if (gY1Label != null)
+                mg.drawString(gY1Label,
+                              (gX0+gX1)/2,
+                              gY11+5+8+10, // XXX 8 is hard coded estimate of tic label height
+                              0.,-1.,
+                              null);
+
             // draw bounds
             g.setColor(boundsColor);
+            {
+                int n = possibleBoundsFetcher.nData();
+                double datum[] = new double[2];
+                FORI (i, n)
+                {
+                    possibleBoundsFetcher.getDatum(i, datum);
+                    double x = datum[0];
+                    double y = datum[1];
+                    double gX = LERP(gX0+.5,gX1-.5, (x-x0)/(x1-x0));
+                    double gY = LERP(gY0+.5,gY1-.5, (y-y0)/(y1-y0));
+                    mg.drawPoint(gX,gY,1,2);
+                }
+            }
             // draw data
             g.setColor(dataColor);
+            {
+                int n = dataFetcher.nData();
+                double datum[] = new double[2];
+                FORI (i, n)
+                {
+                    dataFetcher.getDatum(i, datum);
+                    double x = datum[0];
+                    double y = datum[1];
+                    double gX = LERP(gX0+.5,gX1-.5, (x-x0)/(x1-x0));
+                    double gY = LERP(gY0+.5,gY1-.5, (y-y0)/(y1-y0));
+                    mg.drawPoint(gX,gY,1);
+                }
+            }
 
+            System.out.println("out drawOnePlot");
         } // drawStats
 
         public static void drawStats(java.awt.Graphics g,
                                      java.awt.Dimension gsize,
-                                     SpiralModel spiralModel,
+                                     final SpiralModel spiralModel,
                                      SpiralView spiralView)
         {
             // momentAng-dualAng vs. primalAng-dualAng graph
@@ -2020,13 +2103,13 @@ public class SpiralApplet
                 java.awt.Color gray64 = new java.awt.Color(64,64,64);
                 drawOnePlot(g,
                             gsize,
-                            2,100,1, x0+1,x1-1, 1,3,2, "momentAng-dualAng", null, // left to right
-                            2,100,1, y1-1,y0+1, 1,3,2, null, "primalAng-dualAng", // bottom to top
+                            1,145,2, x0,x1, 2,3,1, "momentAng-dualAng", null, // left to right
+                            1,50,2,  y1,y0, 2,3,1, "primalAng-dualAng", null, // bottom to top
 
-                            0., Math.PI/2., // values to put at x bounds
-                            0., Math.PI/2., // values to put at y bounds
+                            0., 90., // values to put at x bounds
+                            0., 90., // values to put at y bounds
 
-                            nParts, nParts, // for major grid lines
+                            9,9, // nMajor x,y
 
                             java.awt.Color.blue, // outerFrameColor
                             java.awt.Color.white, // innerFrameColor
@@ -2035,74 +2118,96 @@ public class SpiralApplet
                             java.awt.Color.green, // boundsColor
                             java.awt.Color.red, // dataColor
                             new DataFetcher() { // possibleBoundsFetcher
+                                // XXX this is actually pretty screwy--- we end up drawing a bounds point for every data point, even if there are a zillion data points and not that many pixels
                                 public int nData()
                                 {
-                                    return 0;
+                                    return spiralModel.params.n.get();
                                 }
                                 public void getDatum(int i, double putDatumHere[/*2*/])
                                 {
-                                    assert(false);
+                                    int val = spiralModel.theList[i];
+                                    double center[] = spiralModel.centers[i];
+                                    double weight = spiralModel.weights[i];
+                                    double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+                                    double maybeTopMomentAng = primalAng;
+                                    putDatumHere[0] = RTOD(primalAng);
+                                    putDatumHere[1] = RTOD(maybeTopMomentAng);
                                 }
                             },
                             new DataFetcher() { // dataFetcher
                                 public int nData()
                                 {
-                                    return 0;
+                                    return spiralModel.params.n.get();
                                 }
                                 public void getDatum(int i, double putDatumHere[/*2*/])
                                 {
-                                    assert(false);
+                                    int val = spiralModel.theList[i];
+                                    double center[] = spiralModel.centers[i];
+                                    double weight = spiralModel.weights[i];
+                                    double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+                                    double momentAng = Math.atan2(center[1],center[0]);
+                                    putDatumHere[0] = RTOD(primalAng);
+                                    putDatumHere[1] = RTOD(momentAng);
                                 }
                             });
 
-
-                // frame
-                /*
-                g.setColor(java.awt.Color.white);
-                g.drawLine(x0,y0,x1-1,y0); // top
-                g.drawLine(x0,y1-1,x1-1,y1-1); // bottom
-                g.drawLine(x0,y0+1,x0,y1-2); // left
-                g.drawLine(x1-1,y0+1,x1-1,y1-2); // right
-                */
-
-                // grid lines
-                g.setColor(new java.awt.Color(64,64,64));
-                int nMajor = 9;
-                FORI (iMajor, nMajor+1)
+                if (false)
                 {
-                    int x = (int)LERP(x0,x1-1,(double)iMajor/(double)nMajor); // position of vertical line
-                    int y = (int)LERP(y0,y1-1,(double)iMajor/(double)nMajor); // position of horizontal line
-                    g.drawString(iMajor==0 ? "   0" : ""+(90*iMajor/nMajor),
-                                 x-6, y1+20);
-                    g.drawString(iMajor==nMajor ? "   0" : ""+(90-90*iMajor/nMajor),
-                                 x0-20, y+5);
-                    if (iMajor != 0 && iMajor != nMajor)
+                    // frame
+                    g.setColor(java.awt.Color.yellow);
+                    g.drawLine(x0,y0,x1-1,y0); // top
+                    g.drawLine(x0,y1-1,x1-1,y1-1); // bottom
+                    g.drawLine(x0,y0+1,x0,y1-2); // left
+                    g.drawLine(x1-1,y0+1,x1-1,y1-2); // right
+                }
+
+                if (false)
+                {
+                    // grid lines
+                    g.setColor(new java.awt.Color(64,64,64));
+                    int nMajor = 9;
+                    FORI (iMajor, nMajor+1)
                     {
-                        g.drawLine(x,y0+1,x,y1-2); // vertical
-                        g.drawLine(x0+1,y,x1-2,y); // horizontal
+                        int x = (int)LERP(x0,x1-1,(double)iMajor/(double)nMajor); // position of vertical line
+                        int y = (int)LERP(y0,y1-1,(double)iMajor/(double)nMajor); // position of horizontal line
+                        g.drawString(iMajor==0 ? "   0" : ""+(90*iMajor/nMajor),
+                                     x-6, y1+20);
+                        g.drawString(iMajor==nMajor ? "   0" : ""+(90-90*iMajor/nMajor),
+                                     x0-20, y+5);
+                        if (iMajor != 0 && iMajor != nMajor)
+                        {
+                            g.drawLine(x,y0+1,x,y1-2); // vertical
+                            g.drawLine(x0+1,y,x1-2,y); // horizontal
+                        }
                     }
                 }
-                g.drawString("primalAng-dualAng", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
-                g.drawString("momentAng-dualAng", x0-30-114, (y0+y1)/2+4); // string width is 114 empirically
-
-                g.setColor(java.awt.Color.red);
-                int n = spiralModel.params.n.get();
-                FORI (i, n)
+                if (false)
                 {
-                    int val = spiralModel.theList[i];
-                    double center[] = spiralModel.centers[i];
-                    double weight = spiralModel.weights[i];
-                    double primalAng = (val+.5)/nParts * (Math.PI*.5);
-                    int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
-                    double momentAng = Math.atan2(center[1],center[0]);
-                    int y = (int)LERP(y1-1,y0, momentAng/(Math.PI*.5));
-                    g.fillRect(x,y,1,1);
+                    g.drawString("primalAng-dualAng", 3+x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
+                    g.drawString("momentAng-dualAng", 3+x0-30-114, (y0+y1)/2+4); // string width is 114 empirically
+                }
 
-                    double maybeTopMomentAng = primalAng;
-                    int maybeTopY = (int)LERP(y1-1,y0,maybeTopMomentAng/(Math.PI*.5));
-                    g.setColor(java.awt.Color.green);
-                    g.fillRect(x,maybeTopY-2,1,1); // should leave exactly 1 pixel gap
-                    g.setColor(java.awt.Color.red);
+                if (false)
+                {
+                    g.setColor(java.awt.Color.yellow);
+                    int n = spiralModel.params.n.get();
+                    FORI (i, n)
+                    {
+                        int val = spiralModel.theList[i];
+                        double center[] = spiralModel.centers[i];
+                        double weight = spiralModel.weights[i];
+                        double primalAng = (val+.5)/nParts * (Math.PI*.5);
+                        int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
+                        double momentAng = Math.atan2(center[1],center[0]);
+                        int y = (int)LERP(y1-1,y0, momentAng/(Math.PI*.5));
+                        g.fillRect(x,y,1,1);
+
+                        double maybeTopMomentAng = primalAng;
+                        int maybeTopY = (int)LERP(y1-1,y0,maybeTopMomentAng/(Math.PI*.5));
+                        g.setColor(java.awt.Color.green);
+                        g.fillRect(x,maybeTopY-2,1,1); // should leave exactly 1 pixel gap
+                        g.setColor(java.awt.Color.yellow);
+                    }
                 }
             }
 
@@ -2119,7 +2224,7 @@ public class SpiralApplet
                 int y1 = gsize.height - 50;
 
                 // frame
-                g.setColor(java.awt.Color.white);
+                g.setColor(java.awt.Color.yellow);
                 g.drawLine(x0,y0,x1-1,y0); // top
                 g.drawLine(x0,y1-1,x1-1,y1-1); // bottom
                 g.drawLine(x0,y0+1,x0,y1-2); // left
@@ -2147,7 +2252,7 @@ public class SpiralApplet
                 g.drawString("primalAng-dualAng", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
                 g.drawString("|twiceAreaBasedMoment| / (primalR*dualR^2)", x0-30-248, (y0+y1)/2+4); // string width is 248 empirically
 
-                g.setColor(java.awt.Color.red);
+                g.setColor(java.awt.Color.yellow);
                 int n = spiralModel.params.n.get();
                 FORI (i, n)
                 {
@@ -2165,7 +2270,7 @@ public class SpiralApplet
                     int maybeTopY = (int)LERP(y1-1,y0,maybeTopMomentR);
                     g.setColor(java.awt.Color.green);
                     g.fillRect(x,maybeTopY-2,1,1); // should leave exactly 1 pixel gap
-                    g.setColor(java.awt.Color.red);
+                    g.setColor(java.awt.Color.yellow);
                 }
             }
             // area vs. primalAng-dualAng graph
@@ -2183,7 +2288,7 @@ public class SpiralApplet
                 int y1 = gsize.height - 50;
 
                 // frame
-                g.setColor(java.awt.Color.white);
+                g.setColor(java.awt.Color.yellow);
                 g.drawLine(x0,y0,x1-1,y0); // top
                 g.drawLine(x0,y1-1,x1-1,y1-1); // bottom
                 g.drawLine(x0,y0+1,x0,y1-2); // left
@@ -2212,7 +2317,7 @@ public class SpiralApplet
                 //g.drawString("area", x0-30-23, (y0+y1)/2+4); // string width is 23 empirically
                 g.drawString("area", x1+10, (y0+y1)/2+4);
 
-                g.setColor(java.awt.Color.red);
+                g.setColor(java.awt.Color.yellow);
                 int n = spiralModel.params.n.get();
                 FORI (i, n)
                 {
@@ -2996,9 +3101,9 @@ public class SpiralApplet
         public SpiralView theSpiralView = new SpiralView();
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
