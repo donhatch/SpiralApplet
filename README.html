@@ -276,7 +276,6 @@ some plausible examples are shown in Figures 1(a-e).
                     \  e0 /  
                    v9*---*v1
                       \ /
-<span id="youarehere"></span>
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
      height="360"
@@ -324,7 +323,6 @@ some plausible examples are shown in Figures 1(a-e).
         <g transform="translate(-2,2) scale(.033333) translate(-20,0) "> <text>v7</text> </g>
         <g transform="translate(-1.5,3) scale(.033333) translate(5,5) "> <text>e8</text> </g>
         <g transform="translate(-1,4)  scale(.033333) translate(-20,5) "> <text>v9</text> </g>
-
     </g>
 </svg>
     Need to tweak it a bit from this to give quills slope.
@@ -390,6 +388,117 @@ some plausible examples are shown in Figures 1(a-e).
                      |       |
                    v7*---+---*v1
                      |   e0  |
+
+        In ShephardsPlayApplet:
+            nVirtual=5
+                0,1 1/1
+                1,1 1/1
+
+<span id="youarehere"></span>
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     version="1.1"
+     height="330"
+     >
+    <!-- 1 unit = 20 pixels -->
+    <g transform="translate(175,175) scale(30)">
+        <!-- Q: how to scale the coords but not the stroke width??? -->
+        <!-- A: supposedly non-scaling-stroke was introduced in SVG Tiny 1.2, not sure if that's what's being used or what -->
+        <path
+            id="thePath"
+            vector-effect="non-scaling-stroke"
+            style="stroke: lightGray; stroke-width: 2.0; fill: none"
+            d="
+                M 1 3.5
+                L 2 .5
+                L -2.5 -4
+                L 0 3.5
+                L 1 3.5
+
+                M 1 3.5
+                l -.25 1
+
+                M 2 .5
+                l 1 .5
+
+                M -2.5 -4
+                l -.75 -1
+
+                M 0 3.5
+                l .25 1
+            "
+        />
+        <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
+    </g>
+</svg>
+<svg xmlns="http://www.w3.org/2000/svg"
+     version="1.1"
+     height="330"
+     >
+    <!-- 1 unit = 20 pixels -->
+    <g transform="translate(175,175) scale(30)">
+        <!-- Q: how to scale the coords but not the stroke width??? -->
+        <!-- A: supposedly non-scaling-stroke was introduced in SVG Tiny 1.2, not sure if that's what's being used or what -->
+        <path
+            id="thePath"
+            vector-effect="non-scaling-stroke"
+            style="stroke: lightGray; stroke-width: 2.0; fill: none"
+            d="
+                M -1 3.5
+                L -2 .5
+                L 2.5 -4
+                L 0 3.5
+                L -1 3.5
+
+                M -1 3.5
+                l .25 1
+
+                M -2 .5
+                l -1 .5
+
+                M 2.5 -4
+                l .75 -1
+
+                M 0 3.5
+                l -.25 1
+            "
+        />
+        <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
+    </g>
+</svg>
+<hr>
+
+            \
+             *
+              \
+               \
+              \ \
+                 \
+                  \
+               \   \
+                    \
+                     \
+                \     \
+                       \
+                        \
+                 \       \
+                          \
+                           \
+                  \         *
+
+
+                   \       / \
+
+
+                    \     /   \
+
+
+                     *---*
+
+
+                      \ /
+
+<hr>
 </pre>
 <pre>
     Figure 1(c): 013
