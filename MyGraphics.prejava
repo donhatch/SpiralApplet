@@ -437,19 +437,23 @@ public class MyGraphics
                         2./((Math.abs(scaleX)+Math.abs(scaleY))*.5));   // 2 pixels
     } // drawLine
 
-    public void drawPoint(double x, double y, int nPixels)
+    public void drawPoint(double x, double y, int nPixelsX, int nPixelsY)
     {
-        int x0 = (int)Math.round(x * scaleX + translateX - .5*nPixels);
-        int y0 = (int)Math.round(y * scaleY + translateY - .5*nPixels);
-        if (verbose >= 2) System.out.println("in drawPoint("+x+","+y+","+nPixels+") -> "+x0+","+y0);
+        int x0 = (int)Math.round(x * scaleX + translateX - .5*nPixelsX);
+        int y0 = (int)Math.round(y * scaleY + translateY - .5*nPixelsY);
+        if (verbose >= 2) System.out.println("in drawPoint("+x+","+y+","+nPixelsX+","+nPixelsY+") -> "+x0+","+y0);
         // have to check, otherwise java fillRect does weird wraparound stuff
         // XXX should check in floating-point
-        if (x0 < -nPixels
-         || x0 > gsize.width+nPixels
-         || y0 < -nPixels
-         || y0 > gsize.height+nPixels)
+        if (x0 < -nPixelsX
+         || x0 > gsize.width+nPixelsX
+         || y0 < -nPixelsY
+         || y0 > gsize.height+nPixelsY)
             return;
-        g.fillRect(x0, y0, nPixels, nPixels);
+        g.fillRect(x0, y0, nPixelsX, nPixelsY);
+    }
+    public void drawPoint(double x, double y, int nPixels)
+    {
+        drawPoint(x, y, nPixels, nPixels);
     }
     public void drawString(String s, double x, double y)
     {
