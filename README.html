@@ -310,7 +310,6 @@ Figure 1(a): 212
     better coords.
 </pre>
 <p>
-<span id="youarehere"></span>
 Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
@@ -892,12 +891,20 @@ the inductive hypothesis is that the Lemma holds at $\underline{t}$:
     & (\underline{C}) \;\;  &                      &  &  & \leq \underline{\theta_p} \\
     & (\underline{D}) \;\;  &                      &  &  & \lt \underline{\theta_d}+\pi/2.
 \end{alignat*}
+<span id="youarehere"></span>
 and, assuming that, we must prove that it holds at $\overline{t}$:
 \begin{alignat*}{3}
     & (\overline{A}) \;\;  &  0                   &  &  & \lt \overline{r_m} \lt \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2 \\
     & (\overline{B}) \;\;  & \overline{\theta_d} &  &  & \lt  \overline{\theta_m} \\
     & (\overline{C}) \;\;  &                      &  &  & \leq \overline{\theta_p} \\
     & (\overline{D}) \;\;  &                      &  &  & \lt \overline{\theta_d}+\pi/2.
+\end{alignat*}
+
+and, assuming that, we must prove that it holds at $\overline{t}$:
+    $$(\overline{A}) \;\;  0                   \lt \overline{r_m} \lt \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2 \\$$
+\begin{alignat*}{7}
+     \overline{\theta_d}&  &  & \lt             &  \overline{\theta_m}  &  & \leq            &  \overline{\theta_p}  &  & \lt             &  \overline{\theta_d}+\pi/2. \\
+                        &  &  & (\overline{B})  &                       &  & (\overline{C})  &                       &  & (\overline{D})  & \\
 \end{alignat*}
 
 There are two cases.
