@@ -265,90 +265,66 @@ There is no apparent contradiction in anything described so far;
 some plausible examples are shown in Figures 1(a-e).
 <pre>
     Figure 1(a): 212
-                         |  
-                         *v5
-                        / \
-                     e6/   \e4
-                      /     \
-                   v7*       *v3
-                    /|       |\
-                     |e8   e2| 
-                     |       |  
-                   v9*---+---*v1
-                     |   e0  |
+                       |  
+                       *v5
+                      / \
+                     /   \
+                    /e6 e4\
+                   /       \
+                v7*         *v3
+                 / \e8   e2/ \
+                    \  e0 /  
+                   v9*---*v1
+                      \ /
 <span id="youarehere"></span>
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
-     height="300"
+     height="360"
      >
-    <g transform="translate(200,200)">
+    <!-- 1 unit = 20 pixels -->
+    <g transform="translate(180,180) scale(30)">
+        <!-- Q: how to scale the coords but not the stroke width??? -->
+        <!-- A: supposedly non-scaling-stroke was introduced in SVG Tiny 1.2, not sure if that's what's being used or what -->
         <path
             id="thePath"
+            vector-effect="non-scaling-stroke"
             style="stroke: lightGray; stroke-width: 2.0; fill: none"
             d="
-                M 20 20
-                L 40 -20
-                L 0 -140
-                L -40 -20
-                L -20 20
-                L 20 20
+                M 1 4
+                L 2 2
+                L 0 -4
+                L -2 2
+                L -1 4
+                L 1 4
 
-                M 20 20
-                l -10 30
+                M 1 4
+                l -.5 1.5
 
-                M 40 -20
-                l 20 40
+                M 2 2
+                l 1 2
 
-                M 0 -140
-                l 0 -40
+                M 0 -4
+                l 0 -2
 
-                M -40 -20
-                l -20 40
+                M -2 2
+                l -1 2
 
-                M -20 20
-                l 10 30
+                M -1 4
+                l .5 1.5
             "
         />
-        <g transform="translate(0,-140)">
-            <text>v5</text>
-        </g>
-    </g>
-</svg>
-<svg xmlns="http://www.w3.org/2000/svg"
-     version="1.1"
-     height="240"
-     >
-    <g transform="translate(200,0) scale(2)">
-        <path
-            id="thePath"
-            style="stroke: lightGray; stroke-width: 1.0; fill: none"
-            d="
-                M 50 100
-                L 60 80
-                L 40 20 
-                L 20 80
-                L 30 100
-                L 50 100
+        <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
+        <g transform="translate(0,4)   scale(.033333) translate(-7.5,-5) "> <text>e0</text> </g>
+        <g transform="translate(1,4)   scale(.033333) translate(5,5) "> <text>v1</text> </g>
+        <g transform="translate(1.5,3)   scale(.033333) translate(-20,5) "> <text>e2</text> </g>
+        <g transform="translate(2,2)  scale(.033333) translate(5,0) "> <text>v3</text> </g>
+        <g transform="translate(1,-1)  scale(.033333) translate(-15,20) "> <text>e4</text> </g>
+        <g transform="translate(0,-4)  scale(.033333) translate(5,0) "> <text>v5</text> </g>
+        <g transform="translate(-1,-1)  scale(.033333) translate(0,20) "> <text>e6</text> </g>
+        <g transform="translate(-2,2) scale(.033333) translate(-20,0) "> <text>v7</text> </g>
+        <g transform="translate(-1.5,3) scale(.033333) translate(5,5) "> <text>e8</text> </g>
+        <g transform="translate(-1,4)  scale(.033333) translate(-20,5) "> <text>v9</text> </g>
 
-                M 50 100
-                L 45 115
-
-                M 60 80
-                L 70 100
-
-                M 40 20
-                L 40 0
-
-                M 20 80
-                L 10 100
-
-                M 30 100
-                L 35 115
-            "
-        />
-        <g transform="translate(40,20) scale(.5)">
-            <text>v5</text>
-        </g>
     </g>
 </svg>
     Need to tweak it a bit from this to give quills slope.
