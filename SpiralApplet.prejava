@@ -1706,6 +1706,7 @@ public class SpiralApplet
                     double prevVal = theList[n-1];
 
                     int maxPasses = 2 + 10000/n; // really should be, roughly, one complete pass plus some fixed number of iterations
+                    double scratch[] = new double[3];
                     PRINT(maxPasses);
                     FORI (iPass, maxPasses)
                     {
@@ -1715,56 +1716,36 @@ public class SpiralApplet
                             // from prev weight and center
 
                             // val is (proportional to) primalAng-dualAng.
-                            // when val increases, it means primalAng is increasing.
-                            // when val decreases, it means dualAng is increasing.
+                            // when val increases, it means primalAng is increasing
+                            // (i.e. Priscilla is moving, Dudley is turning)
+                            // when val decreases, it means dualAng is increasing
+                            // (i.e. Dudley is moving, Priscilla is turning)
                             // but, we always keep it canonicalized so that dualAng is 0.
                             double val = theList[i];
                             double prevPrimalAng = Math.PI/2 * ((prevVal+.5)/nParts);
                             double primalAng = Math.PI/2 * ((val+.5)/nParts);
                             if (primalAng > prevPrimalAng)
                             {
-                                // primalAng is increasing.
-                                // this shrinks the canonical representation of the primal,
-                                // thereby shrinking the center accordingly.
-                                // nothing happens to the weight,
-                                // nor to the direction from origin to center.
-                                double shrink = Math.cos(primalAng)
-                                              / Math.cos(prevPrimalAng);
-                                assert(shrink < 1.);
-                                VecMath.vxs(thisCenter, prevCenter, shrink);
-                                thisWeight = prevWeight;
+                                updateCenterAndWeightWhenPriscillaMoved(
+                                        prevCenter[0], prevCenter[1], prevWeight,
+                                        prevPrimalAng,
+                                        primalAng,
+                                        scratch);
+                                thisCenter[0] = scratch[0];
+                                thisCenter[1] = scratch[1];
+                                thisWeight = scratch[2];
                             }
                             else
                             {
-                                // dualAng is increasing...
-                                // decrease primalAng to compensate,
-                                // so dualAng ends up zero.
-                                // the formula for shrink is magic, worked out on paper
-                                double shrink = Math.sin(primalAng)
-                                              / Math.sin(prevPrimalAng);
-                                assert(shrink <= 1.);
+                                updateCenterAndWeightWhenDudleyMoved(
+                                        prevCenter[0], prevCenter[1], prevWeight,
+                                        prevPrimalAng,
+                                        primalAng,
+                                        scratch);
+                                thisCenter[0] = scratch[0];
+                                thisCenter[1] = scratch[1];
+                                thisWeight = scratch[2];
 
-                                double weightIncr = shrink*Math.sin(prevPrimalAng-primalAng);
-                                assert(weightIncr >= 0.);
-                                double prevWeightShrunk = prevWeight * SQR(shrink);
-                                thisWeight = prevWeightShrunk + weightIncr;
-
-                                // angle to rotate previous picture by (CW, so it's negative)
-                                double t = primalAng-prevPrimalAng;
-                                assert(t <= 0.);
-                                double ct = Math.cos(t);
-                                double st = Math.sin(t);
-                                double m[][] = {
-                                    {ct,st},
-                                    {-st,ct},
-                                };
-                                VecMath.vxm(thisCenter, prevCenter, m);
-                                if (thisWeight == 0.)
-                                    assert(weightIncr == 0.);
-                                else
-                                {
-                                    VecMath.lerp(thisCenter,thisCenter, new double[]{Math.cos(primalAng),Math.sin(primalAng)}, weightIncr/thisWeight);
-                                }
                             }
 
                             if (done)
@@ -1833,6 +1814,78 @@ public class SpiralApplet
             public SpiralView()
             {}
         }; // public class SpiralView
+
+
+
+        public static void updateCenterAndWeightWhenPriscillaMoved(
+                double oldCenterX,
+                double oldCenterY,
+                double oldWeight,
+                double oldPrimalMinusDualAng,
+                double newPrimalMinusDualAng,
+                double newCenterAndWeight[])
+        {
+            // primalAng is increasing. (assuming newPrimalMinusDual > oldPrimalMinusDual).
+            // this shrinks the canonical representation of the primal,
+            // thereby shrinking the center accordingly.
+            // nothing happens to the weight,
+            // nor to the direction from origin to center.
+            double shrink = Math.cos(newPrimalMinusDualAng)
+                          / Math.cos(oldPrimalMinusDualAng);
+            assert(shrink < 1.); // XXX actually I think this can be relaxed
+            double newCenterX = shrink * oldCenterX;
+            double newCenterY = shrink * oldCenterY;
+            double newWeight = oldWeight;
+            newCenterAndWeight[0] = newCenterX;
+            newCenterAndWeight[1] = newCenterY;
+            newCenterAndWeight[2] = newWeight;
+        } // updateCenterAndWeightWhenPriscillaMoved
+
+        public static void updateCenterAndWeightWhenDudleyMoved(
+                double oldCenterX,
+                double oldCenterY,
+                double oldWeight,
+                double oldPrimalMinusDualAng,
+                double newPrimalMinusDualAng,
+                double newCenterAndWeight[])
+        {
+            // dualAng is increasing... (assuming newPrimalMinusDual < oldPrimalMinusDual).
+            // decrease primalAng to compensate,
+            // so dualAng ends up zero.
+            // the formula for shrink is magic, worked out on paper
+            double shrink = Math.sin(newPrimalMinusDualAng)
+                          / Math.sin(oldPrimalMinusDualAng);
+            assert(shrink <= 1.); // XXX actually I think this can be relaxed
+
+            double weightIncr = shrink*Math.sin(oldPrimalMinusDualAng-newPrimalMinusDualAng);
+            assert(weightIncr >= 0.);
+            double oldWeightShrunk = oldWeight * SQR(shrink);
+            double newWeight = oldWeightShrunk + weightIncr;
+
+            // angle to rotate previous picture by (rotate CW, so it's negative)
+            double t = newPrimalMinusDualAng-oldPrimalMinusDualAng;
+            assert(t <= 0.);
+            double ct = Math.cos(t);
+            double st = Math.sin(t);
+            double m[][] = {
+                {ct,st},
+                {-st,ct},
+            };
+            double newCenterX = m[0][0]*oldCenterX + m[1][0]*oldCenterY;
+            double newCenterY = m[0][1]*oldCenterX + m[1][1]*oldCenterY;
+
+            if (newWeight == 0.)
+                assert(weightIncr == 0.);
+            else
+            {
+                newCenterX = LERP(newCenterX, Math.cos(newPrimalMinusDualAng), weightIncr/newWeight);
+                newCenterY = LERP(newCenterY, Math.sin(newPrimalMinusDualAng), weightIncr/newWeight);
+            }
+            newCenterAndWeight[0] = newCenterX;
+            newCenterAndWeight[1] = newCenterY;
+            newCenterAndWeight[2] = newWeight;
+        } // updateCenterAndWeightWhenDudleyMoved
+                        
 
 
         public void drawStats(java.awt.Graphics g,
