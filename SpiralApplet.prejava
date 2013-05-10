@@ -1545,7 +1545,6 @@ public class SpiralApplet
 
 
 
-            public int theList[/*n*/]; // XXX DEFUNCT, transitioning to THELIST
             public int THELIST[/*n*/];
             public double centers[/*n*/][/*2*/]; // centers[i] is center of theList up through index i, rotated and scaled canonically
             public double weights[/*n*/]; // weights[i] is area of dual diagram of theList up through index i, rotated and scaled canonically
@@ -1573,7 +1572,6 @@ public class SpiralApplet
                 assert(n % 2 == 0); // doesn't work with odd n
                 assert(nParts >= 2); // doesn't work with only one part
 
-                this.theList = new int[n];
                 this.THELIST = new int[n];
                 if (deltaStyle == DELTASTYLE_1)
                 {
@@ -1589,14 +1587,12 @@ public class SpiralApplet
                     {
                         FORI (i, n)
                         {
-                            //if (iPass >= 1 && val == this.theList[i])
                             if (iPass >= 1 && VAL == this.THELIST[i])
                             {
                                 done = true;
                                 break;
                             }
                             assert(val >= 0 && val < nParts);
-                            this.theList[i] = val;
                             this.THELIST[i] = VAL;
 
                             if (val == 0)
@@ -1657,7 +1653,6 @@ public class SpiralApplet
                                 break;
                             }
                             assert(val >= 0 && val < nParts);
-                            this.theList[i] = val;
                             this.THELIST[i] = VAL;
 
                             if (nRemainingThisSign == 0)
@@ -1714,7 +1709,6 @@ public class SpiralApplet
                 // sanity check-- parity of value should be same as parity of index
                 FORI (i, n)
                 {
-                    assert((theList[i] + i)%2 == 0);
                     // assert((THELIST[i] + i)%2 == 0);
                     assert((nParts-1-THELIST[i] + i)%2 == 0); // XXX temporary
                 }
@@ -1732,8 +1726,8 @@ public class SpiralApplet
 
                     boolean done = false;
 
-                    double prevVal = theList[n-1];
                     double prevVAL = THELIST[n-1];
+                    double prevVal = nParts-1-prevVAL; // XXX temporary
 
                     int maxPasses = 2 + 10000/n; // really should be, roughly, one complete pass plus some fixed number of iterations
                     PRINT(maxPasses);
@@ -1748,8 +1742,8 @@ public class SpiralApplet
                             // when val increases, it means dualAng is increasing.
                             // when val decreases, it means primalAng is increasing.
                             // but, we always keep it canonicalized so that dualAng is 0.
-                            double val = theList[i];
                             double VAL = THELIST[i];
+                            double val = nParts-1-VAL; // XXX temporary
                             double prevPrimalAng = Math.PI/2 * (1 - (prevVal+.5)/nParts);
                             double primalAng = Math.PI/2 * (1 - (val+.5)/nParts);
                             if (primalAng > prevPrimalAng)
@@ -1834,11 +1828,6 @@ public class SpiralApplet
                     assert(done);
                 }
 
-                FORI (i, n)
-                {
-                    assert(theList[i] == nParts-1-THELIST[i]);
-                }
-
                 // sanity check-- all centers should have strictly positive y coord.
                 FORI (i, n)
                 {
@@ -1847,9 +1836,7 @@ public class SpiralApplet
                     {
                         System.out.println("Oh no! centers["+i+"] = "+centers[i][1]+" <= 0!");
                     }
-                    double primalAng = (1.-(theList[i]+.5)/nParts)*(Math.PI*.5);
                     double primalANG = (THELIST[i]+.5)/nParts*(Math.PI*.5);
-                    assert(EQ(primalANG, primalAng, 1e-6));
 
                     // theorem says |areaBasedMoment| <= sin(2*primalAng)/4
                     if (!(VecMath.norm(centers[i])*(weights[i]*.5) < Math.sin(2*primalANG)/4))
@@ -1920,8 +1907,8 @@ public class SpiralApplet
                 int n = spiralModel.params.n.get();
                 FORI (i, n)
                 {
-                    int val = spiralModel.theList[i];
                     int VAL = spiralModel.THELIST[i];
+                    int val = nParts-1-VAL; // XXX temporary
                     double center[] = spiralModel.centers[i];
                     double weight = spiralModel.weights[i];
                     double primalAng = (1.-(val+.5)/nParts) * (Math.PI*.5);
@@ -1985,12 +1972,12 @@ public class SpiralApplet
                 int n = spiralModel.params.n.get();
                 FORI (i, n)
                 {
-                    int val = spiralModel.theList[i];
                     int VAL = spiralModel.THELIST[i];
+                    int val = nParts-1-VAL; // XXX temporary
                     double center[] = spiralModel.centers[i];
                     double weight = spiralModel.weights[i];
                     double primalAng = (1.-(val+.5)/nParts) * (Math.PI*.5);
-                    double primalANG = (val+.5)/nParts * (Math.PI*.5);
+                    double primalANG = (VAL+.5)/nParts * (Math.PI*.5);
                     assert(EQ(primalANG, primalAng, 1e-6));
                     int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
                     double momentR = VecMath.norm(center) * weight;
@@ -2052,12 +2039,12 @@ public class SpiralApplet
                 int n = spiralModel.params.n.get();
                 FORI (i, n)
                 {
-                    int val = spiralModel.theList[i];
                     int VAL = spiralModel.THELIST[i];
+                    int val = nParts-1-VAL; // XXX temporary
                     double center[] = spiralModel.centers[i];
                     double weight = spiralModel.weights[i];
                     double primalAng = (1.-(val+.5)/nParts) * (Math.PI*.5);
-                    double primalANG = (val+.5)/nParts * (Math.PI*.5);
+                    double primalANG = (VAL+.5)/nParts * (Math.PI*.5);
                     assert(EQ(primalANG, primalAng, 1e-6));
                     int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
                     double area = weight*.5;
@@ -2065,9 +2052,8 @@ public class SpiralApplet
                     g.fillRect(x,y,1,1);
                 }
             }
-
-            
         } // drawStats
+
         public void drawTicker(java.awt.Graphics g,
                                java.awt.Dimension gsize,
                                double gCenterX, double gCenterY, // in pixels from upper-left corner of window
@@ -2371,8 +2357,10 @@ public class SpiralApplet
             i0 = MOD(i0, n);
             if (debugLevel >= 1) PRINT(i0);
             int i1 = (i0+1)%n;
-            int val0 = spiralModel.theList[i0];
-            int val1 = spiralModel.theList[i1];
+            int VAL0 = spiralModel.THELIST[i0];
+            int VAL1 = spiralModel.THELIST[i1];
+            int val0 = nParts-1-VAL0; // XXX temporary
+            int val1 = nParts-1-VAL1; // XXX temporary
             if (debugLevel >= 1) PRINT(val0);
             if (debugLevel >= 1) PRINT(val1);
             if (debugLevel >= 1) PRINT(frac);
@@ -2457,7 +2445,8 @@ public class SpiralApplet
 
                     // TODO: combine straight parts, the line will look better
 
-                    int thisVal = spiralModel.theList[i];
+                    int thisVAL = spiralModel.THELIST[i];
+                    int thisVal = nParts-1-thisVAL; // XXX temporary
                     if (scanDir==1 ? thisVal < prevVal : thisVal > prevVal)
                     {
                         // primal movement, dual turn
@@ -2632,8 +2621,8 @@ public class SpiralApplet
                         java.awt.Color savedColor = mg.getColor();
                         mg.setColor(java.awt.Color.yellow);
 
-                        boolean big = (spiralModel.theList[i] < spiralModel.theList[(i+1)%n])
-                                 && !(spiralModel.theList[MOD(i-1,n)] < spiralModel.theList[i]);
+                        boolean big = (spiralModel.THELIST[i] > spiralModel.THELIST[(i+1)%n])
+                                 && !(spiralModel.THELIST[MOD(i-1,n)] > spiralModel.THELIST[i]);
                         mg.drawPoint(center[0], center[1], big?3:1);
                         mg.setColor(savedColor);
                     }
