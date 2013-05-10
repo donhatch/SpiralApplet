@@ -1703,7 +1703,7 @@ public class SpiralApplet
 
                     boolean done = false;
 
-                    double prevVAL = THELIST[n-1];
+                    double prevVal = THELIST[n-1];
 
                     int maxPasses = 2 + 10000/n; // really should be, roughly, one complete pass plus some fixed number of iterations
                     PRINT(maxPasses);
@@ -1714,43 +1714,43 @@ public class SpiralApplet
                             // Compute new weight and center
                             // from prev weight and center
 
-                            // val is (proportional to) 90+dualANG-primalANG.
-                            // when val increases, it means dualANG is increasing.
-                            // when val decreases, it means primalANG is increasing.
-                            // but, we always keep it canonicalized so that dualANG is 0.
-                            double VAL = THELIST[i];
-                            double prevPrimalANG = Math.PI/2 * ((prevVAL+.5)/nParts);
-                            double primalANG = Math.PI/2 * ((VAL+.5)/nParts);
-                            if (primalANG > prevPrimalANG)
+                            // val is (proportional to) 90+dualAng-primalAng.
+                            // when val increases, it means dualAng is increasing.
+                            // when val decreases, it means primalAng is increasing.
+                            // but, we always keep it canonicalized so that dualAng is 0.
+                            double val = THELIST[i];
+                            double prevPrimalAng = Math.PI/2 * ((prevVal+.5)/nParts);
+                            double primalAng = Math.PI/2 * ((val+.5)/nParts);
+                            if (primalAng > prevPrimalAng)
                             {
-                                // primalANG is increasing.
+                                // primalAng is increasing.
                                 // this shrinks the canonical representation of the primal,
                                 // thereby shrinking the center accordingly.
                                 // nothing happens to the weight,
                                 // nor to the direction from origin to center.
-                                double shrink = Math.cos(primalANG)
-                                              / Math.cos(prevPrimalANG);
+                                double shrink = Math.cos(primalAng)
+                                              / Math.cos(prevPrimalAng);
                                 assert(shrink < 1.);
                                 VecMath.vxs(thisCenter, prevCenter, shrink);
                                 thisWeight = prevWeight;
                             }
                             else
                             {
-                                // dualANG is increasing...
-                                // decrease primalANG to compensate,
-                                // so dualANG ends up zero.
+                                // dualAng is increasing...
+                                // decrease primalAng to compensate,
+                                // so dualAng ends up zero.
                                 // the formula for shrink is magic, worked out on paper
-                                double shrink = Math.sin(primalANG)
-                                              / Math.sin(prevPrimalANG);
+                                double shrink = Math.sin(primalAng)
+                                              / Math.sin(prevPrimalAng);
                                 assert(shrink <= 1.);
 
-                                double weightIncr = shrink*Math.sin(prevPrimalANG-primalANG);
+                                double weightIncr = shrink*Math.sin(prevPrimalAng-primalAng);
                                 assert(weightIncr >= 0.);
                                 double prevWeightShrunk = prevWeight * SQR(shrink);
                                 thisWeight = prevWeightShrunk + weightIncr;
 
                                 // angle to rotate previous picture by (CW, so it's negative)
-                                double t = primalANG-prevPrimalANG;
+                                double t = primalAng-prevPrimalAng;
                                 assert(t <= 0.);
                                 double ct = Math.cos(t);
                                 double st = Math.sin(t);
@@ -1763,7 +1763,7 @@ public class SpiralApplet
                                     assert(weightIncr == 0.);
                                 else
                                 {
-                                    VecMath.lerp(thisCenter,thisCenter, new double[]{Math.cos(primalANG),Math.sin(primalANG)}, weightIncr/thisWeight);
+                                    VecMath.lerp(thisCenter,thisCenter, new double[]{Math.cos(primalAng),Math.sin(primalAng)}, weightIncr/thisWeight);
                                 }
                             }
 
@@ -1797,7 +1797,7 @@ public class SpiralApplet
                             prevCenter[0] = thisCenter[0];
                             prevCenter[1] = thisCenter[1];
                             prevWeight = thisWeight;
-                            prevVAL = VAL;
+                            prevVal = val;
                         }
                     }
                     assert(done);
@@ -1811,12 +1811,12 @@ public class SpiralApplet
                     {
                         System.out.println("Oh no! centers["+i+"] = "+centers[i][1]+" <= 0!");
                     }
-                    double primalANG = (THELIST[i]+.5)/nParts*(Math.PI*.5);
+                    double primalAng = (THELIST[i]+.5)/nParts*(Math.PI*.5);
 
-                    // theorem says |areaBasedMoment| <= sin(2*primalANG)/4
-                    if (!(VecMath.norm(centers[i])*(weights[i]*.5) < Math.sin(2*primalANG)/4))
+                    // theorem says |areaBasedMoment| <= sin(2*primalAng)/4
+                    if (!(VecMath.norm(centers[i])*(weights[i]*.5) < Math.sin(2*primalAng)/4))
                     {
-                        System.out.println("Oh no! centers["+i+"] = "+centers[i][1]+" has length "+VecMath.norm(centers[i])*(weights[i]*.5)+" >= "+Math.sin(2*primalANG)/4+"!");
+                        System.out.println("Oh no! centers["+i+"] = "+centers[i][1]+" has length "+VecMath.norm(centers[i])*(weights[i]*.5)+" >= "+Math.sin(2*primalAng)/4+"!");
                     }
                 }
             } // init
@@ -1840,7 +1840,7 @@ public class SpiralApplet
                               SpiralModel spiralModel,
                               SpiralView spiralView)
         {
-            // momentAng-dualANG vs. primalANG-dualANG graph
+            // momentAng-dualAng vs. primalAng-dualAng graph
             {
                 int nParts = spiralModel.params.nParts.get();
                 int pixelsPerPart = spiralView.pixelsPerPart.get();
@@ -1875,23 +1875,23 @@ public class SpiralApplet
                         g.drawLine(x0+1,y,x1-2,y); // horizontal
                     }
                 }
-                g.drawString("primalANG-dualANG", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
-                g.drawString("momentAng-dualANG", x0-30-114, (y0+y1)/2+4); // string width is 114 empirically
+                g.drawString("primalAng-dualAng", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
+                g.drawString("momentAng-dualAng", x0-30-114, (y0+y1)/2+4); // string width is 114 empirically
 
                 g.setColor(java.awt.Color.red);
                 int n = spiralModel.params.n.get();
                 FORI (i, n)
                 {
-                    int VAL = spiralModel.THELIST[i];
+                    int val = spiralModel.THELIST[i];
                     double center[] = spiralModel.centers[i];
                     double weight = spiralModel.weights[i];
-                    double primalANG = (VAL+.5)/nParts * (Math.PI*.5);
-                    int x = (int)LERP(x0,x1-1, primalANG/(Math.PI*.5));
+                    double primalAng = (val+.5)/nParts * (Math.PI*.5);
+                    int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
                     double momentAng = Math.atan2(center[1],center[0]);
                     int y = (int)LERP(y1-1,y0, momentAng/(Math.PI*.5));
                     g.fillRect(x,y,1,1);
 
-                    double maybeTopMomentAng = primalANG;
+                    double maybeTopMomentAng = primalAng;
                     int maybeTopY = (int)LERP(y1-1,y0,maybeTopMomentAng/(Math.PI*.5));
                     g.setColor(java.awt.Color.green);
                     g.fillRect(x,maybeTopY-2,1,1); // should leave exactly 1 pixel gap
@@ -1900,7 +1900,7 @@ public class SpiralApplet
             }
 
 
-            // |twiceAreaBasedMoment|/(primalR*dualR^2) vs. primalANG-dualANG graph
+            // |twiceAreaBasedMoment|/(primalR*dualR^2) vs. primalAng-dualAng graph
             {
                 int nParts = spiralModel.params.nParts.get();
                 int pixelsPerPart = spiralView.pixelsPerPart.get();
@@ -1937,31 +1937,31 @@ public class SpiralApplet
                         g.drawLine(x0+1,y,x1-2,y); // horizontal
                     }
                 }
-                g.drawString("primalANG-dualANG", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
+                g.drawString("primalAng-dualAng", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
                 g.drawString("|twiceAreaBasedMoment| / (primalR*dualR^2)", x0-30-248, (y0+y1)/2+4); // string width is 248 empirically
 
                 g.setColor(java.awt.Color.red);
                 int n = spiralModel.params.n.get();
                 FORI (i, n)
                 {
-                    int VAL = spiralModel.THELIST[i];
+                    int val = spiralModel.THELIST[i];
                     double center[] = spiralModel.centers[i];
                     double weight = spiralModel.weights[i];
-                    double primalANG = (VAL+.5)/nParts * (Math.PI*.5);
-                    assert(EQ(primalANG, primalANG, 1e-6));
-                    int x = (int)LERP(x0,x1-1, primalANG/(Math.PI*.5));
+                    double primalAng = (val+.5)/nParts * (Math.PI*.5);
+                    assert(EQ(primalAng, primalAng, 1e-6));
+                    int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
                     double momentR = VecMath.norm(center) * weight;
                     int y = (int)LERP(y1-1,y0, momentR);
                     g.fillRect(x,y,1,1);
 
-                    double maybeTopMomentR = .5*Math.sin(2*primalANG);
+                    double maybeTopMomentR = .5*Math.sin(2*primalAng);
                     int maybeTopY = (int)LERP(y1-1,y0,maybeTopMomentR);
                     g.setColor(java.awt.Color.green);
                     g.fillRect(x,maybeTopY-2,1,1); // should leave exactly 1 pixel gap
                     g.setColor(java.awt.Color.red);
                 }
             }
-            // area vs. primalANG-dualANG graph
+            // area vs. primalAng-dualAng graph
             // this is actually a stupid graph,
             // since area is obviously unbounded
             // no matter what the current primal angle is.
@@ -2001,7 +2001,7 @@ public class SpiralApplet
                         g.drawLine(x0+1,y,x1-2,y); // horizontal
                     }
                 }
-                g.drawString("primalANG-dualANG", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
+                g.drawString("primalAng-dualAng", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
                 //g.drawString("area", x0-30-23, (y0+y1)/2+4); // string width is 23 empirically
                 g.drawString("area", x1+10, (y0+y1)/2+4);
 
@@ -2009,12 +2009,12 @@ public class SpiralApplet
                 int n = spiralModel.params.n.get();
                 FORI (i, n)
                 {
-                    int VAL = spiralModel.THELIST[i];
+                    int val = spiralModel.THELIST[i];
                     double center[] = spiralModel.centers[i];
                     double weight = spiralModel.weights[i];
-                    double primalANG = (VAL+.5)/nParts * (Math.PI*.5);
-                    assert(EQ(primalANG, primalANG, 1e-6));
-                    int x = (int)LERP(x0,x1-1, primalANG/(Math.PI*.5));
+                    double primalAng = (val+.5)/nParts * (Math.PI*.5);
+                    assert(EQ(primalAng, primalAng, 1e-6));
+                    int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
                     double area = weight*.5;
                     int y = (int)LERP(y1-1,y0, area);
                     g.fillRect(x,y,1,1);
@@ -2049,9 +2049,9 @@ public class SpiralApplet
 
             // Given gCenterX,gCenterY,
             // figure out the "base" pixel index.
-            // this is the pixel where VAL=0 would go
+            // this is the pixel where val=0 would go
             // at an exact even integer focus
-            // (VAL=0 is only achievable on even focus).
+            // (val=0 is only achievable on even focus).
             // If ixBase,iyBase are both .5 mod 1,
             // then we round one down and one up-- that's the purpose of the -round(-) thing.
             // XXX TODO: this works since the inputs are all multiples of .5, but may not be the most robust way in general, should think about it more
@@ -2160,13 +2160,13 @@ public class SpiralApplet
             i0 = MOD(i0, n);
             //PRINT(i0);
             int i1 = (i0+1)%n;
-            int VAL0 = spiralModel.THELIST[i0];
-            int VAL1 = spiralModel.THELIST[i1];
-            //PRINT(VAL0);
-            //PRINT(VAL1);
+            int val0 = spiralModel.THELIST[i0];
+            int val1 = spiralModel.THELIST[i1];
+            //PRINT(val0);
+            //PRINT(val1);
             //PRINT(frac);
-            Rational VAL = new Rational(VAL0,1).lerpEquals(VAL1,1, frac.n,frac.d); // VAL = lerp(VAL0,VAL1,frac)
-            //PRINT(VAL);
+            Rational val = new Rational(val0,1).lerpEquals(val1,1, frac.n,frac.d); // val = lerp(val0,val1,frac)
+            //PRINT(val);
 
 
             // Now we need to figure out
@@ -2193,13 +2193,13 @@ public class SpiralApplet
             {
                 // figure out how many pixels from base to i0
 
-                Rational upperLeftOffset = new Rational(VAL0*pixelsPerPart, 2);
-                Rational lowerLeftOffset = VAL.minus(VAL0,1).abs().times(pixelsPerPart,2);
+                Rational upperLeftOffset = new Rational(val0*pixelsPerPart, 2);
+                Rational lowerLeftOffset = val.minus(val0,1).abs().times(pixelsPerPart,2);
                 //PRINT(upperLeftOffset);
                 //PRINT(lowerLeftOffset);
 
                 // upperLeftOffset is now a multiple of .5.
-                // adjust lowerLeftOffset to nearest VALue that's the same as upperLeftOffset mod 1.
+                // adjust lowerLeftOffset to nearest Value that's the same as upperLeftOffset mod 1.
 
                 if (upperLeftOffset.d == 1) // i.e. if it's an integer
                     lowerLeftOffset.roundEquals();
@@ -2232,27 +2232,27 @@ public class SpiralApplet
                 {
                     int prevX = ix0;
                     int prevY = iy0;
-                    int prevVAL = spiralModel.THELIST[i0];
+                    int prevVal = spiralModel.THELIST[i0];
                     for (int i = (i0+1)%n; ; i = (i+1)%n)
                     {
-                        int thisVAL = spiralModel.THELIST[i];
+                        int thisVal = spiralModel.THELIST[i];
                         int thisX, thisY;
-                        if (thisVAL > prevVAL)
+                        if (thisVal > prevVal)
                         {
                             // vertical seg upwards
                             thisX = prevX;
-                            thisY = prevY - (thisVAL-prevVAL) * pixelsPerPart;
+                            thisY = prevY - (thisVal-prevVal) * pixelsPerPart;
                         }
                         else
                         {
                             // horizonal seg to right
                             thisY = prevY;
-                            thisX = prevX + (prevVAL-thisVAL) * pixelsPerPart;
+                            thisX = prevX + (prevVal-thisVal) * pixelsPerPart;
                         }
                         g.drawLine(prevX,prevY,thisX,thisY);
                         if (thisX >= gsize.width || thisY < 0)
                             break;
-                        prevVAL = thisVAL;
+                        prevVal = thisVal;
                         prevX = thisX;
                         prevY = thisY;
                     }
@@ -2262,27 +2262,27 @@ public class SpiralApplet
                 {
                     int prevX = ix0;
                     int prevY = iy0;
-                    int prevVAL = spiralModel.THELIST[i0];
+                    int prevVal = spiralModel.THELIST[i0];
                     for (int i = MOD(i0-1,n); ; i = MOD(i-1,n))
                     {
-                        int thisVAL = spiralModel.THELIST[i];
+                        int thisVal = spiralModel.THELIST[i];
                         int thisX, thisY;
-                        if (thisVAL < prevVAL)
+                        if (thisVal < prevVal)
                         {
                             // vertical seg downwards
                             thisX = prevX;
-                            thisY = prevY + (prevVAL-thisVAL) * pixelsPerPart;
+                            thisY = prevY + (prevVal-thisVal) * pixelsPerPart;
                         }
                         else
                         {
                             // horizonal seg to left
                             thisY = prevY;
-                            thisX = prevX - (thisVAL-prevVAL) * pixelsPerPart;
+                            thisX = prevX - (thisVal-prevVal) * pixelsPerPart;
                         }
                         g.drawLine(prevX,prevY,thisX,thisY);
                         if (thisX < 0 || thisY >= gsize.height)
                             break;
-                        prevVAL = thisVAL;
+                        prevVal = thisVal;
                         prevX = thisX;
                         prevY = thisY;
                     }
@@ -2325,13 +2325,13 @@ public class SpiralApplet
             i0 = MOD(i0, n);
             if (debugLevel >= 1) PRINT(i0);
             int i1 = (i0+1)%n;
-            int VAL0 = spiralModel.THELIST[i0];
-            int VAL1 = spiralModel.THELIST[i1];
-            if (debugLevel >= 1) PRINT(VAL0);
-            if (debugLevel >= 1) PRINT(VAL1);
+            int val0 = spiralModel.THELIST[i0];
+            int val1 = spiralModel.THELIST[i1];
+            if (debugLevel >= 1) PRINT(val0);
+            if (debugLevel >= 1) PRINT(val1);
             if (debugLevel >= 1) PRINT(frac);
-            double VAL = LERP(VAL0,VAL1,frac.toDouble()); // XXX TODO: use rational arithmetic all the way through... maybe? actually might not be necessary in this function
-            if (debugLevel >= 1) PRINT(VAL);
+            double val = LERP(val0,val1,frac.toDouble()); // XXX TODO: use rational arithmetic all the way through... maybe? actually might not be necessary in this function
+            if (debugLevel >= 1) PRINT(val);
 
             if (debugLevel >= 1)
             {
@@ -2339,9 +2339,9 @@ public class SpiralApplet
                 PRINT(i0);
                 PRINT(i1);
                 PRINT(frac);
-                PRINT(VAL0);
-                PRINT(VAL1);
-                PRINT(VAL);
+                PRINT(val0);
+                PRINT(val1);
+                PRINT(val);
             }
 
             java.awt.Color gray128 = new java.awt.Color(128,128,128);
@@ -2376,20 +2376,20 @@ public class SpiralApplet
                 }
 
 
-                double dualANG = 0;
-                double primalANG = Math.PI/2 * ((VAL+.5)/nParts);
+                double dualAng = 0;
+                double primalAng = Math.PI/2 * ((val+.5)/nParts);
                 double dualR = scale;
                 double primalR = scale;
 
-                double dualX = dualR * Math.cos(dualANG);
-                double dualY = dualR * Math.sin(dualANG);
-                double primalX = primalR * Math.cos(primalANG);
-                double primalY = primalR * Math.sin(primalANG);
+                double dualX = dualR * Math.cos(dualAng);
+                double dualY = dualR * Math.sin(dualAng);
+                double primalX = primalR * Math.cos(primalAng);
+                double primalY = primalR * Math.sin(primalAng);
 
                 if (debugLevel >= 1 && scanDir > 0)
                 {
-                    PRINT(RTOD(primalANG));
-                    PRINT(RTOD(dualANG));
+                    PRINT(RTOD(primalAng));
+                    PRINT(RTOD(dualAng));
                     PRINT(primalX);
                     PRINT(primalY);
                 }
@@ -2403,31 +2403,31 @@ public class SpiralApplet
                 boolean centerHasStabilized = false;
 
 
-                double prevPrevVAL = VAL;
-                double prevVAL = VAL;
+                double prevPrevVal = val;
+                double prevVal = val;
                 for (int i = scanDir==1?i1:i0; ; i = MOD(i+scanDir,n))
                 {
                     returnValue++;
 
                     // TODO: combine straight parts, the line will look better
 
-                    int thisVAL = spiralModel.THELIST[i];
-                    if (scanDir==1 ? thisVAL > prevVAL : thisVAL < prevVAL)
+                    int thisVal = spiralModel.THELIST[i];
+                    if (scanDir==1 ? thisVal > prevVal : thisVal < prevVal)
                     {
                         // primal movement, dual turn
                         if (debugLevel >= 2 && scanDir > 0) System.out.println("            primal movement, dual turn");
-                        double angleDelta = (double)(thisVAL-prevVAL)/(double)nParts * (Math.PI*.5);
+                        double angleDelta = (double)(thisVal-prevVal)/(double)nParts * (Math.PI*.5);
                         if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(angleDelta));
-                        double nextPrimalANG = primalANG + angleDelta;
-                        if (nextPrimalANG > Math.PI)
-                            nextPrimalANG -= 2*Math.PI;
-                        else if (nextPrimalANG < -Math.PI)
-                            nextPrimalANG += 2*Math.PI;
-                        if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(nextPrimalANG));
-                        double nextPrimalR = primalR * Math.cos(primalANG-dualANG)
-                                                     / Math.cos(nextPrimalANG-dualANG);
-                        double nextPrimalX = nextPrimalR * Math.cos(nextPrimalANG);
-                        double nextPrimalY = nextPrimalR * Math.sin(nextPrimalANG);
+                        double nextPrimalAng = primalAng + angleDelta;
+                        if (nextPrimalAng > Math.PI)
+                            nextPrimalAng -= 2*Math.PI;
+                        else if (nextPrimalAng < -Math.PI)
+                            nextPrimalAng += 2*Math.PI;
+                        if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(nextPrimalAng));
+                        double nextPrimalR = primalR * Math.cos(primalAng-dualAng)
+                                                     / Math.cos(nextPrimalAng-dualAng);
+                        double nextPrimalX = nextPrimalR * Math.cos(nextPrimalAng);
+                        double nextPrimalY = nextPrimalR * Math.sin(nextPrimalAng);
                         if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalR);
                         if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalX);
                         if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalY);
@@ -2438,8 +2438,8 @@ public class SpiralApplet
                                         nextPrimalX, nextPrimalY,
                                         antiAliasFlag);
                             if (
-                                prevPrevVAL != prevVAL &&
-                                (thisVAL<prevVAL) != (prevVAL<prevPrevVAL))
+                                prevPrevVal != prevVal &&
+                                (thisVal<prevVal) != (prevVal<prevPrevVal))
                             {
                                 // draw point at larger-index endpoint of the line
                                 if (scanDir < 0)
@@ -2465,8 +2465,8 @@ public class SpiralApplet
                             }
                         }
                         if (drawRungsFlag &&
-                            prevPrevVAL != prevVAL &&
-                            (thisVAL<prevVAL != (prevVAL<prevPrevVAL)))
+                            prevPrevVal != prevVal &&
+                            (thisVal<prevVal != (prevVal<prevPrevVal)))
                         {
                             java.awt.Color savedColor = mg.getColor();
                             mg.setColor(dimPink);
@@ -2476,27 +2476,27 @@ public class SpiralApplet
                             mg.setColor(savedColor);
                         }
 
-                        primalANG = nextPrimalANG;
+                        primalAng = nextPrimalAng;
                         primalR = nextPrimalR;
                         primalX = nextPrimalX;
                         primalY = nextPrimalY;
                     }
-                    else if (scanDir==1 ? thisVAL < prevVAL : thisVAL > prevVAL)
+                    else if (scanDir==1 ? thisVal < prevVal : thisVal > prevVal)
                     {
                         // dual movement, primal turn
                         if (debugLevel >= 2 && scanDir > 0) System.out.println("            dual movement, primal turn");
-                        double angleDelta = (double)(prevVAL-thisVAL)/(double)nParts * (Math.PI*.5);
-                        double nextDualANG = dualANG + angleDelta;
-                        if (nextDualANG > Math.PI)
-                            nextDualANG -= 2*Math.PI;
-                        else if (nextDualANG < -Math.PI)
-                            nextDualANG += 2*Math.PI;
+                        double angleDelta = (double)(prevVal-thisVal)/(double)nParts * (Math.PI*.5);
+                        double nextDualAng = dualAng + angleDelta;
+                        if (nextDualAng > Math.PI)
+                            nextDualAng -= 2*Math.PI;
+                        else if (nextDualAng < -Math.PI)
+                            nextDualAng += 2*Math.PI;
                         // worked this out on paper.
                         // don't think too hard about the scanDir=-1 case, in which case angleDelta is negative and the triangle is inside out... it just works.
-                        double nextDualR= dualR * Math.sin(primalANG-dualANG)
-                                                / Math.sin(primalANG-nextDualANG);
-                        double nextDualX = nextDualR * Math.cos(nextDualANG);
-                        double nextDualY = nextDualR * Math.sin(nextDualANG);
+                        double nextDualR= dualR * Math.sin(primalAng-dualAng)
+                                                / Math.sin(primalAng-nextDualAng);
+                        double nextDualX = nextDualR * Math.cos(nextDualAng);
+                        double nextDualY = nextDualR * Math.sin(nextDualAng);
 
                         if (drawDualFlag)
                         {
@@ -2504,8 +2504,8 @@ public class SpiralApplet
                                         nextDualX, nextDualY,
                                         antiAliasFlag);
 
-                            if (prevVAL==prevPrevVAL
-                             || (thisVAL<prevVAL) != (prevVAL<prevPrevVAL))
+                            if (prevVal==prevPrevVal
+                             || (thisVal<prevVal) != (prevVal<prevPrevVal))
                             {
                                 if (scanDir < 0)
                                 {
@@ -2532,8 +2532,8 @@ public class SpiralApplet
                             }
                         }
                         if (drawRungsFlag &&
-                            (prevVAL!=prevPrevVAL &&
-                            (thisVAL<prevVAL != (prevVAL<prevPrevVAL))))
+                            (prevVal!=prevPrevVal &&
+                            (thisVal<prevVal != (prevVal<prevPrevVal))))
                         {
                             java.awt.Color savedColor = mg.getColor();
                             mg.setColor(dimPink);
@@ -2566,7 +2566,7 @@ public class SpiralApplet
                             }
                         }
 
-                        dualANG = nextDualANG;
+                        dualAng = nextDualAng;
                         dualR = nextDualR;
                         dualX = nextDualX;
                         dualY = nextDualY;
@@ -2592,8 +2592,8 @@ public class SpiralApplet
                         mg.setColor(savedColor);
                     }
 
-                    prevPrevVAL = prevVAL;
-                    prevVAL = thisVAL;
+                    prevPrevVal = prevVal;
+                    prevVal = thisVal;
                 }
 
                 if (scanDir < 0 && drawPrimalFlag)
@@ -2614,13 +2614,13 @@ public class SpiralApplet
                         // i.e. |center| <= |p| |d|^2 sin(2 t) / (2*twiceArea)
                         // I.e. it's in a certain pie slice, bounded by two rays
                         // and an arc.  Draw that arc.
-                        double initialPrimalANG = (VAL+.5)/nParts*(Math.PI*.5); // dualANG is 0
-                        double arcRadius = Math.sin(2*initialPrimalANG) / (2*twiceArea) * scale;
+                        double initialPrimalAng = (val+.5)/nParts*(Math.PI*.5); // dualAng is 0
+                        double arcRadius = Math.sin(2*initialPrimalAng) / (2*twiceArea) * scale;
                         mg.setColor(java.awt.Color.yellow);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
                                         0., // startRadians
-                                        initialPrimalANG, // arcRadians
+                                        initialPrimalAng, // arcRadians
                                         1., // thickness in pixels
                                         antiAliasFlag);
 
@@ -2629,12 +2629,12 @@ public class SpiralApplet
                         // let's actually do the actual moment and arc too, in magenta.
                         // (scaled so max possible is 1).
                         mg.setColor(java.awt.Color.magenta);
-                        arcRadius = Math.sin(2*initialPrimalANG) * scale;
+                        arcRadius = Math.sin(2*initialPrimalAng) * scale;
                         mg.drawPoint(centerX*(2*twiceArea),centerY*(2*twiceArea),5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
                                         0., // startRadians
-                                        initialPrimalANG, // arcRadians
+                                        initialPrimalAng, // arcRadians
                                         1., // thickness in pixels
                                         antiAliasFlag);
                     }
