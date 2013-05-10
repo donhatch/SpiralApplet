@@ -1714,9 +1714,9 @@ public class SpiralApplet
                             // Compute new weight and center
                             // from prev weight and center
 
-                            // val is (proportional to) 90+dualAng-primalAng.
-                            // when val increases, it means dualAng is increasing.
-                            // when val decreases, it means primalAng is increasing.
+                            // val is (proportional to) primalAng-dualAng.
+                            // when val increases, it means primalAng is increasing.
+                            // when val decreases, it means dualAng is increasing.
                             // but, we always keep it canonicalized so that dualAng is 0.
                             double val = theList[i];
                             double prevPrimalAng = Math.PI/2 * ((prevVal+.5)/nParts);
