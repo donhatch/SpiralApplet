@@ -31,15 +31,27 @@
     TODO: can't seem to get asciimath to work?  oh wait! it's working, from the web page http://cdn.mathjax.org/mathjax/2.1-latest/test/sample-asciimath.html .  EEK, works over the web but not locally?? hmm.  wonder if I need to put something locally? or enable something?  weird
     TODO: make some inline SVG images!
                 http://www.w3schools.com/html/html5_svg.asp
+    TODO: css validator is giving me errors on the styles inside the svg sections, wtf?
+        ERROR: Property stroke doesn't exist : lightGray
+        ERROR: Property stroke-width doesn't exist : 2.0
+        ERROR: Property fill doesn't exist : none
+    TODO: main validator:
+        ERROR: Attribute vector-effect not allowed on element path at this point.
+        oh no! and if I try to change version from 1.1 to 1.2 it says:
+            Unsupported SVG version specified. This validator only supports SVG 1.1. The recommended way to suppress this warning is to remove the version attribute altogether.
+        
+        
 -->
     <title>There's No Single-Exit Lagoon</title>
     <style type="text/css">
         p.breakhere {page-break-before:always;}
+        .asciiprevis {display:none;}
 
         /*
-            ARGH! anything media-specific causes corrupt print output!
+            ARGH! anything media-specific causes corrupt output of math when printing!
             need to figure out why!
         */
+
         @media print {
             body {font-size:x-large;}
         }
@@ -108,11 +120,6 @@
     (a,=,b),
     ( ,=, c)
 :)`
-<hr> <!--============================================================-->
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="190">
-  <polygon points="100,10 40,180 190,60 10,60 160,180"
-           style="fill:lime;stroke:purple;stroke-width:5;fill-rule:evenodd;" />
-</svg>
 <hr> <!--============================================================-->
 Visualizing an infinite spiral
 to try to prove the every-lagoon-has-at-least-two-good-exits conjecture.
@@ -263,9 +270,9 @@ CCW from straight out.
 <p>
 There is no apparent contradiction in anything described so far;
 some plausible examples are shown in Figures 1(a-e).
-<!--
-<pre>
-    Figure 1(a): 212
+<p>
+<pre class="asciiprevis">
+Figure 1(a): 212
                        |  
                        *v5
                       / \
@@ -304,7 +311,6 @@ some plausible examples are shown in Figures 1(a-e).
     and then get ShephardsPlayApplet to spit out
     better coords.
 </pre>
--->
 <p>
 <span id="youarehere"></span>
 Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
@@ -317,7 +323,7 @@ Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
         <!-- Q: how to scale the coords but not the stroke width??? -->
         <!-- A: supposedly non-scaling-stroke was introduced in SVG Tiny 1.2, not sure if that's what's being used or what -->
         <path
-            id="thePath"
+            id="fig1apath"
             vector-effect="non-scaling-stroke"
             style="stroke: lightGray; stroke-width: 2.0; fill: none"
             d="
@@ -358,9 +364,8 @@ Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
     </g>
 </svg>
 
-<!--
-<pre>
-    Figure 1(b): 112
+<pre class="asciiprevis">
+Figure 1(b): 211
                     \
                      *v5
                      | \_
@@ -399,7 +404,6 @@ Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
             nVirtual=5
                 0,1 1/1
                 1,1 1/1
-<hr>
 
             \
              *
@@ -430,9 +434,7 @@ Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
 
 
                       \ /
-
 </pre>
--->
 Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
@@ -443,7 +445,7 @@ Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
         <!-- Q: how to scale the coords but not the stroke width??? -->
         <!-- A: supposedly non-scaling-stroke was introduced in SVG Tiny 1.2, not sure if that's what's being used or what -->
         <path
-            id="thePath"
+            id="fig1bpath"
             vector-effect="non-scaling-stroke"
             style="stroke: lightGray; stroke-width: 2.0; fill: none"
             d="
@@ -478,9 +480,10 @@ Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
         <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
     </g>
 </svg>
-<pre>
-    Figure 1(c): 3 exits tilted too far CW, 1 good exit
-<!--
+<p>
+Figure 1(c): 3 exits tilted too far CW, 1 good exit
+<pre class="asciiprevis">
+Figure 1(c): 310
 
                          __/
                       __/
@@ -503,7 +506,6 @@ Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
             nVirtual=5  (good for just primal... although primal/dual equalized at about 5.75 or so)
                 0,1 1/1
                 1,2 1/1
--->
 </pre>
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
@@ -514,7 +516,7 @@ Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
         <!-- Q: how to scale the coords but not the stroke width??? -->
         <!-- A: supposedly non-scaling-stroke was introduced in SVG Tiny 1.2, not sure if that's what's being used or what -->
         <path
-            id="thePath"
+            id="fig1cpath"
             vector-effect="non-scaling-stroke"
             style="stroke: lightGray; stroke-width: 2.0; fill: none"
             d="
@@ -549,12 +551,11 @@ Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
         <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
     </g>
 </svg>
-<pre>
+<p>
     Figure 1(d): mild spiral
-</pre>
-<pre>
+<p>
     Figure 1(e): steep spiral
-</pre>
+<p>
 These examples satisfy all the properties
 of a single-exit single-polygon lagoon with the cc at the origin,
 *except* that when we actually compute the cc,
@@ -1023,10 +1024,21 @@ Dudley has moved (in a straight line) and Priscilla has stayed still.
 
 
     <!-- it would be cool to make some javascript to do the following:
-         if current url starts with "file", use one of these,
-         otherwise use the other.
+         if current url starts with "file", use "http://validator.w3.org/#validate_by_upload"
+         if current url starts with "http", use "http://validator.w3.org/check?uri=referer"
+                                                "http://jigsaw.w3.org/check/referer"
          and maybe even fill in the starting file if possible? -->
-    <!-- <a href="http://jigsaw.w3.org/css-validator/check/referer"> -->
+
+    <a href="http://validator.w3.org/unicorn/#validate-by-upload">
+        <img style="border:0;width:88px;height:31px"
+            src="http://jigsaw.w3.org/css-validator/images/vcss"
+            alt="Valid CSS!" />
+    </a>
+    <a href="http://validator.w3.org/#validate_by_upload">
+        <img style="border:0;width:88px;height:31px"
+            src="http://jigsaw.w3.org/css-validator/images/vcss"
+            alt="Valid CSS!" />
+    </a>
     <a href="http://jigsaw.w3.org/css-validator/#validate_by_upload">
         <img style="border:0;width:88px;height:31px"
             src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
