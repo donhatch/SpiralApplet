@@ -1392,10 +1392,12 @@ public class SpiralApplet
                 }
                 if (showStatsFlag.get())
                 {
+                    double primalMinusDualFocusAngle = Math.PI/8;
                     drawStats(g,
                               size,
                               theSpiralModel,
-                              theSpiralView);
+                              theSpiralView,
+                              primalMinusDualFocusAngle);
                 }
 
 
@@ -1517,16 +1519,16 @@ public class SpiralApplet
         // "0.19999999999999996" -> "2"
         private static String doubleToStringNice(double x)
         {
-            System.out.println("    in doubleToStringNice("+x+")");
+            //System.out.println("    in doubleToStringNice("+x+")");
             if (x == 0)
             {
-                System.out.println("    out doubleToStringNice("+x+"), returning '0' trivially");
+                //System.out.println("    out doubleToStringNice("+x+"), returning '0' trivially");
                 return "0"; // avoid dealing with stuff like "-0.0"
             }
             if (x < 0)
             {
                 String answer = "-" + doubleToStringNice(-x);
-                System.out.println("    out doubleToStringNice("+x+"), returning minus something");
+                //System.out.println("    out doubleToStringNice("+x+"), returning minus something");
                 return answer;
             }
 
@@ -1546,7 +1548,7 @@ public class SpiralApplet
                         fudge *= .1;
                     x += fudge;
                     String answer = doubleToStringNice(x + fudge);
-                    System.out.println("    out doubleToStringNice("+x+"), returning"+answer);
+                    //System.out.println("    out doubleToStringNice("+x+"), returning"+answer);
                     return answer;
                 }
 
@@ -1566,7 +1568,7 @@ public class SpiralApplet
                     s = s.substring(1); // change the "0." to just "."
             }
             assert(s.length() >= 1);
-            System.out.println("    out doubleToStringNice("+x+"), returning "+s);
+            //System.out.println("    out doubleToStringNice("+x+"), returning "+s);
             return s;
         } // doubleToStringNice
 
@@ -2127,7 +2129,10 @@ public class SpiralApplet
                     double y = datum[1];
                     double gX = LERP(gX0+.5,gX1-.5, (x-x0)/(x1-x0));
                     double gY = LERP(gY0+.5,gY1-.5, (y-y0)/(y1-y0));
-                    mg.drawPoint(gX,gY,1,2);
+                    mg.drawPoint(gX,gY,3,3);
+                    //mg.drawPoint(gX,gY,2,2);
+                    //mg.drawPoint(gX,gY,1,2);
+                    //mg.drawPoint(gX,gY,1,1);
                 }
             }
             // draw data
@@ -2152,7 +2157,8 @@ public class SpiralApplet
         public static void drawStats(java.awt.Graphics g,
                                      java.awt.Dimension gsize,
                                      final SpiralModel spiralModel,
-                                     SpiralView spiralView)
+                                     SpiralView spiralView,
+                                     final double focusPrimalAngleMinusDualAngle)
         {
             java.awt.Color gray64 = new java.awt.Color(64,64,64);
 
@@ -2169,123 +2175,65 @@ public class SpiralApplet
                 int y1 = gsize.height/2 - 60;
                 int y0 = y1 - pixelsInPlot;
 
-                drawOnePlot(g,
-                            gsize,
-                            1,145,2, x0,x1, 2,3,1, "momentAng-dualAng", null, // left to right
-                            1,50,2,  y1,y0, 2,3,1, "primalAng-dualAng", null, // bottom to top
+                drawOnePlot(
+                    g,
+                    gsize,
+                    1,145,2, x0,x1, 2,3,1, "momentAng-dualAng", null, // left to right
+                    1,50,2,  y1,y0, 2,3,1, "primalAng-dualAng", null, // bottom to top
 
-                            0., 90., // values to put at x bounds
-                            0., 90., // values to put at y bounds
+                    0., 90., // values to put at x bounds
+                    0., 90., // values to put at y bounds
 
-                            9,9, // nMajor x,y
+                    9,9, // nMajor x,y
 
-                            java.awt.Color.blue, // outerFrameColor
-                            java.awt.Color.white, // innerFrameColor
-                            gray64, // majorGridColor
-                            gray64, // labelColor
-                            java.awt.Color.green, // boundsColor
-                            java.awt.Color.red, // dataColor
-                            new DataFetcher() { // possibleBoundsFetcher
-                                // XXX this is actually pretty screwy--- we end up drawing a bounds point for every data point, even if there are a zillion data points and not that many pixels
-                                public int nData()
-                                {
-                                    return spiralModel.params.n.get();
-                                }
-                                public void getDatum(int i, double putDatumHere[/*2*/])
-                                {
-                                    int val = spiralModel.theList[i];
-                                    double center[] = spiralModel.centers[i];
-                                    double weight = spiralModel.weights[i];
-                                    double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-                                    double maybeTopMomentAng = primalAng;
-                                    putDatumHere[0] = RTOD(primalAng);
-                                    putDatumHere[1] = RTOD(maybeTopMomentAng);
-                                }
-                            },
-                            new DataFetcher() { // dataFetcher
-                                public int nData()
-                                {
-                                    return spiralModel.params.n.get();
-                                }
-                                public void getDatum(int i, double putDatumHere[/*2*/])
-                                {
-                                    int val = spiralModel.theList[i];
-                                    double center[] = spiralModel.centers[i];
-                                    double weight = spiralModel.weights[i];
-                                    double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-                                    double momentAng = Math.atan2(center[1],center[0]);
-                                    putDatumHere[0] = RTOD(primalAng);
-                                    putDatumHere[1] = RTOD(momentAng);
-                                }
-                            });
-
-                if (false)
-                {
-                    // frame
-                    g.setColor(java.awt.Color.yellow);
-                    g.drawLine(x0,y0,x1-1,y0); // top
-                    g.drawLine(x0,y1-1,x1-1,y1-1); // bottom
-                    g.drawLine(x0,y0+1,x0,y1-2); // left
-                    g.drawLine(x1-1,y0+1,x1-1,y1-2); // right
-                }
-
-                if (false)
-                {
-                    // grid lines
-                    g.setColor(new java.awt.Color(64,64,64));
-                    int nMajor = 9;
-                    FORI (iMajor, nMajor+1)
-                    {
-                        int x = (int)LERP(x0,x1-1,(double)iMajor/(double)nMajor); // position of vertical line
-                        int y = (int)LERP(y0,y1-1,(double)iMajor/(double)nMajor); // position of horizontal line
-                        g.drawString(iMajor==0 ? "   0" : ""+(90*iMajor/nMajor),
-                                     x-6, y1+20);
-                        g.drawString(iMajor==nMajor ? "   0" : ""+(90-90*iMajor/nMajor),
-                                     x0-20, y+5);
-                        if (iMajor != 0 && iMajor != nMajor)
+                    java.awt.Color.blue, // outerFrameColor
+                    java.awt.Color.white, // innerFrameColor
+                    gray64, // majorGridColor
+                    gray64, // labelColor
+                    java.awt.Color.green, // boundsColor
+                    java.awt.Color.red, // dataColor
+                    new DataFetcher() { // possibleBoundsFetcher
+                        // XXX this is actually pretty screwy--- we end up drawing a bounds point for every data point, even if there are a zillion data points and not that many pixels
+                        public int nData()
                         {
-                            g.drawLine(x,y0+1,x,y1-2); // vertical
-                            g.drawLine(x0+1,y,x1-2,y); // horizontal
+                            return spiralModel.params.n.get();
+                        }
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            int val = spiralModel.theList[i];
+                            double center[] = spiralModel.centers[i];
+                            double weight = spiralModel.weights[i];
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+                            double maybeTopMomentAng = primalAng;
+                            putDatumHere[0] = RTOD(primalAng);
+                            putDatumHere[1] = RTOD(maybeTopMomentAng);
+                        }
+                    },
+                    new DataFetcher() { // dataFetcher
+                        public int nData()
+                        {
+                            return spiralModel.params.n.get();
+                        }
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            int val = spiralModel.theList[i];
+                            double center[] = spiralModel.centers[i];
+                            double weight = spiralModel.weights[i];
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+                            double momentAng = Math.atan2(center[1],center[0]);
+                            putDatumHere[0] = RTOD(primalAng);
+                            putDatumHere[1] = RTOD(momentAng);
                         }
                     }
-                }
-                if (false)
-                {
-                    g.drawString("primalAng-dualAng", 3+x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
-                    g.drawString("momentAng-dualAng", 3+x0-30-114, (y0+y1)/2+4); // string width is 114 empirically
-                }
-
-                if (false)
-                {
-                    g.setColor(java.awt.Color.yellow);
-                    int n = spiralModel.params.n.get();
-                    FORI (i, n)
-                    {
-                        int val = spiralModel.theList[i];
-                        double center[] = spiralModel.centers[i];
-                        double weight = spiralModel.weights[i];
-                        double primalAng = (val+.5)/nParts * (Math.PI*.5);
-                        int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
-                        double momentAng = Math.atan2(center[1],center[0]);
-                        int y = (int)LERP(y1-1,y0, momentAng/(Math.PI*.5));
-                        g.fillRect(x,y,1,1);
-
-                        double maybeTopMomentAng = primalAng;
-                        int maybeTopY = (int)LERP(y1-1,y0,maybeTopMomentAng/(Math.PI*.5));
-                        g.setColor(java.awt.Color.yellow);
-                        g.fillRect(x,maybeTopY-2,1,1); // should leave exactly 1 pixel gap
-                        g.setColor(java.awt.Color.yellow);
-                    }
-                }
+                );
             }
 
 
-            // |twiceAreaBasedMoment|/(primalR*dualR^2) vs. primalAng-dualAng graph
+            // |areaBasedMoment|/(primalR*dualR^2) vs. primalAng-dualAng graph
             {
                 int nParts = spiralModel.params.nParts.get();
                 int pixelsPerPart = spiralView.pixelsPerPart.get();
                 int pixelsInPlot = nParts * pixelsPerPart + 1;
-
 
                 // these bounds include inner frame
                 int x0 = (gsize.width-pixelsInPlot)/2;
@@ -2293,117 +2241,143 @@ public class SpiralApplet
                 int y0 = gsize.height/2 + 10;
                 int y1 = gsize.height - 50;
 
-                drawOnePlot(g,
-                            gsize,
-                            1,145,2, x0,x1, 2,3,1, "momentAng-dualAng", null, // left to right
-                            1,50,2,  y1,y0, 2,3,1, "primalAng-dualAng", null, // bottom to top
+                drawOnePlot(
+                    g,
+                    gsize,
+                    1,145,2, x0,x1, 2,3,1, "|areaBasedMoment| / (primalR*dualR^2)", null, // left to right
+                    1,50,2,  y1,y0, 2,3,1, "primalAng-dualAng", null, // bottom to top
 
-                            0., 90., // values to put at x bounds
-                            0., 1., // values to put at y bounds
+                    0., 90., // values to put at x bounds
+                    0., .25, // values to put at y bounds
 
-                            9,10, // nMajor x,y
+                    9,10, // nMajor x,y
 
-                            java.awt.Color.blue, // outerFrameColor
-                            java.awt.Color.white, // innerFrameColor
-                            gray64, // majorGridColor
-                            gray64, // labelColor
-                            java.awt.Color.green, // boundsColor
-                            java.awt.Color.red, // dataColor
-                            new DataFetcher() { // possibleBoundsFetcher
-                                public int nData()
-                                {
-                                    return spiralModel.params.n.get();
-                                }
-                                public void getDatum(int i, double putDatumHere[/*2*/])
-                                {
-                                    int val = spiralModel.theList[i];
-                                    double center[] = spiralModel.centers[i];
-                                    double weight = spiralModel.weights[i];
-                                    double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-                                    double momentMag = MyMath.hypot(center[1],center[0]) * weight;
-                                    double maxMomentMag = Math.sin(2*primalAng)/2;
+                    java.awt.Color.blue, // outerFrameColor
+                    java.awt.Color.white, // innerFrameColor
+                    gray64, // majorGridColor
+                    gray64, // labelColor
+                    java.awt.Color.green, // boundsColor
+                    java.awt.Color.red, // dataColor
+                    new DataFetcher() { // possibleBoundsFetcher
+                        public int nData()
+                        {
+                            return spiralModel.params.n.get();
+                        }
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            int val = spiralModel.theList[i];
+                            double center[] = spiralModel.centers[i];
+                            double weight = spiralModel.weights[i];
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+                            double twiceAreaBasedMomentMag = MyMath.hypot(center[1],center[0]) * weight;
+                            double areaBasedMomentMag = .5 * twiceAreaBasedMomentMag;
+                            double maxAreaBasedMomentMag = Math.sin(2*primalAng)/4; // i.e. tri area / 2
 
-                                    assert(momentMag < maxMomentMag);
+                            assert(areaBasedMomentMag < maxAreaBasedMomentMag);
 
-                                    putDatumHere[0] = RTOD(primalAng);
-                                    putDatumHere[1] = maxMomentMag;
-                                }
-                            },
-                            new DataFetcher() { // dataFetcher
-                                public int nData()
-                                {
-                                    return spiralModel.params.n.get();
-                                }
-                                public void getDatum(int i, double putDatumHere[/*2*/])
-                                {
-                                    int val = spiralModel.theList[i];
-                                    double center[] = spiralModel.centers[i];
-                                    double weight = spiralModel.weights[i];
-                                    double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-                                    double momentMag = MyMath.hypot(center[1],center[0]) * weight;
-                                    putDatumHere[0] = RTOD(primalAng);
-                                    putDatumHere[1] = momentMag;
-                                }
-                            });
+                            putDatumHere[0] = RTOD(primalAng);
+                            putDatumHere[1] = maxAreaBasedMomentMag;
+                        }
+                    },
+                    new DataFetcher() { // dataFetcher
+                        public int nData()
+                        {
+                            return spiralModel.params.n.get();
+                        }
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            int val = spiralModel.theList[i];
+                            double center[] = spiralModel.centers[i];
+                            double weight = spiralModel.weights[i];
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+                            double twiceAreaBasedMomentMag = MyMath.hypot(center[1],center[0]) * weight;
+                            double areaBasedMomentMag = .5 * twiceAreaBasedMomentMag;
+                            putDatumHere[0] = RTOD(primalAng);
+                            putDatumHere[1] = areaBasedMomentMag;
+                        }
+                    }
+                );
             }
 
-            // area vs. primalAng-dualAng graph
-            // this is actually a stupid graph,
-            // since area is obviously unbounded
-            // no matter what the current primal angle is.
+            // areaBasedMoment vs. primalAng-dualAng graph
             {
                 int nParts = spiralModel.params.nParts.get();
                 int pixelsPerPart = spiralView.pixelsPerPart.get();
                 int pixelsInPlot = nParts * pixelsPerPart + 1;
 
-                int x0 = (gsize.width+pixelsInPlot)/2 + 10;
-                int x1 = x0 + pixelsInPlot;
+                // these bounds include inner frame
                 int y0 = gsize.height/2 + 10;
                 int y1 = gsize.height - 50;
+                int x0 = (gsize.width+pixelsInPlot)/2 + 10;
+                int x1 = x0 + (y1-y0); // so it's square
 
-                // frame
-                g.setColor(java.awt.Color.yellow);
-                g.drawLine(x0,y0,x1-1,y0); // top
-                g.drawLine(x0,y1-1,x1-1,y1-1); // bottom
-                g.drawLine(x0,y0+1,x0,y1-2); // left
-                g.drawLine(x1-1,y0+1,x1-1,y1-2); // right
+                drawOnePlot(
+                    g,
+                    gsize,
+                    1,3,2,  x0,x1, 2,100,1, null, "y", // left to right
+                    1,50,2, y1,y0, 2,3,1,   "x", null, // bottom to top
 
-                // grid lines and labels
-                g.setColor(java.awt.Color.yellow);
-                int nMajor = 9;
-                FORI (iMajor, nMajor+1)
-                {
-                    int x = (int)LERP(x0,x1-1,(double)iMajor/(double)nMajor); // position of vertical line
-                    int y = (int)LERP(y0,y1-1,(double)iMajor/(double)nMajor); // position of horizontal line
-                    g.drawString(iMajor==0 ? "   0" : ""+(90*iMajor/nMajor),
-                                 x-6, y1+20);
-                    /*
-                    g.drawString(iMajor==nMajor ? "   0" : ""+(90-90*iMajor/nMajor),
-                                 x0-20, y+5);
-                    */
-                    if (iMajor != 0 && iMajor != nMajor)
-                    {
-                        g.drawLine(x,y0+1,x,y1-2); // vertical
-                        g.drawLine(x0+1,y,x1-2,y); // horizontal
+                    0., .25, // values to put at x bounds
+                    0., .25, // values to put at y bounds
+
+                    10,10, // nMajor x,y
+
+                    java.awt.Color.blue, // outerFrameColor
+                    java.awt.Color.white, // innerFrameColor
+                    gray64, // majorGridColor
+                    gray64, // labelColor
+                    java.awt.Color.green, // boundsColor
+                    java.awt.Color.red, // dataColor
+                    new DataFetcher() { // possibleBoundsFetcher
+                        public int nData()
+                        {
+                            return 2*90;
+                        }
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            if (i >= 90)
+                            {
+                                // more refined inner arc
+                                i -= 90;
+                                double angle = (i+.5)/90*(Math.PI/2);
+                                double rMax = Math.cos(angle)*Math.sin(angle)/2;
+                                double xMax = Math.cos(angle)*rMax;
+                                double yMax = Math.sin(angle)*rMax;
+
+                                putDatumHere[0] = xMax;
+                                putDatumHere[1] = yMax;
+                            }
+                            else
+                            {
+                                // outer circular arc
+                                double maxAreaBasedMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                double angle = (i+.5)/90*(Math.PI/2);
+                                double xMax = maxAreaBasedMomentMag * Math.cos(angle);
+                                double yMax = maxAreaBasedMomentMag * Math.sin(angle);
+
+                                putDatumHere[0] = xMax;
+                                putDatumHere[1] = yMax;
+                            }
+                        }
+                    },
+                    new DataFetcher() { // dataFetcher
+                        public int nData()
+                        {
+                            return spiralModel.params.n.get();
+                        }
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            int val = spiralModel.theList[i];
+                            double center[] = spiralModel.centers[i];
+                            double weight = spiralModel.weights[i];
+                            double area = weight * .5;
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+                            putDatumHere[0] = center[0]*area;
+                            putDatumHere[1] = center[1]*area;
+                        }
                     }
-                }
-                g.drawString("primalAng-dualAng", x0+(pixelsInPlot-103)/2, y1+40); // string width is 103 empirically
-                //g.drawString("area", x0-30-23, (y0+y1)/2+4); // string width is 23 empirically
-                g.drawString("area", x1+10, (y0+y1)/2+4);
+                );
 
-                g.setColor(java.awt.Color.yellow);
-                int n = spiralModel.params.n.get();
-                FORI (i, n)
-                {
-                    int val = spiralModel.theList[i];
-                    double center[] = spiralModel.centers[i];
-                    double weight = spiralModel.weights[i];
-                    double primalAng = (val+.5)/nParts * (Math.PI*.5);
-                    int x = (int)LERP(x0,x1-1, primalAng/(Math.PI*.5));
-                    double area = weight*.5;
-                    int y = (int)LERP(y1-1,y0, area);
-                    g.fillRect(x,y,1,1);
-                }
             }
         } // drawStats
 
