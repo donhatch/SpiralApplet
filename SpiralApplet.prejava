@@ -1721,8 +1721,8 @@ public class SpiralApplet
                             // but, we always keep it canonicalized so that dualAng is 0.
                             double VAL = THELIST[i];
                             double val = nParts-1-VAL; // XXX temporary
-                            double prevPrimalAng = Math.PI/2 * (1 - (prevVal+.5)/nParts);
-                            double primalAng = Math.PI/2 * (1 - (val+.5)/nParts);
+                            double prevPrimalAng = Math.PI/2 * ((prevVAL+.5)/nParts);
+                            double primalAng = Math.PI/2 * ((VAL+.5)/nParts);
                             if (primalAng > prevPrimalAng)
                             {
                                 // primalAng is increasing.
@@ -1800,6 +1800,7 @@ public class SpiralApplet
                             prevCenter[1] = thisCenter[1];
                             prevWeight = thisWeight;
                             prevVal = val;
+                            prevVAL = VAL;
                         }
                     }
                     assert(done);
@@ -2058,9 +2059,9 @@ public class SpiralApplet
 
             // Given gCenterX,gCenterY,
             // figure out the "base" pixel index.
-            // this is the pixel where val=0 would go
+            // this is the pixel where VAL=0 would go
             // at an exact even integer focus
-            // (val=0 is only achievable on even focus).
+            // (VAL=0 is only achievable on even focus).
             // If ixBase,iyBase are both .5 mod 1,
             // then we round one down and one up-- that's the purpose of the -round(-) thing.
             // XXX TODO: this works since the inputs are all multiples of .5, but may not be the most robust way in general, should think about it more
@@ -2169,13 +2170,13 @@ public class SpiralApplet
             i0 = MOD(i0, n);
             //PRINT(i0);
             int i1 = (i0+1)%n;
-            int val0 = spiralModel.THELIST[i0];
-            int val1 = spiralModel.THELIST[i1];
-            //PRINT(val0);
-            //PRINT(val1);
+            int VAL0 = spiralModel.THELIST[i0];
+            int VAL1 = spiralModel.THELIST[i1];
+            //PRINT(VAL0);
+            //PRINT(VAL1);
             //PRINT(frac);
-            Rational val = new Rational(val0,1).lerpEquals(val1,1, frac.n,frac.d); // val = lerp(val0,val1,frac)
-            //PRINT(val);
+            Rational VAL = new Rational(VAL0,1).lerpEquals(VAL1,1, frac.n,frac.d); // VAL = lerp(VAL0,VAL1,frac)
+            //PRINT(VAL);
 
 
             // Now we need to figure out
@@ -2202,13 +2203,13 @@ public class SpiralApplet
             {
                 // figure out how many pixels from base to i0
 
-                Rational upperLeftOffset = new Rational(val0*pixelsPerPart, 2);
-                Rational lowerLeftOffset = val.minus(val0,1).abs().times(pixelsPerPart,2);
+                Rational upperLeftOffset = new Rational(VAL0*pixelsPerPart, 2);
+                Rational lowerLeftOffset = VAL.minus(VAL0,1).abs().times(pixelsPerPart,2);
                 //PRINT(upperLeftOffset);
                 //PRINT(lowerLeftOffset);
 
                 // upperLeftOffset is now a multiple of .5.
-                // adjust lowerLeftOffset to nearest value that's the same as upperLeftOffset mod 1.
+                // adjust lowerLeftOffset to nearest VALue that's the same as upperLeftOffset mod 1.
 
                 if (upperLeftOffset.d == 1) // i.e. if it's an integer
                     lowerLeftOffset.roundEquals();
@@ -2241,27 +2242,27 @@ public class SpiralApplet
                 {
                     int prevX = ix0;
                     int prevY = iy0;
-                    int prevVal = spiralModel.THELIST[i0];
+                    int prevVAL = spiralModel.THELIST[i0];
                     for (int i = (i0+1)%n; ; i = (i+1)%n)
                     {
-                        int thisVal = spiralModel.THELIST[i];
+                        int thisVAL = spiralModel.THELIST[i];
                         int thisX, thisY;
-                        if (thisVal > prevVal)
+                        if (thisVAL > prevVAL)
                         {
                             // vertical seg upwards
                             thisX = prevX;
-                            thisY = prevY - (thisVal-prevVal) * pixelsPerPart;
+                            thisY = prevY - (thisVAL-prevVAL) * pixelsPerPart;
                         }
                         else
                         {
                             // horizonal seg to right
                             thisY = prevY;
-                            thisX = prevX + (prevVal-thisVal) * pixelsPerPart;
+                            thisX = prevX + (prevVAL-thisVAL) * pixelsPerPart;
                         }
                         g.drawLine(prevX,prevY,thisX,thisY);
                         if (thisX >= gsize.width || thisY < 0)
                             break;
-                        prevVal = thisVal;
+                        prevVAL = thisVAL;
                         prevX = thisX;
                         prevY = thisY;
                     }
@@ -2271,27 +2272,27 @@ public class SpiralApplet
                 {
                     int prevX = ix0;
                     int prevY = iy0;
-                    int prevVal = spiralModel.THELIST[i0];
+                    int prevVAL = spiralModel.THELIST[i0];
                     for (int i = MOD(i0-1,n); ; i = MOD(i-1,n))
                     {
-                        int thisVal = spiralModel.THELIST[i];
+                        int thisVAL = spiralModel.THELIST[i];
                         int thisX, thisY;
-                        if (thisVal < prevVal)
+                        if (thisVAL < prevVAL)
                         {
                             // vertical seg downwards
                             thisX = prevX;
-                            thisY = prevY + (prevVal-thisVal) * pixelsPerPart;
+                            thisY = prevY + (prevVAL-thisVAL) * pixelsPerPart;
                         }
                         else
                         {
                             // horizonal seg to left
                             thisY = prevY;
-                            thisX = prevX - (thisVal-prevVal) * pixelsPerPart;
+                            thisX = prevX - (thisVAL-prevVAL) * pixelsPerPart;
                         }
                         g.drawLine(prevX,prevY,thisX,thisY);
                         if (thisX < 0 || thisY >= gsize.height)
                             break;
-                        prevVal = thisVal;
+                        prevVAL = thisVAL;
                         prevX = thisX;
                         prevY = thisY;
                     }
@@ -2342,6 +2343,7 @@ public class SpiralApplet
             if (debugLevel >= 1) PRINT(val1);
             if (debugLevel >= 1) PRINT(frac);
             double val = LERP(val0,val1,frac.toDouble()); // XXX TODO: use rational arithmetic all the way through... maybe? actually might not be necessary in this function
+            double VAL = LERP(VAL0,VAL1,frac.toDouble()); // XXX TODO: use rational arithmetic all the way through... maybe? actually might not be necessary in this function
             if (debugLevel >= 1) PRINT(val);
 
             if (debugLevel >= 1)
@@ -2389,6 +2391,8 @@ public class SpiralApplet
 
                 double dualAng = 0;
                 double primalAng = Math.PI/2 * (1 - (val+.5)/nParts);
+                double primalANG = Math.PI/2 * ((VAL+.5)/nParts);
+                assert(EQ(primalAng,primalANG,1e-6));
                 double dualR = scale;
                 double primalR = scale;
 
@@ -2415,7 +2419,9 @@ public class SpiralApplet
 
 
                 double prevPrevVal = val;
+                double prevPrevVAL = VAL;
                 double prevVal = val;
+                double prevVAL = VAL;
                 for (int i = scanDir==1?i1:i0; ; i = MOD(i+scanDir,n))
                 {
                     returnValue++;
@@ -2424,11 +2430,11 @@ public class SpiralApplet
 
                     int thisVAL = spiralModel.THELIST[i];
                     int thisVal = nParts-1-thisVAL; // XXX temporary
-                    if (scanDir==1 ? thisVal < prevVal : thisVal > prevVal)
+                    if (scanDir==1 ? thisVAL > prevVAL : thisVAL < prevVAL)
                     {
                         // primal movement, dual turn
                         if (debugLevel >= 2 && scanDir > 0) System.out.println("            primal movement, dual turn");
-                        double angleDelta = (double)(prevVal-thisVal)/(double)nParts * (Math.PI*.5);
+                        double angleDelta = (double)(thisVAL-prevVAL)/(double)nParts * (Math.PI*.5);
                         if (debugLevel >= 2 && scanDir > 0) PRINT(RTOD(angleDelta));
                         double nextPrimalAng = primalAng + angleDelta;
                         if (nextPrimalAng > Math.PI)
@@ -2450,8 +2456,8 @@ public class SpiralApplet
                                         nextPrimalX, nextPrimalY,
                                         antiAliasFlag);
                             if (
-                                prevPrevVal != prevVal &&
-                                (thisVal>prevVal) != (prevVal>prevPrevVal))
+                                prevPrevVAL != prevVAL &&
+                                (thisVAL<prevVAL) != (prevVAL<prevPrevVAL))
                             {
                                 // draw point at larger-index endpoint of the line
                                 if (scanDir < 0)
@@ -2477,8 +2483,8 @@ public class SpiralApplet
                             }
                         }
                         if (drawRungsFlag &&
-                            prevPrevVal != prevVal &&
-                            (thisVal>prevVal != (prevVal>prevPrevVal)))
+                            prevPrevVAL != prevVAL &&
+                            (thisVAL<prevVAL != (prevVAL<prevPrevVAL)))
                         {
                             java.awt.Color savedColor = mg.getColor();
                             mg.setColor(dimPink);
@@ -2493,11 +2499,11 @@ public class SpiralApplet
                         primalX = nextPrimalX;
                         primalY = nextPrimalY;
                     }
-                    else if (scanDir==1 ? thisVal > prevVal : thisVal < prevVal)
+                    else if (scanDir==1 ? thisVAL < prevVAL : thisVAL > prevVAL)
                     {
                         // dual movement, primal turn
                         if (debugLevel >= 2 && scanDir > 0) System.out.println("            dual movement, primal turn");
-                        double angleDelta = (double)(thisVal-prevVal)/(double)nParts * (Math.PI*.5);
+                        double angleDelta = (double)(prevVAL-thisVAL)/(double)nParts * (Math.PI*.5);
                         double nextDualAng = dualAng + angleDelta;
                         if (nextDualAng > Math.PI)
                             nextDualAng -= 2*Math.PI;
@@ -2516,8 +2522,8 @@ public class SpiralApplet
                                         nextDualX, nextDualY,
                                         antiAliasFlag);
 
-                            if (prevVal==prevPrevVal
-                             || (thisVal>prevVal) != (prevVal>prevPrevVal))
+                            if (prevVAL==prevPrevVAL
+                             || (thisVAL<prevVAL) != (prevVAL<prevPrevVAL))
                             {
                                 if (scanDir < 0)
                                 {
@@ -2544,8 +2550,8 @@ public class SpiralApplet
                             }
                         }
                         if (drawRungsFlag &&
-                            (prevVal!=prevPrevVal &&
-                            (thisVal>prevVal != (prevVal>prevPrevVal))))
+                            (prevVAL!=prevPrevVAL &&
+                            (thisVAL<prevVAL != (prevVAL<prevPrevVAL))))
                         {
                             java.awt.Color savedColor = mg.getColor();
                             mg.setColor(dimPink);
@@ -2606,6 +2612,8 @@ public class SpiralApplet
 
                     prevPrevVal = prevVal;
                     prevVal = thisVal;
+                    prevPrevVAL = prevVAL;
+                    prevVAL = thisVAL;
                 }
 
                 if (scanDir < 0 && drawPrimalFlag)
