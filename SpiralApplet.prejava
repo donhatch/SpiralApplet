@@ -1814,15 +1814,6 @@ public class SpiralApplet
                             }
                             else
                             {
-                                if (iPass==1 && i == n-1)
-                                {
-                                    // oh no, didn't stabilize.. print out the damage
-                                    PRINTVEC(this.centers[i]);
-                                    PRINT(this.weights[i]);
-                                    PRINTVEC(thisCenter);
-                                    PRINT(thisWeight);
-                                }
-
                                 VecMath.copyvec(this.centers[i], thisCenter);
                                 this.weights[i] = thisWeight;
                             }
@@ -1886,7 +1877,7 @@ public class SpiralApplet
             // nor to the direction from origin to center.
             double shrink = Math.cos(newPrimalMinusDualAng)
                           / Math.cos(oldPrimalMinusDualAng);
-            assert(shrink < 1.);
+            assert(shrink <= 1.);
             double newCenterX = shrink * oldCenterX;
             double newCenterY = shrink * oldCenterY;
             double newWeight = oldWeight;
@@ -1940,6 +1931,33 @@ public class SpiralApplet
             newCenterAndWeight[1] = newCenterY;
             newCenterAndWeight[2] = newWeight;
         } // updateCenterAndWeightWhenDudleyMoved
+
+        // Actually we know which one moved (assuming spiraling outward).
+        public static void updateCenterAndWeightWhenSomeoneMoved(
+                double oldCenterX,
+                double oldCenterY,
+                double oldWeight,
+                double oldPrimalMinusDualAng,
+                double newPrimalMinusDualAng,
+                double newCenterAndWeight[])
+        {
+            if (newPrimalMinusDualAng >= oldPrimalMinusDualAng)
+                updateCenterAndWeightWhenPriscillaMoved(
+                    oldCenterX,
+                    oldCenterY,
+                    oldWeight,
+                    oldPrimalMinusDualAng,
+                    newPrimalMinusDualAng,
+                    newCenterAndWeight);
+            else
+                updateCenterAndWeightWhenDudleyMoved(
+                    oldCenterX,
+                    oldCenterY,
+                    oldWeight,
+                    oldPrimalMinusDualAng,
+                    newPrimalMinusDualAng,
+                    newCenterAndWeight);
+        } // updateCenterAndWeightWhenSomeoneMoved
                         
 
 
@@ -3123,8 +3141,41 @@ public class SpiralApplet
                                         initialPrimalAng, // arcRadians
                                         1., // thickness in pixels
                                         antiAliasFlag);
-                    }
 
+                        {
+                            // Getting more interesting!
+                            // this is actually visualizing what happens during the lemma.
+                            // Let's get even more sophisticated--
+                            // for every possible *next* value (from initialPrimalAng),
+                            // show the moment of it.
+                            double scratch[] = new double[3];
+                            FORI (speculativeNextVal, nParts)
+                            {
+                                double speculativeNextPrimalAng = (speculativeNextVal+.5)/nParts*(Math.PI*.5);
+                                updateCenterAndWeightWhenSomeoneMoved(
+                                    centerX,
+                                    centerY,
+                                    twiceArea,
+                                    initialPrimalAng,
+                                    speculativeNextPrimalAng,
+                                    scratch);
+                                double speculativeNextCenterX = scratch[0];
+                                double speculativeNextCenterY = scratch[1];
+                                double speculativeNextTwiceArea = scratch[2];
+
+                                // pick a nice color from red to green
+                                double speculativeFrac = (speculativeNextVal+.5)/nParts;
+                                int g = (int)(speculativeFrac*255);
+                                int r = 255-g;
+                                int b = 0;
+                                mg.setColor(new java.awt.Color(r,g,b));
+
+                                mg.drawPoint(speculativeNextCenterX*(2*speculativeNextTwiceArea),
+                                             speculativeNextCenterY*(2*speculativeNextTwiceArea),
+                                             1);
+                            }
+                        }
+                    }
                 }
 
             } // for iScanDir
