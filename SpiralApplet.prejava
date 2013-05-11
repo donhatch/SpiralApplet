@@ -1563,9 +1563,10 @@ public class SpiralApplet
                     // I used to like to draw it centered in the window,
                     // but now I think I like to draw it with the lower edge
                     // centered.
-                    double offset = theSpiralModel.params.nParts.get()
+                    double offset = (theSpiralModel.params.nParts.get()
                                   * theSpiralView.pixelsPerPart.get()
-                                  * .25;
+                                  * .25)
+                                  * 1.5;
                     drawTicker(g,
                                size,
                                size.width/2.-offset,
