@@ -652,8 +652,11 @@ public class SpiralApplet
                         add(new JCheckBoxForBoolean("show model ticker", applet.showTickerFlag) {{
                             setMargin(nomargin);
                         }});
-                        add(new JCheckBoxForBoolean("show model spiral", applet.showSpiralFlag) {{
-                            setMargin(nomargin);
+                        add(new JRow() {{
+                            add(new JCheckBoxForBoolean("show model spiral", applet.showSpiralFlag) {{
+                                setMargin(nomargin);
+                            }});
+                            add(makeIncrementableTextFieldForInt(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
                         }});
                         add(new JCheckBoxForBoolean("show model stats", applet.showStatsFlag) {{
                             setMargin(nomargin);
@@ -947,13 +950,6 @@ public class SpiralApplet
 
             graphicsAntiAliasingSetter = new GraphicsAntiAliasingSetter();
 
-            theSpiralView.showRungsFlag.addListener(showRungsFlagListener = new Listenable.Listener() {
-                public void valueChanged()
-                {
-                    theCanvas.repaint();
-                }
-            });
-
             theSpiralView.pixelsPerPart.addListener(pixelsPerPartListener = new Listenable.Listener() {
                 public void valueChanged()
                 {
@@ -1003,30 +999,22 @@ public class SpiralApplet
                 }
             });
 
-            showTimingFlag.addListener(showTimingFlagListener = new Listenable.Listener() {
+
+            // add this after all others, so that we don't repaint
+            // until other processing stabilizes
+            repaintWhenValueChanged = new Listenable.Listener() {
                 public void valueChanged()
                 {
                     theCanvas.repaint();
                 }
-            });
-            showTickerFlag.addListener(showTickerFlagListener = new Listenable.Listener() {
-                public void valueChanged()
-                {
-                    theCanvas.repaint();
-                }
-            });
-            showSpiralFlag.addListener(showSpiralFlagListener = new Listenable.Listener() {
-                public void valueChanged()
-                {
-                    theCanvas.repaint();
-                }
-            });
-            showStatsFlag.addListener(showStatsFlagListener = new Listenable.Listener() {
-                public void valueChanged()
-                {
-                    theCanvas.repaint();
-                }
-            });
+            };
+            showTimingFlag.addListener(repaintWhenValueChanged);
+            showTickerFlag.addListener(repaintWhenValueChanged);
+            showSpiralFlag.addListener(repaintWhenValueChanged);
+            showStatsFlag.addListener(repaintWhenValueChanged);
+            theSpiralView.showRungsFlag.addListener(repaintWhenValueChanged);
+            theSpiralView.focusAngleDegrees.addListener(repaintWhenValueChanged);
+
 
             if (eventVerbose >= 1) System.out.println("out init");
         } // init
@@ -1392,7 +1380,8 @@ public class SpiralApplet
                 }
                 if (showStatsFlag.get())
                 {
-                    double primalMinusDualFocusAngle = Math.PI/8;
+                    // YOU ARE HERE
+                    double primalMinusDualFocusAngle = DTOR(theSpiralView.focusAngleDegrees.get());
                     drawStats(g,
                               size,
                               theSpiralModel,
@@ -1874,6 +1863,7 @@ public class SpiralApplet
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
             public Rational focusQuantum = new Rational(1,quantaPerPart.get());
             public Rational focusAnimationVelocity = new Rational(0,1);
+            public Listenable.Double focusAngleDegrees = new Listenable.Double(0.,90.,45.);
             public SpiralView()
             {}
         }; // public class SpiralView
@@ -1888,6 +1878,7 @@ public class SpiralApplet
                 double newPrimalMinusDualAng,
                 double newCenterAndWeight[])
         {
+            assumpt(newPrimalMinusDualAng >= oldPrimalMinusDualAng);
             // primalAng is increasing. (assuming newPrimalMinusDual > oldPrimalMinusDual).
             // this shrinks the canonical representation of the primal,
             // thereby shrinking the center accordingly.
@@ -1895,7 +1886,7 @@ public class SpiralApplet
             // nor to the direction from origin to center.
             double shrink = Math.cos(newPrimalMinusDualAng)
                           / Math.cos(oldPrimalMinusDualAng);
-            assert(shrink < 1.); // XXX actually I think this can be relaxed
+            assert(shrink < 1.);
             double newCenterX = shrink * oldCenterX;
             double newCenterY = shrink * oldCenterY;
             double newWeight = oldWeight;
@@ -1912,13 +1903,14 @@ public class SpiralApplet
                 double newPrimalMinusDualAng,
                 double newCenterAndWeight[])
         {
+            assumpt(newPrimalMinusDualAng <= oldPrimalMinusDualAng);
             // dualAng is increasing... (assuming newPrimalMinusDual < oldPrimalMinusDual).
             // decrease primalAng to compensate,
             // so dualAng ends up zero.
             // the formula for shrink is magic, worked out on paper
             double shrink = Math.sin(newPrimalMinusDualAng)
                           / Math.sin(oldPrimalMinusDualAng);
-            assert(shrink <= 1.); // XXX actually I think this can be relaxed
+            assert(shrink <= 1.);
 
             double weightIncr = shrink*Math.sin(oldPrimalMinusDualAng-newPrimalMinusDualAng);
             assert(weightIncr >= 0.);
@@ -1992,7 +1984,6 @@ public class SpiralApplet
                                      DataFetcher dataFetcher)
 
         {
-            System.out.println("in drawOnePlot");
             assumpt(gX0 < gX1);
             assumpt(gY0 != gY1);
             if (gY0 > gY1)
@@ -2151,8 +2142,7 @@ public class SpiralApplet
                 }
             }
 
-            System.out.println("out drawOnePlot");
-        } // drawStats
+        } // drawOnePlot
 
         public static void drawStats(java.awt.Graphics g,
                                      java.awt.Dimension gsize,
@@ -2299,17 +2289,19 @@ public class SpiralApplet
                 );
             }
 
-            // areaBasedMoment vs. primalAng-dualAng graph
+            // all angle-based moments x vs. y, scatter plot
             {
                 int nParts = spiralModel.params.nParts.get();
                 int pixelsPerPart = spiralView.pixelsPerPart.get();
                 int pixelsInPlot = nParts * pixelsPerPart + 1;
 
                 // these bounds include inner frame
-                int y0 = gsize.height/2 + 10;
-                int y1 = gsize.height - 50;
+                int y0 = 0 + 50;
+                int y1 = gsize.height/2 - 10;
                 int x0 = (gsize.width+pixelsInPlot)/2 + 10;
                 int x1 = x0 + (y1-y0); // so it's square
+                x0 += 30;
+                y1 -= 30;
 
                 drawOnePlot(
                     g,
@@ -2341,6 +2333,10 @@ public class SpiralApplet
                                 i -= 90;
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 double rMax = Math.cos(angle)*Math.sin(angle)/2;
+                                if (false)
+                                {
+                                    rMax *= Math.cos(angle);
+                                }
                                 double xMax = Math.cos(angle)*rMax;
                                 double yMax = Math.sin(angle)*rMax;
 
@@ -2350,7 +2346,8 @@ public class SpiralApplet
                             else
                             {
                                 // outer circular arc
-                                double maxAreaBasedMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                double worstFocusPrimalAngleMinusDualAngle = Math.PI/4;
+                                double maxAreaBasedMomentMag = Math.sin(2*worstFocusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 double xMax = maxAreaBasedMomentMag * Math.cos(angle);
                                 double yMax = maxAreaBasedMomentMag * Math.sin(angle);
@@ -2372,8 +2369,138 @@ public class SpiralApplet
                             double weight = spiralModel.weights[i];
                             double area = weight * .5;
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-                            putDatumHere[0] = center[0]*area;
-                            putDatumHere[1] = center[1]*area;
+
+                            double areaBasedMomentX = center[0]*area;
+                            double areaBasedMomentY = center[1]*area;
+
+                            if (false)
+                            {
+                                // what if we divide by supposed upper bound, for this moment angle?
+                                double angle = Math.atan2(center[1],center[0]);
+                                double rMax = Math.cos(angle)*Math.sin(angle)/2;
+                                areaBasedMomentX /= rMax;
+                                areaBasedMomentY /= rMax;
+
+                                // but then we need to scale down so it's still in the picture I think?
+                                // i.e. multiply by .25
+                                areaBasedMomentX /= 4;
+                                areaBasedMomentY /= 4;
+                            }
+
+                            putDatumHere[0] = areaBasedMomentX;
+                            putDatumHere[1] = areaBasedMomentY;
+                        }
+                    }
+                );
+
+            }
+
+            // angle-based moments x vs. y, scatter plot,
+            // only at the given focus angle
+            {
+                int nParts = spiralModel.params.nParts.get();
+                int pixelsPerPart = spiralView.pixelsPerPart.get();
+                int pixelsInPlot = nParts * pixelsPerPart + 1;
+
+                // these bounds include inner frame
+                int y0 = gsize.height/2 + 10;
+                int y1 = gsize.height - 50;
+                int x0 = (gsize.width+pixelsInPlot)/2 + 10;
+                int x1 = x0 + (y1-y0); // so it's square
+
+                drawOnePlot(
+                    g,
+                    gsize,
+                    1,3,2,  x0,x1, 2,100,1, null, "y", // left to right
+                    1,50,2, y1,y0, 2,3,1,   "x", null, // bottom to top
+
+                    0., .25, // values to put at x bounds
+                    0., .25, // values to put at y bounds
+
+                    10,10, // nMajor x,y
+
+                    java.awt.Color.blue, // outerFrameColor
+                    java.awt.Color.white, // innerFrameColor
+                    gray64, // majorGridColor
+                    gray64, // labelColor
+                    java.awt.Color.green, // boundsColor
+                    java.awt.Color.red, // dataColor
+                    new DataFetcher() { // possibleBoundsFetcher
+                        public int nData()
+                        {
+                            return 3*90;
+                        }
+                        public void getDatum(int ii, double putDatumHere[/*2*/])
+                        {
+                            int iPicture = ii / 90;
+                            int i = ii % 90;
+                            if (iPicture == 0)
+                            {
+                                // outer circular arc
+                                double maxAreaBasedMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                double angle = (i+.5)/90*(Math.PI/2);
+                                double xMax = maxAreaBasedMomentMag * Math.cos(angle);
+                                double yMax = maxAreaBasedMomentMag * Math.sin(angle);
+
+                                putDatumHere[0] = xMax;
+                                putDatumHere[1] = yMax;
+                            }
+                            else if (iPicture == 1)
+                            {
+                                // more refined inner arc
+                                double angle = (i+.5)/90*(Math.PI/2);
+                                double rMax = Math.cos(angle)*Math.sin(angle)/2;
+                                double xMax = Math.cos(angle)*rMax;
+                                double yMax = Math.sin(angle)*rMax;
+
+                                putDatumHere[0] = xMax;
+                                putDatumHere[1] = yMax;
+                            }
+                            else
+                            {
+                                // another inner arc somewhere else (not interesting)
+                                double cosFocusAngle = Math.cos(focusPrimalAngleMinusDualAngle);
+                                double maxAreaBasedMomentMag = cosFocusAngle / 4;
+                                double angle = (i+.5)/90*(Math.PI/2);
+                                double xMax = maxAreaBasedMomentMag * Math.cos(angle);
+                                double yMax = maxAreaBasedMomentMag * Math.sin(angle);
+
+                                putDatumHere[0] = xMax;
+                                putDatumHere[1] = yMax;
+                            }
+                        }
+                    },
+                    new DataFetcher() { // dataFetcher
+                        public int nData()
+                        {
+                            return spiralModel.params.n.get();
+                        }
+                        double scratch[] = new double[3];
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            int val = spiralModel.theList[i];
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+
+                            double center[] = spiralModel.centers[i];
+                            double weight = spiralModel.weights[i];
+
+                            if (focusPrimalAngleMinusDualAngle > primalAng)
+                                updateCenterAndWeightWhenPriscillaMoved(
+                                    center[0], center[1], weight, primalAng,
+                                    focusPrimalAngleMinusDualAngle,
+                                    scratch);
+                            else
+                                updateCenterAndWeightWhenDudleyMoved(
+                                    center[0], center[1], weight, primalAng,
+                                    focusPrimalAngleMinusDualAngle,
+                                    scratch);
+
+                            double newCenterX = scratch[0];
+                            double newCenterY = scratch[1];
+                            double newWeight = scratch[2];
+                            double newArea = newWeight * .5;
+                            putDatumHere[0] = newCenterX * newArea;
+                            putDatumHere[1] = newCenterY * newArea;
                         }
                     }
                 );
@@ -3163,6 +3290,8 @@ public class SpiralApplet
         private JFrame theHelpWindow = null;
         private Listenable.String windowTitle = new Listenable.String("Spiral Applet");
 
+        private Listenable.Listener repaintWhenValueChanged = null;
+
         private Listenable.Listener showRungsFlagListener = null;
         private Listenable.Listener focusListener = null;
         private Listenable.Listener pixelsPerPartListener = null;
@@ -3466,7 +3595,7 @@ public class SpiralApplet
         textComponent.setEnabled(true); // otherwise not selectable
     }
 
-    static JRow makeIncrementableTextFieldForInt(final Listenable.Int f, final String name, final int increment)
+    static JRow makeIncrementableTextFieldForInt(final Listenable.Number f, final String name, final double increment)
     {
         final java.awt.Color asciiToColor[] = new java.awt.Color[128];
         asciiToColor[' '] = null;
@@ -3487,7 +3616,7 @@ public class SpiralApplet
                 addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
-                        f.set(f.get()-increment);
+                        f.setDouble(f.getDouble()-increment);
                     }
                 });
                 setToolTipText("<html>decrement "+name+"</html>");
@@ -3512,7 +3641,7 @@ public class SpiralApplet
                 addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
-                        f.set(f.get()+increment);
+                        f.setDouble(f.getDouble()+increment);
                     }
                 });
                 setToolTipText("<html>increment "+name+"</html>");
