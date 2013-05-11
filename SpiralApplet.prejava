@@ -7,6 +7,9 @@
     BUG: bad ticker anim when pixelsPerIncr = 4
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown, performance went down, forevermore??
+    BUG: some of the drawing is wrong for different orientations
+
+    TODO: keystrokes to change orientation
     TODO: smooth out animation when going very slowly
     TODO: gui for scale
     todo: check out LWJGL for consistent frame rate?
@@ -830,7 +833,7 @@ public class SpiralApplet
                             {
                                 if (spiralOrientationNumber != -1)
                                 {
-                                    applet.theSpiralView.spiralOrientationNumber.set(spiralOrientationNumber);
+                                    applet.theSpiralView.orientationNumber.set(spiralOrientationNumber);
                                 }
                             }
                         });
@@ -1213,7 +1216,7 @@ public class SpiralApplet
             theSpiralView.showRungsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.pastelsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.focusAngleDegrees.addListener(repaintWhenValueChanged);
-            theSpiralView.spiralOrientationNumber.addListener(repaintWhenValueChanged);
+            theSpiralView.orientationNumber.addListener(repaintWhenValueChanged);
 
 
             if (eventVerbose >= 1) System.out.println("out init");
@@ -1577,6 +1580,7 @@ public class SpiralApplet
                                    false, // drawPrimalFlag
                                    true, // drawDualFlag
                                    false, // drawRungsFlag
+                                   theSpiralView.orientationNumber.get(),
                                    theSpiralView.pastelsFlag.get(),
                                    antiAliasingFlag);
                     }
@@ -1590,6 +1594,7 @@ public class SpiralApplet
                                    true, // drawPrimalFlag
                                    false, // drawDualFlag
                                    theSpiralView.showRungsFlag.get(), // drawRungsFlag
+                                   theSpiralView.orientationNumber.get(),
                                    theSpiralView.pastelsFlag.get(),
                                    antiAliasingFlag);
                     }
@@ -2072,7 +2077,7 @@ public class SpiralApplet
             public Rational focusQuantum = new Rational(1,quantaPerPart.get());
             public Rational focusAnimationVelocity = new Rational(0,1);
             public Listenable.Double focusAngleDegrees = new Listenable.Double(0.,90.,45.);
-            public Listenable.Int spiralOrientationNumber = new Listenable.Int(0,12, 1);
+            public Listenable.Int orientationNumber = new Listenable.Int(0,12, 1);
             public SpiralView()
             {}
         }; // public class SpiralView
@@ -3031,6 +3036,7 @@ public class SpiralApplet
                                      boolean drawPrimalFlag,
                                      boolean drawDualFlag,
                                      boolean drawRungsFlag,
+                                     int orientationNumber,
                                      boolean pastelsFlag,
                                      boolean antiAliasFlag)
         {
@@ -3089,6 +3095,30 @@ public class SpiralApplet
             int returnValue = 0;
 
 
+            // fudge using orientationNumber-- orientationNumber=1 means don't rotate
+            double orientationAngleFudge = (orientationNumber-1)/12.*(2*Math.PI); // naive
+            {
+                double primalAng = Math.PI/2 * ((val+.5)/nParts);
+                switch (orientationNumber % 3)
+                {
+                    case 0:
+                        // rotate bisector to x axis
+                        orientationAngleFudge = -primalAng*.5;
+                        break;
+                    case 1:
+                        // rotate dual angle (0) to x axis-- already there
+                        orientationAngleFudge = 0.;
+                        break;
+                    case 2:
+                        // rotate primal to y axis
+                        orientationAngleFudge = Math.PI*.5 - primalAng;
+                        break;
+                    default:
+                        assert(false);
+                }
+                orientationAngleFudge += (orientationNumber/3) * (Math.PI*.5);
+            }
+
 
             if (drawPrimalFlag)
             {
@@ -3096,7 +3126,7 @@ public class SpiralApplet
                     mg.setColor(pastels[(int)(2*val+1)]);
                 else
                     mg.setColor(java.awt.Color.cyan);
-                double primalAng = Math.PI/2 * ((val+.5)/nParts);
+                double primalAng = Math.PI/2 * ((val+.5)/nParts) + orientationAngleFudge;
                 mg.drawLine(0.,0.,scale*Math.cos(primalAng),scale*Math.sin(primalAng),antiAliasFlag);
             }
 
@@ -3127,8 +3157,10 @@ public class SpiralApplet
                 }
 
 
-                double dualAng = 0;
-                double primalAng = Math.PI/2 * ((val+.5)/nParts);
+                double dualAng = 0 + orientationAngleFudge;
+                double primalAng = Math.PI/2 * ((val+.5)/nParts) + orientationAngleFudge;
+
+
                 double dualR = scale;
                 double primalR = scale;
 
@@ -3222,7 +3254,10 @@ public class SpiralApplet
                             (thisVal<prevVal != (prevVal<prevPrevVal)))
                         {
                             java.awt.Color savedColor = mg.getColor();
-                            mg.setColor(dimPink);
+                            if (pastelsFlag)
+                                mg.setColor(savedColor.darker().darker());
+                            else
+                                mg.setColor(dimPink);
                             mg.drawLine(primalX, primalY,
                                         dualX, dualY,
                                         antiAliasFlag);
@@ -3291,7 +3326,10 @@ public class SpiralApplet
                             (thisVal<prevVal != (prevVal<prevPrevVal))))
                         {
                             java.awt.Color savedColor = mg.getColor();
-                            mg.setColor(dimPink);
+                            if (pastelsFlag)
+                                mg.setColor(savedColor.darker().darker());
+                            else
+                                mg.setColor(dimPink);
                             mg.drawLine(primalX, primalY,
                                         dualX, dualY,
                                         antiAliasFlag);
@@ -3374,7 +3412,7 @@ public class SpiralApplet
                         mg.setColor(java.awt.Color.yellow);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
-                                        0., // startRadians
+                                        0.+orientationAngleFudge, // startRadians
                                         initialPrimalAng, // arcRadians
                                         1., // thickness in pixels
                                         antiAliasFlag);
@@ -3392,7 +3430,7 @@ public class SpiralApplet
                                      5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
-                                        0., // startRadians
+                                        0.+orientationAngleFudge, // startRadians
                                         initialPrimalAng, // arcRadians
                                         1., // thickness in pixels
                                         antiAliasFlag);
@@ -4114,7 +4152,6 @@ public class SpiralApplet
         frame.setSize(718,583);
         frame.setSize(648,600);
         frame.setSize(512,353);
-        frame.setSize(20,20);
 
         frame.setVisible(true);
 
