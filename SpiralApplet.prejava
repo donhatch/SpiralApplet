@@ -2171,6 +2171,48 @@ public class SpiralApplet
             }
         } // updateCenterAndWeightWhenDudleyMoved
 
+        // DEBUGGING-- sanity check that two dudleys is the same as the cumulative dudley.
+        // yes, this does appear to be working correctly
+        // (when I substitute this for the normal one, the prints
+        // indicate that the two answers are the same)
+        public static void updateCenterAndWeightWhenDudleyMoved2(
+                double oldCenterX,
+                double oldCenterY,
+                double oldWeight,
+                double oldPrimalMinusDualAng,
+                double newPrimalMinusDualAng,
+                double newCenterAndWeight[])
+        {
+            System.out.println("in dudley moved 2");
+            double midPrimalMinusDualAng = LERP(oldPrimalMinusDualAng, newPrimalMinusDualAng, .654321);
+            double midCenterAndWeight[] = newCenterAndWeight; // use it as scratch
+            updateCenterAndWeightWhenDudleyMoved(
+                oldCenterX,
+                oldCenterY,
+                oldWeight,
+                oldPrimalMinusDualAng,
+                midPrimalMinusDualAng,
+                midCenterAndWeight);
+            PRINTVEC(midCenterAndWeight);
+            updateCenterAndWeightWhenDudleyMoved(
+                midCenterAndWeight[0],
+                midCenterAndWeight[1],
+                midCenterAndWeight[2],
+                midPrimalMinusDualAng,
+                newPrimalMinusDualAng,
+                newCenterAndWeight);
+            PRINTVEC(newCenterAndWeight);
+            updateCenterAndWeightWhenDudleyMoved(
+                oldCenterX,
+                oldCenterY,
+                oldWeight,
+                oldPrimalMinusDualAng,
+                newPrimalMinusDualAng,
+                newCenterAndWeight);
+            PRINTVEC(newCenterAndWeight);
+            System.out.println("in dudley moved 2");
+        }
+
         // Actually we know which one moved (assuming spiraling outward).
         public static void updateCenterAndWeightWhenSomeoneMoved(
                 double oldCenterX,
@@ -2197,6 +2239,7 @@ public class SpiralApplet
                     newPrimalMinusDualAng,
                     newCenterAndWeight);
         } // updateCenterAndWeightWhenSomeoneMoved
+
                         
 
 
