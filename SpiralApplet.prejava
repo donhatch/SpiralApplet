@@ -23,6 +23,7 @@
           but then a few minutes later, it's throttled again.  weird weird weird.
           actually maybe when non-throttled, I'd been running it for a while?
     TODO: allow saving/restoring window positions, but in a discoverable non-evil way
+    TODO: can we automatically detect missing @Override's?  the web says not using javac, but Eclipse can do it I think
 */
 
 #include "macros.h"
@@ -513,6 +514,7 @@ public class SpiralApplet
                             add(new JRepeatingButton("") {
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -540,6 +542,7 @@ public class SpiralApplet
                             add(new JRepeatingButton("") {
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -567,6 +570,7 @@ public class SpiralApplet
                             add(new JRepeatingButton("") {
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -594,6 +598,7 @@ public class SpiralApplet
                             add(new JRepeatingButton("") {
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -621,6 +626,7 @@ public class SpiralApplet
                             add(new JRepeatingButton("") {
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -672,6 +678,7 @@ public class SpiralApplet
                     add(new JRepeatingButton("") {
                         public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45,45); }
                         public java.awt.Dimension getMinimumSize()   { return getPreferredSize(); }
+                        @Override
                         public void paint(java.awt.Graphics g)
                         {
                             super.paint(g);
@@ -1531,6 +1538,7 @@ public class SpiralApplet
             //        if you put it in the mouseEntered handler or something,
             //        though this can lead to various unpredictabilities.
             //
+            @Override
             public boolean isFocusTraversable()
             {
                 return true;
@@ -1544,6 +1552,7 @@ public class SpiralApplet
 
 
             // PAINT/DISPLAY/DRAW
+            @Override
             public void paintComponent(java.awt.Graphics g)
             {
                 //try { Thread.sleep(50); } catch (InterruptedException e) {}
@@ -4112,6 +4121,7 @@ public class SpiralApplet
             add(new JRepeatingButton("") {
                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
+                @Override
                 public void paint(java.awt.Graphics g)
                 {
                     super.paint(g);
@@ -4136,6 +4146,7 @@ public class SpiralApplet
             add(new JRepeatingButton("") {
                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
+                @Override
                 public void paint(java.awt.Graphics g)
                 {
                     super.paint(g);
