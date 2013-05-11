@@ -1343,10 +1343,16 @@ public class SpiralApplet
                 int nItersPrimal=0, nItersDual=0;
                 if (showTickerFlag.get())
                 {
+                    // I used to like to draw it centered in the window,
+                    // but now I think I like to draw it with the lower edge
+                    // centered.
+                    double offset = theSpiralModel.params.nParts.get()
+                                  * theSpiralView.pixelsPerPart.get()
+                                  * .25;
                     drawTicker(g,
                                size,
-                               size.width/2.,
-                               size.height/2.,
+                               size.width/2.-offset,
+                               size.height/2.-offset,
                                theSpiralModel,
                                theSpiralView);
                 }
@@ -3134,7 +3140,8 @@ public class SpiralApplet
                         // (scaled so max possible is 1).
                         mg.setColor(java.awt.Color.getHSBColor((float)((val+.5)/nParts), .5f, 1.f)); // lerp from red to green
                         arcRadius = Math.sin(2*initialPrimalAng) * scale;
-                        mg.drawPoint(centerX*(2*twiceArea),centerY*(2*twiceArea),5);
+                        mg.drawPoint(centerX*(2*twiceArea),centerY*(2*twiceArea),
+                                     5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
                                         0., // startRadians
@@ -3166,7 +3173,7 @@ public class SpiralApplet
                                 mg.setColor(java.awt.Color.getHSBColor((float)((speculativeNextVal+.5)/nParts), .5f, 1.f));
                                 mg.drawPoint(speculativeNextCenterX*(2*speculativeNextTwiceArea),
                                              speculativeNextCenterY*(2*speculativeNextTwiceArea),
-                                             1);
+                                             3);
                             }
                         }
                     }
