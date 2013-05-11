@@ -810,6 +810,13 @@ public class SpiralApplet
                                 if (mouseIsInButton)
                                     repaint();
                             }
+                            public void mouseDragged(java.awt.event.MouseEvent mouseEvent)
+                            {
+                                mouseX = mouseEvent.getX();
+                                mouseY = mouseEvent.getY();
+                                if (mouseIsInButton)
+                                    repaint();
+                            }
                         });
                         // apparently we don't get a repaint when rollover ends,
                         // and we need one to remove the highlighting, so...
@@ -831,10 +838,11 @@ public class SpiralApplet
                         addActionListener(new java.awt.event.ActionListener() {
                             public void actionPerformed(java.awt.event.ActionEvent e)
                             {
+                                // note, this is a repeating button
+                                // so we'll get events as long as the button is down. cool!
+                                // that means the user can drag around and change the orientation that way.
                                 if (spiralOrientationNumber != -1)
-                                {
                                     applet.theSpiralView.orientationNumber.set(spiralOrientationNumber);
-                                }
                             }
                         });
                         setToolTipText("<html>spiral orientation</html>");
@@ -1006,7 +1014,6 @@ public class SpiralApplet
                 theControlPanelWindow.getContentPane().add(controlPanel);
 
                 theControlPanelWindow.setLocation(730, 10);
-                theControlPanelWindow.setLocation(10, 90);
                 theControlPanelWindow.setSize(preferredWidth+34, preferredHeight); // empirical-- will be wrong on another machine, no doubt XXX TODO: can we compute a good preferred size? pack() or something? just want to pack width, not height, I think?
                 theControlPanelWindow.setVisible(true);
             }
@@ -3400,6 +3407,20 @@ public class SpiralApplet
                     //assert(centerY > 0.);
 
                     {
+                        double initialPrimalAng = (val+.5)/nParts*(Math.PI*.5); // dualAng is 0
+
+                        if (pastelsFlag)
+                            mg.setColor(pastels[(int)(2*val+1)]);
+                        else
+                            mg.setColor(gray128);
+
+                        mg.drawThickArc(-scale,-scale,   // bounding box corner
+                                        2*scale, 2*scale, // diameter
+                                        0.+orientationAngleFudge, // startRadians
+                                        initialPrimalAng, // arcRadians
+                                        1., // thickness in pixels
+                                        antiAliasFlag);
+
                         // Part of the theorem I'm trying to prove
                         // says that:
                         //      |moment| <= |p| |d|^2 sin(2 t) / 4   
@@ -3407,7 +3428,6 @@ public class SpiralApplet
                         // i.e. |center| <= |p| |d|^2 sin(2 t) / (2*twiceArea)
                         // I.e. it's in a certain pie slice, bounded by two rays
                         // and an arc.  Draw that arc.
-                        double initialPrimalAng = (val+.5)/nParts*(Math.PI*.5); // dualAng is 0
                         double arcRadius = Math.sin(2*initialPrimalAng) / (2*twiceArea) * scale;
                         mg.setColor(java.awt.Color.yellow);
                         mg.drawThickArc(-arcRadius,-arcRadius,
