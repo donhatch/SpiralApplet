@@ -515,7 +515,7 @@ public class SpiralApplet
                                             applet.accelBackward();
                                         }
                                     });
-                                    setToolTipText("<html>accelerate backward</html>");
+                                    setToolTipText("<html>accelerate backward<br>(shift-left-arrow key)</html>");
                                 }}, stretchxy);
                                 add(new JRepeatingButton("") {
                                     public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
@@ -541,7 +541,7 @@ public class SpiralApplet
                                             applet.stepBackward();
                                         }
                                     });
-                                    setToolTipText("<html>step backward</html>");
+                                    setToolTipText("<html>step backward<br>(left-arrow key)</html>");
                                 }}, stretchxy);
                                 add(new JRepeatingButton("") {
                                     public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
@@ -567,7 +567,7 @@ public class SpiralApplet
                                             applet.pause();
                                         }
                                     });
-                                    setToolTipText("<html>stop</html>");
+                                    setToolTipText("<html>stop<br>(space key)</html>");
                                 }}, stretchxy);
                                 add(new JRepeatingButton("") {
                                     public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
@@ -593,7 +593,7 @@ public class SpiralApplet
                                             applet.stepForward();
                                         }
                                     });
-                                    setToolTipText("<html>step forward</html>");
+                                    setToolTipText("<html>step forward<br>(right-arrow key)</html>");
                                 }}, stretchxy);
                                 add(new JRepeatingButton("") {
                                     public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
@@ -619,7 +619,7 @@ public class SpiralApplet
                                             applet.accelForward();
                                         }
                                     });
-                                    setToolTipText("<html>accelerate forward</html>");
+                                    setToolTipText("<html>accelarate forward<br>(shift-right-arrow key)</html>");
                                 }}, stretchxy);
                             }});
                         }});
