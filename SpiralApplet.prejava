@@ -29,7 +29,7 @@
 #define java_awt_event_MouseEvent_BUTTON2 2
 #define java_awt_event_MouseEvent_BUTTON3 3
 
-//import com.donhatchsw.util.Arrays;
+import com.donhatchsw.util.Arrays;
 import com.donhatchsw.util.MyMath;
 import com.donhatchsw.util.VecMath;
 //import com.donhatchsw.util.SortStuff;
@@ -356,7 +356,8 @@ public class SpiralApplet
                 final java.awt.Color asciiToColor[] = new java.awt.Color[128];
                 asciiToColor[' '] = null;
                 asciiToColor['b'] = java.awt.Color.black;
-
+                asciiToColor['g'] = new java.awt.Color(128,128,128); // 50% gray
+                asciiToColor['r'] = java.awt.Color.red;
 
                 /*
                 contentPane.add(new JSeparator(), stretchx);
@@ -475,177 +476,368 @@ public class SpiralApplet
                 contentPane.add(new JLabel("View"));
                 add(new JRow() {{
                     add(new JLabel("        ")); // indent a bit
-                    add(new JRow() {{
-                        add(new JCol() {{
-                            add(new JRow() {{
-                                add(new JButton("reset focus to") {{
-                                    setMargin(nomargin);
-                                    addActionListener(new java.awt.event.ActionListener() {
-                                        public void actionPerformed(java.awt.event.ActionEvent e)
-                                        {
-                                            applet.theSpiralView.focus.set(applet.theSpiralView.resetFocusTo.get(),1);
-                                            applet.theCanvas.repaint();
-                                        }
-                                    });
-                                }}, centerjustify);
-                                add(new JTextFieldForNumber(applet.theSpiralView.resetFocusTo));
-                            }});
-                            add(new JRow() {{
-                                add(new JRepeatingButton("") {
-                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                    public void paint(java.awt.Graphics g)
+                    add(new JCol() {{
+                        add(new JRow() {{
+                            add(new JButton("reset focus to") {{
+                                setMargin(nomargin);
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
-                                        super.paint(g);
-                                        drawPixmapCentered(g, getSize(), asciiToColor,
-                                                           new String[] {
-                                                              "   b  b",
-                                                              "  bb bb",
-                                                              " bbbbbb",
-                                                              "bbbbbbb",
-                                                              " bbbbbb",
-                                                              "  bb bb",
-                                                              "   b  b",
-                                                           });
+                                        applet.theSpiralView.focus.set(applet.theSpiralView.resetFocusTo.get(),1);
+                                        applet.theCanvas.repaint();
                                     }
-                                {
-                                    addActionListener(new java.awt.event.ActionListener() {
-                                        public void actionPerformed(java.awt.event.ActionEvent e)
-                                        {
-                                            applet.accelBackward();
-                                        }
-                                    });
-                                    setToolTipText("<html>accelerate backward<br>(shift-left-arrow key)</html>");
-                                }}, stretchxy);
-                                add(new JRepeatingButton("") {
-                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                    public void paint(java.awt.Graphics g)
-                                    {
-                                        super.paint(g);
-                                        drawPixmapCentered(g, getSize(), asciiToColor,
-                                                           new String[] {
-                                                              "   b bb",
-                                                              "  bb bb",
-                                                              " bbb bb",
-                                                              "bbbb bb",
-                                                              " bbb bb",
-                                                              "  bb bb",
-                                                              "   b bb",
-                                                           });
-                                    }
-                                {
-                                    addActionListener(new java.awt.event.ActionListener() {
-                                        public void actionPerformed(java.awt.event.ActionEvent e)
-                                        {
-                                            applet.stepBackward();
-                                        }
-                                    });
-                                    setToolTipText("<html>step backward<br>(left-arrow key)</html>");
-                                }}, stretchxy);
-                                add(new JRepeatingButton("") {
-                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                    public void paint(java.awt.Graphics g)
-                                    {
-                                        super.paint(g);
-                                        drawPixmapCentered(g, getSize(), asciiToColor,
-                                                           new String[] {
-                                                              "bbb bbb",
-                                                              "bbb bbb",
-                                                              "bbb bbb",
-                                                              "bbb bbb",
-                                                              "bbb bbb",
-                                                              "bbb bbb",
-                                                              "bbb bbb",
-                                                           });
-                                    }
-                                {
-                                    addActionListener(new java.awt.event.ActionListener() {
-                                        public void actionPerformed(java.awt.event.ActionEvent e)
-                                        {
-                                            applet.pause();
-                                        }
-                                    });
-                                    setToolTipText("<html>stop<br>(space key)</html>");
-                                }}, stretchxy);
-                                add(new JRepeatingButton("") {
-                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                    public void paint(java.awt.Graphics g)
-                                    {
-                                        super.paint(g);
-                                        drawPixmapCentered(g, getSize(), asciiToColor,
-                                                           new String[] {
-                                                              "bb b   ",
-                                                              "bb bb  ",
-                                                              "bb bbb ",
-                                                              "bb bbbb",
-                                                              "bb bbb ",
-                                                              "bb bb  ",
-                                                              "bb b   ",
-                                                           });
-                                    }
-                                {
-                                    addActionListener(new java.awt.event.ActionListener() {
-                                        public void actionPerformed(java.awt.event.ActionEvent e)
-                                        {
-                                            applet.stepForward();
-                                        }
-                                    });
-                                    setToolTipText("<html>step forward<br>(right-arrow key)</html>");
-                                }}, stretchxy);
-                                add(new JRepeatingButton("") {
-                                    public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
-                                    public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
-                                    public void paint(java.awt.Graphics g)
-                                    {
-                                        super.paint(g);
-                                        drawPixmapCentered(g, getSize(), asciiToColor,
-                                                           new String[] {
-                                                              "b  b   ",
-                                                              "bb bb  ",
-                                                              "bbbbbb ",
-                                                              "bbbbbbb",
-                                                              "bbbbbb ",
-                                                              "bb bb  ",
-                                                              "b  b   ",
-                                                           });
-                                    }
-                                {
-                                    addActionListener(new java.awt.event.ActionListener() {
-                                        public void actionPerformed(java.awt.event.ActionEvent e)
-                                        {
-                                            applet.accelForward();
-                                        }
-                                    });
-                                    setToolTipText("<html>accelarate forward<br>(shift-right-arrow key)</html>");
-                                }}, stretchxy);
-                            }});
+                                });
+                            }}, centerjustify);
+                            add(new JTextFieldForNumber(applet.theSpiralView.resetFocusTo));
                         }});
-                        add(new JLabel("    "));
-                        add(new JCol() {{
-                            add(new JTablePanel() {{
-                                add(new JLabel("Anim sleep ms:"));
-                                add(makeIncrementableTextFieldForInt(applet.animSleepMS, "number of milliseconds to sleep after each vsync pulse before calling repaint()", 1));
-                                advanceRow();
-                                add(new JLabel("Pixels per part:"));
-                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, "pixels per part in ticker and stats plots", 1));
-                                advanceRow();
-                                add(new JLabel("Time quanta per part:"));
-                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.quantaPerPart, "time quanta per part", 1));
+                        add(new JRow() {{
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "   b  b",
+                                                          "  bb bb",
+                                                          " bbbbbb",
+                                                          "bbbbbbb",
+                                                          " bbbbbb",
+                                                          "  bb bb",
+                                                          "   b  b",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.accelBackward();
+                                    }
+                                });
+                                setToolTipText("<html>accelerate backward<br>(shift-left-arrow key)</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "   b bb",
+                                                          "  bb bb",
+                                                          " bbb bb",
+                                                          "bbbb bb",
+                                                          " bbb bb",
+                                                          "  bb bb",
+                                                          "   b bb",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.stepBackward();
+                                    }
+                                });
+                                setToolTipText("<html>step backward<br>(left-arrow key)</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                          "bbb bbb",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.pause();
+                                    }
+                                });
+                                setToolTipText("<html>stop<br>(space key)</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "bb b   ",
+                                                          "bb bb  ",
+                                                          "bb bbb ",
+                                                          "bb bbbb",
+                                                          "bb bbb ",
+                                                          "bb bb  ",
+                                                          "bb b   ",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.stepForward();
+                                    }
+                                });
+                                setToolTipText("<html>step forward<br>(right-arrow key)</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "b  b   ",
+                                                          "bb bb  ",
+                                                          "bbbbbb ",
+                                                          "bbbbbbb",
+                                                          "bbbbbb ",
+                                                          "bb bb  ",
+                                                          "b  b   ",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.accelForward();
+                                    }
+                                });
+                                setToolTipText("<html>accelerate forward<br>(shift-right-arrow key)</html>");
+                            }}, stretchxy);
+                        }});
+                    }});
+                    add(new JLabel("    "));
+                    add(new JCol() {{
+                        add(new JTablePanel() {{
+                            add(new JLabel("Anim sleep ms:"));
+                            add(makeIncrementableTextFieldForInt(applet.animSleepMS, "number of milliseconds to sleep after each vsync pulse before calling repaint()", 1));
+                            advanceRow();
+                            add(new JLabel("Pixels per part:"));
+                            add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, "pixels per part in ticker and stats plots", 1));
+                            advanceRow();
+                            add(new JLabel("Time quanta per part:"));
+                            add(makeIncrementableTextFieldForInt(applet.theSpiralView.quantaPerPart, "time quanta per part", 1));
+                        }});
+                        add(new JRow() {{
+                            add(new JCheckBoxForBoolean("show rungs", applet.theSpiralView.showRungsFlag) {{
+                                setMargin(nomargin);
                             }});
-                            add(new JRow() {{
-                                add(new JCheckBoxForBoolean("show rungs", applet.theSpiralView.showRungsFlag) {{
-                                    setMargin(nomargin);
-                                }});
-                                add(new JCheckBoxForBoolean("pastels", applet.theSpiralView.pastelsFlag) {{
-                                    setMargin(nomargin);
-                                }});
+                            add(new JCheckBoxForBoolean("pastels", applet.theSpiralView.pastelsFlag) {{
+                                setMargin(nomargin);
                             }});
                         }});
                     }});
-                }});
+                    add(new JLabel("    "));
+                    add(new JRepeatingButton("") {
+                        public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45,45); }
+                        public java.awt.Dimension getMinimumSize()   { return getPreferredSize(); }
+                        public void paint(java.awt.Graphics g)
+                        {
+                            super.paint(g);
+                            // note the following is padded by 1 pixel on all sides,
+                            // to allow for highlighting to change color there
+                            String rows[] = new String[] {
+                                "                                     ",
+                                "                 b   b               ",
+                                "                 gg gg               ",
+                                "            b     b b    b           ",
+                                "            b     gbg    b           ",
+                                "        bg  b      b     b  gb       ",
+                                "         gbgb            bgbg        ",
+                                "           gb            bg          ",
+                                "     b                          b    ",
+                                "     gg                        gg    ",
+                                "      b                        b     ",
+                                "      gg                      gg     ",
+                                "   bbbbb                      bbbbb  ",
+                                "                                     ",
+                                "                                     ",
+                                "                                     ",
+                                " bg                               gb ",
+                                "  gbg                           gbg  ",
+                                "    bb                         bb    ",
+                                "  gbg                           gbg  ",
+                                " bg                               gb ",
+                                "                                     ",
+                                "                                     ",
+                                "                                     ",
+                                "   bbbbb                      bbbbb  ",
+                                "      gg                      gg     ",
+                                "      b                        b     ",
+                                "     gg                        gg    ",
+                                "     b                          b    ",
+                                "           gb            bg          ",
+                                "         gbgb            bgbg        ",
+                                "        bg  b      b     b  gb       ",
+                                "            b     gbg    b           ",
+                                "            b     b b    b           ",
+                                "                 gg gg               ",
+                                "                 b   b               ",
+                                "                                     ",
+                            };
+                            java.awt.Color fudgedAsciiToColor[] = asciiToColor;
+                            if (mouseIsInButton)
+                            {
+
+                                // find which little icon is in the given direction
+                                // and highlight it.
+                                // holy moly!
+
+                                java.awt.Dimension gsize = getSize();
+
+                                double angle = Math.atan2(-(mouseY-(gsize.height*.5)),
+                                                            mouseX-(gsize.width*.5));
+
+                                // round to nearest multiple of 30 degrees (i.e. 2pi/12)
+                                double angleQuantum = 2*Math.PI / 12;
+                                this.spiralOrientationNumber = (int)Math.round(angle/angleQuantum);
+                                this.spiralOrientationNumber = MOD(this.spiralOrientationNumber,12);
+                                angle = this.spiralOrientationNumber*angleQuantum;
+
+
+                                fudgedAsciiToColor = (java.awt.Color[])Arrays.copy(asciiToColor,1);
+                                fudgedAsciiToColor['!'] = java.awt.Color.getHSBColor((float)(angle/(2*Math.PI)), 1.f, 1.f);
+
+
+                                int center = (rows.length+1)/2;
+
+
+                                double cos = Math.cos(angle);
+                                double sin = Math.sin(angle);
+                                assert(rows.length == rows[0].length());
+
+                                int seedRow = -1, seedCol = -1;
+                                boolean foundSeed = false;
+                                FORI (i, center)
+                                {
+                                    seedCol = (int)Math.round(center + cos*(1+i));
+                                    seedRow = (int)Math.round(center - sin*(1+i));
+                                    if (rows[seedRow].charAt(seedCol) != ' ')
+                                    {
+                                        foundSeed = true;
+                                        break;
+                                    }
+                                }
+                                assert(foundSeed);
+
+                                // convert the whole thing to char array
+                                char chars[][] = new char[rows.length][];
+                                FORI (iRow, rows.length)
+                                    chars[iRow] = rows[iRow].toCharArray();
+
+                                // seed fill, setting outline to '!' (highlight color)
+                                {
+                                    boolean isSeen[][] = new boolean[rows.length][rows.length]; // false initially
+                                    int seen[][] = new int[rows.length*rows.length][2];
+                                    int nSeen = 0;
+                                    seen[nSeen][0] = seedRow;
+                                    seen[nSeen][1] = seedCol;
+                                    nSeen++;
+                                    FORI (iSeen, nSeen) // while nSeen is growing
+                                    {
+                                        int row0 = seen[iSeen][0];
+                                        int col0 = seen[iSeen][1];
+                                        if (chars[row0][col0] == ' ')
+                                        {
+                                            // don't proceed to neighbors, but change color
+                                            chars[row0][col0] = '!';
+                                        }
+                                        else
+                                        {
+                                            // don't proceed to neighbors, but change color
+                                            for (int drow = -1; drow <= 1; drow++)
+                                            for (int dcol = -1; dcol <= 1; dcol++)
+                                            {
+                                                if (drow==0 && dcol==0) continue;
+                                                int row1 = row0+drow;
+                                                int col1 = col0+dcol;
+                                                if (!INRANGE(0 <=, row1, < rows.length)
+                                                 || !INRANGE(0 <=, col1, < rows.length))
+                                                    assert(false); // shouldn't happen
+                                                if (isSeen[row1][col1]) continue;
+                                                isSeen[row1][col1] = true;
+                                                seen[nSeen][0] = row1;
+                                                seen[nSeen][1] = col1;
+                                                nSeen++;
+                                            }
+                                        }
+                                    }
+
+                                    if (false) // can change to true for debugging
+                                    {
+                                        fudgedAsciiToColor['w'] = java.awt.Color.white;
+                                        chars[seedRow][seedCol] = 'w';
+                                    }
+                                }
+
+                                // convert the whole thing back to Strings
+                                FORI (iRow, rows.length)
+                                    rows[iRow] = new String(chars[iRow]);
+
+                            }
+                            drawPixmapCentered(g, getSize(), fudgedAsciiToColor, rows);
+                        }
+                        boolean mouseIsInButton = false;
+                        int mouseX = -1;
+                        int mouseY = -1;
+                        int spiralOrientationNumber = -1; // gets set during paint
+                    {
+                        addMouseMotionListener(new java.awt.event.MouseAdapter() {
+                            public void mouseMoved(java.awt.event.MouseEvent mouseEvent)
+                            {
+                                mouseX = mouseEvent.getX();
+                                mouseY = mouseEvent.getY();
+                                if (mouseIsInButton)
+                                    repaint();
+                            }
+                        });
+                        // apparently we don't get a repaint when rollover ends,
+                        // and we need one to remove the highlighting, so...
+                        addMouseListener(new java.awt.event.MouseAdapter() {
+                            public void mouseEntered(java.awt.event.MouseEvent e)
+                            {
+                                mouseIsInButton = true;
+                                repaint();
+                            }
+                            public void mouseExited(java.awt.event.MouseEvent e)
+                            {
+                                mouseIsInButton = false;
+                                mouseX = -1;
+                                mouseY = -1;
+                                spiralOrientationNumber = -1;
+                                repaint();
+                            }
+                        });
+                        addActionListener(new java.awt.event.ActionListener() {
+                            public void actionPerformed(java.awt.event.ActionEvent e)
+                            {
+                                if (spiralOrientationNumber != -1)
+                                {
+                                    applet.theSpiralView.spiralOrientationNumber.set(spiralOrientationNumber);
+                                }
+                            }
+                        });
+                        setToolTipText("<html>spiral orientation</html>");
+                        setRolloverEnabled(false);
+                    }});
+                }}); // view contents row
                 contentPane.add(new JSeparator(), stretchx);
                 contentPane.add(new JLabel("Debug"));
                 add(new JRow() {{
@@ -811,6 +1003,7 @@ public class SpiralApplet
                 theControlPanelWindow.getContentPane().add(controlPanel);
 
                 theControlPanelWindow.setLocation(730, 10);
+                theControlPanelWindow.setLocation(10, 90);
                 theControlPanelWindow.setSize(preferredWidth+34, preferredHeight); // empirical-- will be wrong on another machine, no doubt XXX TODO: can we compute a good preferred size? pack() or something? just want to pack width, not height, I think?
                 theControlPanelWindow.setVisible(true);
             }
@@ -1020,6 +1213,7 @@ public class SpiralApplet
             theSpiralView.showRungsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.pastelsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.focusAngleDegrees.addListener(repaintWhenValueChanged);
+            theSpiralView.spiralOrientationNumber.addListener(repaintWhenValueChanged);
 
 
             if (eventVerbose >= 1) System.out.println("out init");
@@ -1878,6 +2072,7 @@ public class SpiralApplet
             public Rational focusQuantum = new Rational(1,quantaPerPart.get());
             public Rational focusAnimationVelocity = new Rational(0,1);
             public Listenable.Double focusAngleDegrees = new Listenable.Double(0.,90.,45.);
+            public Listenable.Int spiralOrientationNumber = new Listenable.Int(0,12, 1);
             public SpiralView()
             {}
         }; // public class SpiralView
@@ -3918,6 +4113,8 @@ public class SpiralApplet
         frame.setSize(601,600);
         frame.setSize(718,583);
         frame.setSize(648,600);
+        frame.setSize(512,353);
+        frame.setSize(20,20);
 
         frame.setVisible(true);
 
