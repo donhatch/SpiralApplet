@@ -512,7 +512,9 @@ public class SpiralApplet
                         }});
                         add(new JRow() {{
                             add(new JRepeatingButton("") {
+                                @Override
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
@@ -540,7 +542,9 @@ public class SpiralApplet
                                 setToolTipText("<html>accelerate backward<br>(shift-left-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
+                                @Override
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
@@ -568,7 +572,9 @@ public class SpiralApplet
                                 setToolTipText("<html>step backward<br>(left-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
+                                @Override
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
@@ -596,7 +602,9 @@ public class SpiralApplet
                                 setToolTipText("<html>stop<br>(space key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
+                                @Override
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
@@ -624,7 +632,9 @@ public class SpiralApplet
                                 setToolTipText("<html>step forward<br>(right-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
+                                @Override
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                @Override
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
@@ -676,7 +686,9 @@ public class SpiralApplet
                     }});
                     add(new JLabel("    "));
                     add(new JRepeatingButton("") {
+                        @Override
                         public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45,45); }
+                        @Override
                         public java.awt.Dimension getMinimumSize()   { return getPreferredSize(); }
                         @Override
                         public void paint(java.awt.Graphics g)
@@ -939,6 +951,7 @@ public class SpiralApplet
 
                             add(new JLabel("Window title:"));
                             add(new JTextFieldForString(applet.windowTitle) {
+                                @Override
                                 public java.awt.Dimension getPreferredSize()
                                 {
                                     java.awt.Dimension superSize = super.getPreferredSize();
@@ -946,6 +959,7 @@ public class SpiralApplet
                                     return new java.awt.Dimension(200, superSize.height);
                                 }
                                 // weird, getPreferredSize seems adequate when returning 100... but when returning 200, it turns to zero!? unless we also provide getMinimumSize
+                                @Override
                                 public java.awt.Dimension getMinimumSize()
                                 {
                                     return getPreferredSize();
@@ -1042,6 +1056,7 @@ public class SpiralApplet
 
 
                 java.awt.Component controlPanel = new SpiralAppletControlPanel(this) {
+                    @Override
                     public java.awt.Dimension getPreferredSize()
                     {
                         if (useScrollPane)
@@ -1049,6 +1064,7 @@ public class SpiralApplet
                         else
                             return super.getPreferredSize();
                     }
+                    @Override
                     public java.awt.Dimension getMinimumSize()
                     {
                         if (useScrollPane)
@@ -1199,6 +1215,7 @@ public class SpiralApplet
             }
         } // randomlyColorize
 
+        @Override
         public void init()
         {
             eventVerbose = getParameterInt("EventVerbose", eventVerbose);
@@ -1280,16 +1297,19 @@ public class SpiralApplet
             if (eventVerbose >= 1) System.out.println("out init");
         } // init
 
+        @Override
         public void start()
         {
             if (eventVerbose >= 1) System.out.println("in start");
             if (eventVerbose >= 1) System.out.println("out start");
         }
+        @Override
         public void stop()
         {
             if (eventVerbose >= 1) System.out.println("in stop");
             if (eventVerbose >= 1) System.out.println("out stop");
         }
+        @Override
         public void destroy()
         {
             if (eventVerbose >= 1) System.out.println("in destroy");
@@ -3912,6 +3932,7 @@ public class SpiralApplet
             });
         }
 
+        @Override
         public java.awt.Dimension getPreferredSize()
         {
             //System.out.println("in JTextFieldForNumber.getPreferredSize()");
@@ -3944,6 +3965,7 @@ public class SpiralApplet
         // weird, the following is called during horizontal shrinking
         // but not during horizontal expanding... if we don't do this too
         // then it looks wrong when shrinking.  what a hack...
+        @Override
         public java.awt.Dimension getMinimumSize()
         {
             //System.out.println("in JTextFieldForNumber.getMinimumSize()");
@@ -4119,7 +4141,9 @@ public class SpiralApplet
         asciiToColor['b'] = java.awt.Color.black;
         return new JRow() {{
             add(new JRepeatingButton("") {
+                @Override
                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
+                @Override
                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
                 @Override
                 public void paint(java.awt.Graphics g)
@@ -4144,7 +4168,9 @@ public class SpiralApplet
                 setToolTipText("<html>"+name+"</html>");
             }} );
             add(new JRepeatingButton("") {
+                @Override
                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
+                @Override
                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
                 @Override
                 public void paint(java.awt.Graphics g)
