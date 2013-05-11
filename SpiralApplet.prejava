@@ -3132,7 +3132,7 @@ public class SpiralApplet
                         // well hell, that actually wasn't very interesting.
                         // let's actually do the actual moment and arc too, in magenta.
                         // (scaled so max possible is 1).
-                        mg.setColor(java.awt.Color.magenta);
+                        mg.setColor(java.awt.Color.getHSBColor((float)((val+.5)/nParts), .5f, 1.f)); // lerp from red to green
                         arcRadius = Math.sin(2*initialPrimalAng) * scale;
                         mg.drawPoint(centerX*(2*twiceArea),centerY*(2*twiceArea),5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
@@ -3163,13 +3163,7 @@ public class SpiralApplet
                                 double speculativeNextCenterY = scratch[1];
                                 double speculativeNextTwiceArea = scratch[2];
 
-                                // pick a nice color from red to green
-                                double speculativeFrac = (speculativeNextVal+.5)/nParts;
-                                int g = (int)(speculativeFrac*255);
-                                int r = 255-g;
-                                int b = 0;
-                                mg.setColor(new java.awt.Color(r,g,b));
-
+                                mg.setColor(java.awt.Color.getHSBColor((float)((speculativeNextVal+.5)/nParts), .5f, 1.f));
                                 mg.drawPoint(speculativeNextCenterX*(2*speculativeNextTwiceArea),
                                              speculativeNextCenterY*(2*speculativeNextTwiceArea),
                                              1);
@@ -3326,9 +3320,9 @@ public class SpiralApplet
         public SpiralView theSpiralView = new SpiralView();
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
@@ -3891,7 +3885,7 @@ public class SpiralApplet
                 public void run()
                 {
                     System.out.println("in thread run");
-                    System.out.println("    sleeping forever");
+                    System.out.println("    sleeping forever (http://www.javamex.com/tutorials/threads/sleep_issues.shtml)");
                     try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException e) {}
                     assert(false);
                     System.out.println("out thread run");
