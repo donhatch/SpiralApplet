@@ -652,14 +652,14 @@ public class SpiralApplet
                         add(new JCheckBoxForBoolean("show model ticker", applet.showTickerFlag) {{
                             setMargin(nomargin);
                         }});
+                        add(new JCheckBoxForBoolean("show model spiral", applet.showSpiralFlag) {{
+                            setMargin(nomargin);
+                        }});
                         add(new JRow() {{
-                            add(new JCheckBoxForBoolean("show model spiral", applet.showSpiralFlag) {{
+                            add(new JCheckBoxForBoolean("show model stats", applet.showStatsFlag) {{
                                 setMargin(nomargin);
                             }});
                             add(makeIncrementableTextFieldForInt(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
-                        }});
-                        add(new JCheckBoxForBoolean("show model stats", applet.showStatsFlag) {{
-                            setMargin(nomargin);
                         }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
                             setMargin(nomargin);
