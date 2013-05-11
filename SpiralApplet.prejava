@@ -2,11 +2,10 @@
     Notes:
         Uses System.nanoTime which requires java >= 1.4
 
-    BUG: Time quanta per part doesn't take effect til animation stopped and restarted
-    BUG: on assert fail in paint, displayed line number is too small by a few lines
-    BUG: bad ticker anim when pixelsPerIncr = 4
+    BUG: trail shouldn't move!
+    BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
-    BUG: as soon as a tooltip is shown, performance went down, forevermore??
+    BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??
     BUG: some of the drawing is wrong for different orientations
 
     TODO: keystrokes to change orientation
@@ -2127,6 +2126,9 @@ public class SpiralApplet
                 double newPrimalMinusDualAng,
                 double newCenterAndWeight[])
         {
+            double oldMomentX = oldWeight * oldCenterX;
+            double oldMomentY = oldWeight * oldCenterY;
+
             assumpt(newPrimalMinusDualAng <= oldPrimalMinusDualAng);
             // dualAng is increasing... (assuming newPrimalMinusDual < oldPrimalMinusDual).
             // decrease primalAng to compensate,
@@ -2136,33 +2138,37 @@ public class SpiralApplet
                           / Math.sin(oldPrimalMinusDualAng);
             assert(shrink <= 1.);
 
-            double weightIncr = shrink*Math.sin(oldPrimalMinusDualAng-newPrimalMinusDualAng);
-            assert(weightIncr >= 0.);
-            double oldWeightShrunk = oldWeight * SQR(shrink);
-            double newWeight = oldWeightShrunk + weightIncr;
-
             // angle to rotate previous picture by (rotate CW, so it's negative)
             double t = newPrimalMinusDualAng-oldPrimalMinusDualAng;
             assert(t <= 0.);
             double ct = Math.cos(t);
             double st = Math.sin(t);
-            double m[][] = {
-                {ct,st},
-                {-st,ct},
-            };
-            double newCenterX = m[0][0]*oldCenterX + m[1][0]*oldCenterY;
-            double newCenterY = m[0][1]*oldCenterX + m[1][1]*oldCenterY;
 
+            // old moment in new space is old moment shrunk by shrink^2 and rotated
+            double oldMomentInNewSpaceX = SQR(shrink) * (oldMomentX * ct - oldMomentY * st);
+            double oldMomentInNewSpaceY = SQR(shrink) * (oldMomentX * st + oldMomentY * ct);
+
+            // worked this out on paper
+            double weightIncrInNewSpace = shrink*Math.sin(oldPrimalMinusDualAng-newPrimalMinusDualAng);
+            assert(weightIncrInNewSpace >= 0.);
+
+            double newMomentX = oldMomentInNewSpaceX + weightIncrInNewSpace * Math.cos(newPrimalMinusDualAng);
+            double newMomentY = oldMomentInNewSpaceY + weightIncrInNewSpace * Math.sin(newPrimalMinusDualAng);
+            double newWeight = SQR(shrink)*oldWeight + weightIncrInNewSpace;
             if (newWeight == 0.)
-                assert(weightIncr == 0.);
+            {
+                // it's a bit unfortunate to lose the center but oh well
+                newCenterAndWeight[0] = 0.;
+                newCenterAndWeight[1] = 0.;
+                newCenterAndWeight[2] = 0.;
+            }
             else
             {
-                newCenterX = LERP(newCenterX, Math.cos(newPrimalMinusDualAng), weightIncr/newWeight);
-                newCenterY = LERP(newCenterY, Math.sin(newPrimalMinusDualAng), weightIncr/newWeight);
+                newCenterAndWeight[0] = newMomentX / newWeight;
+                newCenterAndWeight[1] = newMomentY / newWeight;
+                newCenterAndWeight[2] = newWeight;
+                //PRINTVEC(newCenterAndWeight);
             }
-            newCenterAndWeight[0] = newCenterX;
-            newCenterAndWeight[1] = newCenterY;
-            newCenterAndWeight[2] = newWeight;
         } // updateCenterAndWeightWhenDudleyMoved
 
         // Actually we know which one moved (assuming spiraling outward).
@@ -3482,7 +3488,7 @@ public class SpiralApplet
                             // for every possible *next* value (from initialPrimalAng),
                             // show the moment of it.
                             double scratch[] = new double[3];
-                            FORI (speculativeNextVal, nParts)
+                            FORIDOWN (speculativeNextVal, nParts)
                             {
                                 double speculativeNextPrimalAng = (speculativeNextVal+.5)/nParts*(Math.PI*.5);
                                 updateCenterAndWeightWhenSomeoneMoved(
@@ -3496,12 +3502,30 @@ public class SpiralApplet
                                 double speculativeNextCenterY = scratch[1];
                                 double speculativeNextTwiceArea = scratch[2];
 
+                                // sanity check:
+                                // when priscilla moving (i.e. primal angle increasing),
+                                // the values in the upward trail should stay constant.
+                                // when dudley moving (i.e. primal angle decreasing),
+                                // the values in the downward trail should stay constant.
+
+                                //if (speculativeNextPrimalAng >= initialPrimalAng)
+                                if (speculativeNextPrimalAng <= initialPrimalAng)
+                                {
+                                    System.out.print("    "+doubleToStringNice(RTOD(initialPrimalAng))+" -> "+doubleToStringNice(RTOD(speculativeNextPrimalAng))+":");
+                                    System.out.println(" "+speculativeNextCenterX*speculativeNextTwiceArea
+                                                       +" "
+                                                       +speculativeNextCenterY*speculativeNextTwiceArea
+                                                       +" "
+                                                       +speculativeNextTwiceArea);
+                                }
+
                                 if (pastelsFlag)
                                     mg.setColor(pastels[speculativeNextVal*2+1]);
                                 mg.drawPoint(speculativeNextCenterX*(2*speculativeNextTwiceArea),
                                              speculativeNextCenterY*(2*speculativeNextTwiceArea),
                                              pastelsFlag ? 3 : 1);
                             }
+                            OUT("-------------------");
                         }
                     }
                 }
