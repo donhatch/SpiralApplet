@@ -635,8 +635,13 @@ public class SpiralApplet
                                 add(new JLabel("Time quanta per part:"));
                                 add(makeIncrementableTextFieldForInt(applet.theSpiralView.quantaPerPart, "time quanta per part", 1));
                             }});
-                            add(new JCheckBoxForBoolean("show rungs", applet.theSpiralView.showRungsFlag) {{
-                                setMargin(nomargin);
+                            add(new JRow() {{
+                                add(new JCheckBoxForBoolean("show rungs", applet.theSpiralView.showRungsFlag) {{
+                                    setMargin(nomargin);
+                                }});
+                                add(new JCheckBoxForBoolean("pastels", applet.theSpiralView.pastelsFlag) {{
+                                    setMargin(nomargin);
+                                }});
                             }});
                         }});
                     }});
@@ -1013,6 +1018,7 @@ public class SpiralApplet
             showSpiralFlag.addListener(repaintWhenValueChanged);
             showStatsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.showRungsFlag.addListener(repaintWhenValueChanged);
+            theSpiralView.pastelsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.focusAngleDegrees.addListener(repaintWhenValueChanged);
 
 
@@ -1221,9 +1227,16 @@ public class SpiralApplet
     #define CTRL(lowerCaseLetter) ((lowerCaseLetter)-'a' + 1)
                 switch (c)
                 {
+                    case ' ':
+                    {
+                        pause();
+                        break;
+                    }
                     case '\n':
+                    {
                         theCanvas.repaint();
                         break;
+                    }
                     case CTRL('q'): // quit
                     {
                         System.out.println("Aww.");
@@ -1354,7 +1367,8 @@ public class SpiralApplet
                                size.width/2.-offset,
                                size.height/2.-offset,
                                theSpiralModel,
-                               theSpiralView);
+                               theSpiralView,
+                               theSpiralView.pastelsFlag.get());
                 }
                 if (showSpiralFlag.get())
                 {
@@ -1369,6 +1383,7 @@ public class SpiralApplet
                                    false, // drawPrimalFlag
                                    true, // drawDualFlag
                                    false, // drawRungsFlag
+                                   theSpiralView.pastelsFlag.get(),
                                    antiAliasingFlag);
                     }
                     if (true)
@@ -1381,6 +1396,7 @@ public class SpiralApplet
                                    true, // drawPrimalFlag
                                    false, // drawDualFlag
                                    theSpiralView.showRungsFlag.get(), // drawRungsFlag
+                                   theSpiralView.pastelsFlag.get(),
                                    antiAliasingFlag);
                     }
                 }
@@ -1858,6 +1874,7 @@ public class SpiralApplet
             public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // must be >= 1
             public Listenable.Int quantaPerPart = new Listenable.Int(2, 1024, 1); // must be >= 1
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
+            public Listenable.Boolean pastelsFlag = new Listenable.Boolean(false);
             public Rational focusQuantum = new Rational(1,quantaPerPart.get());
             public Rational focusAnimationVelocity = new Rational(0,1);
             public Listenable.Double focusAngleDegrees = new Listenable.Double(0.,90.,45.);
@@ -2536,7 +2553,8 @@ public class SpiralApplet
                                       java.awt.Dimension gsize,
                                       double gCenterX, double gCenterY, // in pixels from upper-left corner of window
                                       SpiralModel spiralModel,
-                                      SpiralView spiralView)
+                                      SpiralView spiralView,
+                                      boolean pastelsFlag)
         {
             //System.out.println("    in drawTicker");
             int n = spiralModel.params.n.get();
@@ -2556,6 +2574,10 @@ public class SpiralApplet
             java.awt.Color gray64 = new java.awt.Color(64,64,64);
             java.awt.Color gray32 = new java.awt.Color(32,32,32);
 
+            java.awt.Color pastels[] = new java.awt.Color[2*nParts+1];
+            FORI(iPastel, 2*nParts+1)
+                pastels[iPastel] = java.awt.Color.getHSBColor((float)iPastel/(float)(2*nParts), .5f, 1.f);
+
 
             // Given gCenterX,gCenterY,
             // figure out the "base" pixel index.
@@ -2574,7 +2596,7 @@ public class SpiralApplet
             //PRINT(iyBase);
 
             // figure out where to draw rails, i.e. bounds
-            // of ticker stip.
+            // of ticker strip.
             // this should be the same regardless of focus.
             //  1->1
             //  2->1
@@ -2759,6 +2781,8 @@ public class SpiralApplet
                             thisY = prevY;
                             thisX = prevX + (prevVal-thisVal) * pixelsPerPart;
                         }
+                        if (pastelsFlag)
+                            g.setColor(pastels[(int)(prevVal)+thisVal+1]);
                         g.drawLine(prevX,prevY,thisX,thisY);
                         if (thisX >= gsize.width || thisY < 0)
                             break;
@@ -2789,6 +2813,8 @@ public class SpiralApplet
                             thisY = prevY;
                             thisX = prevX - (thisVal-prevVal) * pixelsPerPart;
                         }
+                        if (pastelsFlag)
+                            g.setColor(pastels[(int)(prevVal)+thisVal+1]);
                         g.drawLine(prevX,prevY,thisX,thisY);
                         if (thisX < 0 || thisY >= gsize.height)
                             break;
@@ -2810,6 +2836,7 @@ public class SpiralApplet
                                      boolean drawPrimalFlag,
                                      boolean drawDualFlag,
                                      boolean drawRungsFlag,
+                                     boolean pastelsFlag,
                                      boolean antiAliasFlag)
         {
             int debugLevel = 0; // 1 = global, 2 = and some per-increment
@@ -2860,7 +2887,26 @@ public class SpiralApplet
             java.awt.Color pink = new java.awt.Color(255,128,128);
             java.awt.Color dimPink = new java.awt.Color(128,64,64);
 
+            java.awt.Color pastels[] = new java.awt.Color[2*nParts+1];
+            FORI(iPastel, 2*nParts+1)
+                pastels[iPastel] = java.awt.Color.getHSBColor((float)iPastel/(float)(2*nParts), .5f, 1.f);
+
             int returnValue = 0;
+
+
+
+            if (drawPrimalFlag)
+            {
+                if (pastelsFlag)
+                    mg.setColor(pastels[(int)(2*val+1)]);
+                else
+                    mg.setColor(java.awt.Color.cyan);
+                double primalAng = Math.PI/2 * ((val+.5)/nParts);
+                mg.drawLine(0.,0.,scale*Math.cos(primalAng),scale*Math.sin(primalAng),antiAliasFlag);
+            }
+
+
+
 
             // scanDir=1: the part *after* (bigger than) the focus.
             // scanDir=-1: the part *before* (smaller than) the focus.
@@ -2942,6 +2988,8 @@ public class SpiralApplet
                         if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalX);
                         if (debugLevel >= 2 && scanDir > 0) PRINT(nextPrimalY);
 
+                        if (pastelsFlag)
+                            mg.setColor(pastels[(int)(prevVal)+thisVal+1]);
                         if (drawPrimalFlag)
                         {
                             mg.drawLine(primalX, primalY,
@@ -3010,6 +3058,8 @@ public class SpiralApplet
 
                         if (drawDualFlag)
                         {
+                            if (pastelsFlag)
+                                mg.setColor(pastels[(int)(prevVal)+thisVal+1]);
                             mg.drawLine(dualX, dualY,
                                         nextDualX, nextDualY,
                                         antiAliasFlag);
@@ -3138,7 +3188,10 @@ public class SpiralApplet
                         // well hell, that actually wasn't very interesting.
                         // let's actually do the actual moment and arc too, in magenta.
                         // (scaled so max possible is 1).
-                        mg.setColor(java.awt.Color.getHSBColor((float)((val+.5)/nParts), .5f, 1.f)); // lerp from red to green
+                        if (pastelsFlag)
+                            mg.setColor(pastels[(int)(2*val+1)]);
+                        else
+                            mg.setColor(java.awt.Color.magenta);
                         arcRadius = Math.sin(2*initialPrimalAng) * scale;
                         mg.drawPoint(centerX*(2*twiceArea),centerY*(2*twiceArea),
                                      5);
@@ -3170,10 +3223,11 @@ public class SpiralApplet
                                 double speculativeNextCenterY = scratch[1];
                                 double speculativeNextTwiceArea = scratch[2];
 
-                                mg.setColor(java.awt.Color.getHSBColor((float)((speculativeNextVal+.5)/nParts), .5f, 1.f));
+                                if (pastelsFlag)
+                                    mg.setColor(pastels[speculativeNextVal*2+1]);
                                 mg.drawPoint(speculativeNextCenterX*(2*speculativeNextTwiceArea),
                                              speculativeNextCenterY*(2*speculativeNextTwiceArea),
-                                             3);
+                                             pastelsFlag ? 3 : 1);
                             }
                         }
                     }
