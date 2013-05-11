@@ -12,6 +12,8 @@
     TODO: keystrokes to change orientation
     TODO: smooth out animation when going very slowly
     TODO: gui for scale
+    TODO: allow dragging ticker
+    TODO: allow dragging points on spiral? hmm
     todo: check out LWJGL for consistent frame rate?
     TODO: maybe JavaFX? she says it works well for vsync: http://www.java-gaming.org/index.php?topic=27763.0.  ah good, it's included in jdk 7.
     TODO: use javax.swing.Timer instead of my own custom thread
@@ -1816,7 +1818,7 @@ public class SpiralApplet
             public static class Params
             {
                 // XXX same thing in applet... should this be a little subclass?
-                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 1000); // must be positive multiple of 2
+                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 100*1000); // must be positive multiple of 2
                 public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be >= 2
                 public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
                 public Listenable.Int randomSeed = new Listenable.Int(0, (1<<31)-1, 1);
@@ -2677,7 +2679,7 @@ public class SpiralApplet
                     new DataFetcher() { // possibleBoundsFetcher
                         public int nData()
                         {
-                            return 3*90;
+                            return 4*90;
                         }
                         public void getDatum(int ii, double putDatumHere[/*2*/])
                         {
@@ -2705,7 +2707,7 @@ public class SpiralApplet
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
                             }
-                            else
+                            else if (iPicture == 2)
                             {
                                 // another inner arc somewhere else (not interesting)
                                 double cosFocusAngle = Math.cos(focusPrimalAngleMinusDualAngle);
@@ -2717,6 +2719,23 @@ public class SpiralApplet
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
                             }
+                            else if (iPicture == 3)
+                            {
+                                // another funky estimate-- this one is a circle
+                                // tangent the x axis at the origin,
+                                // that seems to meet the original circle at the right place.
+                                // still not right though.
+                                double maxAreaBasedMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                double R = maxAreaBasedMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
+                                double t = LERP(-Math.PI*.5, Math.PI*.5, (i+.5)/90);
+                                double xMax = Math.cos(t)*R;
+                                double yMax = Math.sin(t)*R + R;
+
+                                putDatumHere[0] = xMax;
+                                putDatumHere[1] = yMax;
+                            }
+                            else
+                                assert(false);
                         }
                     },
                     new DataFetcher() { // dataFetcher
