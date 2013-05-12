@@ -693,6 +693,7 @@ public class SpiralApplet
                         @Override
                         public void paint(java.awt.Graphics g)
                         {
+                            if (debug) OUT("                    in orientation button paint");
                             super.paint(g);
                             // note the following is padded by 1 pixel on all sides,
                             // to allow for highlighting to change color there
@@ -735,8 +736,12 @@ public class SpiralApplet
                                 "                 b   b               ",
                                 "                                     ",
                             };
-                            java.awt.Color fudgedAsciiToColor[] = asciiToColor;
-                            if (mouseIsInButton)
+                            // convert the whole thing to char array
+                            char chars[][] = new char[rows.length][];
+                            FORI (iRow, rows.length)
+                                chars[iRow] = rows[iRow].toCharArray();
+                            java.awt.Color fudgedAsciiToColor[] = (java.awt.Color[])Arrays.copy(asciiToColor,1);
+
                             {
 
                                 // find which little icon is in the given direction
@@ -745,150 +750,174 @@ public class SpiralApplet
 
                                 java.awt.Dimension gsize = getSize();
 
-                                double angle = Math.atan2(-(mouseY-(gsize.height*.5)),
-                                                            mouseX-(gsize.width*.5));
-
-                                // round to nearest multiple of 30 degrees (i.e. 2pi/12)
-                                double angleQuantum = 2*Math.PI / 12;
-                                this.spiralOrientationNumber = (int)Math.round(angle/angleQuantum);
-                                this.spiralOrientationNumber = MOD(this.spiralOrientationNumber,12);
-                                angle = this.spiralOrientationNumber*angleQuantum;
-
-
-                                fudgedAsciiToColor = (java.awt.Color[])Arrays.copy(asciiToColor,1);
-                                fudgedAsciiToColor['!'] = java.awt.Color.getHSBColor((float)(angle/(2*Math.PI)), 1.f, 1.f);
-
-
-                                int center = (rows.length+1)/2;
-
-
-                                double cos = Math.cos(angle);
-                                double sin = Math.sin(angle);
-                                assert(rows.length == rows[0].length());
-
-                                int seedRow = -1, seedCol = -1;
-                                boolean foundSeed = false;
-                                FORI (i, center)
+                                int orientationNumbersToHighlight[] = new int[2];
+                                int nToHighlight = 0;
+                                if (applet.theSpiralView.orientationNumber.get() != -1)
+                                    orientationNumbersToHighlight[nToHighlight++] = applet.theSpiralView.orientationNumber.get();
+                                if (this.spiralOrientationNumber != -1
+                                 && this.spiralOrientationNumber != applet.theSpiralView.orientationNumber.get())
+                                    orientationNumbersToHighlight[nToHighlight++] = this.spiralOrientationNumber;
+                                //PRINT(nToHighlight);
+                                //PRINTARRAY(orientationNumbersToHighlight);
+                                FORI (iToHighlight, nToHighlight)
                                 {
-                                    seedCol = (int)Math.round(center + cos*(1+i));
-                                    seedRow = (int)Math.round(center - sin*(1+i));
-                                    if (rows[seedRow].charAt(seedCol) != ' ')
-                                    {
-                                        foundSeed = true;
-                                        break;
-                                    }
-                                }
-                                assert(foundSeed);
+                                    int orientationNumberToHighlight = orientationNumbersToHighlight[iToHighlight];
+                                    double angle = orientationNumberToHighlight*(2*Math.PI/12);
+                                    char highlightChar = "0123456789!?".charAt(orientationNumberToHighlight);
+                                    fudgedAsciiToColor[highlightChar] = java.awt.Color.getHSBColor((float)(angle/(2*Math.PI)), 1.f, 1.f);
+                                    int center = (rows.length+1)/2;
 
-                                // convert the whole thing to char array
-                                char chars[][] = new char[rows.length][];
-                                FORI (iRow, rows.length)
-                                    chars[iRow] = rows[iRow].toCharArray();
 
-                                // seed fill, setting outline to '!' (highlight color)
-                                {
-                                    boolean isSeen[][] = new boolean[rows.length][rows.length]; // false initially
-                                    int seen[][] = new int[rows.length*rows.length][2];
-                                    int nSeen = 0;
-                                    seen[nSeen][0] = seedRow;
-                                    seen[nSeen][1] = seedCol;
-                                    nSeen++;
-                                    FORI (iSeen, nSeen) // while nSeen is growing
+                                    double cos = Math.cos(angle);
+                                    double sin = Math.sin(angle);
+                                    assert(rows.length == rows[0].length());
+
+                                    int seedRow = -1, seedCol = -1;
+                                    boolean foundSeed = false;
+                                    FORI (i, center)
                                     {
-                                        int row0 = seen[iSeen][0];
-                                        int col0 = seen[iSeen][1];
-                                        if (chars[row0][col0] == ' ')
+                                        seedCol = (int)Math.round(center + cos*(1+i));
+                                        seedRow = (int)Math.round(center - sin*(1+i));
+                                        if (rows[seedRow].charAt(seedCol) != ' ')
                                         {
-                                            // don't proceed to neighbors, but change color
-                                            chars[row0][col0] = '!';
+                                            foundSeed = true;
+                                            break;
                                         }
-                                        else
+                                    }
+                                    assert(foundSeed);
+
+                                    // seed fill, setting outline to highlight char
+                                    {
+                                        boolean isSeen[][] = new boolean[rows.length][rows.length]; // false initially
+                                        int seen[][] = new int[rows.length*rows.length][2];
+                                        int nSeen = 0;
+                                        seen[nSeen][0] = seedRow;
+                                        seen[nSeen][1] = seedCol;
+                                        nSeen++;
+                                        FORI (iSeen, nSeen) // while nSeen is growing
                                         {
-                                            // don't proceed to neighbors, but change color
-                                            for (int drow = -1; drow <= 1; drow++)
-                                            for (int dcol = -1; dcol <= 1; dcol++)
+                                            int row0 = seen[iSeen][0];
+                                            int col0 = seen[iSeen][1];
+                                            if (chars[row0][col0] == ' ')
                                             {
-                                                if (drow==0 && dcol==0) continue;
-                                                int row1 = row0+drow;
-                                                int col1 = col0+dcol;
-                                                if (!INRANGE(0 <=, row1, < rows.length)
-                                                 || !INRANGE(0 <=, col1, < rows.length))
-                                                    assert(false); // shouldn't happen
-                                                if (isSeen[row1][col1]) continue;
-                                                isSeen[row1][col1] = true;
-                                                seen[nSeen][0] = row1;
-                                                seen[nSeen][1] = col1;
-                                                nSeen++;
+                                                // don't proceed to neighbors, but change color
+                                                chars[row0][col0] = highlightChar;
+                                            }
+                                            else
+                                            {
+                                                // don't proceed to neighbors, but change color
+                                                for (int drow = -1; drow <= 1; drow++)
+                                                for (int dcol = -1; dcol <= 1; dcol++)
+                                                {
+                                                    if (drow==0 && dcol==0) continue;
+                                                    int row1 = row0+drow;
+                                                    int col1 = col0+dcol;
+                                                    if (!INRANGE(0 <=, row1, < rows.length)
+                                                     || !INRANGE(0 <=, col1, < rows.length))
+                                                        assert(false); // shouldn't happen
+                                                    if (isSeen[row1][col1]) continue;
+                                                    isSeen[row1][col1] = true;
+                                                    seen[nSeen][0] = row1;
+                                                    seen[nSeen][1] = col1;
+                                                    nSeen++;
+                                                }
                                             }
                                         }
-                                    }
 
-                                    if (false) // can change to true for debugging
-                                    {
-                                        fudgedAsciiToColor['w'] = java.awt.Color.white;
-                                        chars[seedRow][seedCol] = 'w';
+                                        if (false) // can change to true for debugging
+                                        {
+                                            fudgedAsciiToColor['w'] = java.awt.Color.white;
+                                            chars[seedRow][seedCol] = 'w';
+                                        }
                                     }
                                 }
-
-                                // convert the whole thing back to Strings
-                                FORI (iRow, rows.length)
-                                    rows[iRow] = new String(chars[iRow]);
-
                             }
+                            // convert the whole thing back to Strings
+                            FORI (iRow, rows.length)
+                                rows[iRow] = new String(chars[iRow]);
                             drawPixmapCentered(g, getSize(), fudgedAsciiToColor, rows);
+                            if (debug) OUT("                    out orientation button paint");
+                        } // paint
+                        private void updateSpiralOrientationNumber(int mouseX, int mouseY)
+                        {
+                            java.awt.Dimension gsize = getSize();
+                            double angle = Math.atan2(-(mouseY-(gsize.height*.5)),
+                                                        mouseX-(gsize.width*.5));
+                            spiralOrientationNumber = (int)Math.round(angle*(12/(2*Math.PI)));
+                            spiralOrientationNumber = MOD(spiralOrientationNumber,12);
                         }
-                        boolean mouseIsInButton = false;
-                        int mouseX = -1;
-                        int mouseY = -1;
+                        // keep track of state...
+                        boolean pressed = false;
+                        boolean entered = false;
+                        boolean debug = false;
                         int spiralOrientationNumber = -1; // gets set during paint
+
                     {
                         addMouseMotionListener(new java.awt.event.MouseAdapter() {
                             @Override
                             public void mouseMoved(java.awt.event.MouseEvent mouseEvent)
                             {
-                                mouseX = mouseEvent.getX();
-                                mouseY = mouseEvent.getY();
-                                if (mouseIsInButton)
-                                    repaint();
+                                if (debug) OUT("        in mouseMoved");
+                                updateSpiralOrientationNumber(mouseEvent.getX(), mouseEvent.getY());
+                                repaint();
+                                if (debug) OUT("        out mouseMoved");
                             }
                             @Override
                             public void mouseDragged(java.awt.event.MouseEvent mouseEvent)
                             {
-                                mouseX = mouseEvent.getX();
-                                mouseY = mouseEvent.getY();
-                                if (mouseIsInButton)
-                                    repaint();
+                                if (debug) OUT("                in mouseDragged");
+                                updateSpiralOrientationNumber(mouseEvent.getX(), mouseEvent.getY());
+                                applet.theSpiralView.orientationNumber.set(spiralOrientationNumber);
+                                repaint();
+                                if (debug) OUT("                out mouseDragged");
                             }
                         });
                         // apparently we don't get a repaint when rollover ends,
                         // and we need one to remove the highlighting, so...
                         addMouseListener(new java.awt.event.MouseAdapter() {
                             @Override
-                            public void mouseEntered(java.awt.event.MouseEvent e)
+                            public void mouseEntered(java.awt.event.MouseEvent mouseEvent)
                             {
-                                mouseIsInButton = true;
+                                if (debug) OUT("    in mouseEntered");
+                                entered = true;
+                                updateSpiralOrientationNumber(mouseEvent.getX(), mouseEvent.getY());
                                 repaint();
+                                if (debug) OUT("    out mouseEntered");
                             }
                             @Override
-                            public void mouseExited(java.awt.event.MouseEvent e)
+                            public void mouseExited(java.awt.event.MouseEvent mouseEvent)
                             {
-                                mouseIsInButton = false;
-                                mouseX = -1;
-                                mouseY = -1;
+                                if (debug) OUT("    in mouseExited");
+                                entered = false;
+                                if (pressed)
+                                    updateSpiralOrientationNumber(mouseEvent.getX(), mouseEvent.getY());
+                                else
+                                    spiralOrientationNumber = -1;
                                 spiralOrientationNumber = -1;
                                 repaint();
+                                if (debug) OUT("    out mouseExited");
                             }
                             @Override
                             public void mousePressed(java.awt.event.MouseEvent mouseEvent)
                             {
-                                OUT("in mousePressed");
-                                OUT("out mousePressed");
+                                if (debug) OUT("            in mousePressed");
+                                pressed = true;
+                                updateSpiralOrientationNumber(mouseEvent.getX(), mouseEvent.getY());
+                                applet.theSpiralView.orientationNumber.set(spiralOrientationNumber);
+                                repaint();
+                                if (debug) OUT("            out mousePressed");
                             }
                             @Override
                             public void mouseReleased(java.awt.event.MouseEvent mouseEvent)
                             {
-                                OUT("in mouseReleased");
-                                OUT("out mouseReleased");
+                                if (debug) OUT("            in mouseReleased");
+                                pressed = false;
+                                if (entered)
+                                    updateSpiralOrientationNumber(mouseEvent.getX(), mouseEvent.getY());
+                                else
+                                    spiralOrientationNumber = -1;
+                                repaint();
+                                if (debug) OUT("            out mouseReleased");
                             }
                         });
                         addActionListener(new java.awt.event.ActionListener() {
@@ -903,7 +932,7 @@ public class SpiralApplet
                             }
                         });
                         setToolTipText("<html>spiral orientation</html>");
-                        setRolloverEnabled(false);
+                        //setRolloverEnabled(false);
                     }});
                 }}); // view contents row
                 contentPane.add(new JSeparator(), stretchx);
