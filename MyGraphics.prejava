@@ -59,6 +59,12 @@ public class MyGraphics
         translateY += y*scaleY;
     }
 
+    public void scale(double x, double y)
+    {
+        scaleX *= x;
+        scaleY *= y;
+    }
+
     // window coords to input coords
     public void pick(double x, double y, double result[/*2*/])
     {

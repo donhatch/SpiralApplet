@@ -2,7 +2,6 @@
     Notes:
         Uses System.nanoTime which requires java >= 1.4
 
-    BUG: trail shouldn't move!
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??
@@ -1640,11 +1639,6 @@ public class SpiralApplet
                 theSpiralView.focus.plusEquals(theSpiralView.focusAnimationVelocity);
                 theSpiralView.focus.modEquals(theSpiralModel.params.n.get(), 1);
 
-                double minSize = (double)MIN(size.width, size.height);
-
-                MyGraphics mg = new MyGraphics(g, size,
-                    -size.width/minSize,size.width/minSize,
-                    -size.height/minSize,size.height/minSize);
 
                 if (implementAntiAliasingInHardware)
                 {
@@ -1689,12 +1683,19 @@ public class SpiralApplet
                 }
                 if (showSpiralFlag.get())
                 {
-                    double scale = .95; // TODO: gui hook for this
+                    // for drawing the spirals
+                    double spiralScale = .95;
+                    double minSize = (double)MIN(size.width, size.height);
+                    MyGraphics mg = new MyGraphics(g, size,
+                        -size.width/minSize,size.width/minSize,
+                        -size.height/minSize,size.height/minSize);
+                    mg.scale(spiralScale,spiralScale);
+
+
                     if (true)
                     {
                         // draw dual spiral
                         nItersDual = drawSpiral(mg,
-                                   scale,
                                    theSpiralModel,
                                    theSpiralView,
                                    false, // drawPrimalFlag
@@ -1708,7 +1709,6 @@ public class SpiralApplet
                     {
                         // draw primal spiral
                         nItersPrimal = drawSpiral(mg,
-                                   scale,
                                    theSpiralModel,
                                    theSpiralView,
                                    true, // drawPrimalFlag
@@ -3217,7 +3217,6 @@ public class SpiralApplet
 
         // returns number of inner loop iterations.
         public static int drawSpiral(MyGraphics mg,
-                                     double scale,
                                      SpiralModel spiralModel,
                                      SpiralView spiralView,
                                      boolean drawPrimalFlag,
@@ -3314,7 +3313,7 @@ public class SpiralApplet
                 else
                     mg.setColor(java.awt.Color.cyan);
                 double primalAng = Math.PI/2 * ((val+.5)/nParts) + orientationAngleFudge;
-                mg.drawLine(0.,0.,scale*Math.cos(primalAng),scale*Math.sin(primalAng),antiAliasFlag);
+                mg.drawLine(0.,0.,Math.cos(primalAng),Math.sin(primalAng),antiAliasFlag);
             }
 
 
@@ -3348,8 +3347,8 @@ public class SpiralApplet
                 double primalAng = Math.PI/2 * ((val+.5)/nParts) + orientationAngleFudge;
 
 
-                double dualR = scale;
-                double primalR = scale;
+                double dualR = 1.;
+                double primalR = 1.;
 
                 double dualX = dualR * Math.cos(dualAng);
                 double dualY = dualR * Math.sin(dualAng);
@@ -3594,8 +3593,8 @@ public class SpiralApplet
                         else
                             mg.setColor(gray128);
 
-                        mg.drawThickArc(-scale,-scale,   // bounding box corner
-                                        2*scale, 2*scale, // diameter
+                        mg.drawThickArc(-1.,-1.,   // bounding box corner
+                                        2., 2., // diameter
                                         0.+orientationAngleFudge, // startRadians
                                         initialPrimalAng, // arcRadians
                                         1., // thickness in pixels
@@ -3608,7 +3607,7 @@ public class SpiralApplet
                         // i.e. |center| <= |p| |d|^2 sin(2 t) / (2*twiceArea)
                         // I.e. it's in a certain pie slice, bounded by two rays
                         // and an arc.  Draw that arc.
-                        double arcRadius = Math.sin(2*initialPrimalAng) / (2*twiceArea) * scale;
+                        double arcRadius = Math.sin(2*initialPrimalAng) / (2*twiceArea);
                         mg.setColor(java.awt.Color.yellow);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
@@ -3625,7 +3624,7 @@ public class SpiralApplet
                             mg.setColor(pastels[(int)(2*val+1)]);
                         else
                             mg.setColor(java.awt.Color.magenta);
-                        arcRadius = Math.sin(2*initialPrimalAng) * scale;
+                        arcRadius = Math.sin(2*initialPrimalAng);
                         mg.drawPoint(centerX*(2*twiceArea),centerY*(2*twiceArea),
                                      5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
@@ -3656,21 +3655,24 @@ public class SpiralApplet
                                 double speculativeNextCenterY = scratch[1];
                                 double speculativeNextTwiceArea = scratch[2];
 
-                                // sanity check:
-                                // when priscilla moving (i.e. primal angle increasing),
-                                // the values in the upward trail should stay constant.
-                                // when dudley moving (i.e. primal angle decreasing),
-                                // the values in the downward trail should stay constant.
-
-                                //if (speculativeNextPrimalAng >= initialPrimalAng)
-                                if (speculativeNextPrimalAng <= initialPrimalAng)
+                                if (false)
                                 {
-                                    System.out.print("    "+doubleToStringNice(RTOD(initialPrimalAng))+" -> "+doubleToStringNice(RTOD(speculativeNextPrimalAng))+":");
-                                    System.out.println(" "+speculativeNextCenterX*speculativeNextTwiceArea
-                                                       +" "
-                                                       +speculativeNextCenterY*speculativeNextTwiceArea
-                                                       +" "
-                                                       +speculativeNextTwiceArea);
+                                    // sanity check:
+                                    // when priscilla moving (i.e. primal angle increasing),
+                                    // the values in the upward trail should stay constant.
+                                    // when dudley moving (i.e. primal angle decreasing),
+                                    // the values in the downward trail should stay constant.
+
+                                    //if (speculativeNextPrimalAng >= initialPrimalAng)
+                                    if (speculativeNextPrimalAng <= initialPrimalAng)
+                                    {
+                                        System.out.print("    "+doubleToStringNice(RTOD(initialPrimalAng))+" -> "+doubleToStringNice(RTOD(speculativeNextPrimalAng))+":");
+                                        System.out.println(" "+speculativeNextCenterX*speculativeNextTwiceArea
+                                                           +" "
+                                                           +speculativeNextCenterY*speculativeNextTwiceArea
+                                                           +" "
+                                                           +speculativeNextTwiceArea);
+                                    }
                                 }
 
                                 if (pastelsFlag)
@@ -3679,7 +3681,8 @@ public class SpiralApplet
                                              speculativeNextCenterY*(2*speculativeNextTwiceArea),
                                              pastelsFlag ? 3 : 1);
                             }
-                            OUT("-------------------");
+                            if (false)
+                                OUT("-------------------");
                         }
                     }
                 }
