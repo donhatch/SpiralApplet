@@ -6,6 +6,7 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??
 
+    TODO: saturation slider
     TODO: keystrokes to change orientation
     TODO: smooth out animation when going very slowly
     TODO: gui for scale
@@ -1840,6 +1841,13 @@ public class SpiralApplet
                                      v1[0], v1[1],
                                      v2[0], v2[1]);
         }
+        static void rotate(double x, double y, double theta, double answer[/*2*/])
+        {
+            double c = Math.cos(theta);
+            double s = Math.sin(theta);
+            answer[0] = x*c - y*s;
+            answer[1] = x*s + y*c;
+        }
 
 
         // "33.0" -> "33"
@@ -3665,6 +3673,44 @@ public class SpiralApplet
                                 double speculativeNextTwiceArea = scratch[2];
                                 double speculativeNextCenterX = speculativeNextCenterXinCanonicalOrientation*c - speculativeNextCenterYinCanonicalOrientation*s;
                                 double speculativeNextCenterY = speculativeNextCenterXinCanonicalOrientation*s + speculativeNextCenterYinCanonicalOrientation*c;
+
+                                {
+                                    // oh no! it's only right now if dudly is on an axis
+                                    // (i.e. orientationNumber mod 3 is 1).
+                                    // handle fudge for the other two cases...
+                                    double t = 0.;
+                                    switch(orientationNumber % 3)
+                                    {
+                                        case 0:
+                                            // we kept dudley fixed;
+                                            // want to keep avg fixed instead.
+                                            // rotate answer by ((oldP-oldD)-(newP-newD))/2.
+                                            t = (initialPrimalAng-speculativeNextPrimalAng)*.5;
+                                            break;
+                                        case 1:
+                                            // it's right already
+                                            t = 0.;
+                                            break;
+                                        case 2:
+                                        {
+                                            // we kept dudley fixed;
+                                            // want to keep priscilla fixed instead.
+                                            // rotate answer by ((oldP-oldD)-(newP-newD)).
+                                            t = initialPrimalAng-speculativeNextPrimalAng;
+                                            break;
+                                        }
+                                        default:
+                                            assert(false);
+                                    }
+                                    rotate(speculativeNextCenterX,
+                                           speculativeNextCenterY,
+                                           t,
+                                           scratch);
+                                    speculativeNextCenterX = scratch[0];
+                                    speculativeNextCenterY = scratch[1];
+                                }
+
+
 
                                 if (false)
                                 {
