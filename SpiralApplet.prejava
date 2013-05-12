@@ -6,6 +6,8 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??
 
+    TODO: non-rotating mode
+    TODO: delta mode approximating arbitrary slopes
     TODO: saturation slider
     TODO: keystrokes to change orientation
     TODO: smooth out animation when going very slowly
@@ -1721,7 +1723,6 @@ public class SpiralApplet
                 }
                 if (showStatsFlag.get())
                 {
-                    // YOU ARE HERE
                     double primalMinusDualFocusAngle = DTOR(theSpiralView.focusAngleDegrees.get());
                     drawStats(g,
                               size,
@@ -2357,6 +2358,66 @@ public class SpiralApplet
                     newPrimalMinusDualAng,
                     newCenterAndWeight);
         } // updateCenterAndWeightWhenSomeoneMoved
+
+
+
+        //
+        // I think this should be the workhorse that everyone uses--
+        // It can subsume most of the above, I think.
+        //
+        // Given initial and final primal and dual points (in polar coords r,theta),
+        // compute the moment and twiceArea of the logarithmic spiral.
+        // Parametrizing by t from 0 to 1:
+        //     primal_r(t) = primal_r0 * pow(primal_r1/primal_r0, t)
+        //     primal_theta(t) = primal_theta0 + (primal_theta1-primal_theta0) * t
+        // and analogously for dual_r and dual_theta.
+        //
+        // TwiceArea is:
+        //     (dual_theta1-dual_theta0) * Integral[t=0..1] dual_r^2 dt
+        // Moment is:
+        //     (dual_theta1-dual_theta0) * Integral[t=0..1] <primal_x,primal_y> * dual_r^2 dt
+        // where:
+        //     primal_x(t) = primal_r(t) * cos primal_theta(t)
+        //     primal_y(t) = primal_r(t) * sin primal_theta(t)
+        //
+        // In other words,
+        //      Moment x = (dual_theta1-dual_theta0) * Integral[t=0..1] (primal_r * cos(primal_theta) * dual_r^2) dt
+        //      Moment y = (dual_theta1-dual_theta0) * Integral[t=0..1] (primal_r * sin(primal_theta) * dual_r^2) dt
+        //     TwiceArea = (dual_theta1-dual_theta0) * Integral[t=0..1] dual_r^2 dt
+        //
+        // Expanding the integral for TwiceArea:
+        //     TwiceArea = (dual_theta1-dual_theta0) * Integral[t=0..1] dual_r^2 dt
+        //               = (dual_theta1-dual_theta0) * Integral[t=0..1] (dual_r0*pow(dual_r1/dual_r0, t))^2 dt
+        //               = (dual_theta1-dual_theta0) * dual_r0^2 * Integral[t=0..1] pow(dual_r1^2/dual_r0^2, t) dt
+        // (using fact that Integral a^t dt = a^t / log(a))
+        //               = (dual_theta1-dual_theta0) * dual_r0^2 * [pow(dual_r1^2/dual_r0^2,t)|0..1] / log(dual_r1^2/dual_r0^2)
+        //               = (dual_theta1-dual_theta0) * dual_r0^2 * (dual_r1^2/dual_r0^2 - 1) / log(dual_r1^2/dual_r0^2)
+        // Note that if dual_r1/dual_r1 is 1, that becomes 0/0,
+        // but we can use the robust log1p_over_x function in MyMath for this
+        // (see my "right way to calculate stuff" page).
+        //
+        // Expanding the integral for moment y:
+        //      Moment y = (dual_theta1-dual_theta0) * Integral[t=0..1] (primal_r * sin(primal_theta) * dual_r^2) dt
+        //               = (dual_theta1-dual_theta0) * primal_r0 * dual_r0^2 Integral[t=0..1] (primal_r1/primal_r0 * sin(primal_theta) * dual_r^2) dt
+        //      XXX YOU ARE HERE
+        // WOOPS! this isn't right at all! the right answer should include straight lines, this will do spirals instead, that's not right!
+        //        
+        public static void spiralMomentAndTwiceArea(
+            double primal_r0, double primal_theta0,
+            double dual_r0,   double dual_theta0,
+            double primal_r1, double primal_theta1,
+            double dual_r1,   double dual_theta1,
+            double answerMomentAndTwiceArea[/*3*/])
+        {
+            // deltas... (geometric for r's, arithmetic for theta's)
+            double primal_dr = primal_r1/primal_r0;
+            double primal_dtheta = primal_theta1-primal_theta0;
+            double dual_dr = dual_r1/dual_r0;
+            double dual_dtheta = dual_theta1-dual_theta0; // dual_theta's are otherwise unused
+            assumpt(false); // XXX implement me!
+            //double twiceArea = dual_dtheta * SQR(dual_r0) / MyMath.log1p_over_x(SQR(dual_dr)-1);   XXX implement in MyMath!
+        } // spiralMomentAndTwiceArea
+
 
                         
 
