@@ -5,7 +5,6 @@
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??
-    BUG: some of the drawing is wrong for different orientations
 
     TODO: keystrokes to change orientation
     TODO: smooth out animation when going very slowly
@@ -3304,6 +3303,8 @@ public class SpiralApplet
                 }
                 orientationAngleFudge += (orientationNumber/3) * (Math.PI*.5);
             }
+            double sinOrientationAngleFudge = Math.sin(orientationAngleFudge);
+            double cosOrientationAngleFudge = Math.cos(orientationAngleFudge);
 
 
             if (drawPrimalFlag)
@@ -3579,11 +3580,14 @@ public class SpiralApplet
                 {
                     mg.setColor(java.awt.Color.yellow);
                     mg.drawPoint(centerX, centerY, 5);
-                    if (centerY <= 0.)
                     {
-                        System.out.println("HEY! centerY is "+centerY);
+                        double centerYinCanonicalOrientation = -centerX*sinOrientationAngleFudge + centerY*cosOrientationAngleFudge;
+                        if (centerYinCanonicalOrientation <= 0.)
+                        {
+                            System.out.println("HEY! centerY is "+centerY);
+                        }
+                        //assert(centerYinCanonicalOrientation > 0.);
                     }
-                    //assert(centerY > 0.);
 
                     {
                         double initialPrimalAng = (val+.5)/nParts*(Math.PI*.5); // dualAng is 0
@@ -3641,19 +3645,26 @@ public class SpiralApplet
                             // for every possible *next* value (from initialPrimalAng),
                             // show the moment of it.
                             double scratch[] = new double[3];
+                            double c = cosOrientationAngleFudge;
+                            double s = sinOrientationAngleFudge;
+                            double centerXinCanonicalOrientation =  centerX*c + centerY*s;
+                            double centerYinCanonicalOrientation = -centerX*s + centerY*c;
                             FORIDOWN (speculativeNextVal, nParts)
                             {
                                 double speculativeNextPrimalAng = (speculativeNextVal+.5)/nParts*(Math.PI*.5);
+
                                 updateCenterAndWeightWhenSomeoneMoved(
-                                    centerX,
-                                    centerY,
+                                    centerXinCanonicalOrientation,
+                                    centerYinCanonicalOrientation,
                                     twiceArea,
                                     initialPrimalAng,
                                     speculativeNextPrimalAng,
                                     scratch);
-                                double speculativeNextCenterX = scratch[0];
-                                double speculativeNextCenterY = scratch[1];
+                                double speculativeNextCenterXinCanonicalOrientation = scratch[0];
+                                double speculativeNextCenterYinCanonicalOrientation = scratch[1];
                                 double speculativeNextTwiceArea = scratch[2];
+                                double speculativeNextCenterX = speculativeNextCenterXinCanonicalOrientation*c - speculativeNextCenterYinCanonicalOrientation*s;
+                                double speculativeNextCenterY = speculativeNextCenterXinCanonicalOrientation*s + speculativeNextCenterYinCanonicalOrientation*c;
 
                                 if (false)
                                 {
