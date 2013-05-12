@@ -6,6 +6,7 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??
 
+    TODO: make everything area (not twice-area) based
     TODO: non-rotating mode
     TODO: delta mode approximating arbitrary slopes
     TODO: saturation slider
