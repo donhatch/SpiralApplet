@@ -2615,6 +2615,23 @@ public class SpiralApplet
             {
                 int n = dataFetcher.nData();
                 double datum[] = new double[2];
+                g.setColor(dataColor.darker().darker().darker());
+
+                double gXprev = Double.NaN;
+                double gYprev = Double.NaN;
+                FORI (i, n)
+                {
+                    dataFetcher.getDatum(i, datum);
+                    double x = datum[0];
+                    double y = datum[1];
+                    double gX = LERP(gX0+.5,gX1-.5, (x-x0)/(x1-x0));
+                    double gY = LERP(gY0+.5,gY1-.5, (y-y0)/(y1-y0));
+                    if (i > 0)
+                        mg.drawLine(gXprev,gYprev,gX,gY,false);
+                    gXprev = gX;
+                    gYprev = gY;
+                }
+                g.setColor(dataColor);
                 FORI (i, n)
                 {
                     dataFetcher.getDatum(i, datum);
