@@ -3566,6 +3566,7 @@ public class SpiralApplet
                 double centerX = 0.;
                 double centerY = 0.;
                 double twiceArea = 0.;
+                double area = 0.;
                 boolean centerHasStabilized = false;
 
 
@@ -3575,7 +3576,7 @@ public class SpiralApplet
                 {
                     returnValue++;
 
-                    // TODO: combine straight parts, the line will look better
+                    // TODO: combine straight parts, the line will look better.  actually maybe not, it will ruin the pastel-ness, unless I tweak the line drawing
 
                     int thisVal = spiralModel.theList[i];
                     if (scanDir==1 ? thisVal > prevVal : thisVal < prevVal)
@@ -3722,10 +3723,14 @@ public class SpiralApplet
                         if (scanDir < 0)
                         {
                             double twiceAreaIncr = twiceTriangleArea(0.,0., dualX,dualY, nextDualX,nextDualY);
+                            double areaIncr = .5 * twiceTriangleArea(0.,0., dualX,dualY, nextDualX,nextDualY);
                             assert(twiceAreaIncr <= 0.); // area triangle is negative since scanning backwards
+                            assert(areaIncr <= 0.); // area triangle is negative since scanning backwards
                             twiceAreaIncr = ABS(twiceAreaIncr);
+                            areaIncr = ABS(areaIncr);
 
-                            if (twiceArea+twiceAreaIncr == twiceArea)
+                            //if (twiceArea+twiceAreaIncr == twiceArea)
+                            if (area+areaIncr == area)
                             {
                                 centerHasStabilized = true;
                                 // don't break til it's all visually small enough too
@@ -3733,12 +3738,12 @@ public class SpiralApplet
                             //if (dualY != 0.) // experimenting-- if we omit first one, should sometimes assert-fail due to center being too low. seems to work.
                             {
                                 twiceArea += twiceAreaIncr;
+                                area += areaIncr;
 
-                                centerX = LERP(centerX, primalX, twiceAreaIncr/twiceArea);
-                                centerY = LERP(centerY, primalY, twiceAreaIncr/twiceArea);
-                                //PRINT(twiceAreaIncr);
-                                //PRINT(twiceAreaIncr*primalX);
-                                //PRINT(twiceAreaIncr*primalY);
+                                //centerX = LERP(centerX, primalX, twiceAreaIncr/twiceArea);
+                                //centerY = LERP(centerY, primalY, twiceAreaIncr/twiceArea);
+                                centerX = LERP(centerX, primalX, areaIncr/area);
+                                centerY = LERP(centerY, primalY, areaIncr/area);
                             }
                         }
 
@@ -3804,10 +3809,9 @@ public class SpiralApplet
                         // says that:
                         //      |moment| <= |p| |d|^2 sin(2 t) / 4   
                         // i.e. |center| <= |p| |d|^2 sin(2 t) / (4*area)
-                        // i.e. |center| <= |p| |d|^2 sin(2 t) / (2*twiceArea)
                         // I.e. it's in a certain pie slice, bounded by two rays
                         // and an arc.  Draw that arc.
-                        double arcRadius = Math.sin(2*initialPrimalAng) / (2*twiceArea);
+                        double arcRadius = Math.sin(2*initialPrimalAng) / (4*area);
                         mg.setColor(java.awt.Color.yellow);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
@@ -3825,7 +3829,7 @@ public class SpiralApplet
                         else
                             mg.setColor(java.awt.Color.magenta);
                         arcRadius = Math.sin(2*initialPrimalAng);
-                        mg.drawPoint(centerX*(2*twiceArea),centerY*(2*twiceArea),
+                        mg.drawPoint(centerX*(4*area),centerY*(4*area),
                                      5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
@@ -3852,13 +3856,14 @@ public class SpiralApplet
                                 updateCenterAndAreaWhenSomeoneMoved(
                                     centerXinCanonicalOrientation,
                                     centerYinCanonicalOrientation,
-                                    twiceArea*.5,
+                                    area,
                                     initialPrimalAng,
                                     speculativeNextPrimalAng,
                                     scratch);
                                 double speculativeNextCenterXinCanonicalOrientation = scratch[0];
                                 double speculativeNextCenterYinCanonicalOrientation = scratch[1];
                                 double speculativeNextTwiceArea = scratch[2]*2.;
+                                double speculativeNextArea = scratch[2];
                                 double speculativeNextCenterX = speculativeNextCenterXinCanonicalOrientation*c - speculativeNextCenterYinCanonicalOrientation*s;
                                 double speculativeNextCenterY = speculativeNextCenterXinCanonicalOrientation*s + speculativeNextCenterYinCanonicalOrientation*c;
 
@@ -3912,11 +3917,11 @@ public class SpiralApplet
                                     if (speculativeNextPrimalAng <= initialPrimalAng)
                                     {
                                         System.out.print("    "+doubleToStringNice(RTOD(initialPrimalAng))+" -> "+doubleToStringNice(RTOD(speculativeNextPrimalAng))+":");
-                                        System.out.println(" "+speculativeNextCenterX*speculativeNextTwiceArea
+                                        System.out.println(" "+speculativeNextCenterX*speculativeNextArea
                                                            +" "
-                                                           +speculativeNextCenterY*speculativeNextTwiceArea
+                                                           +speculativeNextCenterY*speculativeNextArea
                                                            +" "
-                                                           +speculativeNextTwiceArea);
+                                                           +speculativeNextArea);
                                     }
                                     if (speculativeNextVal==0)
                                         OUT("-------------------");
@@ -3924,8 +3929,8 @@ public class SpiralApplet
 
                                 if (pastelsFlag)
                                     mg.setColor(pastels[speculativeNextVal*2+1]);
-                                mg.drawPoint(speculativeNextCenterX*(2*speculativeNextTwiceArea),
-                                             speculativeNextCenterY*(2*speculativeNextTwiceArea),
+                                mg.drawPoint(speculativeNextCenterX*(2*speculativeNextArea),
+                                             speculativeNextCenterY*(2*speculativeNextArea),
                                              pastelsFlag ? 3 : 1);
                             }
                         }
