@@ -59,8 +59,17 @@ public class Rational
         int g11 = gcd(n1,d1);
         n1 /= g11;
         d1 /= g11;
-        this.n = n0*d1 + n1*d0;
-        this.d = d0*d1;
+
+        // overflows given 5228001/1000 - 1/1000 !
+        //this.n = n0*d1 + n1*d0;
+        //this.d = d0*d1;
+
+        // so pre-reduce some more.
+        // (*still* doesn't prevent need to reduce at end, e.g. -4/3 + 4/3
+        int g = gcd(d0,d1);
+        this.n = d1/g*n0 + d0/g*n1;
+        this.d = d0/g*d1;
+
         reduce();
         return this;
     }
@@ -610,6 +619,19 @@ public class Rational
     public static void confidenceTest()
     {
         System.out.println("in Rational.confidenceTest");
+
+        if (true)
+        {
+            // the following is prone to overflowing an int if done naively
+            assert(new Rational(2149,1).mod(new Rational(1000*1000,1)).toDouble() == 2149.);
+
+            // the following was failing
+            assert(new Rational(52228,1).plus(1,100).minus(1,100).toDouble() == 52228.);
+            assert(new Rational(52228,1).plus(1,1000).minus(1,1000).toDouble() == 52228.);
+            assert(new Rational(52228,1).minus(1,1000).plus(1,1000).toDouble() == 52228.);
+            assert(new Rational(52228,1).plus(1,1000).plus(1,1000).minus(1,1000).minus(1,1000).toDouble() == 52228.);
+        }
+
         int nMin = -4;
         int nMax = 4;
         int dMin = 1;
@@ -651,8 +673,6 @@ public class Rational
                 }
             }
 
-            // the following is prone to overflowing an int if done naively
-            assert(new Rational(2149,1).mod(new Rational(1000*1000,1)).toDouble() == 2149);
         }
         System.out.println("out Rational.confidenceTest");
     }
