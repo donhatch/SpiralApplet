@@ -2569,7 +2569,7 @@ public class SpiralApplet
             if (gX0Label != null)
             {
                 mg.drawStringRotated(gX0Label,
-                                     gX00-5-20-5, // XXX 20 is hard coded estimate of left tic label width
+                                     gX00-5-12-5, // XXX 12 is hard coded estimate of left tic label width
                                      (gY0+gY1)/2,
                                      0., -1., // anchor at top of text
                                      null,
@@ -2634,26 +2634,28 @@ public class SpiralApplet
                                      SpiralView spiralView,
                                      final double focusPrimalAngleMinusDualAngle)
         {
+            int nParts = spiralModel.params.nParts.get();
+            int pixelsPerPart = spiralView.pixelsPerPart.get();
+            int pixelsInPlot = nParts * pixelsPerPart + 1;
+
             java.awt.Color gray64 = new java.awt.Color(64,64,64);
+
+            int x0 = 60;
+            int x1 = x0 + pixelsInPlot;
+            int y1 = 40;
+            int y0 = y1 + pixelsInPlot;
+
+            int xDelta = 1+40+2+pixelsInPlot+2+5+1 + 5; // ARGH
+            int yDelta = 1+45+2+pixelsInPlot+2+15+1 + 5; // ARGH
+
 
             // momentAng-dualAng vs. primalAng-dualAng graph
             {
-                int nParts = spiralModel.params.nParts.get();
-                int pixelsPerPart = spiralView.pixelsPerPart.get();
-                int pixelsInPlot = nParts * pixelsPerPart + 1;
-
-
-                // these bounds include inner frame
-                int x0 = (gsize.width-pixelsInPlot)/2;
-                int x1 = x0 + pixelsInPlot;
-                int y1 = gsize.height/2 - 60;
-                int y0 = y1 - pixelsInPlot;
-
                 drawOnePlot(
                     g,
                     gsize,
-                    1,145,2, x0,x1, 2,3,1, "momentAng-dualAng", null, // left to right
-                    1,50,2,  y1,y0, 2,3,1, "primalAng-dualAng", null, // bottom to top
+                    1,40,2, x0,x1, 2,5,1, "momentAng-dualAng", null, // left to right
+                    1,45,2, y0,y1, 2,15,1, "primalAng-dualAng", null, // bottom to top
 
                     0., 90., // values to put at x bounds
                     0., 90., // values to put at y bounds
@@ -2699,29 +2701,23 @@ public class SpiralApplet
                 );
             }
 
+            // advance downward
+            y0 += yDelta;
+            y1 += yDelta;
+
 
             // |moment|/(primalR*dualR^2) vs. primalAng-dualAng graph
             {
-                int nParts = spiralModel.params.nParts.get();
-                int pixelsPerPart = spiralView.pixelsPerPart.get();
-                int pixelsInPlot = nParts * pixelsPerPart + 1;
-
-                // these bounds include inner frame
-                int x0 = (gsize.width-pixelsInPlot)/2;
-                int x1 = x0 + pixelsInPlot;
-                int y0 = gsize.height/2 + 10;
-                int y1 = gsize.height - 50;
-
                 drawOnePlot(
                     g,
                     gsize,
-                    1,145,2, x0,x1, 2,3,1, "|moment| / (primalR*dualR^2)", null, // left to right
-                    1,50,2,  y1,y0, 2,3,1, "primalAng-dualAng", null, // bottom to top
+                    1,40,2, x0,x1, 2,5,1, "|moment| / (primalR*dualR^2)", null, // left to right
+                    1,45,2, y0,y1, 2,15,1, "primalAng-dualAng", null, // bottom to top
 
                     0., 90., // values to put at x bounds
                     0., .25, // values to put at y bounds
 
-                    9,10, // nMajor x,y
+                    9,5, // nMajor x,y
 
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
@@ -2770,30 +2766,24 @@ public class SpiralApplet
                 );
             }
 
-            // all angle-based moments x vs. y, scatter plot
+            // advance upward and to right
+            x0 += xDelta;
+            x1 += xDelta;
+            y0 -= yDelta;
+            y1 -= yDelta;
+
+            // all moments x vs. y, scatter plot
             {
-                int nParts = spiralModel.params.nParts.get();
-                int pixelsPerPart = spiralView.pixelsPerPart.get();
-                int pixelsInPlot = nParts * pixelsPerPart + 1;
-
-                // these bounds include inner frame
-                int y0 = 0 + 50;
-                int y1 = gsize.height/2 - 10;
-                int x0 = (gsize.width+pixelsInPlot)/2 + 10;
-                int x1 = x0 + (y1-y0); // so it's square
-                x0 += 30;
-                y1 -= 30;
-
                 drawOnePlot(
                     g,
                     gsize,
-                    1,3,2,  x0,x1, 2,100,1, null, "y", // left to right
-                    1,50,2, y1,y0, 2,3,1,   "x", null, // bottom to top
+                    1,40,2, x0,x1, 2,5,1, "moment y", null, // left to right
+                    1,45,2, y0,y1, 2,15,1, "moment x", null, // bottom to top
 
                     0., .25, // values to put at x bounds
                     0., .25, // values to put at y bounds
 
-                    10,10, // nMajor x,y
+                    5,5, // nMajor x,y
 
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
@@ -2853,20 +2843,6 @@ public class SpiralApplet
                             double areaBasedMomentX = center[0]*area;
                             double areaBasedMomentY = center[1]*area;
 
-                            if (false)
-                            {
-                                // what if we divide by supposed upper bound, for this moment angle?
-                                double angle = Math.atan2(center[1],center[0]);
-                                double rMax = Math.cos(angle)*Math.sin(angle)/2;
-                                areaBasedMomentX /= rMax;
-                                areaBasedMomentY /= rMax;
-
-                                // but then we need to scale down so it's still in the picture I think?
-                                // i.e. multiply by .25
-                                areaBasedMomentX /= 4;
-                                areaBasedMomentY /= 4;
-                            }
-
                             putDatumHere[0] = areaBasedMomentX;
                             putDatumHere[1] = areaBasedMomentY;
                         }
@@ -2875,29 +2851,23 @@ public class SpiralApplet
 
             }
 
-            // angle-based moments x vs. y, scatter plot,
+            // advance downward
+            y0 += yDelta;
+            y1 += yDelta;
+
+            // moments x vs. y, scatter plot,
             // only at the given focus angle
             {
-                int nParts = spiralModel.params.nParts.get();
-                int pixelsPerPart = spiralView.pixelsPerPart.get();
-                int pixelsInPlot = nParts * pixelsPerPart + 1;
-
-                // these bounds include inner frame
-                int y0 = gsize.height/2 + 10;
-                int y1 = gsize.height - 50;
-                int x0 = (gsize.width+pixelsInPlot)/2 + 10;
-                int x1 = x0 + (y1-y0); // so it's square
-
                 drawOnePlot(
                     g,
                     gsize,
-                    1,3,2,  x0,x1, 2,100,1, null, "y", // left to right
-                    1,50,2, y1,y0, 2,3,1,   "x", null, // bottom to top
+                    1,40,2, x0,x1, 2,5,1, "moment y at primal-dual = "+doubleToStringNice(RTOD(focusPrimalAngleMinusDualAngle))+" degrees", null, // left to right
+                    1,45,2, y0,y1, 2,15,1, "moment x at primal-dual = "+doubleToStringNice(RTOD(focusPrimalAngleMinusDualAngle))+" degrees", null, // left to right
 
                     0., .25, // values to put at x bounds
                     0., .25, // values to put at y bounds
 
-                    10,10, // nMajor x,y
+                    5,5, // nMajor x,y
 
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
@@ -2995,6 +2965,148 @@ public class SpiralApplet
                             double newArea = scratch[2];
                             putDatumHere[0] = newCenterX * newArea;
                             putDatumHere[1] = newCenterY * newArea;
+                        }
+                    }
+                );
+
+            }
+            // advance upward and to right
+            x0 += xDelta;
+            x1 += xDelta;
+            y0 -= yDelta;
+            y1 -= yDelta;
+
+            // all centers x vs. y, scatter plot
+            {
+                drawOnePlot(
+                    g,
+                    gsize,
+                    1,40,2, x0,x1, 2,5,1, "center y", null, // left to right
+                    1,45,2, y0,y1, 2,15,1, "center x", null, // bottom to top
+
+                    0., 1., // values to put at x bounds
+                    0., 1., // values to put at y bounds
+
+                    10,10, // nMajor x,y
+
+                    java.awt.Color.blue, // outerFrameColor
+                    java.awt.Color.white, // innerFrameColor
+                    gray64, // majorGridColor
+                    gray64, // labelColor
+                    java.awt.Color.green, // boundsColor
+                    java.awt.Color.red, // dataColor
+                    new DataFetcher() { // possibleBoundsFetcher
+                        public int nData()
+                        {
+                            return 90;
+                        }
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            double angle = (i+.5)/90*(Math.PI/2);
+                            putDatumHere[0] = Math.cos(angle);
+                            putDatumHere[1] = Math.sin(angle);
+                        }
+                    },
+                    new DataFetcher() { // dataFetcher
+                        public int nData()
+                        {
+                            return spiralModel.params.n.get();
+                        }
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            double center[] = spiralModel.centers[i];
+
+                            putDatumHere[0] = center[0];
+                            putDatumHere[1] = center[1];
+                        }
+                    }
+                );
+
+            }
+
+            // advance downward
+            y0 += yDelta;
+            y1 += yDelta;
+
+            // centers x vs. y, scatter plot,
+            // only at the given focus angle
+            {
+                drawOnePlot(
+                    g,
+                    gsize,
+                    1,40,2, x0,x1, 2,5,1, "center y at primal-dual = "+doubleToStringNice(RTOD(focusPrimalAngleMinusDualAngle))+" degrees", null, // left to right
+                    1,45,2, y0,y1, 2,15,1, "center x at primal-dual = "+doubleToStringNice(RTOD(focusPrimalAngleMinusDualAngle))+" degrees", null, // left to right
+
+                    0., 1., // values to put at x bounds
+                    0., 1., // values to put at y bounds
+
+                    10,10, // nMajor x,y
+
+                    java.awt.Color.blue, // outerFrameColor
+                    java.awt.Color.white, // innerFrameColor
+                    gray64, // majorGridColor
+                    gray64, // labelColor
+                    java.awt.Color.green, // boundsColor
+                    java.awt.Color.red, // dataColor
+                    new DataFetcher() { // possibleBoundsFetcher
+                        public int nData()
+                        {
+                            return 2*90;
+                        }
+                        public void getDatum(int ii, double putDatumHere[/*2*/])
+                        {
+                            int iPicture = ii / 90;
+                            int i = ii % 90;
+                            if (iPicture == 0)
+                            {
+                                double angle = (i+.5)/90*(Math.PI/2);
+                                putDatumHere[0] = Math.cos(angle);
+                                putDatumHere[1] = Math.sin(angle);
+                            }
+                            else
+                            {
+                                double c = Math.cos(focusPrimalAngleMinusDualAngle);
+                                double s = Math.sin(focusPrimalAngleMinusDualAngle);
+                                double x = (i+.5)/90 * c;
+                                double y = (i+.5)/90 * s;
+                                if (i%2 == 0)
+                                    x = c;
+                                putDatumHere[0] = x;
+                                putDatumHere[1] = y;
+                            }
+                        }
+                    },
+                    new DataFetcher() { // dataFetcher
+                        public int nData()
+                        {
+                            return spiralModel.params.n.get();
+                        }
+                        double scratch[] = new double[3];
+                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        {
+                            int val = spiralModel.theList[i];
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+
+                            double center[] = spiralModel.centers[i];
+                            double area = spiralModel.areas[i];
+
+                            if (focusPrimalAngleMinusDualAngle > primalAng)
+                                updateCenterAndAreaWhenPriscillaMoved(
+                                    center[0], center[1], area, primalAng,
+                                    focusPrimalAngleMinusDualAngle,
+                                    scratch);
+                            else
+                                updateCenterAndAreaWhenDudleyMoved(
+                                    center[0], center[1], area, primalAng,
+                                    focusPrimalAngleMinusDualAngle,
+                                    scratch);
+
+                            double newCenterX = scratch[0];
+                            double newCenterY = scratch[1];
+                            double newArea = scratch[2];
+
+                            putDatumHere[0] = newCenterX;
+                            putDatumHere[1] = newCenterY;
                         }
                     }
                 );
