@@ -122,3 +122,15 @@ send: renumber
 .PHONY: clean
 clean:
 	rm -f core ${JARFILE} *.class *.java.lines *.java
+
+
+# can use this when bisection debugging-- careful though, it clobbers SpiralApplet.prejava
+.PHONY: GOOD BAD
+GOOD:;
+	cp SpiralApplet.prejava.good SpiralApplet.prejava
+	touch SpiralApplet.prejava
+	make
+BAD:;
+	cp SpiralApplet.prejava.bad SpiralApplet.prejava
+	touch SpiralApplet.prejava
+	make
