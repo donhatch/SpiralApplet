@@ -767,7 +767,7 @@ public class SpiralApplet
                                     int orientationNumberToHighlight = orientationNumbersToHighlight[iToHighlight];
                                     double angle = orientationNumberToHighlight*(2*Math.PI/12);
                                     char highlightChar = "0123456789!?".charAt(orientationNumberToHighlight);
-                                    fudgedAsciiToColor[highlightChar] = java.awt.Color.getHSBColor((float)(angle/(2*Math.PI)), 1.f, 1.f);
+                                    fudgedAsciiToColor[highlightChar] = getHSBColor((float)(angle/(2*Math.PI)), 1.f, 1.f);
                                     int center = (rows.length+1)/2;
 
 
@@ -1914,6 +1914,20 @@ public class SpiralApplet
 
 
 
+        // fudged hsb-- hue gets clamped not wrapped,
+        // and max hue is violet, so color ramp goes from red to violet.
+        // this makes the distinction between low and high values clearer.
+        static java.awt.Color getHSBColor(float h, float s, float b)
+        {
+            assert(h >= 0.);
+            assert(h <= 1.);
+            h = CLAMP(h,0.f,1.f);
+            h *= (float)(5./6.); // so 1 becomes 5/6 = violet
+            return java.awt.Color.getHSBColor(h,s,b);
+        }
+
+
+
 
 
 
@@ -2425,11 +2439,13 @@ public class SpiralApplet
 
 
 
-        // for the drawStats function
+        // for the drawStats function.
+        // this is actually pretty weird, maybe should just pass in an array of points instead
         public static interface DataFetcher
         {
             public int nData();
-            public void getDatum(int i, double putDatumHere[/*2*/]);
+            // should fill in the i'th datum with x,y,hue
+            public void getDatum(int i, double putDatumHere[/*3*/]);
         } // abstract class DataFetcher
 
         // more general drawStats, takes an arbitrary iteration and bounds
@@ -2460,6 +2476,8 @@ public class SpiralApplet
                                      java.awt.Color labelColor,
                                      java.awt.Color boundsColor,
                                      java.awt.Color dataColor,
+
+                                     boolean pastelsFlag,
 
                                      DataFetcher possibleBoundsFetcher,
                                      DataFetcher dataFetcher)
@@ -2593,10 +2611,10 @@ public class SpiralApplet
                               null);
 
             // draw bounds
-            g.setColor(boundsColor);
+            g.setColor(pastelsFlag ? java.awt.Color.white : boundsColor);
             {
                 int n = possibleBoundsFetcher.nData();
-                double datum[] = new double[2];
+                double datum[] = new double[3];
                 FORI (i, n)
                 {
                     possibleBoundsFetcher.getDatum(i, datum);
@@ -2611,17 +2629,23 @@ public class SpiralApplet
                 }
             }
             // draw data
-            g.setColor(dataColor);
             {
                 int n = dataFetcher.nData();
-                double datum[] = new double[2];
-                g.setColor(dataColor.darker().darker().darker());
+                double datum[] = new double[3];
+
+                java.awt.Color color = dataColor;
+                g.setColor(color.darker().darker().darker());
 
                 double gXprev = Double.NaN;
                 double gYprev = Double.NaN;
                 FORI (i, n)
                 {
                     dataFetcher.getDatum(i, datum);
+                    if (pastelsFlag)
+                    {
+                        color = getHSBColor((float)datum[2], .5f, 1.f);
+                        g.setColor(color.darker().darker().darker());
+                    }
                     double x = datum[0];
                     double y = datum[1];
                     double gX = LERP(gX0+.5,gX1-.5, (x-x0)/(x1-x0));
@@ -2631,10 +2655,16 @@ public class SpiralApplet
                     gXprev = gX;
                     gYprev = gY;
                 }
-                g.setColor(dataColor);
+
+                g.setColor(color);
                 FORI (i, n)
                 {
                     dataFetcher.getDatum(i, datum);
+                    if (pastelsFlag)
+                    {
+                        color = getHSBColor((float)datum[2], .5f, 1.f);
+                        g.setColor(color);
+                    }
                     double x = datum[0];
                     double y = datum[1];
                     double gX = LERP(gX0+.5,gX1-.5, (x-x0)/(x1-x0));
@@ -2654,6 +2684,7 @@ public class SpiralApplet
             int nParts = spiralModel.params.nParts.get();
             int pixelsPerPart = spiralView.pixelsPerPart.get();
             int pixelsInPlot = nParts * pixelsPerPart + 1;
+            boolean pastelsFlag = spiralView.pastelsFlag.get();
 
             java.awt.Color gray64 = new java.awt.Color(64,64,64);
             java.awt.Color gray128 = new java.awt.Color(128,128,128);
@@ -2686,6 +2717,7 @@ public class SpiralApplet
                     gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
+                    pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         // XXX this is actually pretty screwy--- we end up drawing a bounds point for every data point, even if there are a zillion data points and not that many pixels
                         public int nData()
@@ -2699,6 +2731,7 @@ public class SpiralApplet
                             double maybeTopMomentAng = primalAng;
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = RTOD(maybeTopMomentAng);
+                            putDatumHere[2] = 0.;
                         }
                     },
                     new DataFetcher() { // dataFetcher
@@ -2714,6 +2747,7 @@ public class SpiralApplet
                             double momentAng = Math.atan2(center[1],center[0]);
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = RTOD(momentAng);
+                            putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
                     }
                 );
@@ -2743,6 +2777,7 @@ public class SpiralApplet
                     gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
+                    pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         public int nData()
                         {
@@ -2763,6 +2798,7 @@ public class SpiralApplet
 
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = maxAreaBasedMomentMag;
+                            putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
                     },
                     new DataFetcher() { // dataFetcher
@@ -2779,6 +2815,7 @@ public class SpiralApplet
                             double areaBasedMomentMag = MyMath.hypot(center[1],center[0]) * area;
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = areaBasedMomentMag;
+                            putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
                     }
                 );
@@ -2809,6 +2846,7 @@ public class SpiralApplet
                     gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
+                    pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         public int nData()
                         {
@@ -2831,6 +2869,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
+                                putDatumHere[2] = 0.;
                             }
                             else
                             {
@@ -2843,6 +2882,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
+                                putDatumHere[2] = 0.;
                             }
                         }
                     },
@@ -2863,6 +2903,7 @@ public class SpiralApplet
 
                             putDatumHere[0] = areaBasedMomentX;
                             putDatumHere[1] = areaBasedMomentY;
+                            putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
                     }
                 );
@@ -2893,10 +2934,12 @@ public class SpiralApplet
                     gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
+                    pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
+                        private double scratch[] = new double[3];
                         public int nData()
                         {
-                            return 3*90;
+                            return 4*90;
                         }
                         public void getDatum(int ii, double putDatumHere[/*2*/])
                         {
@@ -2912,6 +2955,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
+                                putDatumHere[2] = 0.;
                             }
                             else if (iPicture == 1)
                             {
@@ -2923,6 +2967,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
+                                putDatumHere[2] = 0.;
                             }
                             else if (iPicture == 2)
                             {
@@ -2938,6 +2983,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
+                                putDatumHere[2] = 0.;
                             }
                             else if (iPicture == 3)
                             {
@@ -2946,11 +2992,49 @@ public class SpiralApplet
                                 double maxMagForOtherAngle = Math.sin(2*otherAngle)/4;
                                 double otherX = maxMagForOtherAngle * Math.cos(otherAngle);
                                 double otherY = maxMagForOtherAngle * Math.sin(otherAngle);
-                                // okay, starting with ...  ARGH! area matters, I think??
-                                //YOU ARE HERE
+                                double otherArea = 100.; // arbitrary, it doesn't matter I don't think
+                                updateCenterAndAreaWhenSomeoneMoved(
+                                    otherX / otherArea,
+                                    otherY / otherArea,
+                                    otherArea,
+                                    otherAngle,
+                                    focusPrimalAngleMinusDualAngle,
+                                    scratch);
+                                double xCenter = scratch[0];
+                                double yCenter = scratch[1];
+                                double area = scratch[2];
+                                double xMoment = xCenter * area;
+                                double yMoment = yCenter * area;
+
+                                // oh no! it appears to be exactly equal to the circle! damn!
+                                // let's verify that...
+                                {
+                                    double maxAreaBasedMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                    double Rexpected = maxAreaBasedMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
+                                    double Rgotttttt = MyMath.hypot(xMoment,yMoment-Rexpected);
+                                    assert(EQ(Rexpected, Rgotttttt, 1e-6));
+                                    //PRINT(Rexpected);
+                                    //PRINT(Rgotttttt);
+                                    //OUT("---");
+                                }
+
+                                putDatumHere[0] = xMoment;
+                                putDatumHere[1] = yMoment;
+                                putDatumHere[2] = 0.;
                             }
                             else
                                 assert(false);
+
+                            if (true)
+                            {
+                                // suppress all parts except last
+                                if (iPicture != 3)
+                                {
+                                    putDatumHere[0] = 0.;
+                                    putDatumHere[1] = 0.;
+                                    putDatumHere[2] = 0.;
+                                }
+                            }
                         }
                     },
                     new DataFetcher() { // dataFetcher
@@ -2983,6 +3067,8 @@ public class SpiralApplet
                             double newArea = scratch[2];
                             putDatumHere[0] = newCenterX * newArea;
                             putDatumHere[1] = newCenterY * newArea;
+                            //putDatumHere[2] = focusPrimalAngleMinusDualAngle / (Math.PI*.5);
+                            putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
                     }
                 );
@@ -3013,6 +3099,7 @@ public class SpiralApplet
                     gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
+                    pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         public int nData()
                         {
@@ -3023,6 +3110,7 @@ public class SpiralApplet
                             double angle = (i+.5)/90*(Math.PI/2);
                             putDatumHere[0] = Math.cos(angle);
                             putDatumHere[1] = Math.sin(angle);
+                            putDatumHere[2] = 0.;
                         }
                     },
                     new DataFetcher() { // dataFetcher
@@ -3032,10 +3120,14 @@ public class SpiralApplet
                         }
                         public void getDatum(int i, double putDatumHere[/*2*/])
                         {
+                            int val = spiralModel.theList[i];
                             double center[] = spiralModel.centers[i];
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
                             putDatumHere[0] = center[0];
                             putDatumHere[1] = center[1];
+                            putDatumHere[2] = 0.;
+                            putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
                     }
                 );
@@ -3066,6 +3158,7 @@ public class SpiralApplet
                     gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
+                    pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         public int nData()
                         {
@@ -3080,6 +3173,7 @@ public class SpiralApplet
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 putDatumHere[0] = Math.cos(angle);
                                 putDatumHere[1] = Math.sin(angle);
+                                putDatumHere[2] = 0.;
                             }
                             else
                             {
@@ -3091,6 +3185,7 @@ public class SpiralApplet
                                     x = c;
                                 putDatumHere[0] = x;
                                 putDatumHere[1] = y;
+                                putDatumHere[2] = 0.;
                             }
                         }
                     },
@@ -3125,6 +3220,7 @@ public class SpiralApplet
 
                             putDatumHere[0] = newCenterX;
                             putDatumHere[1] = newCenterY;
+                            putDatumHere[2] = focusPrimalAngleMinusDualAngle / (Math.PI*.5);
                         }
                     }
                 );
@@ -3159,7 +3255,7 @@ public class SpiralApplet
 
             java.awt.Color pastels[] = new java.awt.Color[2*nParts+1];
             FORI(iPastel, 2*nParts+1)
-                pastels[iPastel] = java.awt.Color.getHSBColor((float)iPastel/(float)(2*nParts), .5f, 1.f);
+                pastels[iPastel] = getHSBColor((float)iPastel/(float)(2*nParts), .5f, 1.f);
 
 
             // Given gCenterX,gCenterY,
@@ -3472,7 +3568,7 @@ public class SpiralApplet
 
             java.awt.Color pastels[] = new java.awt.Color[2*nParts+1];
             FORI(iPastel, 2*nParts+1)
-                pastels[iPastel] = java.awt.Color.getHSBColor((float)iPastel/(float)(2*nParts), .5f, 1.f);
+                pastels[iPastel] = getHSBColor((float)iPastel/(float)(2*nParts), .5f, 1.f);
 
             int returnValue = 0;
 
