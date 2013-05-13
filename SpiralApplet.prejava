@@ -732,7 +732,7 @@ public class SpiralApplet
                             add(new JLabel("Anim sleep ms:"));
                             add(makeIncrementableTextFieldForInt(applet.animSleepMS, "number of milliseconds to sleep after each vsync pulse before calling repaint()", 1));
                             advanceRow();
-                            add(new JLabel("Pixels per part:"));
+                            add(new JLabel("Ticker/plot pixels per part:"));
                             add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, "pixels per part in ticker and stats plots", 1));
                             advanceRow();
                             add(new JLabel("Animation speed parts/frame:"));
@@ -3087,7 +3087,7 @@ public class SpiralApplet
                             else
                                 assert(false);
 
-                            if (true)
+                            if (false)
                             {
                                 // suppress all parts except last
                                 if (iPicture != 3)
@@ -3979,8 +3979,30 @@ public class SpiralApplet
                             mg.setColor(pastels[(int)(2*val+1)]);
                         else
                             mg.setColor(java.awt.Color.magenta);
+
+                        double momentX = centerX*area;
+                        double momentY = centerY*area;
+                        {
+                            double momentMag = MyMath.hypot(momentX,momentY);
+                            double momentAngle = Math.atan2(momentY,momentX);
+                            double boundIThought = Math.sin(momentAngle)*Math.cos(momentAngle)*.5; // = sin(2*momentAngle)/4
+                            // FUDGE... see how far I was off
+                            double fudge = 1.299; // anything above this gets printed
+
+                            // worst I've seen is:
+                            // factor of 1.4095784151209487 at focus 52228
+
+                            if (momentMag > boundIThought*fudge)
+                            {
+                                System.out.println("HEY! focus="+spiralView.focus+": moment mag is bigger than I thought it should be! by factor of "+(momentMag/boundIThought)+" (ang="+RTOD(initialPrimalAng)+" momentAng="+RTOD(momentAngle)+" momentMag="+momentMag+")");
+                                mg.setColor(java.awt.Color.red);
+                            }
+
+                        }
+
+
                         arcRadius = Math.sin(2*initialPrimalAng);
-                        mg.drawPoint(centerX*(4*area),centerY*(4*area),
+                        mg.drawPoint(momentX*4,momentY*4,
                                      5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
@@ -4079,8 +4101,8 @@ public class SpiralApplet
 
                                 if (pastelsFlag)
                                     mg.setColor(pastels[speculativeNextVal*2+1]);
-                                mg.drawPoint(speculativeNextCenterX*(2*speculativeNextArea),
-                                             speculativeNextCenterY*(2*speculativeNextArea),
+                                mg.drawPoint(speculativeNextCenterX*(4*speculativeNextArea),
+                                             speculativeNextCenterY*(4*speculativeNextArea),
                                              pastelsFlag ? 3 : 1);
                             }
                         }
@@ -4258,9 +4280,9 @@ public class SpiralApplet
         public SpiralView theSpiralView = new SpiralView();
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
