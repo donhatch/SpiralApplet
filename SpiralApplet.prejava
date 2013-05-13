@@ -953,7 +953,7 @@ public class SpiralApplet
                             setMargin(nomargin);
                         }});
                         add(new JRow() {{
-                            add(new JCheckBoxForBoolean("show model stats", applet.showStatsFlag) {{
+                            add(new JCheckBoxForBoolean("show plots of model stats", applet.showPlotsFlag) {{
                                 setMargin(nomargin);
                             }});
                             add(makeIncrementableTextFieldForInt(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
@@ -1319,7 +1319,7 @@ public class SpiralApplet
             showTimingFlag.addListener(repaintWhenValueChanged);
             showTickerFlag.addListener(repaintWhenValueChanged);
             showSpiralFlag.addListener(repaintWhenValueChanged);
-            showStatsFlag.addListener(repaintWhenValueChanged);
+            showPlotsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.showRungsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.pastelsFlag.addListener(repaintWhenValueChanged);
             theSpiralView.focusAngleDegrees.addListener(repaintWhenValueChanged);
@@ -1723,7 +1723,7 @@ public class SpiralApplet
                                    antiAliasingFlag);
                     }
                 }
-                if (showStatsFlag.get())
+                if (showPlotsFlag.get())
                 {
                     double primalMinusDualFocusAngle = DTOR(theSpiralView.focusAngleDegrees.get());
                     drawStats(g,
@@ -1763,7 +1763,7 @@ public class SpiralApplet
 
 
 
-                if (!showStatsFlag.get()
+                if (!showPlotsFlag.get()
                  && !showTimingFlag.get())
                 {
                     // draw dot at exact center of window,
@@ -4083,7 +4083,7 @@ public class SpiralApplet
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showTickerFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
@@ -4105,7 +4105,7 @@ public class SpiralApplet
         private Listenable.Listener showTimingFlagListener = null;
         private Listenable.Listener showTickerFlagListener = null;
         private Listenable.Listener showSpiralFlagListener = null;
-        private Listenable.Listener showStatsFlagListener = null;
+        private Listenable.Listener showPlotsFlagListener = null;
 
 
     //
