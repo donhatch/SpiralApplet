@@ -2656,6 +2656,7 @@ public class SpiralApplet
             int pixelsInPlot = nParts * pixelsPerPart + 1;
 
             java.awt.Color gray64 = new java.awt.Color(64,64,64);
+            java.awt.Color gray128 = new java.awt.Color(128,128,128);
 
             int x0 = 60;
             int x1 = x0 + pixelsInPlot;
@@ -2682,7 +2683,7 @@ public class SpiralApplet
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
                     gray64, // majorGridColor
-                    gray64, // labelColor
+                    gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
                     new DataFetcher() { // possibleBoundsFetcher
@@ -2739,7 +2740,7 @@ public class SpiralApplet
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
                     gray64, // majorGridColor
-                    gray64, // labelColor
+                    gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
                     new DataFetcher() { // possibleBoundsFetcher
@@ -2805,7 +2806,7 @@ public class SpiralApplet
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
                     gray64, // majorGridColor
-                    gray64, // labelColor
+                    gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
                     new DataFetcher() { // possibleBoundsFetcher
@@ -2889,7 +2890,7 @@ public class SpiralApplet
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
                     gray64, // majorGridColor
-                    gray64, // labelColor
+                    gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
                     new DataFetcher() { // possibleBoundsFetcher
@@ -3009,7 +3010,7 @@ public class SpiralApplet
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
                     gray64, // majorGridColor
-                    gray64, // labelColor
+                    gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
                     new DataFetcher() { // possibleBoundsFetcher
@@ -3062,7 +3063,7 @@ public class SpiralApplet
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
                     gray64, // majorGridColor
-                    gray64, // labelColor
+                    gray128, // labelColor
                     java.awt.Color.green, // boundsColor
                     java.awt.Color.red, // dataColor
                     new DataFetcher() { // possibleBoundsFetcher
