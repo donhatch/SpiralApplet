@@ -2188,7 +2188,7 @@ public class SpiralApplet
                     }
                     double primalAng = (theList[i]+.5)/nParts*(Math.PI*.5);
 
-                    // theorem says |areaBasedMoment| <= sin(2*primalAng)/4
+                    // theorem says |moment| <= sin(2*primalAng)/4
                     if (!(VecMath.norm(centers[i])*areas[i] < Math.sin(2*primalAng)/4))
                     {
                         System.out.println("Oh no! centers["+i+"] = "+centers[i][1]+" has length "+VecMath.norm(centers[i])*areas[i]+" >= "+Math.sin(2*primalAng)/4+"!");
@@ -2401,7 +2401,7 @@ public class SpiralApplet
         // Expanding the integral for moment y:
         //      Moment y = (dual_theta1-dual_theta0) * Integral[t=0..1] (primal_r * sin(primal_theta) * dual_r^2) dt
         //               = (dual_theta1-dual_theta0) * primal_r0 * dual_r0^2 Integral[t=0..1] (primal_r1/primal_r0 * sin(primal_theta) * dual_r^2) dt
-        //      XXX YOU ARE HERE
+        // XXX FILL IN THE REST
         // WOOPS! this isn't right at all! the right answer should include straight lines, this will do spirals instead, that's not right!
         //        
         public static void spiralMomentAndArea(
@@ -2567,11 +2567,14 @@ public class SpiralApplet
             g.setColor(labelColor);
 
             if (gX0Label != null)
-                mg.drawString(gX0Label,
-                              gX00-5-12-5, // XXX 12 is hard coded estimate of left tic label width
-                              (gY0+gY1)/2,
-                              1., 0.,
-                              null);
+            {
+                mg.drawStringRotated(gX0Label,
+                                     gX00-5-20-5, // XXX 20 is hard coded estimate of left tic label width
+                                     (gY0+gY1)/2,
+                                     0., -1., // anchor at top of text
+                                     null,
+                                     Math.PI/2.);
+            }
             if (gX1Label != null)
                 mg.drawString(gX1Label,
                               gX11+5+0+5, // XXX 0 is hard coded estimate of right tic label width
@@ -2697,7 +2700,7 @@ public class SpiralApplet
             }
 
 
-            // |areaBasedMoment|/(primalR*dualR^2) vs. primalAng-dualAng graph
+            // |moment|/(primalR*dualR^2) vs. primalAng-dualAng graph
             {
                 int nParts = spiralModel.params.nParts.get();
                 int pixelsPerPart = spiralView.pixelsPerPart.get();
@@ -2712,7 +2715,7 @@ public class SpiralApplet
                 drawOnePlot(
                     g,
                     gsize,
-                    1,145,2, x0,x1, 2,3,1, "|areaBasedMoment| / (primalR*dualR^2)", null, // left to right
+                    1,145,2, x0,x1, 2,3,1, "|moment| / (primalR*dualR^2)", null, // left to right
                     1,50,2,  y1,y0, 2,3,1, "primalAng-dualAng", null, // bottom to top
 
                     0., 90., // values to put at x bounds
@@ -2947,6 +2950,16 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
+                            }
+                            else if (iPicture == 3)
+                            {
+                                // trying yet another thing...
+                                double otherAngle = (i+.5)/90*(Math.PI/2);
+                                double maxMagForOtherAngle = Math.sin(2*otherAngle)/4;
+                                double otherX = maxMagForOtherAngle * Math.cos(otherAngle);
+                                double otherY = maxMagForOtherAngle * Math.sin(otherAngle);
+                                // okay, starting with ...  ARGH! area matters, I think??
+                                //YOU ARE HERE
                             }
                             else
                                 assert(false);
@@ -3939,9 +3952,9 @@ public class SpiralApplet
         public SpiralView theSpiralView = new SpiralView();
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showTickerFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showStatsFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
@@ -4494,7 +4507,7 @@ public class SpiralApplet
         frame.setSize(601,600);
         frame.setSize(718,583);
         frame.setSize(648,600);
-        frame.setSize(512,353);
+        frame.setSize(622,558);
 
         frame.setVisible(true);
 
