@@ -3730,7 +3730,7 @@ public class SpiralApplet
                                 centerHasStabilized = true;
                                 // don't break til it's all visually small enough too
                             }
-                            //if (dualY != 0.) // experimenting-- if we omit first one, should sometimes assert-fail due to center being too low. seems to work.
+                            //if (dualY != 0.) // experimenting-- if we omit first one by uncommenting this, should sometimes assert-fail due to center being too low. seems to happen as expected.
                             {
                                 area += areaIncr;
 
