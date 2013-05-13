@@ -85,10 +85,10 @@ class TimingGraph
             if (seconds > 0.) // implies frames must be > 0 too
             {
                 g.setColor(java.awt.Color.white);
-                g.drawString("fps over "+frames+" frames: "+formatFixedPoint(frames/seconds,3),
+                g.drawString("fps during "+frames+" frames: "+formatFixedPoint(frames/seconds,3),
                              size.width-300,
                              40);
-                g.drawString("spf over "+frames+" frames: "+formatFixedPoint(seconds/frames, 5),
+                g.drawString("spf during "+frames+" frames: "+formatFixedPoint(seconds/frames, 5),
                              size.width-300,
                              60);
                 g.setColor(java.awt.Color.red);

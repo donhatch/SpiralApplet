@@ -539,10 +539,40 @@ public class SpiralApplet
                                     @Override
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
-                                        applet.accelBackward();
+                                        applet.fastBackward();
                                     }
                                 });
-                                setToolTipText("<html>accelerate backward<br>(shift-left-arrow key)</html>");
+                                setToolTipText("<html>fast backward<br>(shift-left-arrow key)</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                @Override
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                @Override
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                @Override
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
+                                                          "     gb",
+                                                          "   gbbb",
+                                                          " gbbbbb",
+                                                          "bbbbbbb",
+                                                          " gbbbbb",
+                                                          "   gbbb",
+                                                          "     gb",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    @Override
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.playBackward();
+                                    }
+                                });
+                                setToolTipText("<html>play backward</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
@@ -645,6 +675,36 @@ public class SpiralApplet
                                     super.paint(g);
                                     drawPixmapCentered(g, getSize(), asciiToColor,
                                                        new String[] {
+                                                          "bg     ",
+                                                          "bbbg   ",
+                                                          "bbbbbg ",
+                                                          "bbbbbbb",
+                                                          "bbbbbg ",
+                                                          "bbbg   ",
+                                                          "bg     ",
+                                                       });
+                                }
+                            {
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    @Override
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.playForward();
+                                    }
+                                });
+                                setToolTipText("<html>play forward</html>");
+                            }}, stretchxy);
+                            add(new JRepeatingButton("") {
+                                @Override
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                @Override
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                @Override
+                                public void paint(java.awt.Graphics g)
+                                {
+                                    super.paint(g);
+                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                                       new String[] {
                                                           "b  b   ",
                                                           "bb bb  ",
                                                           "bbbbbb ",
@@ -659,10 +719,10 @@ public class SpiralApplet
                                     @Override
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
-                                        applet.accelForward();
+                                        applet.fastForward();
                                     }
                                 });
-                                setToolTipText("<html>accelerate forward<br>(shift-right-arrow key)</html>");
+                                setToolTipText("<html>fast forward<br>(shift-right-arrow key)</html>");
                             }}, stretchxy);
                         }});
                     }});
@@ -675,8 +735,12 @@ public class SpiralApplet
                             add(new JLabel("Pixels per part:"));
                             add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, "pixels per part in ticker and stats plots", 1));
                             advanceRow();
-                            add(new JLabel("Time quanta per part:"));
-                            add(makeIncrementableTextFieldForInt(applet.theSpiralView.quantaPerPart, "time quanta per part", 1));
+                            add(new JLabel("Animation speed parts/frame:"));
+                            add(new JRow() {{
+                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedParts, "parts in parts/frame", 1));
+                                add(new JLabel(" / "));
+                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedFrames, "frames in parts/frame", 1));
+                            }});
                         }});
                         add(new JRow() {{
                             add(new JCheckBoxForBoolean("show rungs", applet.theSpiralView.showRungsFlag) {{
@@ -960,7 +1024,7 @@ public class SpiralApplet
                         }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
                             setMargin(nomargin);
-                            setToolTipText("<html>if this is set, print whenever vsync lapse seems to be happening (assumes mostly 60hz framerate)</html>");
+                            setToolTipText("<html>if this is set, print whenever vsync lapse seems to be happening (assumes mostly 60hz framerate)<br>(this happened when using javax.swing.Timer,<br>not so much with javafx.animation.AnimationTimer).</html>");
                         }});
                         add(new JRow() {{
                             add(new JButton("Dump window positions and sizes") {{
@@ -1270,37 +1334,34 @@ public class SpiralApplet
                     theCanvas.repaint();
                 }
             });
-            theSpiralView.quantaPerPart.addListener(quantaPerPartListener = new Listenable.Listener() {
+            theSpiralView.animSpeedFrames.addListener(animSpeedFramesListener = new Listenable.Listener() {
                 @Override
                 public void valueChanged()
                 {
-                    if (theSpiralView.quantaPerPart.get() <= 0)
+                    if (theSpiralView.animSpeedFrames.get() <= 0)
                     {
                         // reject!
-                        System.out.println("rejecting change to quantaPerPart!");
-                        theSpiralView.quantaPerPart.set(1);
+                        System.out.println("rejecting change to animSpeedFrames!");
+                        theSpiralView.animSpeedFrames.set(1);
                         return; // we just got called recursively; our work is done
                     }
 
                     // XXX should this be in SpiralView? hmm
                     // XXX needs to be synchronized
-                    theSpiralView.focusAnimationVelocity.divEquals(theSpiralView.focusQuantum);
-                    theSpiralView.focusQuantum.set(1,theSpiralView.quantaPerPart.get()); // focusQuantum = 1/quantaPerPart
-                    theSpiralView.focusAnimationVelocity.timesEquals(theSpiralView.focusQuantum);
+                    Rational focusQuantum = new Rational(theSpiralView.animSpeedParts.get(), theSpiralView.animSpeedFrames.get());
 
                     // round focus to a multiple of focusQuantum.
                     // this makes sure focus hits integer boundaries,
                     // and prevents out-of-control rational denominators.
-                    if (theSpiralView.focusQuantum.d % theSpiralView.focus.d != 0)
+                    if (focusQuantum.d % theSpiralView.focus.d != 0) // test not really necessary, but it helps if debugging
                     {
                         //System.out.println("rounding focus to multiple of focusQuantum!");
                         //PRINT(theSpiralView.focus);
                         //PRINT(theSpiralView.focusQuantum);
-                        theSpiralView.focus.generalRoundEquals(theSpiralView.focusQuantum);
+                        theSpiralView.focus.generalRoundEquals(focusQuantum);
                         //PRINT(theSpiralView.focus);
                         //OUT("");
                     }
-
 
                     theCanvas.repaint(); // because focus may have changed
                 }
@@ -1489,7 +1550,7 @@ public class SpiralApplet
                     case java.awt.event.KeyEvent.VK_LEFT:
                         if (e.isShiftDown())
                         {
-                            accelBackward();
+                            playBackward();
                         }
                         else
                         {
@@ -1500,7 +1561,7 @@ public class SpiralApplet
                     case java.awt.event.KeyEvent.VK_RIGHT:
                         if (e.isShiftDown())
                         {
-                            accelForward();
+                            playForward();
                         }
                         else
                         {
@@ -1639,8 +1700,9 @@ public class SpiralApplet
                     lastNPaintsPrinted = 0;
                 }
 
+                // advance time
                 // TODO: need to synchronize this I think
-                theSpiralView.focus.plusEquals(theSpiralView.focusAnimationVelocity);
+                theSpiralView.focus.plusEquals(theSpiralView.focusAnimationMultiplier.times(theSpiralView.animSpeedParts.get(),theSpiralView.animSpeedFrames.get()));
                 theSpiralView.focus.modEquals(theSpiralModel.params.n.get(), 1);
 
 
@@ -2214,12 +2276,12 @@ public class SpiralApplet
         {
             public Listenable.Int resetFocusTo = new Listenable.Int(0,0, 636);
             public Rational focus = new Rational(resetFocusTo.get(),1); // always modulo spiralModel.params.n
-            public Listenable.Int pixelsPerPart = new Listenable.Int(2, 1024, 2); // must be >= 1
-            public Listenable.Int quantaPerPart = new Listenable.Int(2, 1024, 1); // must be >= 1
+            public Listenable.Int pixelsPerPart = new Listenable.Int(1, 1024, 2); // must be >= 1
+            public Listenable.Int animSpeedParts = new Listenable.Int(1, 1024, 1); // must be >= 1
+            public Listenable.Int animSpeedFrames = new Listenable.Int(1, 1024, 1); // must be >= 1
             public Listenable.Boolean showRungsFlag = new Listenable.Boolean(false);
             public Listenable.Boolean pastelsFlag = new Listenable.Boolean(false);
-            public Rational focusQuantum = new Rational(1,quantaPerPart.get());
-            public Rational focusAnimationVelocity = new Rational(0,1);
+            public Rational focusAnimationMultiplier = new Rational(0,1);
             public Listenable.Double focusAngleDegrees = new Listenable.Double(0.,90.,45.);
             public Listenable.Int orientationNumber = new Listenable.Int(0,12, 1);
             public SpiralView()
@@ -4032,41 +4094,63 @@ public class SpiralApplet
         } // drawSpiral
 
 
-        private void accelBackward()
+        private void fastBackward()
         {
-            boolean startAnimationFlag = theSpiralView.focusAnimationVelocity.n == 0;
-            theSpiralView.focusAnimationVelocity.minusEquals(theSpiralView.focusQuantum);
+            boolean startAnimationFlag = theSpiralView.focusAnimationMultiplier.n == 0
+                                      || theSpiralView.animSpeedParts.get() == 0;
+            theSpiralView.focusAnimationMultiplier.set(-2,1);
+            if (theSpiralView.animSpeedParts.get() == 0) theSpiralView.animSpeedParts.set(1); // be "helpful"
+            if (startAnimationFlag)
+                startTheAnimation();
+        }
+        private void playBackward()
+        {
+            boolean startAnimationFlag = theSpiralView.focusAnimationMultiplier.n == 0
+                                      || theSpiralView.animSpeedParts.get() == 0;
+            theSpiralView.focusAnimationMultiplier.set(-1,1);
+            if (theSpiralView.animSpeedParts.get() == 0) theSpiralView.animSpeedParts.set(1); // be "helpful"
             if (startAnimationFlag)
                 startTheAnimation();
         }
         private void stepBackward()
         {
-            theSpiralView.focusAnimationVelocity.set(0,1);
-            theSpiralView.focus.minusEquals(theSpiralView.focusQuantum);
+            theSpiralView.focusAnimationMultiplier.set(0,1);
+            theSpiralView.focus.minusEquals(theSpiralView.animSpeedParts.get(),theSpiralView.animSpeedFrames.get());
             theSpiralView.focus.modEquals(theSpiralModel.params.n.get(), 1);
             theCanvas.repaint();
         }
         private void pause()
         {
-            theSpiralView.focusAnimationVelocity.set(0,1);
+            theSpiralView.focusAnimationMultiplier.set(0,1);
             theCanvas.repaint();
         }
         private void stepForward()
         {
-            theSpiralView.focusAnimationVelocity.set(0,1);
-            theSpiralView.focus.plusEquals(theSpiralView.focusQuantum);
+            theSpiralView.focusAnimationMultiplier.set(0,1);
+            theSpiralView.focus.plusEquals(theSpiralView.animSpeedParts.get(),theSpiralView.animSpeedFrames.get());
             theSpiralView.focus.modEquals(theSpiralModel.params.n.get(), 1);
             theCanvas.repaint();
         }
-        private void accelForward()
+        private void playForward()
         {
-            boolean startAnimationFlag = theSpiralView.focusAnimationVelocity.n == 0;
-            theSpiralView.focusAnimationVelocity.plusEquals(theSpiralView.focusQuantum);
+            boolean startAnimationFlag = theSpiralView.focusAnimationMultiplier.n == 0
+                                      || theSpiralView.animSpeedParts.get() == 0;
+            theSpiralView.focusAnimationMultiplier.set(1,1);
+            if (theSpiralView.animSpeedParts.get() == 0) theSpiralView.animSpeedParts.set(1); // be "helpful"
+            if (startAnimationFlag)
+                startTheAnimation();
+        }
+        private void fastForward()
+        {
+            boolean startAnimationFlag = theSpiralView.focusAnimationMultiplier.n == 0
+                                      || theSpiralView.animSpeedParts.get() == 0;
+            theSpiralView.focusAnimationMultiplier.set(2,1);
+            if (theSpiralView.animSpeedParts.get() == 0) theSpiralView.animSpeedParts.set(1); // be "helpful"
             if (startAnimationFlag)
                 startTheAnimation();
         }
 
-        // actually this should probably be in a listener on focusAnimationVelocity
+        // actually this should probably be in a listener on focusAnimationMultiplier
         // I probably have the thread-safety all wrong too
         // but then again I probably have it wrong for paint as well...
         // XXX paint really needs to take a synchronized snapshot of everything it needs, I think...
@@ -4088,12 +4172,12 @@ public class SpiralApplet
                             if (eventVerbose >= 1) System.out.println("in timer action");
 
                             // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
-                            boolean focusAnimationVelocityIsZero;
-                            synchronized(theSpiralView.focusAnimationVelocity)
+                            boolean focusAnimationMultiplierIsZero;
+                            synchronized(theSpiralView.focusAnimationMultiplier)
                             {
-                                focusAnimationVelocityIsZero = (theSpiralView.focusAnimationVelocity.n == 0);
+                                focusAnimationMultiplierIsZero = (theSpiralView.focusAnimationMultiplier.n == 0);
                             }
-                            if (focusAnimationVelocityIsZero)
+                            if (focusAnimationMultiplierIsZero)
                             {
                                 System.out.println("    stopping timer");
                                 theTimer.stop();
@@ -4129,12 +4213,12 @@ public class SpiralApplet
                             if (eventVerbose >= 1) System.out.println("in timer action");
 
                             // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
-                            boolean focusAnimationVelocityIsZero;
-                            synchronized(theSpiralView.focusAnimationVelocity)
+                            boolean focusAnimationMultiplierIsZero;
+                            synchronized(theSpiralView.focusAnimationMultiplier)
                             {
-                                focusAnimationVelocityIsZero = (theSpiralView.focusAnimationVelocity.n == 0);
+                                focusAnimationMultiplierIsZero = (theSpiralView.focusAnimationMultiplier.n == 0);
                             }
-                            if (focusAnimationVelocityIsZero)
+                            if (focusAnimationMultiplierIsZero)
                             {
                                 System.out.println("    stopping javafx animation timer");
                                 theAnimationTimer.stop();
@@ -4194,7 +4278,9 @@ public class SpiralApplet
         private Listenable.Listener showRungsFlagListener = null;
         private Listenable.Listener focusListener = null;
         private Listenable.Listener pixelsPerPartListener = null;
-        private Listenable.Listener quantaPerPartListener = null;
+        private Listenable.Listener animSpeedFramesListener = null;
+        private Listenable.Listener animSpeedParts = null;
+        private Listenable.Listener animSpeedFrames = null;
         private Listenable.Listener showTimingFlagListener = null;
         private Listenable.Listener showTickerFlagListener = null;
         private Listenable.Listener showSpiralFlagListener = null;
