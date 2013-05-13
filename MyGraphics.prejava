@@ -466,6 +466,27 @@ public class MyGraphics
         g.drawString(s, (int)(x * scaleX + translateX),
                         (int)(y * scaleY + translateY));
     }
+    public void drawStringRotated(String s,
+                                  double x, double y,
+                                  double xJustify, // -1,0,1 -> L,C,R
+                                  double yJustify, // -1,0,1 -> T,C,B
+                                  java.awt.Color backgroundColor,
+                                  double theta)
+    {
+        // rotate about xformed x,y
+        java.awt.Graphics2D g2d = (java.awt.Graphics2D)g;
+        assert(g2d != null);
+
+        java.awt.geom.AffineTransform origXform = g2d.getTransform();
+        java.awt.geom.AffineTransform rotated = (java.awt.geom.AffineTransform)origXform.clone();
+        rotated.rotate(
+            theta * (scaleX*scaleY < 0. ? -1 : 1),
+            (int)(x*scaleX + translateX),
+            (int)(y*scaleY + translateY));
+        g2d.setTransform(rotated);
+        drawString(s, x, y, xJustify, yJustify, backgroundColor);
+        g2d.setTransform(origXform);
+    }
     public void drawString(String s, double x, double y, 
                                      double xJustify, // -1,0,1 -> L,C,R
                                      double yJustify, // -1,0,1 -> T,C,B
@@ -511,7 +532,7 @@ public class MyGraphics
     {
         drawString(s, x, y, 1, 0);
     }
-    // XXX should be more of these...
+    // XXX should be more of these, maybe...
     public double getFontHeight()
     {
         java.awt.FontMetrics fm = g.getFontMetrics();
