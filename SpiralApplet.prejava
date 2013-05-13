@@ -3852,13 +3852,13 @@ public class SpiralApplet
                                 updateCenterAndAreaWhenSomeoneMoved(
                                     centerXinCanonicalOrientation,
                                     centerYinCanonicalOrientation,
-                                    twiceArea,
+                                    twiceArea*.5,
                                     initialPrimalAng,
                                     speculativeNextPrimalAng,
                                     scratch);
                                 double speculativeNextCenterXinCanonicalOrientation = scratch[0];
                                 double speculativeNextCenterYinCanonicalOrientation = scratch[1];
-                                double speculativeNextTwiceArea = scratch[2];
+                                double speculativeNextTwiceArea = scratch[2]*2.;
                                 double speculativeNextCenterX = speculativeNextCenterXinCanonicalOrientation*c - speculativeNextCenterYinCanonicalOrientation*s;
                                 double speculativeNextCenterY = speculativeNextCenterXinCanonicalOrientation*s + speculativeNextCenterYinCanonicalOrientation*c;
 
@@ -3918,6 +3918,8 @@ public class SpiralApplet
                                                            +" "
                                                            +speculativeNextTwiceArea);
                                     }
+                                    if (speculativeNextVal==0)
+                                        OUT("-------------------");
                                 }
 
                                 if (pastelsFlag)
@@ -3926,8 +3928,6 @@ public class SpiralApplet
                                              speculativeNextCenterY*(2*speculativeNextTwiceArea),
                                              pastelsFlag ? 3 : 1);
                             }
-                            if (false)
-                                OUT("-------------------");
                         }
                     }
                 }
