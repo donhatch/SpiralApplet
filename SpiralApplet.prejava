@@ -2509,7 +2509,8 @@ public class SpiralApplet
             double dual_dr = dual_r1/dual_r0;
             double dual_dtheta = dual_theta1-dual_theta0; // dual_theta's are otherwise unused
             assumpt(false); // XXX implement me!
-            //double Area = .5 * dual_dtheta * SQR(dual_r0) / MyMath.log1p_over_x(SQR(dual_dr)-1);   XXX implement in MyMath!
+            double Area = .5 * dual_dtheta * SQR(dual_r0) / MyMath.log1p_over_x(SQR(dual_dr)-1);
+            // XXX not right!
         } // spiralMomentAndArea
 
 
@@ -3001,8 +3002,8 @@ public class SpiralApplet
                     1,40,2, x0,x1, 2,5,1, "moment y at primal-dual = "+doubleToStringNice(RTOD(focusPrimalAngleMinusDualAngle))+" degrees", null, // left to right
                     1,45,2, y0,y1, 2,15,1, "moment x at primal-dual = "+doubleToStringNice(RTOD(focusPrimalAngleMinusDualAngle))+" degrees", null, // left to right
 
-                    0., .25, // values to put at x bounds
-                    0., .25, // values to put at y bounds
+                    0., .5, // values to put at x bounds
+                    0., .5, // values to put at y bounds
 
                     5,5, // nMajor x,y
 
@@ -3017,7 +3018,7 @@ public class SpiralApplet
                         private double scratch[] = new double[3];
                         public int nData()
                         {
-                            return 4*90;
+                            return 5*90;
                         }
                         public void getDatum(int ii, double putDatumHere[/*2*/])
                         {
@@ -3098,6 +3099,30 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMoment;
                                 putDatumHere[1] = yMoment;
+                                putDatumHere[2] = 0.;
+                            }
+                            else if (iPicture == 4)
+                            {
+                                // attempted transcription of desired xm < 1/2 xd^2 in p=+y space:
+                                //     rm sin(tp-tm) < 1/2 (rd sin(tp-td))^2
+                                // in dudley space where rd=1 and td=0:
+                                //     rm sin(tp-tm) < 1/2 sin(tp)^2
+                                //     rm (sin(tp)cos(tm)-cos(tp)sin(tm)) < 1/2 sin(tp)^2
+                                //     (yp xm - xp ym) < 1/2 yp^2
+                                //         xm < (1/2 yp^2 + xp ym) / yp
+                                double yp = Math.sin(focusPrimalAngleMinusDualAngle);
+                                double xp = Math.cos(focusPrimalAngleMinusDualAngle);
+                                double frac = (i+.5)/90;
+                                double ym = frac;
+                                assert(0 < ym && ym < 1);
+                                double xm = (.5*yp*yp + xp*ym) / yp;
+                                if (false)
+                                {
+                                    if (i==0) OUT("---");
+                                    PRINT2(xm,ym);
+                                }
+                                putDatumHere[0] = xm;
+                                putDatumHere[1] = ym;
                                 putDatumHere[2] = 0.;
                             }
                             else
@@ -4003,14 +4028,14 @@ public class SpiralApplet
                             double momentAngle = Math.atan2(momentY,momentX);
                             double boundIThought = Math.sin(2*(momentAngle-orientationAngleFudge))*.25;
                             // FUDGE... see how far I was off
-                            double fudge = 1.299; // anything above this gets printed
+                            double fudge = 1.409; // anything above this gets printed
 
                             // worst I've seen (n=100000) is:
                             // factor of 1.4095784151209487 at focus 52228
 
                             if (momentMag > boundIThought*fudge)
                             {
-                                System.out.println("HEY! focus="+spiralView.focus+": moment mag is bigger than I thought it should be! by factor of "+(momentMag/boundIThought)+" (ang="+RTOD(initialPrimalAng)+" momentAng="+RTOD(momentAngle)+" momentMag="+momentMag+")");
+                                System.out.println("HEY! focus="+spiralView.focus+": moment mag is bigger than naive bound! by factor of "+(momentMag/boundIThought)+" (ang="+RTOD(initialPrimalAng)+" momentAng="+RTOD(momentAngle)+" momentMag="+momentMag+")");
                                 mg.setColor(java.awt.Color.red);
                             }
 
