@@ -2274,7 +2274,8 @@ public class SpiralApplet
         }; // public class SpiralModel
         public static class SpiralView
         {
-            public Listenable.Int resetFocusTo = new Listenable.Int(0,0, 636);
+            //public Listenable.Int resetFocusTo = new Listenable.Int(0,0, 636);
+            public Listenable.Int resetFocusTo = new Listenable.Int(0,0, 52228);
             public Rational focus = new Rational(resetFocusTo.get(),1); // always modulo spiralModel.params.n
             public Listenable.Int pixelsPerPart = new Listenable.Int(1, 1024, 2); // must be >= 1
             public Listenable.Int animSpeedParts = new Listenable.Int(1, 1024, 1); // must be >= 1
@@ -3985,11 +3986,11 @@ public class SpiralApplet
                         {
                             double momentMag = MyMath.hypot(momentX,momentY);
                             double momentAngle = Math.atan2(momentY,momentX);
-                            double boundIThought = Math.sin(momentAngle)*Math.cos(momentAngle)*.5; // = sin(2*momentAngle)/4
+                            double boundIThought = Math.sin(2*(momentAngle-orientationAngleFudge))*.25;
                             // FUDGE... see how far I was off
                             double fudge = 1.299; // anything above this gets printed
 
-                            // worst I've seen is:
+                            // worst I've seen (n=100000) is:
                             // factor of 1.4095784151209487 at focus 52228
 
                             if (momentMag > boundIThought*fudge)
