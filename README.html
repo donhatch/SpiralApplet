@@ -866,7 +866,8 @@ Taking magnitude of both sides,
 \begin{align}
    r_m &amp; = (\text{Dudley's triangle area so far}) * r_p \\
        &amp; &lt; (r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2 ) * r_p  \;\; by (3) \\
-       &amp; = r_p r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2
+       &amp; = r_p r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2 \\
+       &amp; = r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2
 \end{align}
 and so we've shown the second part of (A),
 completing the proof of the base case.
@@ -891,7 +892,6 @@ the inductive hypothesis is that the Lemma holds at $\underline{t}$:
     & (\underline{C}) \;\;  &                      &  &  & \leq \underline{\theta_p} \\
     & (\underline{D}) \;\;  &                      &  &  & \lt \underline{\theta_d}+\pi/2.
 \end{alignat*}
-<span id="youarehere"></span>
 and, assuming that, we must prove that it holds at $\overline{t}$:
 \begin{alignat*}{3}
     & (\overline{A}) \;\;  &  0                   &  &  & \lt \overline{r_m} \lt \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2 \\
@@ -944,18 +944,18 @@ $0$).
             *....
                     *$\overline{p}= \langle \overline{x_p},\overline{y_p} \rangle$
                     |
-                  . |
+                  / |
                     | ^
-                 .  | |
+                 /  | |
                     | | Priscilla walks from $\underline{p}$ to $\overline{p}$
-                .   | | (perpendicular to Dudley's stationary position)
+                /   | | (perpendicular to Dudley's stationary position)
                     | |
-               .    | 
+               /    | 
                     |  
-              .     *$\underline{p}=\langle \underline{x_p},\underline{y_p} \rangle$
-                  .  
-             .  .    
-              .             Dudley
+              /     *$\underline{p}=\langle \underline{x_p},\underline{y_p} \rangle$
+                  /  
+             /  /    
+              /             Dudley
            0*----------------*$\underline{d}=\overline{d}$
 
         Fig. 4: Inductive step, Case 1: Priscilla has moved
@@ -1021,6 +1021,135 @@ Case 2: In the time from $\underline{t}$ to $\overline{t}$,
 Dudley has moved (in a straight line) and Priscilla has stayed still.
 <p>
 <span style="color:red">TODO fill this in!</span>
+As in the base case, we work in a rotated coordinate system
+in which Priscilla's (stationary) position is on the +y axis,
+so Dudley is traveling upwards along a now-vertical dual edge,
+as shown in Figure 5.
+<pre>
+        Priscilla
+            *p=[0,y_p_^]
+            :         _
+            :       * d 
+            :       |
+            :     / |
+            :       | ^
+            :    /  | |
+            :       | | Dudley walks from _d_ to ^d^
+            :   /   | | (parallel to Priscilla's stationary position)
+            :       | |
+            :  /    | 
+            :       |  
+            : /    _* d
+            :    _/ : -
+            :/ _/   :
+            : /     :
+           0*.......* [x_d_^,0]
+
+        Fig. 5: Inductive step, Case 2: Dudley has moved
+</pre>
+<span id="youarehere"></span>
+We denote quantities that are stationary at this step
+by giving them both an underbar and overbar.
+Priscilla is on the +y axis and didn't move:
+<pre>
+    (11.5)  r_p_^ = y_p_^ > 0
+            x_p_^ = 0
+    (12)    t_p_^ = = pi/2
+Dudley moved purely upwards, strictly within the first quadrant:
+(XXX may need more clarification, just like previous case)
+    (13)    0 < y_d_ < y_d^
+            0 < x_d_ = x_d^ = x_d_^
+so his angle increased, but stayed less than pi/2:
+    (14)    0 < t_d_ < t_d^ < pi/2
+    (15)    0 < sin(t_d_) < sin(t_d^) < 1 (follows from (14) since sin is increasing in this range)
+    (16)    0 < cos(t_d_) < cos(t_d_) < 1 (follows from (14) since cos is decreasing in this range)
+
+The moment changed as follows:
+        ^m^ = _m_ + (area of Dudley's triangle) * (Priscilla's position)
+    (16.5)  = _m_ + (1/2 * (y_d^-y_d_)*d_x^_) * <0,y_p_^>
+
+Therefore by (12), the moment moved purely upwards as well;
+furthermore (B_,C_,D_) say it started strictly inside the first quadrant
+so it ended there as well;
+so the first part of (A^) is immediately satisfied and:
+    (17)    0 < y_m_ < y_m^
+    (18)    0 < x_m_ = x_m^ = x_m_^
+    (19)    0 < t_m_ < t_m^ < pi/2
+    (20)    0 < sin(t_m_) < sin(t_m^) < 1
+    (21)    0 < cos(t_m^) < cos(t_m_) < 1
+
+(C^) follows triviallly:
+            t_m^ < pi/2  by (18)
+                 = t_p   by (12)
+The second part of (A^) is proved as follows:
+(want to show r_m^ < r_p^ r_d^ ^2 sin(t_p^-t_d^)cos(t_p^-t_d^)/2)
+    r_m^ = |m^| = |m_ + (area of Dudley's triangle) * (Priscilla's position)|
+               <= |m_| + (area of Dudley's triangle) * |p_^|
+               = r_m_ + (area of Dudley's triangle) * r_p_^
+               < r_p_^ r_d_^2 sin(t_p_-t_d_)cos(t_p_-t_d_)/2 + (area of Dudley's triangle) * r_p_^ by (A_)
+               = r_p_^ ((r_d_ sin(t_p_-t_d_))(r_d_ cos(t_p_-t_d_))/2 + (area of Dudley's triangle))
+               = r_p_^ (areaTri(0,<x_d_^,0>,d_) + areaTri(0,d_,d^))
+               = r_p_^ (areaTri(0,<x_d_^,d^))  since this tri is the disjoint union of the previous two tris
+                  XXX should we be using x's and y's in here somewhere?
+               = r_p_^ r_d^2 cos(t_d^)sin(t_d^) / 2
+               = r_p_^ r_d^2 sin(pi/2-t_d^)cos(pi/2-t_d^) / 2    since cos(t)=sin(pi/2-t) in general
+               = r_p_^ r_d^2 sin(t_p_^-t_d^)cos(t_p_^-t_d^) / 2  by (12)
+
+Having shown (A^), we must finally prove (B^).
+
+For this, we first derive an intermediate result
+from the inductive hypothesis.
+The "all terms positive" claims throughout the following
+follow from (left side of) (A_), (B_),(C_),(D_).
+         x_m_ = r_m_ cos(t_m_)
+              = r_m_ sin(pi/2 - t_m_)
+     
+              = r_m_ sin(t_p_ - t_m_) by (12)
+              = r_m_ sin((t_p_-t_d_)-(t_m_-t_d_))
+              = r_m_ (sin(t_p_-t_d_)cos(t_m_-t_d_) - cos(t_p_-t_d_)sin(t_m_-t_d_)) by double-angle identity
+              = r_m_ sin(t_p_-t_d_)cos(t_m_-t_d_) - r_m_ cos(t_p_-t_d_)sin(t_m_-t_d_)
+              < r_m_ sin(t_p_-t_d_)cos(t_m_-t_d_) - 0  since all terms positive
+              < r_m_ sin(t_p_-t_d_) * 1  since cos(t_m_-t_d_)<1 and all terms positive
+              < (1/2 r_p_ r_d_^2 sin(t_p_-t_d_)cos(t_p_-t_d_)) sin(t_p_-t_d_)  by (A_)
+              = 1/2 r_p_ cos(t_p_-t_d_) (r_d_ sin(t_p_-t_d_))^2
+              < 1/2 r_p_ (r_d_ sin(t_p_-t_d_))^2  since 0 < cos(t_p_-t_d_) < 1
+     
+              = 1/2 r_p_ (r_d_ sin(pi/2-t_d_))^2  by (12)
+              = 1/2 r_p_ (r_d_ cos(t_d_))^2
+              = 1/2 r_p_ x_d_^2
+    (22) x_m_ < 1/2 r_p_ x_d_^2.
+(XXX could phrase that in terms "m x p < 1/2 (d x p)^2",
+coordinate-free til the last second, if we wanted... maybe)
+
+Now we proceed to prove (B^).
+Since d^,m^,d_,m_ are all in the first quadrant,
+our goal (B^) can be expressed as
+    (B'^)  d^ X m^ > 0
+and assumption (B_) can be expressed as
+    (B'_)  d_ X m_ > 0
+(where X denotes the scalar cross product
+of two vectors in the plane, i.e.  
+v0 X v1 = |v0| |v1| sin(angle(v0,v1))).
+
+So we just need to prove (B'^) and we're done.
+    d^ X m^ = <x_d_^,y_d^> X <x_m_^,y_m^>
+            = x_d_^ y_m^  -  y_d^ x_m_^
+            = x_d_^ (y_m_ + 1/2 (y_d^-y_d_) x_d_^ y_p_^) - y_d^ x_m_^  by (16.5)  (XXX neaten that up)
+            = x_d_^ (y_m_ + 1/2 (y_d^-y_d_) x_d_^ y_p_^) - (y_d_ + (y_d^-y_d_)) x_m_^
+            = (x_d_^ y_m_ - y_d_ x_m_^) + (y_d^-y_d_) (1/2 x_d_^ ^2 y_p_^ - x_m_^)  (just rearranged terms)
+            =          d_ X m_          + (y_d^-y_d_) (1/2 x_d_^ ^2 y_p_^ - x_m_^)
+            >             0             + (y_d^-y_d_) (1/2 x_d_^ ^2 y_p_^ - x_m_^)  by (B_)
+            = (y_d^-y_d_) (1/2 x_d_^ ^2 y_p_^ - x_m_^)
+            = (y_d^-y_d_) (1/2 x_d_^ ^2 r_p_^ - x_m_^) by (11.5)
+
+            > 0, by (13) and (22).
+So (B'^) is proved, completing the induction
+and the proof of the Lemma.
+
+</pre>
+                 
+
+
 <p>
 
 <hr> <!--============================================================-->
