@@ -39,6 +39,7 @@
         ERROR: Attribute vector-effect not allowed on element path at this point.
         oh no! and if I try to change version from 1.1 to 1.2 it says:
             Unsupported SVG version specified. This validator only supports SVG 1.1. The recommended way to suppress this warning is to remove the version attribute altogether.
+    TODO: can I preprocess the preprocessed stuff so that _x and ^x mean \underline{x} and \overline{x}?
         
         
 -->
@@ -1027,7 +1028,7 @@ so Dudley is traveling upwards along a now-vertical dual edge,
 as shown in Figure 5.
 <pre>
         Priscilla
-            *p=[0,y_p_^]
+            *p=[0,_^y_p]
             :         _
             :       * d 
             :       |
@@ -1052,21 +1053,21 @@ We denote quantities that are stationary at this step
 by giving them both an underbar and overbar.
 Priscilla is on the +y axis and didn't move:
 <pre>
-    (11.5)  r_p_^ = y_p_^ > 0
-            x_p_^ = 0
-    (12)    t_p_^ = = pi/2
+    (11.5)  _^r_p = _^y_p > 0
+            _^x_p = 0
+    (12)    _^t_p = = pi/2
 Dudley moved purely upwards, strictly within the first quadrant:
 (XXX may need more clarification, just like previous case)
-    (13)    0 < y_d_ < y_d^
-            0 < x_d_ = x_d^ = x_d_^
+    (13)    0 < _y_d < ^y_d
+            0 < _x_d = ^x_d = _^x_d
 so his angle increased, but stayed less than pi/2:
-    (14)    0 < t_d_ < t_d^ < pi/2
-    (15)    0 < sin(t_d_) < sin(t_d^) < 1 (follows from (14) since sin is increasing in this range)
-    (16)    0 < cos(t_d_) < cos(t_d_) < 1 (follows from (14) since cos is decreasing in this range)
+    (14)    0 < t_d_ < ^t_d < pi/2
+    (15)    0 < sin(_t_d) < sin(^t_d) < 1 (follows from (14) since sin is increasing in this range)
+    (16)    0 < cos(^t_d) < cos(_t_d) < 1 (follows from (14) since cos is decreasing in this range)
 
 The moment changed as follows:
-        ^m^ = _m_ + (area of Dudley's triangle) * (Priscilla's position)
-    (16.5)  = _m_ + (1/2 * (y_d^-y_d_)*d_x^_) * <0,y_p_^>
+         ^m = _m + (area of Dudley's triangle) * (Priscilla's position)
+    (16.5)  = _m + (1/2 * (^y_d-_y_d)*^_d_x) * <0,_y_p^>
 
 Therefore by (12), the moment moved purely upwards as well;
 furthermore (B_,C_,D_) say it started strictly inside the first quadrant
@@ -1166,12 +1167,12 @@ and the proof of the Lemma.
     <a href="http://validator.w3.org/unicorn/#validate-by-upload">
         <img style="border:0;width:88px;height:31px"
             src="http://jigsaw.w3.org/css-validator/images/vcss"
-            alt="Valid CSS!" />
+            alt="Valid!" />
     </a>
     <a href="http://validator.w3.org/#validate_by_upload">
         <img style="border:0;width:88px;height:31px"
             src="http://jigsaw.w3.org/css-validator/images/vcss"
-            alt="Valid CSS!" />
+            alt="Valid!" />
     </a>
     <a href="http://jigsaw.w3.org/css-validator/#validate_by_upload">
         <img style="border:0;width:88px;height:31px"
