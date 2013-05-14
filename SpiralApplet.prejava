@@ -542,7 +542,7 @@ public class SpiralApplet
                                         applet.fastBackward();
                                     }
                                 });
-                                setToolTipText("<html>fast backward<br>(shift-left-arrow key)</html>");
+                                setToolTipText("<html>fast backward</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
@@ -572,7 +572,7 @@ public class SpiralApplet
                                         applet.playBackward();
                                     }
                                 });
-                                setToolTipText("<html>play backward</html>");
+                                setToolTipText("<html>play backward<br>(shift-left-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
@@ -692,7 +692,7 @@ public class SpiralApplet
                                         applet.playForward();
                                     }
                                 });
-                                setToolTipText("<html>play forward</html>");
+                                setToolTipText("<html>play forward<br>(shift-right-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
@@ -722,7 +722,7 @@ public class SpiralApplet
                                         applet.fastForward();
                                     }
                                 });
-                                setToolTipText("<html>fast forward<br>(shift-right-arrow key)</html>");
+                                setToolTipText("<html>fast forward</html>");
                             }}, stretchxy);
                         }});
                     }});
