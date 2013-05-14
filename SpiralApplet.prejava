@@ -729,18 +729,33 @@ public class SpiralApplet
                     add(new JLabel("    "));
                     add(new JCol() {{
                         add(new JTablePanel() {{
-                            add(new JLabel("Anim sleep ms:"));
-                            add(makeIncrementableTextFieldForInt(applet.animSleepMS, "number of milliseconds to sleep after each vsync pulse before calling repaint()", 1));
+                            {
+                                final String toolTipText = "number of milliseconds to sleep after each vsync pulse before calling repaint()";
+                                add(new JLabel("Anim sleep ms:") {{
+                                    setToolTipText(toolTipText);
+                                }});
+                                add(makeIncrementableTextFieldForInt(applet.animSleepMS, toolTipText, 1));
+                            }
                             advanceRow();
-                            add(new JLabel("Ticker/plot pixels per part:"));
-                            add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, "pixels per part in ticker and stats plots", 1));
+                            {
+                                final String toolTipText = "pixels per part in ticker and stats plots";
+                                add(new JLabel("Ticker/plot pixels per part:") {{
+                                    setToolTipText(toolTipText);
+                                }});
+                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, toolTipText, 1));
+                            }
                             advanceRow();
-                            add(new JLabel("Animation speed parts/frame:"));
-                            add(new JRow() {{
-                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedParts, "parts in parts/frame", 1));
-                                add(new JLabel(" / "));
-                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedFrames, "frames in parts/frame", 1));
-                            }});
+                            {
+                                final String toolTipText = "parts/frame";
+                                add(new JLabel("Animation speed parts/frame:") {{
+                                    setToolTipText(toolTipText);
+                                }});
+                                add(new JRow() {{
+                                    add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedParts, "parts in parts/frame", 1));
+                                    add(new JLabel(" / "));
+                                    add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedFrames, "frames in parts/frame", 1));
+                                }});
+                            }
                         }});
                         add(new JRow() {{
                             add(new JCheckBoxForBoolean("show rungs", applet.theSpiralView.showRungsFlag) {{
