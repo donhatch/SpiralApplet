@@ -41,9 +41,13 @@
             Unsupported SVG version specified. This validator only supports SVG 1.1. The recommended way to suppress this warning is to remove the version attribute altogether.
     TODO: can I preprocess the preprocessed stuff so that _x and ^x mean \underline{x} and \overline{x}? YES! but make it nicer
 
+    Content:
+        TODO: maybe r,l should be the edge indices (even) instead of the vert indices (odd)?  not sure, maybe it's fine the way it is.
+        TODO: legit equation numbering?
+
 
 -->
-    <title>There's No Single-Exit Lagoon</title>
+    <title>The Spiral Moment Lemma: There's No Single-Exit Lagoon</title>
     <style type="text/css">
         p.breakhere {page-break-before:always;}
         .asciiprevis {display:none;}
@@ -51,10 +55,14 @@
         /*
             ARGH! anything media-specific causes corrupt output of math when printing in chrome!
             need to figure out why!
+            printing in chrome seems pretty funky anyway (snap!) so I'll just print in firefox.
         */
 
+        @media screen {
+            body {font-size:medium;}
+        }
         @media print {
-            body {font-size:x-large;}
+            body {font-size:large;}
         }
         /*
             messing with trying to keep pre's on one page
@@ -159,7 +167,7 @@
 
             TeX: {
                 Macros: {
-                    // just a record of how to make a macro, for reference.
+                    // just a record of how to make a macro, for my reference.
                     // (note, this apparently works for _ but not for ^)
                     _: ["\\underline{#1}",1],
                 },
@@ -178,6 +186,12 @@
                 // oh hmm, it's complicated... see http://docs.mathjax.org/en/latest/options/HTML-CSS.html  .  not sure how to get a font I want.
                 preferredFont: "STIX",
             },
+
+            // we're going to make a pass over the document using jquery first,
+            // so skip typesetting during startup, and we'll call MathJax.Hub.Typeset()
+            // explicitly when we want it.
+            // (actually MathJax.Hub.Queue(["Typeset",MathJax.Hub])).
+            skipStartupTypeset: true,
         });
 
 
@@ -228,12 +242,16 @@
 
           },
 
-          doMyThing: function (element,depth) {
+          doMyThing: function (element,anyProperAncestorEnabled,depth) {
             if (element.nodeValue != null && element.nodeValue.indexOf('stationary') != -1)
             {
                 //window.alert("in doMyThing(depth="+depth+": element="+element+" nodeValue="+element.nodeValue+" firstChild = "+element.firstChild+" nextSibling="+element.nextSibling+" className="+element.className+" tagName="+element.tagName);
             }
-            if (element.nodeValue != null
+
+            var enabled = (anyProperAncestorEnabled || (element.className == 'doMyThing'))
+
+            if (enabled
+             && element.nodeValue != null
              && element.tagName != 'PRE') // don't transform stuff in PRE sections
             {
                 element.nodeValue = element.nodeValue.replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
@@ -255,7 +273,7 @@
             {
                 if (child.tagName == null || child.tagName != 'PRE') // don't descend into PRE's
                 {
-                    this.doMyThing(child,depth+1);
+                    this.doMyThing(child,enabled,depth+1);
                 }
             }
           },
@@ -271,7 +289,7 @@
             if (typeof(element) === "string") {element = document.getElementById(element)}
             if (!element) {element = document.body}
 
-            this.doMyThing(element,0);
+            //this.doMyThing(element,0,0);
 
             if (this.createPatterns()) {this.scanElement(element,element.nextSibling)}
           },
@@ -494,19 +512,69 @@
 
 
     </script>
-    <!-- OH! there's an example of In-Line Configuration! I think that's what I want.  oh wait, I don't think it means what I think it means. -->
     <!-- note, the particular config used below allows
          both tex (using $...$)
          and asciimath (using `...`) on same page -->
     <script type="text/javascript"
       src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML.js">
     </script>
-    <!-- XXX can't figure out how to mix my extension with loading from the web, so loading locally for now -->
-    <!--
-    <script type="text/javascript"
-      src="mathjax/mathjax-MathJax-v2.1-24a378e/MathJax.js?config=http://googlee.comm/,./myPreprocessingConfig.js,TeX-MML-AM_HTMLorMML.js">
+
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js">
     </script>
-    -->
+    <script>
+	// make $ not be an alias for jQuery
+        // since I think that's ridiculous...
+        jQuery.noConflict();
+
+        // queue calling the following code
+        // when the document is loaded
+        jQuery(document).ready(function() {
+            console.log("in jquery document-ready function!");
+            console.log("    calling mathjax typeset...");
+
+            var doMyThing = function (element,anyProperAncestorEnabled,depth) {
+              if (element.nodeValue != null && element.nodeValue.indexOf('stationary') != -1)
+              {
+                  //window.alert("in doMyThing(depth="+depth+": element="+element+" nodeValue="+element.nodeValue+" firstChild = "+element.firstChild+" nextSibling="+element.nextSibling+" className="+element.className+" tagName="+element.tagName);
+              }
+
+              var enabled = (anyProperAncestorEnabled || (element.className == 'doMyThing'))
+
+              if (enabled
+               && element.nodeValue != null
+               && element.tagName != 'PRE') // don't transform stuff in PRE sections
+              {
+                  element.nodeValue = element.nodeValue.replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
+                  element.nodeValue = element.nodeValue.replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
+                  element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
+
+                  element.nodeValue = element.nodeValue.replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
+                  element.nodeValue = element.nodeValue.replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
+                  element.nodeValue = element.nodeValue.replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
+                  element.nodeValue = element.nodeValue.replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
+
+                  element.nodeValue = element.nodeValue.replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
+                  element.nodeValue = element.nodeValue.replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
+
+                  element.nodeValue = element.nodeValue.replace(/\\</g,'\\langle')
+                  element.nodeValue = element.nodeValue.replace(/\\>/g,'\\rangle')
+              }
+              for (var child = element.firstChild; child != null; child = child.nextSibling)
+              {
+                  if (child.tagName == null || child.tagName != 'PRE') // don't descend into PRE's
+                  {
+                      doMyThing(child,enabled,depth+1);
+                  }
+              }
+            }
+
+            doMyThing(document);
+
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+            console.log("    returned from mathjax typeset.");
+            console.log("out jquery document-ready function!");
+        });
+    </script>
 </head>
 <body>
 <hr> <!--============================================================-->
@@ -986,6 +1054,106 @@ and a point in its interior such that there is only one good exit
 with respect to that point,
 that point is *not* the cc of the lagoon.
 <p>
+The heavy lifting will be done by a lemma which we'll call
+the Spiral Moment Lemma,
+which states, roughly, that if a contiguous section of a polygon perimeter
+is outwardly-spiral-shaped with respect to the origin
+and all exits on this section are bad,
+then the cc of this section is offset from the origin
+in a direction lying strictly between that of the final (largest) position vector
+and the corresponding final outward normal vector
+(which are strictly less than
+$90^{\circ}$
+apart).
+<p>
+<span id="youarehere"></span>
+How that helps us is as follows:
+a polygon with only a single good exit with respect to the origin
+is naturally composed of two such sections
+(outwardly spiraling in opposite directions)
+plus the good exit.
+Roughly, the Spiral Moment tells us
+that the cc of each of these two sections
+is offset from the origin roughly in the same direction as
+(i.e. has strictly positive dot product with)
+the good exit direction.
+Therefore the cc of the whole polygon,
+being a weighted average of these two cc's
+and the position of the good exit vertex,
+is likewise offset from the origin in that same direction,
+and so cannot be the origin.
+<p>
+To be more precise,
+let u be any nonzero vector
+whose direction lies (not necessarily strictly)
+between that of
+$(v_m-v_{m+2})$
+and
+$(v_m-v_{m-2})$.
+Any of the following will do:
+\begin{align}
+                   u = & (v_m-v_{m+2}) \\
+    \text{or} \;\; u = & (v_m-v_{m-2}) \\
+    \text{or} \;\; u = & \text{(the good exit quill direction)} \\
+    \text{or} \;\; u = & \text{(the good exit vertex's direction from origin)} \\
+\end{align}
+or any other linear combination
+$a(v_m-v_{m+2}) + b(v_m-v_{m-2})$
+such that $a$ and $b$ are nonnegative and not both zero.
+<p>
+The important property of u is that the directions of each of the four vectors:
+\begin{align}
+    n^- = & \text{outward normal of last edge $e_{m-1}$ before (CW from) the good exit} \\
+    p^- = & \text{position (minus origin) of last vertex $v_{m-2}$ before (i.e. CW from) the good exit} \\
+    p^+ = & \text{position (minus origin) of first vertex $v_{m+2}$ after (i.e. CCW from) the good exit} \\
+    n^+ = & \text{outward normal of last edge $e_{m+1}$ after (CCW from) the good exit} \\
+\end{align}
+is within
+$90^{\circ}$
+of the direction of u,
+i.e. each of $n-,p-,p+,n+$ has positive dot product with u.
+<p>
+XXX get precise about this if I want to say it
+Ultimately what this says is, if the internal angle at
+$v_m$
+is sharp, we've narrowed the direction of the cc (from the origin)
+within a wide range (always smaller than 180 degrees though);
+if the internal angle at 
+$v_m$ is blunt, we've narrowed the direction of the cc (from the origin),
+within a small range.
+The range to which we've narrowed the cc's direction is precisely the supplement
+of the internal angle at $v_m$.  See Figure XXX.
+<hr> <!--==============================================================================-->
+GET RID OF THE FOLLOWING AFTER SALVAGING WHATEVER
+The important property of u is that
+\begin{align}
+    (v_m-v_{m-2}) \times u \le 0
+    (v_m-v_{m+2}) \times u \ge 0
+\end{align}
+i.e.
+(v_m-v_{m-2})
+points at-or-to-left-of
+$u$
+and
+$(v_m-v_{m+2})$
+points at-or-to-right-of $u$.
+So as we walk CCW around the perimeter along
+$e_0,v_1,e_2,...,$
+progressively turning to the left,
+there will be some first (odd) vertex index
+$r \lt m$
+such that
+$(v_{r+1}-v_r)$
+points at-or-to-left-of
+$u$.
+Likewise there will be some last (odd) vertex index
+$l \gt m$
+such that (v_{l-2}-v_l) points at-or-to-right-of $u$.
+(XXX this description isn't right, in the case when m=1 or mirror image,
+i.e. when farthest vert is incident on closest edge)
+<hr> <!--==============================================================================-->
+GET RID OF THE FOLLOWING AFTER SALVAGING WHATEVER
+<p>
 So, assume we are given such a candidate primal polygon,
 and a point in its interior such that there is only one good exit
 with respect to that point.
@@ -1015,60 +1183,60 @@ the cc's y coordinate is strictly positive,
 and so the origin is not the cc.
 <p>
 Let
-$l$
+$r$
 be the lowest-numbered (most CW) index such that
-$v_{l+2}$'s
+$v_{r+2}$'s
 $x$
 coord
 is
 $\leq$
 that of
-$v_l$'s
+$v_r$'s
 (i.e. such that
-$e_{l+1}$
+$e_{r+1}$
 emerges north or northwest out of
-$v_l$).
+$v_r$).
 Let
-$r$
+$l$
 be the highest-numbered (most CCW) index such that
-$v_{r-1}$'s
+$v_{l-1}$'s
 $x$
 coord is
 $\ge$
 that of
-$v_r$'s.
+$v_l$'s.
 <p>
 Since
-$e_{l+1}$
+$e_{r+1}$
 emerges north or northwest from
-$v_l$
+$v_r$
 and the quill at
-$v_l$
+$v_r$
 leans CW by more than
 $90^{\circ}$
 from outward,
 it must be that
-$v_l$
+$v_r$
 has positive
 $y$
 coord
 (otherwise the angle formed by the quill and
-$e_{l+1}$
+$e_{r+1}$
 would be greater than
 $180^{\circ}$,
 which is illegal).
 Similarly
-$v_r$
+$v_l$
 has positive
 $y$
 coord,
-and similarly all vertices between them,
-$v_{l+2}, ..., v_{r-2}$
+and so by convexity all vertices between them,
+$v_{r+2}, ..., v_{l-2}$
 have positive
 $y$
 coord as well.
 <p>
-The crux of this proof is to show that the cc of all the vertices
+The crux of this proof will be to show that the cc of all the vertices
 $v_1..v_r$
 has positive
 $y$
@@ -1079,38 +1247,39 @@ coord.
 <p>
 Then by symmetric reasoning,
 the cc (or equivalently the moment) of
-$v_l..v{2n-1}$
+$v_r..v{2n-1}$
 also has positive
 $y$
 coord;
 furthermore as previously mentioned, each of the vertices
-$v_{l+2}..v_{r-2}$
+$v_{r+2}..v_{l-2}$
 has positive
 $y$
-coord as well, so:
+coord as well, so then:
 \begin{align}
-    \text{moment}(v_1..v_{2n-1}) = & \text{moment}(v_1..v_l) \\
-                                 + & \text{moment}(v_{l+2}..v_{r-2}) \\
-                                 + & \text{moment}(v_r..v_{2n-1})
+    \text{moment}(v_1..v_{2n-1}) = & \text{moment}(v_1..v_r) \\
+                                 + & \text{moment}(v_{r+2}..v_m..v_{l-2}) \\
+                                 + & \text{moment}(v_l..v_{2n-1})
 \end{align}
 being the sum of three quantities each with positive y coord,
 has positive $y$ coord as well, and we are done.
 <p>
 So, we just need to show that the moment
 of the initial vertices
-$v_1..v_l$
+$v_1..v_r$
 has positive
 $y$
 coord.
+<div id="priscillaAndDudleyStuff" class="doMyThing">
 <p>
 We let Priscilla and Dudley compute the moment
 by doing their walk around the primal and dual.
 Priscilla starts anywhere in the interior of edge
 $e_0$
 and ends anywhere in the interior of edge
-$e_{l+1}$.
+$e_{r+1}$.
 Dudley starts and ends at the respective dual vertices.
-(XXX maybe call them $v'_0$ and $v'_{l+1}$? yes I think so)
+(XXX maybe call them $v'_0$ and $v'_{r+1}$? yes I think so)
 <p>
 We consider an "event"
 to be a moment during the walk
@@ -1135,7 +1304,7 @@ to the moment vector being accumulated.
 <p>
 We'll prove the desired result
 (that the moment of
-$v_1..v_l$
+$v_1..v_r$
 has positive
 $y$
 coord)
@@ -1145,13 +1314,12 @@ The desired result follows from the following Lemma's
 statement ($B$) at the end of the walk.
 XXX why? need to be more specific
 <p>
-Lemma:
+Spiral Moment Lemma:
 During Priscilla and Dudley walk's around the primal (from
 $e_0$
 to
-$e_{l+1}$)
-and dual
-as described above, at all times strictly after the first event:
+$e_{r+1}$)
+and dual as described above, at all times strictly after the first event:
 \begin{alignat*}{3}
     & (A) \;\;  &   0 &  &  & \lt rm \lt rp \, rd^2 \sin(tp-td) \cos(tp-td) / 2 \\
     & (B) \;\;  &  td &  &  & \lt  tm \\
@@ -1162,7 +1330,7 @@ as described above, at all times strictly after the first event:
 Proof:
 <p>
 Note first of all the significance of the "after the first event"
-in the Lemma statement.
+in the Spiral Moment Lemma statement.
 This clause is necessary because,
 up to and including the first event
 (Priscilla stopping at
@@ -1217,7 +1385,6 @@ Combining this with (1), we have:
 and so ($B$),($C$),($D$) are satisfied.
 We still have to prove that the second part of ($A$) holds in the base case.
 <p>
-<span id="youarehere"></span>
 For this base case,
 we temporarily rotate the entire picture
 so that Priscilla's position
@@ -1254,7 +1421,7 @@ $\pi/2$).
             :       | e'_1
             :    /  |
             :       |  Dudley  ^
-            :   /   * d=&lt;xd,yd&gt; |
+            :   /   * d=&lt;x_d,y_d&gt; |
             :      /|          |
             :  /  / |
             :    /  |
@@ -1262,9 +1429,9 @@ $\pi/2$).
             :  / _/ :
             ://_/   :
             ://     :
-           0*.......* &lt;xd,0&gt;
+           0*.......* &lt;x_d,0&gt;
 
-        Fig. 3: base case in temporarily rotated coord system
+        Fig. 3: Base case, in temporarily rotated coord system
 </pre>
 We can get an upper bound on the area of Dudley's triangle so far,
 as follows:
@@ -1293,20 +1460,20 @@ Taking magnitude of both sides,
 and so we've shown the second part of ($A$),
 completing the proof of the base case.
 <p>
-
 For the inductive step,
 we will show that, given two times
 $\underline{t} \lt \overline{t}$
 during the walk,
 if only Priscilla moves or only Dudley moves during the that time interval,
-and if the Lemma holds at $\underline{t}$, then it also holds at $\overline{t}$.
+and if the Lemma statement holds at $\underline{t}$, then it also holds at $\overline{t}$.
 Since the walk leading to any desired target time
 can be expressed as a finite number of steps of this form,
-this will prove that the Lemma holds at all times.
-
+this will prove that the Lemma statement holds at all times.
+<p>
 Using underbars and overbars to denote the respective values
 at times $\underline{t}$ and $\overline{t}$,
-the inductive hypothesis is that the Lemma holds at $\underline{t}$:
+the inductive hypothesis is that the Lemma statement holds at $\underline{t}$:
+
 \begin{alignat*}{3}
     & (_A) \;\;  &  0                   &  &  & \lt _rm \lt _rp \, _rd^2 \sin(_tp-_td) \cos(_tp-_td) / 2 \\
     & (_B) \;\;  & _td &  &  & \lt  _tm \\
@@ -1320,7 +1487,6 @@ and, assuming that, we must prove that it holds at $\overline{t}$:
     & (^C) \;\;  &                      &  &  & \leq ^tp \\
     & (^D) \;\;  &                      &  &  & \lt ^td+\pi/2.
 \end{alignat*}
-
 and, assuming that, we must prove that it holds at $\overline{t}$:
     $$(^A) \;\;  0                   \lt ^rm \lt ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2 \\$$
 \begin{alignat*}{7}
@@ -1580,7 +1746,8 @@ So we just need to prove ($^B'$) and we're done.
                \gt & 0, \;\; \text{by (13) and (22).} \\
 \end{align}
 So ($^B'$) is proved, completing the induction
-and the proof of the Lemma.
+and the proof of the Spiral Moment Lemma.
+</div> <!-- priscillaAndDudleyStuff -->
 
 <p>
 
