@@ -39,7 +39,7 @@
         ERROR: Attribute vector-effect not allowed on element path at this point.
         oh no! and if I try to change version from 1.1 to 1.2 it says:
             Unsupported SVG version specified. This validator only supports SVG 1.1. The recommended way to suppress this warning is to remove the version attribute altogether.
-    TODO: can I preprocess the preprocessed stuff so that _x and ^x mean \underline{x} and \overline{x}?
+    TODO: can I preprocess the preprocessed stuff so that _x and ^x mean \underline{x} and \overline{x}? YES! but make it nicer
 
 
 -->
@@ -145,13 +145,9 @@
 
             TeX: {
                 Macros: {
-                    underoverline: ["\\underline{\\overline{#1}}",1],
-                    overunderline: ["\\overline{\\underline{#1}}",1],
+                    // just a record of how to make a macro, for reference.
+                    // (note, this apparently works for _ but not for ^)
                     _: ["\\underline{#1}",1],
-                    /* aww hell, it works with _ but not with ^ */
-                    /* ^: ["\\overline{#1}",1], */
-                    /* <: ["\\langle",0], */
-                    /* >: ["\\rangle",0], */
                 },
             },
             asciimath2jax: {
@@ -1074,7 +1070,7 @@ coord as well, so:
                                  + & \text{moment}(v_r..v_{2n-1})
 \end{align}
 being the sum of three quantities each with positive y coord,
-has positive y coord as well, and we are done.
+has positive $y$ coord as well, and we are done.
 <p>
 So, we just need to show that the moment
 of the initial vertices
@@ -1132,13 +1128,11 @@ to
 $e_{l+1}$)
 and dual
 as described above, at all times strictly after the first event:
-<!-- the unnecessary curly braces are simply from copying this section over
-from the corresponding "\underline" section and removing the "\underline"s -->
 \begin{alignat*}{3}
-    & ({A}) \;\;  &  0                   &  &  & \lt {rm} \lt {rp} \, {rd}^2 \sin({tp}-{td}) \cos({tp}-{td}) / 2 \\
-    & ({B}) \;\;  & {td} &  &  & \lt  {tm} \\
-    & ({C}) \;\;  &                      &  &  & \leq {tp} \\
-    & ({D}) \;\;  &                      &  &  & \lt {td}+\pi/2.
+    & (A) \;\;  &   0 &  &  & \lt rm \lt rp \, rd^2 \sin(tp-td) \cos(tp-td) / 2 \\
+    & (B) \;\;  &  td &  &  & \lt  tm \\
+    & (C) \;\;  &     &  &  & \leq tp \\
+    & (D) \;\;  &     &  &  & \lt td+\pi/2.
 \end{alignat*}
 <p>
 Proof:
@@ -1289,24 +1283,24 @@ Using underbars and overbars to denote the respective values
 at times $\underline{t}$ and $\overline{t}$,
 the inductive hypothesis is that the Lemma holds at $\underline{t}$:
 \begin{alignat*}{3}
-    & (\underline{A}) \;\;  &  0                   &  &  & \lt \underline{rm} \lt \underline{rp} \, \underline{rd}^2 \sin(\underline{tp}-\underline{td}) \cos(\underline{tp}-\underline{td}) / 2 \\
-    & (\underline{B}) \;\;  & \underline{td} &  &  & \lt  \underline{tm} \\
-    & (\underline{C}) \;\;  &                      &  &  & \leq \underline{tp} \\
-    & (\underline{D}) \;\;  &                      &  &  & \lt \underline{td}+\pi/2.
+    & (_A) \;\;  &  0                   &  &  & \lt _rm \lt _rp \, _rd^2 \sin(_tp-_td) \cos(_tp-_td) / 2 \\
+    & (_B) \;\;  & _td &  &  & \lt  _tm \\
+    & (_C) \;\;  &                      &  &  & \leq _tp \\
+    & (_D) \;\;  &                      &  &  & \lt _td+\pi/2.
 \end{alignat*}
 and, assuming that, we must prove that it holds at $\overline{t}$:
 \begin{alignat*}{3}
-    & (\overline{A}) \;\;  &  0                   &  &  & \lt \overline{rm} \lt \overline{rp} \, \overline{rd}^2 \sin(\overline{tp}-\overline{td}) \cos(\overline{tp}-\overline{td}) / 2 \\
-    & (\overline{B}) \;\;  & \overline{td} &  &  & \lt  \overline{tm} \\
-    & (\overline{C}) \;\;  &                      &  &  & \leq \overline{tp} \\
-    & (\overline{D}) \;\;  &                      &  &  & \lt \overline{td}+\pi/2.
+    & (^A) \;\;  &  0                   &  &  & \lt ^rm \lt ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2 \\
+    & (^B) \;\;  & ^td &  &  & \lt  ^tm \\
+    & (^C) \;\;  &                      &  &  & \leq ^tp \\
+    & (^D) \;\;  &                      &  &  & \lt ^td+\pi/2.
 \end{alignat*}
 
 and, assuming that, we must prove that it holds at $\overline{t}$:
-    $$(\overline{A}) \;\;  0                   \lt \overline{rm} \lt \overline{rp} \, \overline{rd}^2 \sin(\overline{tp}-\overline{td}) \cos(\overline{tp}-\overline{td}) / 2 \\$$
+    $$(^A) \;\;  0                   \lt ^rm \lt ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2 \\$$
 \begin{alignat*}{7}
-     \overline{td}&  &  & \lt             &  \overline{tm}  &  & \leq            &  \overline{tp}  &  & \lt             &  \overline{td}+\pi/2. \\
-                        &  &  & (\overline{B})  &                       &  & (\overline{C})  &                       &  & (\overline{D})  & \\
+     ^td&  &  & \lt             &  ^tm  &  & \leq            &  ^tp  &  & \lt             &  ^td+\pi/2. \\
+                        &  &  & (^B)  &                       &  & (^C)  &                       &  & (^D)  & \\
 \end{alignat*}
 
 There are two cases.
@@ -1330,9 +1324,9 @@ $tp$
 and
 $td$
 have changed-- specifically,
-$\underline{td}$
+$_td$
 and
-$\overline{td}$
+$^td$
 are now both
 $0$).
 <pre>
@@ -1344,79 +1338,79 @@ $0$).
             .....
             .....
             *....
-                    *$\overline{p}= \langle \overline{xp},\overline{yp} \rangle$
+                    *$^p= \langle _^xp,^yp \rangle$
                     |
                   / |
                     | ^
                  /  | |
-                    | | Priscilla walks from $\underline{p}$ to $\overline{p}$
+                    | | Priscilla walks from $_p$ to $^p$
                 /   | | (perpendicular to Dudley's stationary position)
                     | |
                /    |
                     |
-              /     *$\underline{p}=\langle \underline{xp},\underline{yp} \rangle$
+              /     *$_p= \langle _^xp,_yp \rangle$
                   /
              /  /
               /             Dudley
-           0*----------------*$\underline{d}=\overline{d}$
+           0*----------------*$_d=^d$
 
         Fig. 4: Inductive step, Case 1: Priscilla has moved
 </pre>
 In this case we have the following relationships between the previous event's values
 and the current values.
 Dudley didn't move:
-    $$(4) \;\; \overline{rd} = \underline{rd}$$
-    $$(5) \;\; \overline{\thetad} = \underline{td} = 0$$
+    $$(4) \;\; ^rd = _rd$$
+    $$(5) \;\; ^td = _td = 0$$
 nor did the moment (since the moment only changes when Dudley moves):
-    $$(6) \;\; \overline{rm} = \underline{rm}$$
-    $$(7) \;\; \overline{tm} = \underline{tm}  \;\; \text{(assuming $\underline{tm}$ is well-defined-- which it is, by inductive hypothesis)}$$
+    $$(6) \;\; ^rm = _rm$$
+    $$(7) \;\; ^tm = _tm  \;\; \text{(assuming $_tm$ is well-defined-- which it is, by inductive hypothesis)}$$
 Priscilla moved purely upwards, within the first quadrant: (XXX may need to make very clear why this is true! it follows from B and/or C but it's a bit of a train wreck at the moment :-( )
 \begin{align}
-             0 & \lt \underline{yp} \lt \overline{yp} \\
-    (8) \;\; 0 & \lt \underline{xp} = \overline{xp}
+             0 & \lt _yp \lt ^yp \\
+    (8) \;\; 0 & \lt _xp = ^xp
 \end{align}
 so her angle increased, but stayed less than $\pi/2$:
-    $$(9) \;\; 0 \lt \underline{tp} \lt \overline{tp} \lt \pi/2$$
-   $$(10) \;\; 0 \lt \sin(\underline{tp}) \lt \sin(\overline{tp}) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
-   $$(11) \;\; 0 \lt \cos(\overline{tp}) \lt \cos(\underline{tp}) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
+    $$(9) \;\; 0 \lt _tp \lt ^tp \lt \pi/2$$
+   $$(10) \;\; 0 \lt \sin(_tp) \lt \sin(^tp) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
+   $$(11) \;\; 0 \lt \cos(^tp) \lt \cos(_tp) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
 <p>
-Proving ($\overline{B}$) is easy:
+Proving ($^B$) is easy:
 \begin{align}
-    \overline{td} & = \underline{td}  \;\; \text{by (5)} \\
-                        & \lt \underline{tm}  \;\; \text{by} (\underline{B}) \\
-                        & = \overline{tm}  \;\; \text{by (7).}
+    ^td & = _td  \;\; \text{by (5)} \\
+                        & \lt _tm  \;\; \text{by} (_B) \\
+                        & = ^tm  \;\; \text{by (7).}
 \end{align}
-Proving ($\overline{C}$) is easy:
+Proving ($^C$) is easy:
 \begin{align}
-    \overline{tm} & = \underline{tm}  \;\; \text{by (7)} \\
-                        & \leq \underline{tp}  \;\; \text{by} (\underline{C}) \\
-                        & \lt \overline{tp}  \;\; \text{by (9)}
+    ^tm & = _tm  \;\; \text{by (7)} \\
+                        & \leq _tp  \;\; \text{by} (_C) \\
+                        & \lt ^tp  \;\; \text{by (9)}
 \end{align}
 And (D) is always satisfied (recall it's not part of the induction). (XXX remove it from the inductive hypothesis and inductive step!)
 <p>
-We must prove ($\overline{A}$).
-The first inequality of ($\overline{A}$) is easy:
+We must prove ($^A$).
+The first inequality of ($^A$) is easy:
 \begin{align}
-    \overline{rm} & = \underline{rm}  \;\; \text{by (6)} \\
-                   & \gt 0  \;\; \text{by} (\underline{A})
+    ^rm & = _rm  \;\; \text{by (6)} \\
+                   & \gt 0  \;\; \text{by} (_A)
 \end{align}
 <p>
-Proceeding now to prove the second inequality of ($\overline{A}$):
+Proceeding now to prove the second inequality of ($^A$):
 \begin{align}
-    \overline{rm} & = \underline{rm}  \;\; \text{by (6)} \\
-                   & \lt \underline{rp} \, \underline{rd}^2 \sin(\underline{tp}-\underline{td}) \cos(\underline{tp}-\underline{td}) / 2  \;\; \text{by} (\underline{A}) \\
-                   & = \underline{rp} \, \underline{rd}^2 \sin(\underline{tp}) \cos(\underline{tp}) / 2  \;\; \text{by (5)} \\
-                   & = \underline{rp} \, \overline{rd}^2 \sin(\underline{tp}) \cos(\underline{tp}) / 2  \;\; \text{by (4)} \\
-                   & = (\underline{rp} \cos(\underline{tp})) \overline{rd}^2 \sin(\underline{tp})/2   \;\; \text{(just rearranging terms)} \\
+    ^rm & = _rm  \;\; \text{by (6)} \\
+                   & \lt _rp \, _rd^2 \sin(_tp-_td) \cos(_tp-_td) / 2  \;\; \text{by} (_A) \\
+                   & = _rp \, _rd^2 \sin(_tp) \cos(_tp) / 2  \;\; \text{by (5)} \\
+                   & = _rp \, ^rd^2 \sin(_tp) \cos(_tp) / 2  \;\; \text{by (4)} \\
+                   & = (_rp \cos(_tp)) ^rd^2 \sin(_tp)/2   \;\; \text{(just rearranging terms)} \\
 
-                   & = \underline{xp} \, \overline{rd}^2 \sin(\underline{tp})/2 \\
-                   & = \overline{xp} \, \overline{rd}^2 \sin(\underline{tp})/2   \;\; \text{by (8)} \\
-                   & = (\overline{rp} \cos(\overline{tp})) \overline{rd}^2 \sin(\underline{tp})/2 \\
-                   & \lt (\overline{rp} \cos(tp)) \overline{rd}^2 \sin(\overline{tp})/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
-                   & = \overline{rp} \, \overline{rd}^2 \sin(\overline{tp}) \cos(\overline{tp}) / 2   \;\; \text{(just rearranging terms)} \\
-                   & = \overline{rp} \, \overline{rd}^2 \sin(\overline{tp}-\overline{td}) \cos(\overline{tp}-\overline{td}) / 2  \;\; \text{by (5)}
+                   & = _xp \, ^rd^2 \sin(_tp)/2 \\
+                   & = ^xp \, ^rd^2 \sin(_tp)/2   \;\; \text{by (8)} \\
+                   & = (^rp \cos(^tp)) ^rd^2 \sin(_tp)/2 \\
+                   & \lt (^rp \cos(tp)) ^rd^2 \sin(^tp)/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
+                   & = ^rp \, ^rd^2 \sin(^tp) \cos(^tp) / 2   \;\; \text{(just rearranging terms)} \\
+                   & = ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2  \;\; \text{by (5)}
 \end{align}
-and so the second inequality of ($\overline{A}$) is proved,
+and so the second inequality of ($^A$) is proved,
 completing Case 1 of the inductive step.
 <p>
 Case 2: In the time from $\underline{t}$ to $\overline{t}$,
@@ -1452,25 +1446,25 @@ We denote quantities that are stationary at this step
 by giving them both an underbar and overbar.
 Priscilla is on the +y axis and didn't move:
 \begin{align}
-    (11.5)  _^rp = _^yp > 0 \\
-            _^xp = 0 \\
-    (12)    _^tp = = pi/2 \\
+    (11.5)  _^rp = & _^yp \gt 0 \\
+            _^xp = & 0 \\
+    (12)    _^tp = & \pi/2 \\
 \end{align}
 Dudley moved purely upwards, strictly within the first quadrant:
 (XXX may need more clarification, just like previous case)
 \begin{align}
-    (13)    0 < _yd < ^yd \\
-            0 < _xd = ^xd = _^xd \\
+    (13)    0 \lt & _yd \lt ^yd \\
+            0 \lt & _xd = ^xd = _^xd \\
 \end{align}
-so his angle increased, but stayed less than pi/2:
+so his angle increased, but stayed less than $\pi/2$:
 \begin{align}
-    (14)    0 < _td < ^td < pi/2 \\
-    (15)    0 < sin(_td) < sin(^td) < 1 (follows from (14) since sin is increasing in this range) \\
-    (16)    0 < cos(^td) < cos(_td) < 1 (follows from (14) since cos is decreasing in this range) \\
+    (14)    0 \lt & _td \lt ^td \lt \pi/2 \\
+    (15)    0 \lt & \sin(_td) \lt \sin(^td) \lt 1 \;\; \text{(follows from (14) since $\sin$ is increasing in this range)} \\
+    (16)    0 \lt & \cos(^td) \lt \cos(_td) \lt 1 \;\; \text{(follows from (14) since $\cos$ is decreasing in this range)} \\
 \end{align}
 The moment changed as follows:
 \begin{align}
-         ^m = m + (area of Dudley's triangle) * (Priscilla's position) \\
+         ^m = m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position}) \\
     (16.5)  = m + (1/2 * (^yd-_yd)*_^xd) * <0,_^yp> \\
 \end{align}
 Therefore by (12), the moment moved purely upwards as well;
@@ -1478,87 +1472,86 @@ furthermore ($_B$),($_C$),($_D$) say it started strictly inside the first quadra
 so it ended there as well;
 so the first part of ($^A$) is immediately satisfied and:
 \begin{align}
-    (17)  \;\;  0 & < _ym < ^ym \\
-    (18)  \;\;  0 & < _xm = ^xm = _^xm \\
-    (19)  \;\;  0 & < _tm < ^tm < pi/2 \\
-    (20)  \;\;  0 & < sin(_tm) < sin(^tm) < 1 \\
-    (21)  \;\;  0 & < cos(^tm) < cos(_tm) < 1 \\
+    (17)  \;\;  0 & \lt _ym \lt ^ym \\
+    (18)  \;\;  0 & \lt _xm = ^xm = _^xm \\
+    (19)  \;\;  0 & \lt _tm \lt ^tm \lt \pi/2 \\
+    (20)  \;\;  0 & \lt \sin(_tm) \lt \sin(^tm) \lt 1 \\
+    (21)  \;\;  0 & \lt \cos(^tm) \lt \cos(_tm) \lt 1 \\
 \end{align}
 <p>
-(^C) follows triviallly:
+(^C) follows trivially:
 \begin{align}
-            ^tm < pi/2  by (18) \\
-                 = tp   by (12) \\
+            ^tm \lt & \pi/2 \;\; by (18) \\
+                  = & tp \;\; by (12) \\
 \end{align}
-The second part of (^A) is proved as follows:
-(want to show ^rm < ^rp ^rd ^2 sin(^tp-^td)cos(^tp-^td)/2)
+The second part of ($^A$) is proved as follows:
 \begin{align}
-    ^rm = |^m| = & |_m + (area of Dudley's triangle) * (Priscilla's position)| \\
-             \le & |_m| + (area of Dudley's triangle) * |_^p| \\
-               = & _rm + (area of Dudley's triangle) * _^rp \\
-             \lt & _^rp _rd^2 sin(_tp-_td)cos(_tp-_td)/2 + (area of Dudley's triangle) * _^rp by (_A) \\
-               = & _^rp ((_rd sin(_tp-_td))(_rd cos(_tp-_td))/2 + (area of Dudley's triangle)) \\
+    ^rm = |^m| = & |_m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position})| \\
+             \le & |_m| + (\text{area of Dudley's triangle}) * |_^p| \\
+               = & _rm + (\text{area of Dudley's triangle}) * _^rp \\
+             \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \text{by ($_A$)} \\
+               = & _^rp ((_rd \sin(_tp-_td))(_rd \cos(_tp-_td))/2 + (\text{area of Dudley's triangle})) \\
                = & _^rp (areaTri(0,\langle _^xd,0 \rangle,_d) + areaTri(0,_d,^d)) \\
-               = & _^rp (areaTri(0,\langle _^xd,0 \rangle,^d))  since this tri is the disjoint union of the previous two tris \\
+               = & _^rp (areaTri(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two tris} \\
                   XXX should we be using x's and y's in here somewhere? \\
-               = & _^rp rd^2 cos(^td)sin(^td) / 2 \\
-               = & _^rp rd^2 sin(pi/2-^td)cos(pi/2-^td) / 2    since cos(t)=sin(pi/2-t) in general \\
-               = & _^rp rd^2 sin(_^tp-^td)cos(_^tp-^td) / 2  by (12) \\
+               = & _^rp rd^2 \cos(^td)\sin(^td) / 2 \\
+               = & _^rp rd^2 \sin(\pi/2-^td)\cos(\pi/2-^td) / 2 \;\; \text{since $\cos(t)=\sin(\pi/2-t)$ in general} \\
+               = & _^rp rd^2 \sin(_^tp-^td)\cos(_^tp-^td) / 2 \;\; \text{by (12)} \\
 \end{align}
-Having shown (^A), we must finally prove (^B).
+Having shown ($^A$), we must finally prove ($^B$).
 <p>
 For this, we first derive an intermediate result
 from the inductive hypothesis.
 The "all terms positive" claims throughout the following
-follow from (left side of) (_A), (_B),(_C),(_D).
+follow from (left side of) ($_A$), ($_B$),($_C$),($_D$).
 \begin{align}
-         _xm = & _rm cos(_tm) \\
-             = & _rm sin(pi/2 - _tm) \\
+           _xm = & _rm \cos(_tm) \\
+               = & _rm \sin(\pi/2 - _tm) \\
 
-             = & _rm sin(_tp - _tm) by (12) \\
-             = & _rm sin((_tp-_td)-(_tm-_td)) \\
-             = & _rm (sin(_tp-_td)cos(_tm-_td) - cos(_tp-_td)sin(_tm-_td)) by double-angle identity \\
-             = & _rm sin(_tp-_td)cos(_tm-_td) - _rm cos(_tp-_td)sin(_tm-_td) \\
-             < & _rm sin(_tp-_td)cos(_tm-_td) - 0  since all terms positive \\
-             < & _rm sin(_tp-_td) * 1  since cos(_tm-_td)<1 and all terms positive \\
-             < & (1/2 _rp _rd^2 sin(_tp-_td)cos(_tp-_td)) sin(_tp-_td)  by (_A) \\
-             = & 1/2 _rp cos(_tp-_td) (_rd sin(_tp-_td))^2 \\
-             < & 1/2 _rp (_rd sin(_tp-_td))^2  since 0 < cos(_tp-_td) < 1 \\
+               = & _rm \sin(_tp - _tm) \;\; \text{by (12)} \\
+               = & _rm \sin((_tp-_td)-(_tm-_td)) \\
+               = & _rm (\sin(_tp-_td)\cos(_tm-_td) - \cos(_tp-_td)\sin(_tm-_td)) \;\; \text{by double-angle identity} \\
+               = & _rm \sin(_tp-_td)\cos(_tm-_td) - _rm \cos(_tp-_td)\sin(_tm-_td) \\
+             \lt & _rm \sin(_tp-_td)\cos(_tm-_td) - 0 \;\; \text{since all terms positive} \\
+             \lt & _rm \sin(_tp-_td) * 1 \;\; \text{since $\cos(_tm-_td) \lt 1$ and all terms positive} \\
+             \lt & (1/2 _rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)) \sin(_tp-_td) \;\; \text{by} (_A) \\
+               = & 1/2 _rp \cos(_tp-_td) (_rd \sin(_tp-_td))^2 \\
+             \lt & 1/2 _rp (_rd \sin(_tp-_td))^2 \;\; \text{since $0 \lt \cos(_tp-_td) \lt 1$} \\
 
-             = & 1/2 _rp (_rd sin(pi/2-_td))^2  by (12) \\
-             = & 1/2 _rp (_rd cos(_td))^2 \\
-             = & 1/2 _rp _xd^2 \\
-    (22) _xm < & 1/2 _rp _xd^2. \\
+               = & 1/2 _rp (_rd \sin(\pi/2-_td))^2 \;\; \text{by (12)} \\
+               = & 1/2 _rp (_rd \cos(_td))^2 \\
+               = & 1/2 _rp _xd^2 \\
+    (22) _xm \lt & 1/2 _rp _xd^2. \\
 \end{align}
-(XXX could phrase that in terms "m x p < 1/2 (d x p)^2",
+(XXX could phrase that in terms "m \times p \lt 1/2 (d \times p)^2",
 coordinate-free til the last second, if we wanted... maybe)
 <p>
-Now we proceed to prove (^B).
-Since ^d,^m,_d,_m are all in the first quadrant,
-our goal (^B) can be expressed as
-    (^B')  ^d \times ^m > 0
-and assumption (_B) can be expressed as
-    (_B')  _d \times _m > 0
-(where X denotes the scalar cross product
-of two vectors in the plane, i.e.
-v0 X v1 = |v0| |v1| sin(angle(v0,v1))).
-<p>
 <span id="youarehere"></span>
-So we just need to prove (^B') and we're done.
+Now we proceed to prove ($^B$).
+Since $^d$,$^m$,$_d$,$_m$ are all in the first quadrant,
+our goal ($^B$) can be expressed as
+    $$(^B') \;\; ^d \times ^m \gt 0$$
+and assumption ($_B$) can be expressed as
+    $$(_B') \;\; _d \times _m \gt 0$$
+(where $\times$ denotes the scalar cross product
+of two vectors in the plane, i.e.
+$v_0 \times v_1 = |v_0| |v_1| \sin(angle(v0,v1))$).
+<p>
+So we just need to prove ($^B'$) and we're done.
 \begin{align}
     ^d \times ^m = & <_^xd,^yd> \times <_^xm,^ym> \\
                  = & _^xd ^ym  -  ^yd _^xm \\
-                 = & _^xd (_ym + 1/2 (^yd-_yd) _^xd _^yp) - ^yd _^xm  by (16.5)  (XXX neaten that up) \\
+                 = & _^xd (_ym + 1/2 (^yd-_yd) _^xd _^yp) - ^yd _^xm  \text{by (16.5)  (XXX neaten that up)} \\
                  = & _^xd (_ym + 1/2 (^yd-_yd) _^xd _^yp) - (_yd + (^yd-_yd)) _^xm \\
-                 = & (_^xd _ym - _yd _^xm) + (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm)  (just rearranged terms) \\
+                 = & (_^xd _ym - _yd _^xm) + (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm) \;\; \text{(just rearranged terms)} \\
                  = &          _d \times _m          + (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm) \\
-               \gt &             0             + (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm)  by (_B) \\
+               \gt &             0             + (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm) \;\; \text{by ($_B$)} \\
                  = & (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm) \\
-                 = & (^yd-_yd) (1/2 _^xd ^2 _^rp - _^xm) by (11.5) \\
+                 = & (^yd-_yd) (1/2 _^xd ^2 _^rp - _^xm) \;\; text{by ($11.5$)} \\
 
-               \gt & 0, by (13) and (22). \\
+               \gt & 0, \;\; text{by (13) and (22).} \\
 \end{align}
-So (^B') is proved, completing the induction
+So ($^B'$) is proved, completing the induction
 and the proof of the Lemma.
 
 <p>
