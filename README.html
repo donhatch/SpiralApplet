@@ -21,8 +21,6 @@
           we started loading the page at
     TODO: figure out how to validate?
     TODO: can't seem to get asciimath to work?  oh wait! it's working, from the web page http://cdn.mathjax.org/mathjax/2.1-latest/test/sample-asciimath.html .  EEK, works over the web but not locally?? hmm.  wonder if I need to put something locally? or enable something?  weird
-    TODO: make some inline SVG images!
-                http://www.w3schools.com/html/html5_svg.asp
     TODO: css validator is giving me errors on the styles inside the svg sections, wtf?
         ERROR: Property stroke doesn't exist : blue
         ERROR: Property stroke-width doesn't exist : 2.0
@@ -211,27 +209,51 @@
             console.log("in jquery document-ready function!");
             console.log("    calling mathjax typeset...");
 
-            //jQuery(".doMyThing *").each(function(index,element)
-            jQuery(".doMyThing").find().andSelf() // all descendants (including self) of class="doMyThing" elements
-                                .each(function(index,element) {
+            console.log("what the hell?");
+            console.log(jQuery(".doMyThing *"));
+
+            // for all descendants (including self) of class="doMyThing" elements...
+            //jQuery(".doMyThing *").each(function(index,element) {
+            jQuery(".doMyThing").find("*").andSelf().each(function(index,element) {
                 if (element.nodeValue !== null)
                 {
-                    element.nodeValue = (element.nodeValue
-                        .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
-                        .replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
-                        .replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
+                    if (1)
+                    {
+                        console.log("before: ",element)
+                        element.nodeValue = element.nodeValue    .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}');
+                        element.nodeValue = element.nodeValue.replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}');
+                        element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}');
 
-                        .replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
-                        .replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
-                        .replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
-                        .replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
+                        element.nodeValue = element.nodeValue.replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}');
+                        element.nodeValue = element.nodeValue.replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}');
+                        element.nodeValue = element.nodeValue.replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1');
+                        element.nodeValue = element.nodeValue.replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1');
 
-                        .replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
-                        .replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
+                        element.nodeValue = element.nodeValue.replace(/\b(t)([dmp])\b/g,'{\\theta_$2}');
+                        element.nodeValue = element.nodeValue.replace(/\b([rxy])([dmp])\b/g,'{$1_$2}');
 
-                        .replace(/\\</g,'\\langle')
-                        .replace(/\\>/g,'\\rangle')
-                    );
+                        element.nodeValue = element.nodeValue.replace(/\\</g,'\\langle');
+                        element.nodeValue = element.nodeValue.replace(/\\>/g,'\\rangle');
+                    }
+                    if (0)
+                    {
+                        element.nodeValue = (element.nodeValue
+                            .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
+                            .replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
+                            .replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
+
+                            .replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
+                            .replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
+                            .replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
+                            .replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
+
+                            .replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
+                            .replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
+
+                            .replace(/\\</g,'\\langle')
+                            .replace(/\\>/g,'\\rangle')
+                        );
+                    }
                 }
             });
 
