@@ -49,11 +49,20 @@
         .asciiprevis {display:none;}
 
         /*
-            ARGH! anything media-specific causes corrupt output of math when printing!
+            ARGH! anything media-specific causes corrupt output of math when printing in chrome!
             need to figure out why!
         */
 
+        @media print {
             body {font-size:x-large;}
+        }
+        /*
+            messing with trying to keep pre's on one page
+        */
+            pre * {
+                page-break-after: avoid;
+                page-break-before: avoid;
+            }
 
         /*
         * increase default font size.  Im getting old.
@@ -62,8 +71,13 @@
             body {font-size:xx-small;}
         }
          increase the font size even more when printing--
-         for some reason it comes out really tiny otherwise.
+         for some reason it comes out really tiny otherwise. (more so on chrome than firefox)
          I havent figured out any way to tell chrome to do that otherwise.
+         ideal settings seem to be:
+            firefox screen: medium (or large)
+            firefox print: large (or x-large)
+            chrome screen: large
+            chrome screen: x-large
         @media print {
             body {font-size:x-large;}
         }
@@ -715,10 +729,10 @@ Figure 1(a): 212
     better coords.
 </pre>
 <p>
-Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
      height="360"
+     width="360"
      >
     <!-- 1 unit = 20 pixels -->
     <g transform="translate(180,180) scale(30)">
@@ -765,7 +779,8 @@ Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
         <g transform="translate(-1,4)  scale(.033333) translate(-20,5) "> <text>v9</text> </g>
     </g>
 </svg>
-
+Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
+<p>
 <pre class="asciiprevis">
 Figure 1(b): 211
                     \
@@ -837,10 +852,10 @@ Figure 1(b): 211
 
                       \ /
 </pre>
-Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
      height="320"
+     width="320"
      >
     <!-- 1 unit = 20 pixels -->
     <g transform="translate(160,160) scale(30)">
@@ -882,8 +897,8 @@ Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
         <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
     </g>
 </svg>
+Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
 <p>
-Figure 1(c): 3 exits tilted too far CW, 1 good exit
 <pre class="asciiprevis">
 Figure 1(c): 310
 
@@ -912,6 +927,7 @@ Figure 1(c): 310
 <svg xmlns="http://www.w3.org/2000/svg"
      version="1.1"
      height="190"
+     width="500"
      >
     <!-- 1 unit = 20 pixels -->
     <g transform="translate(250,95) scale(10)">
@@ -953,6 +969,7 @@ Figure 1(c): 310
         <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
     </g>
 </svg>
+Figure 1(c): 3 exits tilted too far CW, 1 good exit
 <p>
     Figure 1(d): mild spiral
 <p>
@@ -982,11 +999,11 @@ $\text{slope}(e_{m-1}) = -\text{slope}(e_{m+1})$.
 So
 $v_{m-2}$
 is to the lower-right of
-$vm$
+$v_m$
 and
 $v_{m+2}$
 is to the lower-left of
-$vm$.
+$v_m$.
 $e_0$
 will always be the single edge closest to the origin (though
 it need not be horizontal any more).
@@ -1008,7 +1025,7 @@ $\leq$
 that of
 $v_l$'s
 (i.e. such that
-e_{l+1}
+$e_{l+1}$
 emerges north or northwest out of
 $v_l$).
 Let
@@ -1129,7 +1146,7 @@ statement ($B$) at the end of the walk.
 XXX why? need to be more specific
 <p>
 Lemma:
-During Priscilla and Dudley walk around the primal (from
+During Priscilla and Dudley walk's around the primal (from
 $e_0$
 to
 $e_{l+1}$)
@@ -1200,6 +1217,7 @@ Combining this with (1), we have:
 and so ($B$),($C$),($D$) are satisfied.
 We still have to prove that the second part of ($A$) holds in the base case.
 <p>
+<span id="youarehere"></span>
 For this base case,
 we temporarily rotate the entire picture
 so that Priscilla's position
@@ -1230,21 +1248,21 @@ $\pi/2$).
 <pre>
       Priscilla
        p=v_1*
-            :       *v'_2
+            :       * v'_2
             :       |
             :     / |
-            :       |e'_1
+            :       | e'_1
             :    /  |
-            :       |  Dudley    ^
-            :   /   *d=[xd,yd] |
-            :      /|            |
+            :       |  Dudley  ^
+            :   /   * d=&lt;xd,yd&gt; |
+            :      /|          |
             :  /  / |
             :    /  |
-            : / /  _*v'_0
+            : / /  _* v'_0
             :  / _/ :
             ://_/   :
             ://     :
-           0*.......* [xd,0]
+           0*.......* &lt;xd,0&gt;
 
         Fig. 3: base case in temporarily rotated coord system
 </pre>
@@ -1315,7 +1333,6 @@ There are two cases.
 Case 1: In the time from $\underline{t}$ to $\overline{t}$,
 Priscilla has moved (in a straight line) and Dudley has stayed still.
 <p>
-<span id="youarehere"></span>
 This time we temporarily rotate the picture
 so that Dudley's (stationary) position is on the
 $+x$
