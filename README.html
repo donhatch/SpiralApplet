@@ -225,20 +225,22 @@
                                 .each(function(index,element) {
                 if (element.nodeValue !== null)
                 {
-                    element.nodeValue = element.nodeValue.replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
-                    element.nodeValue = element.nodeValue.replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
-                    element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
+                    element.nodeValue = (element.nodeValue
+                        .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
+                        .replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
+                        .replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
 
-                    element.nodeValue = element.nodeValue.replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
-                    element.nodeValue = element.nodeValue.replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
-                    element.nodeValue = element.nodeValue.replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
-                    element.nodeValue = element.nodeValue.replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
+                        .replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
+                        .replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
+                        .replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
+                        .replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
 
-                    element.nodeValue = element.nodeValue.replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
-                    element.nodeValue = element.nodeValue.replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
+                        .replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
+                        .replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
 
-                    element.nodeValue = element.nodeValue.replace(/\\</g,'\\langle')
-                    element.nodeValue = element.nodeValue.replace(/\\>/g,'\\rangle')
+                        .replace(/\\</g,'\\langle')
+                        .replace(/\\>/g,'\\rangle')
+                    );
                 }
             });
 
@@ -1111,7 +1113,7 @@ $\pi/2$).
             ://     :
            0*.......* &lt;x_d,0&gt;
 
-        Fig. 3: Base case, in temporarily rotated coord system
+        Figure 3: Base case, in temporarily rotated coord system
 </pre>
 We can get an upper bound on the area of Dudley's triangle so far,
 as follows:
@@ -1227,7 +1229,7 @@ $0$).
           0 *----------------* d
                                -
 
-        Fig. 4: Inductive step, Case 1: Priscilla has moved
+        Figure 4: Inductive step, Case 1: Priscilla has moved
 </pre>
 In this case we have the following relationships between the previous event's values
 and the current values.
@@ -1315,7 +1317,7 @@ as shown in Figure 5.
           0 *.......* &lt;x_d,0&gt;
                        ---
 
-        Fig. 5: Inductive step, Case 2: Dudley has moved
+        Figure 5: Inductive step, Case 2: Dudley has moved
 </pre>
 We denote quantities that are stationary at this step
 by giving them both an underbar and overbar.
