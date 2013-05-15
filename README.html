@@ -202,7 +202,6 @@
         */
 
 
-
         // queue calling the following code
         // when the document is loaded
         jQuery(document).ready(function() {
@@ -210,32 +209,12 @@
             console.log("    calling mathjax typeset...");
 
             console.log("what the hell?");
-            console.log(jQuery(".doMyThing *"));
+            //console.log(jQuery(".doMyThing *"));
 
-            // for all descendants (including self) of class="doMyThing" elements...
-            //jQuery(".doMyThing *").each(function(index,element) {
-            jQuery(".doMyThing").find("*").andSelf().each(function(index,element) {
-                if (element.nodeValue !== null)
-                {
-                    if (1)
-                    {
-                        console.log("before: ",element)
-                        element.nodeValue = element.nodeValue    .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}');
-                        element.nodeValue = element.nodeValue.replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}');
-                        element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}');
-
-                        element.nodeValue = element.nodeValue.replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}');
-                        element.nodeValue = element.nodeValue.replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}');
-                        element.nodeValue = element.nodeValue.replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1');
-                        element.nodeValue = element.nodeValue.replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1');
-
-                        element.nodeValue = element.nodeValue.replace(/\b(t)([dmp])\b/g,'{\\theta_$2}');
-                        element.nodeValue = element.nodeValue.replace(/\b([rxy])([dmp])\b/g,'{$1_$2}');
-
-                        element.nodeValue = element.nodeValue.replace(/\\</g,'\\langle');
-                        element.nodeValue = element.nodeValue.replace(/\\>/g,'\\rangle');
-                    }
-                    if (0)
+            if (1)
+            {
+                var mySimpleCallback = function(index,element) {
+                    if (element.nodeValue !== null)
                     {
                         element.nodeValue = (element.nodeValue
                             .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
@@ -255,19 +234,82 @@
                         );
                     }
                 }
-            });
+                var mySimpleCallbackAll = function(element,someAncestorEnabled) {
+                    if (element.className === 'doMyThing')
+                    {
+                        console.log("HO! tagName="+element.tagName+" className="+element.className);
+                    }
+                    if (element.tagName === 'PRE')
+                    {
+                        console.log('skipping PRE: ',element)
+                    }
+                    if (element.tagName !== 'PRE')
+                    {
+                        var enabled = (someAncestorEnabled || element.className == 'doMyThing');
+                        if (enabled)
+                        {
+                            mySimpleCallback(0,element);
+                        }
+                        for (var child = element.firstChild; child !== null; child = child.nextSibling)
+                        {
+                            mySimpleCallbackAll(child,enabled);
+                        }
+                    }
+                }
+                mySimpleCallbackAll(document,false);
+            }
 
+            if (0)
+            {
+                var myCallback = function(index,element) {
+                    var $element = jQuery(element);
+                    var text = $element.text();
+                    //console.log("            before: ",text);
+                    text = (text
+                        .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
+                        .replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
+                        .replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
 
+                        .replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
+                        .replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
+                        .replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
+                        .replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
+
+                        .replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
+                        .replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
+
+                        .replace(/\\</g,'\\langle')
+                        .replace(/\\>/g,'\\rangle')
+                    );
+                    //console.log("            after: ",text);
+                    $element.text(text);
+                };
+
+                // for all descendants (including self) of class="doMyThing" elements...
+                var query = jQuery(".doMyThing");
+                query = query.find("*");
+                query = query.andSelf();
+                if (1) {
+                    query.each(myCallback);
+                }
+            }
 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
             console.log("    returned from mathjax typeset.");
             console.log("out jquery document-ready function!");
-        });
+        }); // jquery document ready function
     </script>
 </head>
 <body>
 <hr> <!--============================================================-->
-<span id="youarehere"></span>
+
+<div class="doMyThing">
+first thing: $xp$
+</div>
+<div class="doMyThing">
+second thing: $_^yp$
+</div>
+
 <div class="doMyThing">
 $ \< 0 , 1 \> $
 $a^b {a}^{b}$
@@ -290,7 +332,7 @@ $\underoverline{x}$
 $\_x$
 $\^x$
 $a ^ b$
-</div>
+</div> <!-- doMyThing -->
 
 <pre>
 
@@ -382,7 +424,7 @@ the entire dual diagram (triangle complex) is thus determined.
 It consists of
 $n$
 triangles, each having one vertex at the origin.
-</span> <!-- doMyThing -->
+</div> <!-- doMyThing -->
 <p>
 We'll number the primal features in CCW order:
 primal edges have even indices and primal vertices have odd indices:
@@ -796,6 +838,7 @@ or any other linear combination
 $a(v_m-v_{m+2}) + b(v_m-v_{m-2})$
 such that $a$ and $b$ are nonnegative and not both zero.
 <p>
+<span id="youarehere"></span>
 The important property of u is that the directions of each of the four vectors:
 \begin{align}
     n^- = & \text{outward normal of last edge $e_{m-1}$ before (CW from) the good exit} \\
@@ -1115,9 +1158,9 @@ $\pi/2$).
             :     / |
             :       | e'_1
             :    /  |
-            :       |  Dudley  ^
+            :       |  Dudley     ^
             :   /   * d=&lt;x_d,y_d&gt; |
-            :      /|          |
+            :      /|             |
             :  /  / |
             :    /  |
             : / /  _* v'_0
