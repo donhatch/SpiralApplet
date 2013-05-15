@@ -25,7 +25,7 @@
     TODO: my specified default zoom trigger not working?
     TODO: areaTri?
     TODO: it would be awesome if it were possible to start typesetting
-          at a particular place in the page, right after the anchor 
+          at a particular place in the page, right after the anchor
           we started loading the page at
     TODO: figure out how to validate?
     TODO: can't seem to get asciimath to work?  oh wait! it's working, from the web page http://cdn.mathjax.org/mathjax/2.1-latest/test/sample-asciimath.html .  EEK, works over the web but not locally?? hmm.  wonder if I need to put something locally? or enable something?  weird
@@ -40,8 +40,8 @@
         oh no! and if I try to change version from 1.1 to 1.2 it says:
             Unsupported SVG version specified. This validator only supports SVG 1.1. The recommended way to suppress this warning is to remove the version attribute altogether.
     TODO: can I preprocess the preprocessed stuff so that _x and ^x mean \underline{x} and \overline{x}?
-        
-        
+
+
 -->
     <title>There's No Single-Exit Lagoon</title>
     <style type="text/css">
@@ -94,10 +94,12 @@
             Any of the following:
                 _  ^  ^_  _^
             followed by any thing of the following:
+                A B C D
                 tp tm td
                 rp rm rd
                 xp xm xd
                 yp ym yd
+                 p  m  d
             get transformed into the respective one of
                 \underline{thing}
                 \overline{thing}
@@ -148,6 +150,8 @@
                     _: ["\\underline{#1}",1],
                     /* aww hell, it works with _ but not with ^ */
                     /* ^: ["\\overline{#1}",1], */
+                    /* <: ["\\langle",0], */
+                    /* >: ["\\rangle",0], */
                 },
             },
             asciimath2jax: {
@@ -213,22 +217,25 @@
                                        //   to use the same preview for every equation.
 
           },
-          
+
           doMyThing: function (element,depth) {
             //window.alert("in doMyThing(depth="+depth+": element="+element+" nodeValue="+element.nodeValue+" firstChild = "+element.firstChild+" nextSibling="+element.nextSibling+" className="+element.className+" tagName="+element.tagName);
             if (element.nodeValue != null)
             {
-                element.nodeValue = element.nodeValue.replace(/\b([trxy]_?[dmp][_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
-                element.nodeValue = element.nodeValue.replace(/\b([trxy]_[dmp]\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
+                element.nodeValue = element.nodeValue.replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
+                element.nodeValue = element.nodeValue.replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
                 element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
 
-                element.nodeValue = element.nodeValue.replace(/\^_([trxy][dmp])\b/g,'\\overline{\\underline{$1}}')
-                element.nodeValue = element.nodeValue.replace(/_\^([trxy][dmp])\b/g,'\\underline{\\overline{$1}}')
-                element.nodeValue = element.nodeValue.replace(/_([trxy][dmp])\b/g,'\\underline{$1}')
-                element.nodeValue = element.nodeValue.replace(/\^([trxy][dmp])\b/g,'\\overline{$1}')
+                element.nodeValue = element.nodeValue.replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
+                element.nodeValue = element.nodeValue.replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
+                element.nodeValue = element.nodeValue.replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
+                element.nodeValue = element.nodeValue.replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
 
                 element.nodeValue = element.nodeValue.replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
                 element.nodeValue = element.nodeValue.replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
+
+                element.nodeValue = element.nodeValue.replace(/\\</g,'\\langle')
+                element.nodeValue = element.nodeValue.replace(/\\>/g,'\\rangle')
             }
             for (var child = element.firstChild; child != null; child = child.nextSibling)
             {
@@ -251,7 +258,7 @@
 
             if (this.createPatterns()) {this.scanElement(element,element.nextSibling)}
           },
-          
+
           createPatterns: function () {
             var starts = [], parts = [], i, m, config = this.config;
             this.match = {};
@@ -281,18 +288,18 @@
             this.processClass = new RegExp("(^| )("+config.processClass+")( |$)");
             return (parts.length > 0);
           },
-          
+
           patternQuote: function (s) {return s.replace(/([\^$(){}+*?\-|\[\]\:\\])/g,'\\$1')},
-          
+
           endPattern: function (end) {
             return new RegExp(this.patternQuote(end)+"|\\\\.|[{}]","g");
           },
-          
+
           sortLength: function (a,b) {
             if (a.length !== b.length) {return b.length - a.length}
             return (a == b ? 0 : (a < b ? -1 : 1));
           },
-          
+
           scanElement: function (element,stop,ignore) {
             var cname, tname, ignoreChild, process;
             while (element && element != stop) {
@@ -313,7 +320,7 @@
               if (element) {element = element.nextSibling}
             }
           },
-          
+
           scanText: function (element) {
 
             if (element.nodeValue.replace(/\s+/,'') == '') {return element}
@@ -338,7 +345,7 @@
             }
             return element;
           },
-          
+
           startMatch: function (match,element) {
             var delim = this.match[match[0]];
             if (delim != null) {                              // a start delimiter
@@ -375,7 +382,7 @@
             }
             return element;
           },
-          
+
           endMatch: function (match,element) {
             var search = this.search;
             if (match[0] == search.end) {
@@ -400,13 +407,13 @@
             this.switchPattern(this.start);
             return element;
           },
-          
+
           switchPattern: function (pattern) {
             pattern.lastIndex = this.pattern.lastIndex;
             this.pattern = pattern;
             this.search.start = (pattern === this.start);
           },
-          
+
           encloseMath: function (element) {
             var search = this.search, close = search.close, CLOSE, math;
             if (search.cpos === close.length) {close = close.nextSibling}
@@ -436,12 +443,12 @@
             if (CLOSE) {CLOSE.parentNode.removeChild(CLOSE)}
             return math;
           },
-          
+
           insertNode: function (node) {
             var search = this.search;
             search.close.parentNode.insertBefore(node,search.close);
           },
-          
+
           createPreview: function (mode,tex) {
             var preview;
             if (this.config.preview === "TeX") {preview = [this.filterPreview(tex)]}
@@ -451,7 +458,7 @@
               this.insertNode(preview);
             }
           },
-          
+
           createMathTag: function (mode,tex) {
             var script = document.createElement("script");
             script.type = "math/tex" + mode;
@@ -459,11 +466,11 @@
             this.insertNode(script);
             return script;
           },
-          
+
           filterPreview: function (tex) {return tex},
-          
+
           msieNewlineBug: (MathJax.Hub.Browser.isMSIE && document.documentMode < 9)
-          
+
         }]);
 
 
@@ -486,8 +493,10 @@
 </head>
 <body>
 <hr> <!--============================================================-->
+$ \< 0 , 1 \> $
 $a^b {a}^{b}$
 $rp_$
+$_rp$
 $\underline{hey}$ $xp$ $yp$ $tp$ $_xp$ $_^xp$ $^xp$
 ... when `x \lt y^2` we have ...
 ... when $x \lt y^2$ we have ...
@@ -536,7 +545,7 @@ Priscilla's and Dudley's paces are such that the one who's moving
 always does so at unit rotation speed around the origin
 while the other stays still.
 So their positions are continuous piecewise differentiable functions of time,
-with 
+with
     $$(d tp + d td) / dt = 1 \;  \text{wherever both are differentiable.}$$
 <p>
 Since the combined rotational speed is 1 and the combined rotational distance is
@@ -664,7 +673,7 @@ some plausible examples are shown in Figures 1(a-e).
 <p>
 <pre class="asciiprevis">
 Figure 1(a): 212
-                       |  
+                       |
                        *v5
                       / \
                      /   \
@@ -672,7 +681,7 @@ Figure 1(a): 212
                    /       \
                 v7*         *v3
                  / \e8   e2/ \
-                    \  e0 /  
+                    \  e0 /
                    v9*---*v1
                       \ /
     On paper, I seemed to think the following was nice:
@@ -763,7 +772,7 @@ Figure 1(b): 211
                      |     \_
                    e6|       *v3
                      |       | \
-                     |       |  
+                     |       |
                      |       |
                      |       |e2
                      |       |
@@ -1228,8 +1237,8 @@ $\pi/2$).
             :       |  Dudley    ^
             :   /   *d=[xd,yd] |
             :      /|            |
-            :  /  / | 
-            :    /  |  
+            :  /  / |
+            :    /  |
             : / /  _*v'_0
             :  / _/ :
             ://_/   :
@@ -1343,11 +1352,11 @@ $0$).
                     | | Priscilla walks from $\underline{p}$ to $\overline{p}$
                 /   | | (perpendicular to Dudley's stationary position)
                     | |
-               /    | 
-                    |  
+               /    |
+                    |
               /     *$\underline{p}=\langle \underline{xp},\underline{yp} \rangle$
-                  /  
-             /  /    
+                  /
+             /  /
               /             Dudley
            0*----------------*$\underline{d}=\overline{d}$
 
@@ -1420,19 +1429,19 @@ as shown in Figure 5.
 <pre>
         Priscilla
             *p=[0,_^yp]
-            :         _
-            :       * d 
+            :
+            :       * ^d
             :       |
             :     / |
             :       | ^
             :    /  | |
-            :       | | Dudley walks from d_ to ^d^
+            :       | | Dudley walks from _d to ^d
             :   /   | | (parallel to Priscilla's stationary position)
             :       | |
-            :  /    | 
-            :       |  
-            : /    _* d
-            :    _/ : -
+            :  /    |
+            :       |
+            : /    _* _d
+            :    _/ :
             :/ _/   :
             : /     :
            0*.......* [_^xd,0]
@@ -1455,104 +1464,101 @@ Dudley moved purely upwards, strictly within the first quadrant:
 \end{align}
 so his angle increased, but stayed less than pi/2:
 \begin{align}
-    (14)    0 < td_ < ^td < pi/2 \\
+    (14)    0 < _td < ^td < pi/2 \\
     (15)    0 < sin(_td) < sin(^td) < 1 (follows from (14) since sin is increasing in this range) \\
     (16)    0 < cos(^td) < cos(_td) < 1 (follows from (14) since cos is decreasing in this range) \\
 \end{align}
-
 The moment changed as follows:
 \begin{align}
          ^m = m + (area of Dudley's triangle) * (Priscilla's position) \\
-    (16.5)  = m + (1/2 * (^yd-_yd)*^d_x) * <0,_yp^> \\
+    (16.5)  = m + (1/2 * (^yd-_yd)*_^xd) * <0,_^yp> \\
 \end{align}
-
 Therefore by (12), the moment moved purely upwards as well;
-furthermore (B_,C_,D_) say it started strictly inside the first quadrant
+furthermore ($_B$),($_C$),($_D$) say it started strictly inside the first quadrant
 so it ended there as well;
-so the first part of (A^) is immediately satisfied and:
+so the first part of ($^A$) is immediately satisfied and:
 \begin{align}
-    (17)    0 < ym_ < ym^ \\
-    (18)    0 < xm_ = xm^ = _^xm \\
-    (19)    0 < tm_ < tm^ < pi/2 \\
-    (20)    0 < sin(tm_) < sin(tm^) < 1 \\
-    (21)    0 < cos(tm^) < cos(tm_) < 1 \\
+    (17)  \;\;  0 & < _ym < ^ym \\
+    (18)  \;\;  0 & < _xm = ^xm = _^xm \\
+    (19)  \;\;  0 & < _tm < ^tm < pi/2 \\
+    (20)  \;\;  0 & < sin(_tm) < sin(^tm) < 1 \\
+    (21)  \;\;  0 & < cos(^tm) < cos(_tm) < 1 \\
 \end{align}
-
-(C^) follows triviallly:
+<p>
+(^C) follows triviallly:
 \begin{align}
-            tm^ < pi/2  by (18) \\
+            ^tm < pi/2  by (18) \\
                  = tp   by (12) \\
 \end{align}
-The second part of (A^) is proved as follows:
-(want to show rm^ < rp^ rd^ ^2 sin(tp^-td^)cos(tp^-td^)/2)
+The second part of (^A) is proved as follows:
+(want to show ^rm < ^rp ^rd ^2 sin(^tp-^td)cos(^tp-^td)/2)
 \begin{align}
-    rm^ = |m^| = |m_ + (area of Dudley's triangle) * (Priscilla's position)| \\
-               <= |m_| + (area of Dudley's triangle) * |_^p| \\
-               = rm_ + (area of Dudley's triangle) * _^rp \\
-               < _^rp _rd^2 sin(tp_-td_)cos(tp_-td_)/2 + (area of Dudley's triangle) * _^rp by (A_) \\
-               = _^rp ((rd_ sin(tp_-td_))(rd_ cos(tp_-td_))/2 + (area of Dudley's triangle)) \\
-               = _^rp (areaTri(0,<_^xd,0>,d_) + areaTri(0,d_,d^)) \\
-               = _^rp (areaTri(0,<_^xd,d^))  since this tri is the disjoint union of the previous two tris \\
+    ^rm = |^m| = & |_m + (area of Dudley's triangle) * (Priscilla's position)| \\
+             \le & |_m| + (area of Dudley's triangle) * |_^p| \\
+               = & _rm + (area of Dudley's triangle) * _^rp \\
+             \lt & _^rp _rd^2 sin(_tp-_td)cos(_tp-_td)/2 + (area of Dudley's triangle) * _^rp by (_A) \\
+               = & _^rp ((_rd sin(_tp-_td))(_rd cos(_tp-_td))/2 + (area of Dudley's triangle)) \\
+               = & _^rp (areaTri(0,\langle _^xd,0 \rangle,_d) + areaTri(0,_d,^d)) \\
+               = & _^rp (areaTri(0,\langle _^xd,0 \rangle,^d))  since this tri is the disjoint union of the previous two tris \\
                   XXX should we be using x's and y's in here somewhere? \\
-               = _^rp rd^2 cos(td^)sin(td^) / 2 \\
-               = _^rp rd^2 sin(pi/2-td^)cos(pi/2-td^) / 2    since cos(t)=sin(pi/2-t) in general \\
-               = _^rp rd^2 sin(_^tp-td^)cos(_^tp-td^) / 2  by (12) \\
+               = & _^rp rd^2 cos(^td)sin(^td) / 2 \\
+               = & _^rp rd^2 sin(pi/2-^td)cos(pi/2-^td) / 2    since cos(t)=sin(pi/2-t) in general \\
+               = & _^rp rd^2 sin(_^tp-^td)cos(_^tp-^td) / 2  by (12) \\
 \end{align}
-
-Having shown (A^), we must finally prove (B^).
-
+Having shown (^A), we must finally prove (^B).
+<p>
 For this, we first derive an intermediate result
 from the inductive hypothesis.
 The "all terms positive" claims throughout the following
-follow from (left side of) (A_), (B_),(C_),(D_).
+follow from (left side of) (_A), (_B),(_C),(_D).
 \begin{align}
-         xm_ = rm_ cos(tm_) \\
-              = rm_ sin(pi/2 - tm_) \\
-     
-              = rm_ sin(tp_ - tm_) by (12) \\
-              = rm_ sin((tp_-td_)-(tm_-td_)) \\
-              = rm_ (sin(tp_-td_)cos(tm_-td_) - cos(tp_-td_)sin(tm_-td_)) by double-angle identity \\
-              = rm_ sin(tp_-td_)cos(tm_-td_) - rm_ cos(tp_-td_)sin(tm_-td_) \\
-              < rm_ sin(tp_-td_)cos(tm_-td_) - 0  since all terms positive \\
-              < rm_ sin(tp_-td_) * 1  since cos(tm_-td_)<1 and all terms positive \\
-              < (1/2 rp_ _rd^2 sin(tp_-td_)cos(tp_-td_)) sin(tp_-td_)  by (A_) \\
-              = 1/2 rp_ cos(tp_-td_) (rd_ sin(tp_-td_))^2 \\
-              < 1/2 rp_ (rd_ sin(tp_-td_))^2  since 0 < cos(tp_-td_) < 1 \\
-     
-              = 1/2 rp_ (rd_ sin(pi/2-td_))^2  by (12) \\
-              = 1/2 rp_ (rd_ cos(td_))^2 \\
-              = 1/2 rp_ _xd^2 \\
-    (22) xm_ < 1/2 rp_ _xd^2. \\
+         _xm = & _rm cos(_tm) \\
+             = & _rm sin(pi/2 - _tm) \\
+
+             = & _rm sin(_tp - _tm) by (12) \\
+             = & _rm sin((_tp-_td)-(_tm-_td)) \\
+             = & _rm (sin(_tp-_td)cos(_tm-_td) - cos(_tp-_td)sin(_tm-_td)) by double-angle identity \\
+             = & _rm sin(_tp-_td)cos(_tm-_td) - _rm cos(_tp-_td)sin(_tm-_td) \\
+             < & _rm sin(_tp-_td)cos(_tm-_td) - 0  since all terms positive \\
+             < & _rm sin(_tp-_td) * 1  since cos(_tm-_td)<1 and all terms positive \\
+             < & (1/2 _rp _rd^2 sin(_tp-_td)cos(_tp-_td)) sin(_tp-_td)  by (_A) \\
+             = & 1/2 _rp cos(_tp-_td) (_rd sin(_tp-_td))^2 \\
+             < & 1/2 _rp (_rd sin(_tp-_td))^2  since 0 < cos(_tp-_td) < 1 \\
+
+             = & 1/2 _rp (_rd sin(pi/2-_td))^2  by (12) \\
+             = & 1/2 _rp (_rd cos(_td))^2 \\
+             = & 1/2 _rp _xd^2 \\
+    (22) _xm < & 1/2 _rp _xd^2. \\
 \end{align}
 (XXX could phrase that in terms "m x p < 1/2 (d x p)^2",
 coordinate-free til the last second, if we wanted... maybe)
-
-Now we proceed to prove (B^).
-Since d^,m^,d_,m_ are all in the first quadrant,
-our goal (B^) can be expressed as
-    (B'^)  d^ X m^ > 0
-and assumption (B_) can be expressed as
-    (B'_)  d_ X m_ > 0
+<p>
+Now we proceed to prove (^B).
+Since ^d,^m,_d,_m are all in the first quadrant,
+our goal (^B) can be expressed as
+    (^B')  ^d \times ^m > 0
+and assumption (_B) can be expressed as
+    (_B')  _d \times _m > 0
 (where X denotes the scalar cross product
-of two vectors in the plane, i.e.  
+of two vectors in the plane, i.e.
 v0 X v1 = |v0| |v1| sin(angle(v0,v1))).
-
+<p>
 <span id="youarehere"></span>
-So we just need to prove (B'^) and we're done.
+So we just need to prove (^B') and we're done.
 \begin{align}
-    d^ X m^ = <_^xd,yd^> X <_^xm,ym^> \\
-            = _^xd ym^  -  yd^ _^xm \\
-            = _^xd (ym_ + 1/2 (yd^-yd_) _^xd _^yp) - yd^ _^xm  by (16.5)  (XXX neaten that up) \\
-            = _^xd (ym_ + 1/2 (yd^-yd_) _^xd _^yp) - (yd_ + (yd^-yd_)) _^xm \\
-            = (_^xd ym_ - yd_ _^xm) + (yd^-yd_) (1/2 _^xd ^2 _^yp - _^xm)  (just rearranged terms) \\
-            =          d_ X m_          + (yd^-yd_) (1/2 _^xd ^2 _^yp - _^xm) \\
-            \gt             0             + (yd^-yd_) (1/2 _^xd ^2 _^yp - _^xm)  by (B_) \\
-            = (yd^-yd_) (1/2 _^xd ^2 _^yp - _^xm) \\
-            = (yd^-yd_) (1/2 _^xd ^2 _^rp - _^xm) by (11.5) \\
+    ^d \times ^m = & <_^xd,^yd> \times <_^xm,^ym> \\
+                 = & _^xd ^ym  -  ^yd _^xm \\
+                 = & _^xd (_ym + 1/2 (^yd-_yd) _^xd _^yp) - ^yd _^xm  by (16.5)  (XXX neaten that up) \\
+                 = & _^xd (_ym + 1/2 (^yd-_yd) _^xd _^yp) - (_yd + (^yd-_yd)) _^xm \\
+                 = & (_^xd _ym - _yd _^xm) + (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm)  (just rearranged terms) \\
+                 = &          _d \times _m          + (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm) \\
+               \gt &             0             + (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm)  by (_B) \\
+                 = & (^yd-_yd) (1/2 _^xd ^2 _^yp - _^xm) \\
+                 = & (^yd-_yd) (1/2 _^xd ^2 _^rp - _^xm) by (11.5) \\
 
-            \gt 0, by (13) and (22). \\
+               \gt & 0, by (13) and (22). \\
 \end{align}
-So (B'^) is proved, completing the induction
+So (^B') is proved, completing the induction
 and the proof of the Lemma.
 
 <p>
@@ -1585,21 +1591,6 @@ and the proof of the Lemma.
     </a>
 </p>
 <hr> <!--============================================================-->
-
-
-<pre>
-Possible rewording?  Not sure.
-It might make some things simpler, e.g. wouldn't 
-have to worry about whether the angles are defined
-Lemma:  Given a polygon as previously described,
-for each odd i in {1,3,...l},
-    XXX MAYBE, but different language
-    (C) moment(v_1..v_i) dot (v_{i+2}-v_i) \gt 0
-    (A) ||moment(v_1..v_i)|| \langle ||v_i|| {rd}^2 \sin(tp-td)     XXX how the fuck did rd get in here?
-    (B) d^perpdot dot moment{v_1..v_i} \gt 0                              XXX how the fuck did d get in here?  actually need to talk about constructing the dual I think?
-</pre>
-
-
 
 </body>
 </html>
