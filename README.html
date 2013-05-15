@@ -111,7 +111,7 @@
                 xp xm xd
                 yp ym yd
             get turned into, respectively:
-                {\theta_p} {\theta_r} {\theta_d}
+                {\theta_p} {\theta_m} {\theta_d}
                 {r_p} {r_m} {r_d}
                 {x_p} {x_m} {x_d}
                 {y_p} {y_m} {y_d}
@@ -218,7 +218,7 @@
             {
                 element.nodeValue = element.nodeValue.replace(/\b([trxy]_?[dmp][_^])/g,'\\color{red}{\\fbox{$1}}')
                 element.nodeValue = element.nodeValue.replace(/\b([trxy]_[dmp]\b)/g,'\\color{green}{\\fbox{$1}}')
-                element.nodeValue = element.nodeValue.replace(/\b(\\theta_\b)/g,'\\color{blue}{\\fbox{$1}}')
+                element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{$1}}')
 
                 element.nodeValue = element.nodeValue.replace(/\^_([trxy][dmp])\b/g,'\\overline{\\underline{$1}}')
                 element.nodeValue = element.nodeValue.replace(/_\^([trxy][dmp])\b/g,'\\underline{\\overline{$1}}')
@@ -525,18 +525,18 @@ Exactly one of Priscilla and Dudley are moving at any particular time.
 Denote Priscilla's and Dudley's positions,
 in rectangular and polar coordinates,
 by the following, all continuous functions of time $t$:
-    $$r_p,\theta_p, x_p, y_p$$
-    $$r_d,\theta_d, x_d, y_d$$
+    $$rp,tp, xp, yp$$
+    $$rd,td, xd, yd$$
 <p>
-    $$x_p = r_p \cos(\theta_p)  y_p = r_p \sin(\theta_p)$$
-    $$x_d = r_d \cos(\theta_d)  y_d = r_d \sin(\theta_d)$$
+    $$xp = rp \cos(tp)  yp = rp \sin(tp)$$
+    $$xd = rd \cos(td)  yd = rd \sin(td)$$
 <p>
 Priscilla's and Dudley's paces are such that the one who's moving
 always does so at unit rotation speed around the origin
 while the other stays still.
 So their positions are continuous piecewise differentiable functions of time,
 with 
-    $$(d \theta_p + d \theta_d) / dt = 1 \;  \text{wherever both are differentiable.}$$
+    $$(d tp + d td) / dt = 1 \;  \text{wherever both are differentiable.}$$
 <p>
 Since the combined rotational speed is 1 and the combined rotational distance is
 $4 \pi$,
@@ -545,14 +545,14 @@ $4 \pi$
 units of time for Priscilla and Dudley
 to complete one revolution and arrive back at their starting configuration;
 if we fix Priscilla's starting point
-$ \langle x_p,y_p \rangle (t=0)$
+$ \langle xp,yp \rangle (t=0)$
 in the interior (not endpoint) of some primal side, this forces Dudley
 to start at the dual vertex
-$ \langle x_d,y_d \rangle (t=0)$
+$ \langle xd,yd \rangle (t=0)$
 corresponding to that initial primal edge,
 and the entire walk is thus determined.
 They will arrive back at
-$ \langle x_p,y_p\rangle,\langle x_d,y_d\rangle $ at time
+$ \langle xp,yp\rangle,\langle xd,yd\rangle $ at time
 $t = 4 \pi$.
 <p>
 Priscilla and Dudley's walk is defined (modulo the choice of starting point)
@@ -611,23 +611,23 @@ be the (odd) index of the vertex
 that is the global maximum distance from the origin
 of the entire primal polygon perimeter.
 So
-$v_m$
+$vm$
 is the only good exit,
 and distance-from=origin is strictly increasing
 from
 $\langle 0,-1\rangle$
-around CCW to v_m,
-and then strictly decreasing from v_m
+around CCW to vm,
+and then strictly decreasing from vm
 back around CCW to
 $\langle 0,-1\rangle$.
 <p>
 Consider the directions of the "quill" emanating
 from each vertex of this primal polygon.
 Since
-$v_m$
+$vm$
 is the only good exit,
 every quill *except* the one at
-$v_m$
+$vm$
 points more towards the origin than away from it
 (more precisely, the quill
 $i$'s direction's dot product with
@@ -961,7 +961,7 @@ and a point in its interior such that there is only one good exit
 with respect to that point.
 Choose a coordinate system that places that point at the origin,
 with the polygon rotated so that
-$v_m$
+$vm$
 (the "apex")
 has highest y coordinate,
 and
@@ -969,11 +969,11 @@ $\text{slope}(e_{m-1}) = -\text{slope}(e_{m+1})$.
 So
 $v_{m-2}$
 is to the lower-right of
-$v_m$
+$vm$
 and
 $v_{m+2}$
 is to the lower-left of
-$v_m$.
+$vm$.
 $e_0$
 will always be the single edge closest to the origin (though
 it need not be horizontal any more).
@@ -1125,10 +1125,10 @@ as described above, at all times strictly after the first event:
 <!-- the unnecessary curly braces are simply from copying this section over
 from the corresponding "\underline" section and removing the "\underline"s -->
 \begin{alignat*}{3}
-    & ({A}) \;\;  &  0                   &  &  & \lt {r_m} \lt {r_p} \, {r_d}^2 \sin({\theta_p}-{\theta_d}) \cos({\theta_p}-{\theta_d}) / 2 \\
-    & ({B}) \;\;  & {\theta_d} &  &  & \lt  {\theta_m} \\
-    & ({C}) \;\;  &                      &  &  & \leq {\theta_p} \\
-    & ({D}) \;\;  &                      &  &  & \lt {\theta_d}+\pi/2.
+    & ({A}) \;\;  &  0                   &  &  & \lt {rm} \lt {rp} \, {rd}^2 \sin({tp}-{td}) \cos({tp}-{td}) / 2 \\
+    & ({B}) \;\;  & {td} &  &  & \lt  {tm} \\
+    & ({C}) \;\;  &                      &  &  & \leq {tp} \\
+    & ({D}) \;\;  &                      &  &  & \lt {td}+\pi/2.
 \end{alignat*}
 <p>
 Proof:
@@ -1140,10 +1140,10 @@ up to and including the first event
 (Priscilla stopping at
 $v_1$
 and Dudley starting moving),
-$r_m = |m| = 0$,
+$rm = |m| = 0$,
 and so (A) doesn't hold
 (and (B),(C) don't even make sense since
-$\theta_m$
+$tm$
 isn't even defined).
 <p>
 (XXX this can be moved out of the lemma and proof, it can just be an observation earlier)
@@ -1156,9 +1156,9 @@ $90^{\circ}$
 of each other.
 In other words (since Priscilla's outward normal vector
 is in the direction of Dudley's position vector, by definition)
-    $$(1) \;\; \theta_d \lt \theta_p \lt \theta_d+\pi/2,$$
+    $$(1) \;\; td \lt tp \lt td+\pi/2,$$
 so (D) is always satisfied during any walk on any primal polygon
-containing the origin.  (XXX wait, that's not true! argh! need to adjust this... say a true statement, and I think the only reason $t_d \lt t_p$ is that we're in this spiral situation)
+containing the origin.  (XXX wait, that's not true! argh! need to adjust this... say a true statement, and I think the only reason $td \lt tp$ is that we're in this spiral situation)
 We prove the other parts, (A),(B),(C) by induction on the number of events
 (as defined earlier) encountered so far.
 <p>
@@ -1178,14 +1178,14 @@ At this time, the moment accumulated so far is
 which is a nonzero scalar times the nonzero vector
 $p=v_1$,
 so
-$r_m = |m| \gt 0$
+$rm = |m| \gt 0$
 (so the first part of (A) is satisfied, and
-$\theta_m$
+$tm$
 is well-defined),
 and
-$\theta_m = \theta_p$.
+$tm = tp$.
 Combining this with (1), we have:
-    $$\theta_d \lt \theta_m = \theta_p \lt \theta_d+\pi/2$$
+    $$td \lt tm = tp \lt td+\pi/2$$
 and so (B),(C),(D) are satisfied.
 We still have to prove that the second part of (A) holds in the base case.
 <p>
@@ -1202,17 +1202,17 @@ as shown in Figure 3.
 Note that this temporary rotation of the picture
 does not change the truth or falsity of (A) that we are trying to prove,
 since all of the quantities
-$r_m$,
-$r_p$,
-$r_d$,
-$\theta_p-\theta_d$
+$rm$,
+$rp$,
+$rd$,
+$tp-td$
 are invariant under this rotation
 (even though
-$\theta_p$
+$tp$
 and
-$\theta_d$
+$td$
 have changed-- specifically,
-$\theta_p$
+$tp$
 is now
 $\pi/2$).
 (XXX Alternatively, could denote these rotated coords by carat'ing them)
@@ -1225,7 +1225,7 @@ $\pi/2$).
             :       |e'_1
             :    /  |
             :       |  Dudley    ^
-            :   /   *d=[x_d,y_d] |
+            :   /   *d=[xd,yd] |
             :      /|            |
             :  /  / | 
             :    /  |  
@@ -1233,7 +1233,7 @@ $\pi/2$).
             :  / _/ :
             ://_/   :
             ://     :
-           0*.......* [x_d,0]
+           0*.......* [xd,0]
 
         Fig. 3: base case in temporarily rotated coord system
 </pre>
@@ -1242,11 +1242,11 @@ as follows:
 \begin{align}
     & \text{Dudley's triangle area so far} \\
     & \;\; = \text{area}(\triangle(0,v'_0,d)) \\
-    & \;\; &lt; \text{area}(\triangle(0,\langle x_d,0\rangle,d)) \;\; \text{since the former triangle is included in the latter, since v'_0 has y coord &gt; 0 (XXX prove this!)} \\
-    & \;\; = x_d y_d / 2 \\
-    & \;\; = (r_d \cos(\theta_d)) (r_d \sin(\theta_d)) / 2\\
-    & \;\; = (r_d \sin(\pi/2-\theta_d)) (r_d \cos(\pi/2-\theta_d)) / 2\\
-(3) & \;\; = r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2
+    & \;\; &lt; \text{area}(\triangle(0,\langle xd,0\rangle,d)) \;\; \text{since the former triangle is included in the latter, since v'_0 has y coord &gt; 0 (XXX prove this!)} \\
+    & \;\; = xd yd / 2 \\
+    & \;\; = (rd \cos(td)) (rd \sin(td)) / 2\\
+    & \;\; = (rd \sin(\pi/2-td)) (rd \cos(\pi/2-td)) / 2\\
+(3) & \;\; = rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2
 \end{align}
 <p>
 Recalling (2),
@@ -1256,10 +1256,10 @@ Recalling (2),
 \end{align}
 Taking magnitude of both sides,
 \begin{align}
-   r_m &amp; = (\text{Dudley's triangle area so far}) * r_p \\
-       &amp; &lt; (r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2 ) * r_p  \;\; by (3) \\
-       &amp; = r_p r_d^2 \sin(\pi/2-\theta_d) \cos(\pi/2-\theta_d) / 2 \\
-       &amp; = r_p r_d^2 \sin(\theta_p-\theta_d) \cos(\theta_p-\theta_d) / 2
+   rm &amp; = (\text{Dudley's triangle area so far}) * rp \\
+       &amp; &lt; (rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2 ) * rp  \;\; by (3) \\
+       &amp; = rp rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2 \\
+       &amp; = rp rd^2 \sin(tp-td) \cos(tp-td) / 2
 \end{align}
 and so we've shown the second part of (A),
 completing the proof of the base case.
@@ -1279,23 +1279,23 @@ Using underbars and overbars to denote the respective values
 at times $\underline{t}$ and $\overline{t}$,
 the inductive hypothesis is that the Lemma holds at $\underline{t}$:
 \begin{alignat*}{3}
-    & (\underline{A}) \;\;  &  0                   &  &  & \lt \underline{r_m} \lt \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2 \\
-    & (\underline{B}) \;\;  & \underline{\theta_d} &  &  & \lt  \underline{\theta_m} \\
-    & (\underline{C}) \;\;  &                      &  &  & \leq \underline{\theta_p} \\
-    & (\underline{D}) \;\;  &                      &  &  & \lt \underline{\theta_d}+\pi/2.
+    & (\underline{A}) \;\;  &  0                   &  &  & \lt \underline{rm} \lt \underline{rp} \, \underline{rd}^2 \sin(\underline{tp}-\underline{td}) \cos(\underline{tp}-\underline{td}) / 2 \\
+    & (\underline{B}) \;\;  & \underline{td} &  &  & \lt  \underline{tm} \\
+    & (\underline{C}) \;\;  &                      &  &  & \leq \underline{tp} \\
+    & (\underline{D}) \;\;  &                      &  &  & \lt \underline{td}+\pi/2.
 \end{alignat*}
 and, assuming that, we must prove that it holds at $\overline{t}$:
 \begin{alignat*}{3}
-    & (\overline{A}) \;\;  &  0                   &  &  & \lt \overline{r_m} \lt \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2 \\
-    & (\overline{B}) \;\;  & \overline{\theta_d} &  &  & \lt  \overline{\theta_m} \\
-    & (\overline{C}) \;\;  &                      &  &  & \leq \overline{\theta_p} \\
-    & (\overline{D}) \;\;  &                      &  &  & \lt \overline{\theta_d}+\pi/2.
+    & (\overline{A}) \;\;  &  0                   &  &  & \lt \overline{rm} \lt \overline{rp} \, \overline{rd}^2 \sin(\overline{tp}-\overline{td}) \cos(\overline{tp}-\overline{td}) / 2 \\
+    & (\overline{B}) \;\;  & \overline{td} &  &  & \lt  \overline{tm} \\
+    & (\overline{C}) \;\;  &                      &  &  & \leq \overline{tp} \\
+    & (\overline{D}) \;\;  &                      &  &  & \lt \overline{td}+\pi/2.
 \end{alignat*}
 
 and, assuming that, we must prove that it holds at $\overline{t}$:
-    $$(\overline{A}) \;\;  0                   \lt \overline{r_m} \lt \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2 \\$$
+    $$(\overline{A}) \;\;  0                   \lt \overline{rm} \lt \overline{rp} \, \overline{rd}^2 \sin(\overline{tp}-\overline{td}) \cos(\overline{tp}-\overline{td}) / 2 \\$$
 \begin{alignat*}{7}
-     \overline{\theta_d}&  &  & \lt             &  \overline{\theta_m}  &  & \leq            &  \overline{\theta_p}  &  & \lt             &  \overline{\theta_d}+\pi/2. \\
+     \overline{td}&  &  & \lt             &  \overline{tm}  &  & \leq            &  \overline{tp}  &  & \lt             &  \overline{td}+\pi/2. \\
                         &  &  & (\overline{B})  &                       &  & (\overline{C})  &                       &  & (\overline{D})  & \\
 \end{alignat*}
 
@@ -1316,13 +1316,13 @@ $\underline{t}$
 or
 $\overline{t}$
 (even though
-$\theta_p$
+$tp$
 and
-$\theta_d$
+$td$
 have changed-- specifically,
-$\underline{\theta_d}$
+$\underline{td}$
 and
-$\overline{\theta_d}$
+$\overline{td}$
 are now both
 $0$).
 <pre>
@@ -1334,7 +1334,7 @@ $0$).
             .....
             .....
             *....
-                    *$\overline{p}= \langle \overline{x_p},\overline{y_p} \rangle$
+                    *$\overline{p}= \langle \overline{xp},\overline{yp} \rangle$
                     |
                   / |
                     | ^
@@ -1344,7 +1344,7 @@ $0$).
                     | |
                /    | 
                     |  
-              /     *$\underline{p}=\langle \underline{x_p},\underline{y_p} \rangle$
+              /     *$\underline{p}=\langle \underline{xp},\underline{yp} \rangle$
                   /  
              /  /    
               /             Dudley
@@ -1355,56 +1355,56 @@ $0$).
 In this case we have the following relationships between the previous event's values
 and the current values.
 Dudley didn't move:
-    $$(4) \;\; \overline{r_d} = \underline{r_d}$$
-    $$(5) \;\; \overline{\theta_d} = \underline{\theta_d} = 0$$
+    $$(4) \;\; \overline{rd} = \underline{rd}$$
+    $$(5) \;\; \overline{\thetad} = \underline{td} = 0$$
 nor did the moment (since the moment only changes when Dudley moves):
-    $$(6) \;\; \overline{r_m} = \underline{r_m}$$
-    $$(7) \;\; \overline{\theta_m} = \underline{\theta_m}  \;\; \text{(assuming $\underline{\theta_m}$ is well-defined-- which it is, by inductive hypothesis)}$$
+    $$(6) \;\; \overline{rm} = \underline{rm}$$
+    $$(7) \;\; \overline{tm} = \underline{tm}  \;\; \text{(assuming $\underline{tm}$ is well-defined-- which it is, by inductive hypothesis)}$$
 Priscilla moved purely upwards, within the first quadrant: (XXX may need to make very clear why this is true! it follows from B and/or C but it's a bit of a train wreck at the moment :-( )
 \begin{align}
-             0 & \lt \underline{y_p} \lt \overline{y_p} \\
-    (8) \;\; 0 & \lt \underline{x_p} = \overline{x_p}
+             0 & \lt \underline{yp} \lt \overline{yp} \\
+    (8) \;\; 0 & \lt \underline{xp} = \overline{xp}
 \end{align}
 so her angle increased, but stayed less than $\pi/2$:
-    $$(9) \;\; 0 \lt \underline{\theta_p} \lt \overline{\theta_p} \lt \pi/2$$
-   $$(10) \;\; 0 \lt \sin(\underline{\theta_p}) \lt \sin(\overline{\theta_p}) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
-   $$(11) \;\; 0 \lt \cos(\overline{\theta_p}) \lt \cos(\underline{\theta_p}) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
+    $$(9) \;\; 0 \lt \underline{tp} \lt \overline{tp} \lt \pi/2$$
+   $$(10) \;\; 0 \lt \sin(\underline{tp}) \lt \sin(\overline{tp}) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
+   $$(11) \;\; 0 \lt \cos(\overline{tp}) \lt \cos(\underline{tp}) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
 <p>
 Proving ($\overline{B}$) is easy:
 \begin{align}
-    \overline{\theta_d} & = \underline{\theta_d}  \;\; \text{by (5)} \\
-                        & \lt \underline{\theta_m}  \;\; \text{by} (\underline{B}) \\
-                        & = \overline{\theta_m}  \;\; \text{by (7).}
+    \overline{td} & = \underline{td}  \;\; \text{by (5)} \\
+                        & \lt \underline{tm}  \;\; \text{by} (\underline{B}) \\
+                        & = \overline{tm}  \;\; \text{by (7).}
 \end{align}
 Proving ($\overline{C}$) is easy:
 \begin{align}
-    \overline{\theta_m} & = \underline{\theta_m}  \;\; \text{by (7)} \\
-                        & \leq \underline{\theta_p}  \;\; \text{by} (\underline{C}) \\
-                        & \lt \overline{\theta_p}  \;\; \text{by (9)}
+    \overline{tm} & = \underline{tm}  \;\; \text{by (7)} \\
+                        & \leq \underline{tp}  \;\; \text{by} (\underline{C}) \\
+                        & \lt \overline{tp}  \;\; \text{by (9)}
 \end{align}
 And (D) is always satisfied (recall it's not part of the induction). (XXX remove it from the inductive hypothesis and inductive step!)
 <p>
 We must prove ($\overline{A}$).
 The first inequality of ($\overline{A}$) is easy:
 \begin{align}
-    \overline{r_m} & = \underline{r_m}  \;\; \text{by (6)} \\
+    \overline{rm} & = \underline{rm}  \;\; \text{by (6)} \\
                    & \gt 0  \;\; \text{by} (\underline{A})
 \end{align}
 <p>
 Proceeding now to prove the second inequality of ($\overline{A}$):
 \begin{align}
-    \overline{r_m} & = \underline{r_m}  \;\; \text{by (6)} \\
-                   & \lt \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}-\underline{\theta_d}) \cos(\underline{\theta_p}-\underline{\theta_d}) / 2  \;\; \text{by} (\underline{A}) \\
-                   & = \underline{r_p} \, \underline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (5)} \\
-                   & = \underline{r_p} \, \overline{r_d}^2 \sin(\underline{\theta_p}) \cos(\underline{\theta_p}) / 2  \;\; \text{by (4)} \\
-                   & = (\underline{r_p} \cos(\underline{\theta_p})) \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{(just rearranging terms)} \\
+    \overline{rm} & = \underline{rm}  \;\; \text{by (6)} \\
+                   & \lt \underline{rp} \, \underline{rd}^2 \sin(\underline{tp}-\underline{td}) \cos(\underline{tp}-\underline{td}) / 2  \;\; \text{by} (\underline{A}) \\
+                   & = \underline{rp} \, \underline{rd}^2 \sin(\underline{tp}) \cos(\underline{tp}) / 2  \;\; \text{by (5)} \\
+                   & = \underline{rp} \, \overline{rd}^2 \sin(\underline{tp}) \cos(\underline{tp}) / 2  \;\; \text{by (4)} \\
+                   & = (\underline{rp} \cos(\underline{tp})) \overline{rd}^2 \sin(\underline{tp})/2   \;\; \text{(just rearranging terms)} \\
 
-                   & = \underline{x_p} \, \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
-                   & = \overline{x_p} \, \overline{r_d}^2 \sin(\underline{\theta_p})/2   \;\; \text{by (8)} \\
-                   & = (\overline{r_p} \cos(\overline{\theta_p})) \overline{r_d}^2 \sin(\underline{\theta_p})/2 \\
-                   & \lt (\overline{r_p} \cos(\theta_p)) \overline{r_d}^2 \sin(\overline{\theta_p})/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
-                   & = \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}) \cos(\overline{\theta_p}) / 2   \;\; \text{(just rearranging terms)} \\
-                   & = \overline{r_p} \, \overline{r_d}^2 \sin(\overline{\theta_p}-\overline{\theta_d}) \cos(\overline{\theta_p}-\overline{\theta_d}) / 2  \;\; \text{by (5)}
+                   & = \underline{xp} \, \overline{rd}^2 \sin(\underline{tp})/2 \\
+                   & = \overline{xp} \, \overline{rd}^2 \sin(\underline{tp})/2   \;\; \text{by (8)} \\
+                   & = (\overline{rp} \cos(\overline{tp})) \overline{rd}^2 \sin(\underline{tp})/2 \\
+                   & \lt (\overline{rp} \cos(tp)) \overline{rd}^2 \sin(\overline{tp})/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
+                   & = \overline{rp} \, \overline{rd}^2 \sin(\overline{tp}) \cos(\overline{tp}) / 2   \;\; \text{(just rearranging terms)} \\
+                   & = \overline{rp} \, \overline{rd}^2 \sin(\overline{tp}-\overline{td}) \cos(\overline{tp}-\overline{td}) / 2  \;\; \text{by (5)}
 \end{align}
 and so the second inequality of ($\overline{A}$) is proved,
 completing Case 1 of the inductive step.
@@ -1418,14 +1418,14 @@ so Dudley is traveling upwards along a now-vertical dual edge,
 as shown in Figure 5.
 <pre>
         Priscilla
-            *p=[0,_^y_p]
+            *p=[0,_^yp]
             :         _
             :       * d 
             :       |
             :     / |
             :       | ^
             :    /  | |
-            :       | | Dudley walks from _d_ to ^d^
+            :       | | Dudley walks from d_ to ^d^
             :   /   | | (parallel to Priscilla's stationary position)
             :       | |
             :  /    | 
@@ -1434,7 +1434,7 @@ as shown in Figure 5.
             :    _/ : -
             :/ _/   :
             : /     :
-           0*.......* [x_d_^,0]
+           0*.......* [xd_^,0]
 
         Fig. 5: Inductive step, Case 2: Dudley has moved
 </pre>
@@ -1442,48 +1442,48 @@ We denote quantities that are stationary at this step
 by giving them both an underbar and overbar.
 Priscilla is on the +y axis and didn't move:
 <pre>
-    (11.5)  _^r_p = _^y_p > 0
-            _^x_p = 0
-    (12)    _^t_p = = pi/2
+    (11.5)  _^rp = _^yp > 0
+            _^xp = 0
+    (12)    _^tp = = pi/2
 Dudley moved purely upwards, strictly within the first quadrant:
 (XXX may need more clarification, just like previous case)
-    (13)    0 < _y_d < ^y_d
-            0 < _x_d = ^x_d = _^x_d
+    (13)    0 < _yd < ^yd
+            0 < _xd = ^xd = _^xd
 so his angle increased, but stayed less than pi/2:
-    (14)    0 < t_d_ < ^t_d < pi/2
-    (15)    0 < sin(_t_d) < sin(^t_d) < 1 (follows from (14) since sin is increasing in this range)
-    (16)    0 < cos(^t_d) < cos(_t_d) < 1 (follows from (14) since cos is decreasing in this range)
+    (14)    0 < td_ < ^td < pi/2
+    (15)    0 < sin(_td) < sin(^td) < 1 (follows from (14) since sin is increasing in this range)
+    (16)    0 < cos(^td) < cos(_td) < 1 (follows from (14) since cos is decreasing in this range)
 
 The moment changed as follows:
-         ^m = _m + (area of Dudley's triangle) * (Priscilla's position)
-    (16.5)  = _m + (1/2 * (^y_d-_y_d)*^_d_x) * <0,_y_p^>
+         ^m = m + (area of Dudley's triangle) * (Priscilla's position)
+    (16.5)  = m + (1/2 * (^yd-_yd)*^d_x) * <0,_yp^>
 
 Therefore by (12), the moment moved purely upwards as well;
 furthermore (B_,C_,D_) say it started strictly inside the first quadrant
 so it ended there as well;
 so the first part of (A^) is immediately satisfied and:
-    (17)    0 < y_m_ < y_m^
-    (18)    0 < x_m_ = x_m^ = x_m_^
-    (19)    0 < t_m_ < t_m^ < pi/2
-    (20)    0 < sin(t_m_) < sin(t_m^) < 1
-    (21)    0 < cos(t_m^) < cos(t_m_) < 1
+    (17)    0 < ym_ < ym^
+    (18)    0 < xm_ = xm^ = xm_^
+    (19)    0 < tm_ < tm^ < pi/2
+    (20)    0 < sin(tm_) < sin(tm^) < 1
+    (21)    0 < cos(tm^) < cos(tm_) < 1
 
 (C^) follows triviallly:
-            t_m^ < pi/2  by (18)
-                 = t_p   by (12)
+            tm^ < pi/2  by (18)
+                 = tp   by (12)
 The second part of (A^) is proved as follows:
-(want to show r_m^ < r_p^ r_d^ ^2 sin(t_p^-t_d^)cos(t_p^-t_d^)/2)
-    r_m^ = |m^| = |m_ + (area of Dudley's triangle) * (Priscilla's position)|
+(want to show rm^ < rp^ rd^ ^2 sin(tp^-td^)cos(tp^-td^)/2)
+    rm^ = |m^| = |m_ + (area of Dudley's triangle) * (Priscilla's position)|
                <= |m_| + (area of Dudley's triangle) * |p_^|
-               = r_m_ + (area of Dudley's triangle) * r_p_^
-               < r_p_^ r_d_^2 sin(t_p_-t_d_)cos(t_p_-t_d_)/2 + (area of Dudley's triangle) * r_p_^ by (A_)
-               = r_p_^ ((r_d_ sin(t_p_-t_d_))(r_d_ cos(t_p_-t_d_))/2 + (area of Dudley's triangle))
-               = r_p_^ (areaTri(0,<x_d_^,0>,d_) + areaTri(0,d_,d^))
-               = r_p_^ (areaTri(0,<x_d_^,d^))  since this tri is the disjoint union of the previous two tris
+               = rm_ + (area of Dudley's triangle) * rp_^
+               < rp_^ rd_^2 sin(tp_-td_)cos(tp_-td_)/2 + (area of Dudley's triangle) * rp_^ by (A_)
+               = rp_^ ((rd_ sin(tp_-td_))(rd_ cos(tp_-td_))/2 + (area of Dudley's triangle))
+               = rp_^ (areaTri(0,<xd_^,0>,d_) + areaTri(0,d_,d^))
+               = rp_^ (areaTri(0,<xd_^,d^))  since this tri is the disjoint union of the previous two tris
                   XXX should we be using x's and y's in here somewhere?
-               = r_p_^ r_d^2 cos(t_d^)sin(t_d^) / 2
-               = r_p_^ r_d^2 sin(pi/2-t_d^)cos(pi/2-t_d^) / 2    since cos(t)=sin(pi/2-t) in general
-               = r_p_^ r_d^2 sin(t_p_^-t_d^)cos(t_p_^-t_d^) / 2  by (12)
+               = rp_^ rd^2 cos(td^)sin(td^) / 2
+               = rp_^ rd^2 sin(pi/2-td^)cos(pi/2-td^) / 2    since cos(t)=sin(pi/2-t) in general
+               = rp_^ rd^2 sin(tp_^-td^)cos(tp_^-td^) / 2  by (12)
 
 Having shown (A^), we must finally prove (B^).
 
@@ -1491,23 +1491,23 @@ For this, we first derive an intermediate result
 from the inductive hypothesis.
 The "all terms positive" claims throughout the following
 follow from (left side of) (A_), (B_),(C_),(D_).
-         x_m_ = r_m_ cos(t_m_)
-              = r_m_ sin(pi/2 - t_m_)
+         xm_ = rm_ cos(tm_)
+              = rm_ sin(pi/2 - tm_)
      
-              = r_m_ sin(t_p_ - t_m_) by (12)
-              = r_m_ sin((t_p_-t_d_)-(t_m_-t_d_))
-              = r_m_ (sin(t_p_-t_d_)cos(t_m_-t_d_) - cos(t_p_-t_d_)sin(t_m_-t_d_)) by double-angle identity
-              = r_m_ sin(t_p_-t_d_)cos(t_m_-t_d_) - r_m_ cos(t_p_-t_d_)sin(t_m_-t_d_)
-              < r_m_ sin(t_p_-t_d_)cos(t_m_-t_d_) - 0  since all terms positive
-              < r_m_ sin(t_p_-t_d_) * 1  since cos(t_m_-t_d_)<1 and all terms positive
-              < (1/2 r_p_ r_d_^2 sin(t_p_-t_d_)cos(t_p_-t_d_)) sin(t_p_-t_d_)  by (A_)
-              = 1/2 r_p_ cos(t_p_-t_d_) (r_d_ sin(t_p_-t_d_))^2
-              < 1/2 r_p_ (r_d_ sin(t_p_-t_d_))^2  since 0 < cos(t_p_-t_d_) < 1
+              = rm_ sin(tp_ - tm_) by (12)
+              = rm_ sin((tp_-td_)-(tm_-td_))
+              = rm_ (sin(tp_-td_)cos(tm_-td_) - cos(tp_-td_)sin(tm_-td_)) by double-angle identity
+              = rm_ sin(tp_-td_)cos(tm_-td_) - rm_ cos(tp_-td_)sin(tm_-td_)
+              < rm_ sin(tp_-td_)cos(tm_-td_) - 0  since all terms positive
+              < rm_ sin(tp_-td_) * 1  since cos(tm_-td_)<1 and all terms positive
+              < (1/2 rp_ rd_^2 sin(tp_-td_)cos(tp_-td_)) sin(tp_-td_)  by (A_)
+              = 1/2 rp_ cos(tp_-td_) (rd_ sin(tp_-td_))^2
+              < 1/2 rp_ (rd_ sin(tp_-td_))^2  since 0 < cos(tp_-td_) < 1
      
-              = 1/2 r_p_ (r_d_ sin(pi/2-t_d_))^2  by (12)
-              = 1/2 r_p_ (r_d_ cos(t_d_))^2
-              = 1/2 r_p_ x_d_^2
-    (22) x_m_ < 1/2 r_p_ x_d_^2.
+              = 1/2 rp_ (rd_ sin(pi/2-td_))^2  by (12)
+              = 1/2 rp_ (rd_ cos(td_))^2
+              = 1/2 rp_ xd_^2
+    (22) xm_ < 1/2 rp_ xd_^2.
 (XXX could phrase that in terms "m x p < 1/2 (d x p)^2",
 coordinate-free til the last second, if we wanted... maybe)
 
@@ -1522,15 +1522,15 @@ of two vectors in the plane, i.e.
 v0 X v1 = |v0| |v1| sin(angle(v0,v1))).
 
 So we just need to prove (B'^) and we're done.
-    d^ X m^ = <x_d_^,y_d^> X <x_m_^,y_m^>
-            = x_d_^ y_m^  -  y_d^ x_m_^
-            = x_d_^ (y_m_ + 1/2 (y_d^-y_d_) x_d_^ y_p_^) - y_d^ x_m_^  by (16.5)  (XXX neaten that up)
-            = x_d_^ (y_m_ + 1/2 (y_d^-y_d_) x_d_^ y_p_^) - (y_d_ + (y_d^-y_d_)) x_m_^
-            = (x_d_^ y_m_ - y_d_ x_m_^) + (y_d^-y_d_) (1/2 x_d_^ ^2 y_p_^ - x_m_^)  (just rearranged terms)
-            =          d_ X m_          + (y_d^-y_d_) (1/2 x_d_^ ^2 y_p_^ - x_m_^)
-            >             0             + (y_d^-y_d_) (1/2 x_d_^ ^2 y_p_^ - x_m_^)  by (B_)
-            = (y_d^-y_d_) (1/2 x_d_^ ^2 y_p_^ - x_m_^)
-            = (y_d^-y_d_) (1/2 x_d_^ ^2 r_p_^ - x_m_^) by (11.5)
+    d^ X m^ = <xd_^,yd^> X <xm_^,ym^>
+            = xd_^ ym^  -  yd^ xm_^
+            = xd_^ (ym_ + 1/2 (yd^-yd_) xd_^ yp_^) - yd^ xm_^  by (16.5)  (XXX neaten that up)
+            = xd_^ (ym_ + 1/2 (yd^-yd_) xd_^ yp_^) - (yd_ + (yd^-yd_)) xm_^
+            = (xd_^ ym_ - yd_ xm_^) + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)  (just rearranged terms)
+            =          d_ X m_          + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)
+            >             0             + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)  by (B_)
+            = (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)
+            = (yd^-yd_) (1/2 xd_^ ^2 rp_^ - xm_^) by (11.5)
 
             > 0, by (13) and (22).
 
@@ -1592,7 +1592,7 @@ Lemma:  Given a polygon as previously described,
 for each odd i in {1,3,...l},
     XXX MAYBE, but different language
     (C) moment(v_1..v_i) dot (v_{i+2}-v_i) \gt 0
-    (A) ||moment(v_1..v_i)|| \langle ||v_i|| {r_d}^2 \sin(\theta_p-\theta_d)     XXX how the fuck did r_d get in here?
+    (A) ||moment(v_1..v_i)|| \langle ||v_i|| {rd}^2 \sin(tp-td)     XXX how the fuck did rd get in here?
     (B) d^perpdot dot moment{v_1..v_i} \gt 0                              XXX how the fuck did d get in here?  actually need to talk about constructing the dual I think?
 </pre>
 
