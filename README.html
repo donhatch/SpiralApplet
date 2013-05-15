@@ -102,7 +102,64 @@
         */
     </style>
 
-    <script type="text/javascript">
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                // make '$' delimit inline math
+                inlineMath: [['$','$'], ['\\(','\\)']],
+                // make \$ give a real dollar sign, even in non-math mode
+                processEscapes: true,
+            },
+
+            TeX: {
+                Macros: {
+                    // just a record of how to make a macro, for my reference.
+                    // (note, this apparently works for _ but not for ^)
+                    _: ["\\underline{#1}",1],
+                },
+            },
+            asciimath2jax: {
+                delimiters: [['`','`']],
+            },
+            menuSettings: {
+                // make it so that hovering over an equation zooms it
+                // (right click on an equation to see how to alter this
+                // within a session)
+                // XXX this isn't working?
+                zoom: 'hover',
+            },
+            "HTML-CSS": {
+                // oh hmm, it's complicated... see http://docs.mathjax.org/en/latest/options/HTML-CSS.html  .  not sure how to get a font I want.
+                preferredFont: "STIX",
+            },
+
+            // we're going to make a pass over the document using jquery first,
+            // so skip typesetting during startup, and we'll call MathJax.Hub.Typeset()
+            // explicitly when we want it.
+            // (actually MathJax.Hub.Queue(["Typeset",MathJax.Hub])).
+            skipStartupTypeset: true,
+        });
+    </script>
+    <!-- note, the particular config used below allows
+         both tex (using $...$)
+         and asciimath (using `...`) on same page -->
+    <script type="text/javascript"
+      src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML.js">
+    </script>
+
+
+    <script
+        src="http://code.jquery.com/jquery-1.7.1.min.js">
+    </script>
+    <script>
+	// make $ not be an alias for jQuery
+        // since I think that's ridiculous...
+        jQuery.noConflict();
+    </script>
+
+
+    <script>
         /*
         To make the source of the proofs
         more readable and maintainable,
@@ -154,377 +211,8 @@
         and loading it before original combined config file.
 
         */
-    </script>
-
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-                // make '$' delimit inline math
-                inlineMath: [['$','$'], ['\\(','\\)']],
-                // make \$ give a real dollar sign, even in non-math mode
-                processEscapes: true,
-            },
-
-            TeX: {
-                Macros: {
-                    // just a record of how to make a macro, for my reference.
-                    // (note, this apparently works for _ but not for ^)
-                    _: ["\\underline{#1}",1],
-                },
-            },
-            asciimath2jax: {
-                delimiters: [['`','`']],
-            },
-            menuSettings: {
-                // make it so that hovering over an equation zooms it
-                // (right click on an equation to see how to alter this
-                // within a session)
-                // XXX this isn't working?
-                zoom: 'hover',
-            },
-            "HTML-CSS": {
-                // oh hmm, it's complicated... see http://docs.mathjax.org/en/latest/options/HTML-CSS.html  .  not sure how to get a font I want.
-                preferredFont: "STIX",
-            },
-
-            // we're going to make a pass over the document using jquery first,
-            // so skip typesetting during startup, and we'll call MathJax.Hub.Typeset()
-            // explicitly when we want it.
-            // (actually MathJax.Hub.Queue(["Typeset",MathJax.Hub])).
-            skipStartupTypeset: true,
-        });
 
 
-        // XXX YOU ARE HERE -- modify the following for my own nefarious needs
-        MathJax.Hub.Register.PreProcessor(["PreProcess", {
-          version: "2.1",
-          config: {
-            inlineMath: [              // The start/stop pairs for in-line math
-        //    ['$','$'],               //  (comment out any you don't want, or add your own, but
-              ['\\(','\\)']            //  be sure that you don't have an extra comma at the end)
-            ],
-
-            displayMath: [             // The start/stop pairs for display math
-              ['$$','$$'],             //  (comment out any you don't want, or add your own, but
-              ['\\[','\\]']            //  be sure that you don't have an extra comma at the end)
-            ],
-
-            balanceBraces: true,       // determines whether tex2jax requires braces to be
-                                       // balanced within math delimiters (allows for nested
-                                       // dollar signs).  Set to false to get pre-v2.0 compatibility.
-
-            skipTags: ["script","noscript","style","textarea","pre","code"],
-                                       // The names of the tags whose contents will not be
-                                       // scanned for math delimiters
-
-            ignoreClass: "tex2jax_ignore",    // the class name of elements whose contents should
-                                              // NOT be processed by tex2jax.  Note that this
-                                              // is a regular expression, so be sure to quote any
-                                              // regexp special characters
-
-            processClass: "tex2jax_process",  // the class name of elements whose contents SHOULD
-                                              // be processed when they appear inside ones that
-                                              // are ignored.  Note that this is a regular expression,
-                                              // so be sure to quote any regexp special characters
-
-            processEscapes: false,     // set to true to allow \$ to produce a dollar without
-                                       //   starting in-line math mode
-
-            processEnvironments: true, // set to true to process \begin{xxx}...\end{xxx} outside
-                                       //   of math mode, false to prevent that
-
-            processRefs: true,         // set to true to process \ref{...} outside of math mode
-
-
-            preview: "TeX"             // set to "none" to not insert MathJax_Preview spans
-                                       //   or set to an array specifying an HTML snippet
-                                       //   to use the same preview for every equation.
-
-          },
-
-          doMyThing: function (element,anyProperAncestorEnabled,depth) {
-            if (element.nodeValue != null && element.nodeValue.indexOf('stationary') != -1)
-            {
-                //window.alert("in doMyThing(depth="+depth+": element="+element+" nodeValue="+element.nodeValue+" firstChild = "+element.firstChild+" nextSibling="+element.nextSibling+" className="+element.className+" tagName="+element.tagName);
-            }
-
-            var enabled = (anyProperAncestorEnabled || (element.className == 'doMyThing'))
-
-            if (enabled
-             && element.nodeValue != null
-             && element.tagName != 'PRE') // don't transform stuff in PRE sections
-            {
-                element.nodeValue = element.nodeValue.replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
-                element.nodeValue = element.nodeValue.replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
-                element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
-
-                element.nodeValue = element.nodeValue.replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
-                element.nodeValue = element.nodeValue.replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
-                element.nodeValue = element.nodeValue.replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
-                element.nodeValue = element.nodeValue.replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
-
-                element.nodeValue = element.nodeValue.replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
-                element.nodeValue = element.nodeValue.replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
-
-                element.nodeValue = element.nodeValue.replace(/\\</g,'\\langle')
-                element.nodeValue = element.nodeValue.replace(/\\>/g,'\\rangle')
-            }
-            for (var child = element.firstChild; child != null; child = child.nextSibling)
-            {
-                if (child.tagName == null || child.tagName != 'PRE') // don't descend into PRE's
-                {
-                    this.doMyThing(child,enabled,depth+1);
-                }
-            }
-          },
-
-          PreProcess: function (element) {
-            if (!this.configured) {
-              this.config = MathJax.Hub.CombineConfig("tex2jax",this.config);
-              if (this.config.Augment) {MathJax.Hub.Insert(this,this.config.Augment)}
-              if (typeof(this.config.previewTeX) !== "undefined" && !this.config.previewTeX)
-                {this.config.preview = "none"} // backward compatibility for previewTeX parameter
-              this.configured = true;
-            }
-            if (typeof(element) === "string") {element = document.getElementById(element)}
-            if (!element) {element = document.body}
-
-            //this.doMyThing(element,0,0);
-
-            if (this.createPatterns()) {this.scanElement(element,element.nextSibling)}
-          },
-
-          createPatterns: function () {
-            var starts = [], parts = [], i, m, config = this.config;
-            this.match = {};
-            for (i = 0, m = config.inlineMath.length; i < m; i++) {
-              starts.push(this.patternQuote(config.inlineMath[i][0]));
-              this.match[config.inlineMath[i][0]] = {
-                mode: "",
-                end: config.inlineMath[i][1],
-                pattern: this.endPattern(config.inlineMath[i][1])
-              };
-            }
-            for (i = 0, m = config.displayMath.length; i < m; i++) {
-              starts.push(this.patternQuote(config.displayMath[i][0]));
-              this.match[config.displayMath[i][0]] = {
-                mode: "; mode=display",
-                end: config.displayMath[i][1],
-                pattern: this.endPattern(config.displayMath[i][1])
-              };
-            }
-            if (starts.length) {parts.push(starts.sort(this.sortLength).join("|"))}
-            if (config.processEnvironments) {parts.push("\\\\begin\\{([^}]*)\\}")}
-            if (config.processEscapes)      {parts.push("\\\\*\\\\\\\$")}
-            if (config.processRefs)         {parts.push("\\\\(eq)?ref\\{[^}]*\\}")}
-            this.start = new RegExp(parts.join("|"),"g");
-            this.skipTags = new RegExp("^("+config.skipTags.join("|")+")$","i");
-            this.ignoreClass = new RegExp("(^| )("+config.ignoreClass+")( |$)");
-            this.processClass = new RegExp("(^| )("+config.processClass+")( |$)");
-            return (parts.length > 0);
-          },
-
-          patternQuote: function (s) {return s.replace(/([\^$(){}+*?\-|\[\]\:\\])/g,'\\$1')},
-
-          endPattern: function (end) {
-            return new RegExp(this.patternQuote(end)+"|\\\\.|[{}]","g");
-          },
-
-          sortLength: function (a,b) {
-            if (a.length !== b.length) {return b.length - a.length}
-            return (a == b ? 0 : (a < b ? -1 : 1));
-          },
-
-          scanElement: function (element,stop,ignore) {
-            var cname, tname, ignoreChild, process;
-            while (element && element != stop) {
-              if (element.nodeName.toLowerCase() === '#text') {
-                if (!ignore) {element = this.scanText(element)}
-              } else {
-
-                cname = (typeof(element.className) === "undefined" ? "" : element.className);
-                tname = (typeof(element.tagName)   === "undefined" ? "" : element.tagName);
-                if (typeof(cname) !== "string") {cname = String(cname)} // jsxgraph uses non-string class names!
-                process = this.processClass.exec(cname);
-                if (element.firstChild && !cname.match(/(^| )MathJax/) &&
-                     (process || !this.skipTags.exec(tname))) {
-                  ignoreChild = (ignore || this.ignoreClass.exec(cname)) && !process;
-                  this.scanElement(element.firstChild,stop,ignoreChild);
-                }
-              }
-              if (element) {element = element.nextSibling}
-            }
-          },
-
-          scanText: function (element) {
-
-            if (element.nodeValue.replace(/\s+/,'') == '') {return element}
-            var match, prev;
-            this.search = {start: true};
-            this.pattern = this.start;
-            while (element) {
-              this.pattern.lastIndex = 0;
-              while (element && element.nodeName.toLowerCase() === '#text' &&
-                    (match = this.pattern.exec(element.nodeValue))) {
-                if (this.search.start) {element = this.startMatch(match,element)}
-                                  else {element = this.endMatch(match,element)}
-              }
-              if (this.search.matched) {element = this.encloseMath(element)}
-              if (element) {
-                do {prev = element; element = element.nextSibling}
-                  while (element && (element.nodeName.toLowerCase() === 'br' ||
-                                     element.nodeName.toLowerCase() === '#comment'));
-                if (!element || element.nodeName !== '#text')
-                  {return (this.search.close ? this.prevEndMatch() : prev)}
-              }
-            }
-            return element;
-          },
-
-          startMatch: function (match,element) {
-            var delim = this.match[match[0]];
-            if (delim != null) {                              // a start delimiter
-              this.search = {
-                end: delim.end, mode: delim.mode, pcount: 0,
-                open: element, olen: match[0].length, opos: this.pattern.lastIndex - match[0].length
-              };
-              this.switchPattern(delim.pattern);
-            } else if (match[0].substr(0,6) === "\\begin") {  // \begin{...}
-              this.search = {
-                end: "\\end{"+match[1]+"}", mode: "; mode=display", pcount: 0,
-                open: element, olen: 0, opos: this.pattern.lastIndex - match[0].length,
-                isBeginEnd: true
-              };
-              this.switchPattern(this.endPattern(this.search.end));
-            } else if (match[0].substr(0,4) === "\\ref" || match[0].substr(0,6) === "\\eqref") {
-              this.search = {
-                mode: "", end: "", open: element, pcount: 0,
-                olen: 0, opos: this.pattern.lastIndex - match[0].length
-              }
-              return this.endMatch([""],element);
-            } else {                                         // escaped dollar signs
-              // put $ in a span so it doesn't get processed again
-              // split off backslashes so they don't get removed later
-              var slashes = match[0].substr(0,match[0].length-1), n, span;
-              if (slashes.length % 2 === 0) {span = [slashes.replace(/\\\\/g,"\\")]; n = 1}
-                else {span = [slashes.substr(1).replace(/\\\\/g,"\\"),"$"]; n = 0}
-              span = MathJax.HTML.Element("span",null,span);
-              var text = MathJax.HTML.TextNode(element.nodeValue.substr(0,match.index));
-              element.nodeValue = element.nodeValue.substr(match.index + match[0].length - n);
-              element.parentNode.insertBefore(span,element);
-              element.parentNode.insertBefore(text,span);
-              this.pattern.lastIndex = n;
-            }
-            return element;
-          },
-
-          endMatch: function (match,element) {
-            var search = this.search;
-            if (match[0] == search.end) {
-              if (!search.close || search.pcount === 0) {
-                search.close = element;
-                search.cpos = this.pattern.lastIndex;
-                search.clen = (search.isBeginEnd ? 0 : match[0].length);
-              }
-              if (search.pcount === 0) {
-                search.matched = true;
-                element = this.encloseMath(element);
-                this.switchPattern(this.start);
-              }
-            }
-            else if (match[0] === "{") {search.pcount++}
-            else if (match[0] === "}" && search.pcount) {search.pcount--}
-            return element;
-          },
-          prevEndMatch: function () {
-            this.search.matched = true;
-            var element = this.encloseMath(this.search.close);
-            this.switchPattern(this.start);
-            return element;
-          },
-
-          switchPattern: function (pattern) {
-            pattern.lastIndex = this.pattern.lastIndex;
-            this.pattern = pattern;
-            this.search.start = (pattern === this.start);
-          },
-
-          encloseMath: function (element) {
-            var search = this.search, close = search.close, CLOSE, math;
-            if (search.cpos === close.length) {close = close.nextSibling}
-               else {close = close.splitText(search.cpos)}
-            if (!close) {CLOSE = close = MathJax.HTML.addText(search.close.parentNode,"")}
-            search.close = close;
-            math = (search.opos ? search.open.splitText(search.opos) : search.open);
-            while (math.nextSibling && math.nextSibling !== close) {
-              if (math.nextSibling.nodeValue !== null) {
-                if (math.nextSibling.nodeName === "#comment") {
-                  math.nodeValue += math.nextSibling.nodeValue.replace(/^\[CDATA\[((.|\n|\r)*)\]\]$/,"$1");
-                } else {
-                  math.nodeValue += math.nextSibling.nodeValue;
-                }
-              } else if (this.msieNewlineBug) {
-                math.nodeValue += (math.nextSibling.nodeName.toLowerCase() === "br" ? "\n" : " ");
-              } else {
-                math.nodeValue += " ";
-              }
-              math.parentNode.removeChild(math.nextSibling);
-            }
-            var TeX = math.nodeValue.substr(search.olen,math.nodeValue.length-search.olen-search.clen);
-            math.parentNode.removeChild(math);
-            if (this.config.preview !== "none") {this.createPreview(search.mode,TeX)}
-            math = this.createMathTag(search.mode,TeX);
-            this.search = {}; this.pattern.lastIndex = 0;
-            if (CLOSE) {CLOSE.parentNode.removeChild(CLOSE)}
-            return math;
-          },
-
-          insertNode: function (node) {
-            var search = this.search;
-            search.close.parentNode.insertBefore(node,search.close);
-          },
-
-          createPreview: function (mode,tex) {
-            var preview;
-            if (this.config.preview === "TeX") {preview = [this.filterPreview(tex)]}
-            else if (this.config.preview instanceof Array) {preview = this.config.preview}
-            if (preview) {
-              preview = MathJax.HTML.Element("span",{className:MathJax.Hub.config.preRemoveClass},preview);
-              this.insertNode(preview);
-            }
-          },
-
-          createMathTag: function (mode,tex) {
-            var script = document.createElement("script");
-            script.type = "math/tex" + mode;
-            MathJax.HTML.setScript(script,tex);
-            this.insertNode(script);
-            return script;
-          },
-
-          filterPreview: function (tex) {return tex},
-
-          msieNewlineBug: (MathJax.Hub.Browser.isMSIE && document.documentMode < 9)
-
-        }]);
-
-
-
-
-    </script>
-    <!-- note, the particular config used below allows
-         both tex (using $...$)
-         and asciimath (using `...`) on same page -->
-    <script type="text/javascript"
-      src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML.js">
-    </script>
-
-    <script src="http://code.jquery.com/jquery-1.7.1.min.js">
-    </script>
-    <script>
-	// make $ not be an alias for jQuery
-        // since I think that's ridiculous...
-        jQuery.noConflict();
 
         // queue calling the following code
         // when the document is loaded
@@ -532,43 +220,29 @@
             console.log("in jquery document-ready function!");
             console.log("    calling mathjax typeset...");
 
-            var doMyThing = function (element,anyProperAncestorEnabled,depth) {
-              if (element.nodeValue != null && element.nodeValue.indexOf('stationary') != -1)
-              {
-                  //window.alert("in doMyThing(depth="+depth+": element="+element+" nodeValue="+element.nodeValue+" firstChild = "+element.firstChild+" nextSibling="+element.nextSibling+" className="+element.className+" tagName="+element.tagName);
-              }
+            //jQuery(".doMyThing *").each(function(index,element)
+            jQuery(".doMyThing").find().andSelf() // all descendants (including self) of class="doMyThing" elements
+                                .each(function(index,element) {
+                if (element.nodeValue !== null)
+                {
+                    element.nodeValue = element.nodeValue.replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
+                    element.nodeValue = element.nodeValue.replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
+                    element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
 
-              var enabled = (anyProperAncestorEnabled || (element.className == 'doMyThing'))
+                    element.nodeValue = element.nodeValue.replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
+                    element.nodeValue = element.nodeValue.replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
+                    element.nodeValue = element.nodeValue.replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
+                    element.nodeValue = element.nodeValue.replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
 
-              if (enabled
-               && element.nodeValue != null
-               && element.tagName != 'PRE') // don't transform stuff in PRE sections
-              {
-                  element.nodeValue = element.nodeValue.replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
-                  element.nodeValue = element.nodeValue.replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
-                  element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
+                    element.nodeValue = element.nodeValue.replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
+                    element.nodeValue = element.nodeValue.replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
 
-                  element.nodeValue = element.nodeValue.replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
-                  element.nodeValue = element.nodeValue.replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
-                  element.nodeValue = element.nodeValue.replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
-                  element.nodeValue = element.nodeValue.replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
+                    element.nodeValue = element.nodeValue.replace(/\\</g,'\\langle')
+                    element.nodeValue = element.nodeValue.replace(/\\>/g,'\\rangle')
+                }
+            });
 
-                  element.nodeValue = element.nodeValue.replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
-                  element.nodeValue = element.nodeValue.replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
 
-                  element.nodeValue = element.nodeValue.replace(/\\</g,'\\langle')
-                  element.nodeValue = element.nodeValue.replace(/\\>/g,'\\rangle')
-              }
-              for (var child = element.firstChild; child != null; child = child.nextSibling)
-              {
-                  if (child.tagName == null || child.tagName != 'PRE') // don't descend into PRE's
-                  {
-                      doMyThing(child,enabled,depth+1);
-                  }
-              }
-            }
-
-            doMyThing(document);
 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
             console.log("    returned from mathjax typeset.");
@@ -578,6 +252,8 @@
 </head>
 <body>
 <hr> <!--============================================================-->
+<span id="youarehere"></span>
+<div class="doMyThing">
 $ \< 0 , 1 \> $
 $a^b {a}^{b}$
 $rp_$
@@ -599,6 +275,7 @@ $\underoverline{x}$
 $\_x$
 $\^x$
 $a ^ b$
+</div>
 
 <pre>
 
@@ -616,15 +293,18 @@ Dudley is stopped at the corresponding vertex of the dual,
 and when Dudley is moving along an edge of the dual,
 Priscilla is stopped at the corresponding vertex of the primal.
 Exactly one of Priscilla and Dudley are moving at any particular time.
+<div class="doMyThing">
 <p>
 Denote Priscilla's and Dudley's positions,
 in rectangular and polar coordinates,
 by the following, all continuous functions of time $t$:
-    $$rp,tp, xp, yp$$
-    $$rd,td, xd, yd$$
 <p>
-    $$xp = rp \cos(tp)  yp = rp \sin(tp)$$
-    $$xd = rd \cos(td)  yd = rd \sin(td)$$
+\begin{align}
+    rp,tp, & xp, yp \\
+    rd,td, & xd, yd \\
+    xp = rp \cos(tp)  \;\; & \;\;  yp = rp \sin(tp) \\
+    xd = rd \cos(td)  \;\; & \;\;  yd = rd \sin(td)
+\end{align}
 <p>
 Priscilla's and Dudley's paces are such that the one who's moving
 always does so at unit rotation speed around the origin
@@ -687,6 +367,7 @@ the entire dual diagram (triangle complex) is thus determined.
 It consists of
 $n$
 triangles, each having one vertex at the origin.
+</span> <!-- doMyThing -->
 <p>
 We'll number the primal features in CCW order:
 primal edges have even indices and primal vertices have odd indices:
@@ -1066,7 +747,6 @@ and the corresponding final outward normal vector
 $90^{\circ}$
 apart).
 <p>
-<span id="youarehere"></span>
 How that helps us is as follows:
 a polygon with only a single good exit with respect to the origin
 is naturally composed of two such sections
