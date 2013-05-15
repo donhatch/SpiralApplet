@@ -13,14 +13,6 @@
 
     Can't seem to adjust print font size by user :-(
     so messing with it in the style sheet here.
-    Font sizes:
-        xx-small
-        x-small
-        small
-        medium
-        large
-        x-large
-        xx-large
 
     TODO: my specified default zoom trigger not working?
     TODO: areaTri?
@@ -49,13 +41,38 @@
 -->
     <title>The Spiral Moment Lemma: There's No Single-Exit Lagoon</title>
     <style type="text/css">
-        p.breakhere {page-break-before:always;}
+
+        /* hide anything with class="asciiprevis" */
         .asciiprevis {display:none;}
 
         /*
+            For some reason printing comes out really tiny
+            (even more in chrome than in firefox)
+            if I don't make an explicit font size change.
+            I don't know how to change font size for a particular printout,
+            so hard-coding sizes in here.
+            Font sizes:
+                xx-small
+                x-small
+                small
+                medium
+                large
+                x-large
+                xx-large
             ARGH! anything media-specific causes corrupt output of math when printing in chrome!
             need to figure out why!
             printing in chrome seems pretty funky anyway (snap!) so I'll just print in firefox.
+
+            ideal settings (when expressed outside @media) seem to be:
+                firefox screen: medium (or large)
+                firefox print: large (or x-large)
+                chrome screen: large
+                chrome screen: x-large
+            but inside @media it acts different!
+                - in chrome, mathjax max gets corrupt when printed
+                - in firefox, @media print large
+                  is bigger (and more to my liking)
+                  than regular print large!
         */
 
         @media screen {
@@ -64,42 +81,16 @@
         @media print {
             body {font-size:large;}
         }
-        /*
-            messing with trying to keep pre's on one page
-        */
-            pre * {
-                page-break-after: avoid;
-                page-break-before: avoid;
-            }
 
         /*
-        * increase default font size.  Im getting old.
-        * (user can do this using ctrl-{+,-,0}
-        @media screen {
-            body {font-size:xx-small;}
+            messing with trying to keep pre's on one page.
+            these directives probably don't mean anything on screen.
+        */
+        pre * {
+            page-break-after: avoid;
+            page-break-before: avoid;
         }
-         increase the font size even more when printing--
-         for some reason it comes out really tiny otherwise. (more so on chrome than firefox)
-         I havent figured out any way to tell chrome to do that otherwise.
-         ideal settings seem to be:
-            firefox screen: medium (or large)
-            firefox print: large (or x-large)
-            chrome screen: large
-            chrome screen: x-large
-        @media print {
-            body {font-size:x-large;}
-        }
-        */
-
-        /*
-         ARGH! anything media-specific causes corrupt output, it seems.
-         so, make a global setting of the setting I want for print.
-
-         XXX wait a minute, somethings fucked...
-         are comments not working like I expected?
-         the font-size directive works when above this comment, but not below it??
-         the following works when
-        */
+        p.breakhere {page-break-before:always;}
     </style>
 
 
