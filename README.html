@@ -104,6 +104,8 @@
                 \underline{\overline{thing}}
                 \overline{\underline{thing}}
             (the latter two are effectively the same).
+            (The _ and ^ go before the object rather than after,
+            to avoid complication in parsing, for example, rd^2)
         2.
             The following:
                 tp tm td
@@ -216,9 +218,9 @@
             //window.alert("in doMyThing(depth="+depth+": element="+element+" nodeValue="+element.nodeValue+" firstChild = "+element.firstChild+" nextSibling="+element.nextSibling+" className="+element.className+" tagName="+element.tagName);
             if (element.nodeValue != null)
             {
-                element.nodeValue = element.nodeValue.replace(/\b([trxy]_?[dmp][_^])/g,'\\color{red}{\\fbox{$1}}')
-                element.nodeValue = element.nodeValue.replace(/\b([trxy]_[dmp]\b)/g,'\\color{green}{\\fbox{$1}}')
-                element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{$1}}')
+                element.nodeValue = element.nodeValue.replace(/\b([trxy]_?[dmp][_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
+                element.nodeValue = element.nodeValue.replace(/\b([trxy]_[dmp]\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
+                element.nodeValue = element.nodeValue.replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
 
                 element.nodeValue = element.nodeValue.replace(/\^_([trxy][dmp])\b/g,'\\overline{\\underline{$1}}')
                 element.nodeValue = element.nodeValue.replace(/_\^([trxy][dmp])\b/g,'\\underline{\\overline{$1}}')
@@ -483,7 +485,6 @@
     -->
 </head>
 <body>
-<span id="youarehere"></span>
 <hr> <!--============================================================-->
 $a^b {a}^{b}$
 $rp_$
@@ -1434,56 +1435,69 @@ as shown in Figure 5.
             :    _/ : -
             :/ _/   :
             : /     :
-           0*.......* [xd_^,0]
+           0*.......* [_^xd,0]
 
         Fig. 5: Inductive step, Case 2: Dudley has moved
 </pre>
 We denote quantities that are stationary at this step
 by giving them both an underbar and overbar.
 Priscilla is on the +y axis and didn't move:
-<pre>
-    (11.5)  _^rp = _^yp > 0
-            _^xp = 0
-    (12)    _^tp = = pi/2
+\begin{align}
+    (11.5)  _^rp = _^yp > 0 \\
+            _^xp = 0 \\
+    (12)    _^tp = = pi/2 \\
+\end{align}
 Dudley moved purely upwards, strictly within the first quadrant:
 (XXX may need more clarification, just like previous case)
-    (13)    0 < _yd < ^yd
-            0 < _xd = ^xd = _^xd
+\begin{align}
+    (13)    0 < _yd < ^yd \\
+            0 < _xd = ^xd = _^xd \\
+\end{align}
 so his angle increased, but stayed less than pi/2:
-    (14)    0 < td_ < ^td < pi/2
-    (15)    0 < sin(_td) < sin(^td) < 1 (follows from (14) since sin is increasing in this range)
-    (16)    0 < cos(^td) < cos(_td) < 1 (follows from (14) since cos is decreasing in this range)
+\begin{align}
+    (14)    0 < td_ < ^td < pi/2 \\
+    (15)    0 < sin(_td) < sin(^td) < 1 (follows from (14) since sin is increasing in this range) \\
+    (16)    0 < cos(^td) < cos(_td) < 1 (follows from (14) since cos is decreasing in this range) \\
+\end{align}
 
 The moment changed as follows:
-         ^m = m + (area of Dudley's triangle) * (Priscilla's position)
-    (16.5)  = m + (1/2 * (^yd-_yd)*^d_x) * <0,_yp^>
+\begin{align}
+         ^m = m + (area of Dudley's triangle) * (Priscilla's position) \\
+    (16.5)  = m + (1/2 * (^yd-_yd)*^d_x) * <0,_yp^> \\
+\end{align}
 
 Therefore by (12), the moment moved purely upwards as well;
 furthermore (B_,C_,D_) say it started strictly inside the first quadrant
 so it ended there as well;
 so the first part of (A^) is immediately satisfied and:
-    (17)    0 < ym_ < ym^
-    (18)    0 < xm_ = xm^ = xm_^
-    (19)    0 < tm_ < tm^ < pi/2
-    (20)    0 < sin(tm_) < sin(tm^) < 1
-    (21)    0 < cos(tm^) < cos(tm_) < 1
+\begin{align}
+    (17)    0 < ym_ < ym^ \\
+    (18)    0 < xm_ = xm^ = _^xm \\
+    (19)    0 < tm_ < tm^ < pi/2 \\
+    (20)    0 < sin(tm_) < sin(tm^) < 1 \\
+    (21)    0 < cos(tm^) < cos(tm_) < 1 \\
+\end{align}
 
 (C^) follows triviallly:
-            tm^ < pi/2  by (18)
-                 = tp   by (12)
+\begin{align}
+            tm^ < pi/2  by (18) \\
+                 = tp   by (12) \\
+\end{align}
 The second part of (A^) is proved as follows:
 (want to show rm^ < rp^ rd^ ^2 sin(tp^-td^)cos(tp^-td^)/2)
-    rm^ = |m^| = |m_ + (area of Dudley's triangle) * (Priscilla's position)|
-               <= |m_| + (area of Dudley's triangle) * |p_^|
-               = rm_ + (area of Dudley's triangle) * rp_^
-               < rp_^ rd_^2 sin(tp_-td_)cos(tp_-td_)/2 + (area of Dudley's triangle) * rp_^ by (A_)
-               = rp_^ ((rd_ sin(tp_-td_))(rd_ cos(tp_-td_))/2 + (area of Dudley's triangle))
-               = rp_^ (areaTri(0,<xd_^,0>,d_) + areaTri(0,d_,d^))
-               = rp_^ (areaTri(0,<xd_^,d^))  since this tri is the disjoint union of the previous two tris
-                  XXX should we be using x's and y's in here somewhere?
-               = rp_^ rd^2 cos(td^)sin(td^) / 2
-               = rp_^ rd^2 sin(pi/2-td^)cos(pi/2-td^) / 2    since cos(t)=sin(pi/2-t) in general
-               = rp_^ rd^2 sin(tp_^-td^)cos(tp_^-td^) / 2  by (12)
+\begin{align}
+    rm^ = |m^| = |m_ + (area of Dudley's triangle) * (Priscilla's position)| \\
+               <= |m_| + (area of Dudley's triangle) * |_^p| \\
+               = rm_ + (area of Dudley's triangle) * _^rp \\
+               < _^rp _rd^2 sin(tp_-td_)cos(tp_-td_)/2 + (area of Dudley's triangle) * _^rp by (A_) \\
+               = _^rp ((rd_ sin(tp_-td_))(rd_ cos(tp_-td_))/2 + (area of Dudley's triangle)) \\
+               = _^rp (areaTri(0,<_^xd,0>,d_) + areaTri(0,d_,d^)) \\
+               = _^rp (areaTri(0,<_^xd,d^))  since this tri is the disjoint union of the previous two tris \\
+                  XXX should we be using x's and y's in here somewhere? \\
+               = _^rp rd^2 cos(td^)sin(td^) / 2 \\
+               = _^rp rd^2 sin(pi/2-td^)cos(pi/2-td^) / 2    since cos(t)=sin(pi/2-t) in general \\
+               = _^rp rd^2 sin(_^tp-td^)cos(_^tp-td^) / 2  by (12) \\
+\end{align}
 
 Having shown (A^), we must finally prove (B^).
 
@@ -1491,23 +1505,25 @@ For this, we first derive an intermediate result
 from the inductive hypothesis.
 The "all terms positive" claims throughout the following
 follow from (left side of) (A_), (B_),(C_),(D_).
-         xm_ = rm_ cos(tm_)
-              = rm_ sin(pi/2 - tm_)
+\begin{align}
+         xm_ = rm_ cos(tm_) \\
+              = rm_ sin(pi/2 - tm_) \\
      
-              = rm_ sin(tp_ - tm_) by (12)
-              = rm_ sin((tp_-td_)-(tm_-td_))
-              = rm_ (sin(tp_-td_)cos(tm_-td_) - cos(tp_-td_)sin(tm_-td_)) by double-angle identity
-              = rm_ sin(tp_-td_)cos(tm_-td_) - rm_ cos(tp_-td_)sin(tm_-td_)
-              < rm_ sin(tp_-td_)cos(tm_-td_) - 0  since all terms positive
-              < rm_ sin(tp_-td_) * 1  since cos(tm_-td_)<1 and all terms positive
-              < (1/2 rp_ rd_^2 sin(tp_-td_)cos(tp_-td_)) sin(tp_-td_)  by (A_)
-              = 1/2 rp_ cos(tp_-td_) (rd_ sin(tp_-td_))^2
-              < 1/2 rp_ (rd_ sin(tp_-td_))^2  since 0 < cos(tp_-td_) < 1
+              = rm_ sin(tp_ - tm_) by (12) \\
+              = rm_ sin((tp_-td_)-(tm_-td_)) \\
+              = rm_ (sin(tp_-td_)cos(tm_-td_) - cos(tp_-td_)sin(tm_-td_)) by double-angle identity \\
+              = rm_ sin(tp_-td_)cos(tm_-td_) - rm_ cos(tp_-td_)sin(tm_-td_) \\
+              < rm_ sin(tp_-td_)cos(tm_-td_) - 0  since all terms positive \\
+              < rm_ sin(tp_-td_) * 1  since cos(tm_-td_)<1 and all terms positive \\
+              < (1/2 rp_ _rd^2 sin(tp_-td_)cos(tp_-td_)) sin(tp_-td_)  by (A_) \\
+              = 1/2 rp_ cos(tp_-td_) (rd_ sin(tp_-td_))^2 \\
+              < 1/2 rp_ (rd_ sin(tp_-td_))^2  since 0 < cos(tp_-td_) < 1 \\
      
-              = 1/2 rp_ (rd_ sin(pi/2-td_))^2  by (12)
-              = 1/2 rp_ (rd_ cos(td_))^2
-              = 1/2 rp_ xd_^2
-    (22) xm_ < 1/2 rp_ xd_^2.
+              = 1/2 rp_ (rd_ sin(pi/2-td_))^2  by (12) \\
+              = 1/2 rp_ (rd_ cos(td_))^2 \\
+              = 1/2 rp_ _xd^2 \\
+    (22) xm_ < 1/2 rp_ _xd^2. \\
+\end{align}
 (XXX could phrase that in terms "m x p < 1/2 (d x p)^2",
 coordinate-free til the last second, if we wanted... maybe)
 
@@ -1521,36 +1537,23 @@ and assumption (B_) can be expressed as
 of two vectors in the plane, i.e.  
 v0 X v1 = |v0| |v1| sin(angle(v0,v1))).
 
+<span id="youarehere"></span>
 So we just need to prove (B'^) and we're done.
-    d^ X m^ = <xd_^,yd^> X <xm_^,ym^>
-            = xd_^ ym^  -  yd^ xm_^
-            = xd_^ (ym_ + 1/2 (yd^-yd_) xd_^ yp_^) - yd^ xm_^  by (16.5)  (XXX neaten that up)
-            = xd_^ (ym_ + 1/2 (yd^-yd_) xd_^ yp_^) - (yd_ + (yd^-yd_)) xm_^
-            = (xd_^ ym_ - yd_ xm_^) + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)  (just rearranged terms)
-            =          d_ X m_          + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)
-            >             0             + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)  by (B_)
-            = (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)
-            = (yd^-yd_) (1/2 xd_^ ^2 rp_^ - xm_^) by (11.5)
+\begin{align}
+    d^ X m^ = <_^xd,yd^> X <_^xm,ym^> \\
+            = _^xd ym^  -  yd^ _^xm \\
+            = _^xd (ym_ + 1/2 (yd^-yd_) _^xd _^yp) - yd^ _^xm  by (16.5)  (XXX neaten that up) \\
+            = _^xd (ym_ + 1/2 (yd^-yd_) _^xd _^yp) - (yd_ + (yd^-yd_)) _^xm \\
+            = (_^xd ym_ - yd_ _^xm) + (yd^-yd_) (1/2 _^xd ^2 _^yp - _^xm)  (just rearranged terms) \\
+            =          d_ X m_          + (yd^-yd_) (1/2 _^xd ^2 _^yp - _^xm) \\
+            \gt             0             + (yd^-yd_) (1/2 _^xd ^2 _^yp - _^xm)  by (B_) \\
+            = (yd^-yd_) (1/2 _^xd ^2 _^yp - _^xm) \\
+            = (yd^-yd_) (1/2 _^xd ^2 _^rp - _^xm) by (11.5) \\
 
-            > 0, by (13) and (22).
-
-    d^ X m^ = <xd_^,yd^> X <xm_^,ym^>
-            = xd_^ ym^  -  yd^ xm_^
-            = xd_^ (ym_ + 1/2 (yd^-yd_) xd_^ yp_^) - yd^ xm_^  by (16.5)  (XXX neaten that up)
-            = xd_^ (ym_ + 1/2 (yd^-yd_) xd_^ yp_^) - (yd_ + (yd^-yd_)) xm_^
-            = (xd_^ ym_ - yd_ xm_^) + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)  (just rearranged terms)
-            =          d_ X m_          + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)
-            >             0             + (yd^-yd_) (1/2 xd_^ ^2 yp_^ - xm_^)  by (B_)
-            = (^yd-_yd) (1/2 _^xd^2 _^yp - _^xm)
-            = (^yd-_yd) (1/2 _^xd^2 _^rp - _^xm) by (11.5)
-
-            > 0, by (13) and (22).
+            \gt 0, by (13) and (22). \\
+\end{align}
 So (B'^) is proved, completing the induction
 and the proof of the Lemma.
-
-</pre>
-                 
-
 
 <p>
 
