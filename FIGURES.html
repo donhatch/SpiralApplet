@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Figures for The Spiral Moment Lemma: There's No Single-Exit Lagoon</title>
+    <style type="text/css">
+        body {font-size:large;}
+    </style>
+
+    <script
+        src="http://code.jquery.com/jquery-1.7.1.min.js">
+    </script>
+    <script>
+	// make $ not be an alias for jQuery
+        // since I think that's ridiculous...
+        jQuery.noConflict();
+    </script>
+
+
+    <script>
+
+        //
+        // complex arithmetic, 
+        // with complex numbers represented as [x,y]
+        //
+        var times = function(z0,z1) {
+            return [z0[0]*z1[0]-z0[1]*z1[1],
+                    z0[0]*z1[1]+z0[1]*z1[0]]
+        }
+        var plus = function(z0,z1) {
+            return [z0[0]+z1[0],z0[1]+z1[1]];
+        }
+        var minus = function(z0,z1) {
+            return [z0[0]-z1[0],z0[1]-z1[1]];
+        }
+        var dividedby = function(z0,z1) {
+            var answer = times(z0,conj(z1));
+            var denom = z1[0]*z1[0] + z1[1]*z1[1];
+            answer[0] /= denom;
+            answer[1] /= denom;
+            return answer;
+        }
+        var conj = function(z) {
+            return [z[0],-z[1]];
+        }
+        // z00:z01 :: z10 : ?
+        // answer is z01*z10/z00.
+        var analogy = function(z00,z01,z10) {
+            return dividedby(times(z01,z10),z00);
+        }
+        var norm = function(z) {
+            return Math.sqrt(z[0]*z[0]+z[1]*z[1]);
+        }
+
+
+        // returns HTML of a <g> element showing
+        // Dudley's triangle and neighbors,
+        // given the three angles in degrees:
+        //      atan(y1/x1)
+        //      atan(y2/x2)
+        //      atan((y2-y1)/(x2-x1))
+        var makeDudleyAndPriscilla = function(dir01,dir02,dir12,nNeighbors) {
+            var DTOR = Math.PI/180;
+            dir01 *= DTOR;
+            dir02 *= DTOR;
+            dir12 *= DTOR;
+
+            var x2 = Math.cos(dir02);
+            var y2 = Math.sin(dir02);
+            var internalAngle0 = dir02-dir01;
+            var internalAngle1 = Math.PI-(dir12-dir01);
+            var internalAngle2 = dir12-dir02;
+            console.log("internalAngle0=",internalAngle0);
+            console.log("internalAngle1=",internalAngle1);
+            console.log("internalAngle2=",internalAngle2);
+            var length02 = 1.;
+            var sin0 = Math.sin(internalAngle0);
+            var sin1 = Math.sin(internalAngle1);
+            var sin2 = Math.sin(internalAngle2);
+            console.log("sin0=",sin0);
+            console.log("sin1=",sin1);
+            console.log("sin2=",sin2);
+            var length01 = sin2/sin1;
+            console.log("length01=",length01);
+            var length12 = sin0/sin1;
+            console.log("length12=",length12);
+            var x1 = length01 * Math.cos(dir01);
+            var y1 = length01 * Math.sin(dir01);
+            console.log("x2=",x2," y2=",y2);
+            console.log("x1=",x1," y1=",y1);
+
+            // use complex numbers, represented as pairs
+            p1 = [x1,y1];
+            p2 = [x2,y2];
+            p3 = analogy(p1,p2,p2);
+            console.log("p1 = "+p1);
+            console.log("p2 = "+p2);
+            console.log("p3 = "+p3);
+            p4 = analogy(p2,p3,p3);
+            console.log("p4 = "+p4);
+            console.log("p4 = "+p4);
+            p0 = analogy(p2,p1,p1);
+            p_1 = analogy(p1,p0,p0);
+            p_2 = analogy(p0,p_1,p_1);
+            p_3 = analogy(p_1,p_2,p_2);
+
+            //var mainAnswer = ' M .4 0 L 0 1 L -1 0 L 0 -1 L 1 0'
+
+            var mainAnswer = "";
+            mainAnswer += " M 0 0";
+            mainAnswer += " L "+p1[0]+" "+p1[1];
+            mainAnswer += " L "+p2[0]+" "+p2[1];
+            mainAnswer += " L 0 0";
+
+            var neighborsAnswer = "";
+            var z = p1;
+            var Z = p2;
+            for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+            {
+                var temp = analogy(z,Z,Z);
+                z = Z;
+                Z = temp;
+                neighborsAnswer += " M "+z[0]+" "+z[1]
+                neighborsAnswer += " L "+Z[0]+" "+Z[1]
+                neighborsAnswer += " L 0 0"
+            }
+            z = p1;
+            Z = p2;
+            for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+            {
+                var temp = analogy(Z,z,z);
+                Z = z;
+                z = temp;
+                neighborsAnswer += " M "+Z[0]+" "+Z[1];
+                neighborsAnswer += " L "+z[0]+" "+z[1];;
+                neighborsAnswer += " L 0 0";
+            }
+
+            // Okay that was dudley, what about priscilla?
+            // she starts at <0,1>...
+            {
+                Z = [0,1];
+                var length = Math.sin(dir01)/Math.sin(dir02);
+                console.log("dir02-dir01="+(dir02-dir01)/DTOR);
+                console.log("length = "+length);
+                //z = [length*Math.sin(dir01), length*Math.cos(dir01)]
+                z = [length*Math.sin(dir02-dir01), length*Math.cos(dir02-dir01)]
+                console.log("z = "+z)
+                console.log("Z = "+Z)
+                var ZZ = analogy(z,Z,Z);
+                console.log("ZZ = "+ZZ);
+                var qLength = norm(minus(Z,z))*norm(minus(p2,p1))/norm(p1)
+                console.log("qLength = "+qLength);
+                // no, that's elegant but too small.  fudge something else.
+                qLength = norm(minus(Z,z));
+                console.log("qLength = "+qLength);
+
+                var q = [qLength*Math.sin(dir12),1-qLength*Math.cos(dir12)];
+                console.log("q = "+q);
+
+                var priscillaMainAnswer = "";
+                priscillaMainAnswer += " M "+z[0]+" "+z[1];
+                priscillaMainAnswer += " L "+Z[0]+" "+Z[1];
+                priscillaMainAnswer += " L "+ZZ[0]+" "+ZZ[1];
+                priscillaMainAnswer += " M "+Z[0]+" "+Z[1];
+                priscillaMainAnswer += " L "+q[0]+" "+q[1];
+
+                var priscillaNeighborsAnswer = " M 0 0";
+                var zSaved = z;
+                var ZSaved = Z;
+                var ZZSaved = ZZ;
+                var qSaved = q;
+                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                {
+                    var temp = analogy(Z,ZZ,ZZ);
+                    z = Z;
+                    Z = ZZ;
+                    ZZ = temp;
+                    q = analogy(ZSaved,qSaved,Z);
+                    priscillaNeighborsAnswer += " M "+ZZ[0]+" "+ZZ[1];;
+                    priscillaNeighborsAnswer += " L "+Z[0]+" "+Z[1];
+                    priscillaNeighborsAnswer += " L "+q[0]+" "+q[1];
+                }
+                z = zSaved;
+                Z = ZSaved;
+                ZZ = ZZSaved;
+                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                {
+                    var temp = analogy(Z,z,z);
+                    ZZ = Z;
+                    Z = z;
+                    z = temp;
+                    q = analogy(ZSaved,qSaved,Z);
+                    priscillaNeighborsAnswer += " M "+z[0]+" "+z[1];;
+                    priscillaNeighborsAnswer += " L "+Z[0]+" "+Z[1];
+                    priscillaNeighborsAnswer += " L "+q[0]+" "+q[1];
+                }
+            }
+
+
+            return [mainAnswer,neighborsAnswer,
+                    priscillaMainAnswer,priscillaNeighborsAnswer];
+        } // makeDudleyAndPriscilla
+
+        var doIt = function() {
+            console.log("    in doIt");
+
+            var dudleyMainPath = jQuery('#dudleyMainPath');
+            var dudleyNeighborsPath = jQuery('#dudleyNeighborsPath');
+            var priscillaMainPath = jQuery('#priscillaMainPath');
+            var priscillaNeighborsAnswer = jQuery('#priscillaNeighborsPath');
+            console.log("        dudleyMainPath = ",dudleyMainPath);
+            console.log("        dudleyMainPath.attr('d') = ",dudleyMainPath.attr('d'));
+            var ang01 = 15;
+            var ang02 = 25;
+            var ang12 = 60;
+            var nNeighbors = 1;
+            var paths = makeDudleyAndPriscilla(ang01,ang02,ang12, nNeighbors);
+            dudleyMainPath.attr('d', paths[0]);
+            dudleyNeighborsPath.attr('d', paths[1]);
+            priscillaMainPath.attr('d', paths[2]);
+            priscillaNeighborsAnswer.attr('d', paths[3]);
+
+            console.log("    out doIt");
+        };
+
+        jQuery(document).ready(function() {
+            console.log("in jquery document-ready function!");
+
+            doIt();
+
+            console.log("out jquery document-ready function!");
+        }); // jquery document ready function
+    </script>
+</head>
+<body>
+
+<p>
+
+<svg id="theFigure" xmlns="http://www.w3.org/2000/svg"
+     version="1.1"
+     height="500"
+     width="500"
+     >
+    <!-- 1 unit = 20 pixels -->
+    <g id="theGraphic"
+       transform="translate(250,400) scale(1,-1) scale(200)">
+       
+        <path
+            id="dudleyMainPath"
+            vector-effect="non-scaling-stroke"
+            style="stroke: blue; stroke-width: 3.0; fill: none; stroke-miterlimit:1.414"
+            d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
+        />
+        <path
+            id="dudleyNeighborsPath"
+            vector-effect="non-scaling-stroke"
+            style="stroke: blue; stroke-width: 1.0; fill: none; stroke-opacity:.2"
+            d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
+        />
+        <path
+            id="priscillaMainPath"
+            vector-effect="non-scaling-stroke"
+            style="stroke: red; stroke-width: 1.0; fill: none; stroke-opacity:.2"
+            d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
+        />
+        <path
+            id="priscillaNeighborsPath"
+            vector-effect="non-scaling-stroke"
+            style="stroke: red; stroke-width: 1.0; fill: none; stroke-opacity:.2"
+            d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
+        />
+        <circle
+            cx="0" cy="1" r=".025"
+            style="stroke: none; fill: red;"
+        />
+            
+        <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
+        <g transform="translate(0,0)   scale(.005) scale(1,-1)  translate(-5,15)"> <text>0</text> </g>
+        <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
+    </g>
+</svg>
+</body>
+</html>
+
