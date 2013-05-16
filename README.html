@@ -279,7 +279,6 @@
 </head>
 <body>
 <hr> <!--============================================================-->
-<span id="youarehere"></span>
 
 <div class="doMyThing">
 first thing: $xp$
@@ -445,8 +444,8 @@ $i$'s direction's dot product with
 $v_i$ is
 $\lt 0$), so it can't point directly out from the origin,
 it must lean
-$\gt 90$
-degrees from that, CW or CCW.
+$\gt 90^{\circ}$
+from that, CW or CCW.
 For
 $v_i$
 with
@@ -1036,10 +1035,8 @@ to
 $e_{r+1}$)
 and dual as described above, at all times strictly after the first event:
 \begin{alignat*}{3}
-    & (A) \;\;  &   0 &  &  & \lt rm \lt rp \, rd^2 \sin(tp-td) \cos(tp-td) / 2 \\
-    & (B) \;\;  &  td &  &  & \lt  tm \\
-    & (C) \;\;  &     &  &  & \leq tp \\
-    & (D) \;\;  &     &  &  & \lt td+\pi/2.
+    0 & \;\overset{(A)}\lt\;  &  rm & \;\overset{(B)}\lt\;  rp \, rd^2 \sin(tp-td) \cos(tp-td) / 2 \\
+   td & \;\overset{(C)}\lt\;  &  tm & \;\overset{(D)}\leq\; tp \\
 \end{alignat*}
 <p>
 Proof:
@@ -1185,30 +1182,20 @@ Since the walk leading to any desired target time
 can be expressed as a finite number of steps of this form,
 this will prove that the Lemma statement holds at all times.
 <p>
+<span id="youarehere"></span>
 Using underbars and overbars to denote the respective values
 at times $\underline{t}$ and $\overline{t}$,
 the inductive hypothesis is that the Lemma statement holds at $\underline{t}$:
 
 \begin{alignat*}{3}
-    & (_A) \;\;  &  0                   &  &  & \lt _rm \lt _rp \, _rd^2 \sin(_tp-_td) \cos(_tp-_td) / 2 \\
-    & (_B) \;\;  & _td &  &  & \lt  _tm \\
-    & (_C) \;\;  &                      &  &  & \leq _tp \\
-    & (_D) \;\;  &                      &  &  & \lt _td+\pi/2.
+     0 & \;\overset{(_A)}\lt\;  &  _rm & \;\overset{(_B)}\lt\;  _rp \, _rd^2 \sin(_tp-_td) \cos(_tp-_td) / 2 \\
+   _td & \;\overset{(_C)}\lt\;  &  _tm & \;\overset{(_D)}\leq\; _tp \\
 \end{alignat*}
 and, assuming that, we must prove that it holds at $\overline{t}$:
 \begin{alignat*}{3}
-    & (^A) \;\;  &  0                   &  &  & \lt ^rm \lt ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2 \\
-    & (^B) \;\;  & ^td &  &  & \lt  ^tm \\
-    & (^C) \;\;  &                      &  &  & \leq ^tp \\
-    & (^D) \;\;  &                      &  &  & \lt ^td+\pi/2.
+     0 & \;\overset{(^A)}\lt\;  &  ^rm & \;\overset{(^B)}\lt\;  ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2 \\
+   ^td & \;\overset{(^C)}\lt\;  &  ^tm & \;\overset{(^D)}\leq\; ^tp. \\
 \end{alignat*}
-and, assuming that, we must prove that it holds at $\overline{t}$:
-    $$(^A) \;\;  0                   \lt ^rm \lt ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2 \\$$
-\begin{alignat*}{7}
-     ^td&  &  & \lt             &  ^tm  &  & \leq            &  ^tp  &  & \lt             &  ^td+\pi/2. \\
-                        &  &  & (^B)  &                       &  & (^C)  &                       &  & (^D)  & \\
-\end{alignat*}
-
 There are two cases.
 <p>
 Case 1: In the time from $\underline{t}$ to $\overline{t}$,
