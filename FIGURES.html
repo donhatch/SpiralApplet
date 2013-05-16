@@ -25,185 +25,144 @@
         //
         var times = function(z0,z1) {
             return [z0[0]*z1[0]-z0[1]*z1[1],
-                    z0[0]*z1[1]+z0[1]*z1[0]]
-        }
+                    z0[0]*z1[1]+z0[1]*z1[0]];
+        };
         var plus = function(z0,z1) {
             return [z0[0]+z1[0],z0[1]+z1[1]];
-        }
+        };
         var minus = function(z0,z1) {
             return [z0[0]-z1[0],z0[1]-z1[1]];
-        }
+        };
         var dividedby = function(z0,z1) {
             var answer = times(z0,conj(z1));
-            var denom = z1[0]*z1[0] + z1[1]*z1[1];
+            var denom = length2(z1);
             answer[0] /= denom;
             answer[1] /= denom;
             return answer;
-        }
+        };
         var conj = function(z) {
             return [z[0],-z[1]];
-        }
+        };
         // z00:z01 :: z10 : ?
         // answer is z01*z10/z00.
         var analogy = function(z00,z01,z10) {
             return dividedby(times(z01,z10),z00);
-        }
-        var norm = function(z) {
-            return Math.sqrt(z[0]*z[0]+z[1]*z[1]);
-        }
+        };
+        var cross = function(a,b) {
+            return a[0]*b[1] - a[1]*b[0];
+        };
+        var dot = function(a,b) {
+            return a[0]*b[0] + a[1]*b[1];
+        };
+        var length2 = function(z) {
+            return dot(z,z);
+        };
+        var length = function(z) {
+            return Math.sqrt(length2(z));
+        };
+        var normalized = function(z) {
+            var l = length(z);
+            return [z[0]/l, z[1]/l];
+        };
+        var perpDot = function(z) {
+            return [-z[1], z[0]];
+        };
+        var scaled = function(z,s) {
+            return [z[0]*s, z[1]*s];
+        };
 
 
-        // returns HTML of a <g> element showing
-        // Dudley's triangle and neighbors,
-        // given the three angles in degrees:
-        //      atan(y1/x1)
-        //      atan(y2/x2)
-        //      atan((y2-y1)/(x2-x1))
-        var makeDudleyAndPriscilla = function(dir01,dir02,dir12,nNeighbors) {
-            var DTOR = Math.PI/180;
-            dir01 *= DTOR;
-            dir02 *= DTOR;
-            dir12 *= DTOR;
-
-            var x2 = Math.cos(dir02);
-            var y2 = Math.sin(dir02);
-            var internalAngle0 = dir02-dir01;
-            var internalAngle1 = Math.PI-(dir12-dir01);
-            var internalAngle2 = dir12-dir02;
-            console.log("internalAngle0=",internalAngle0);
-            console.log("internalAngle1=",internalAngle1);
-            console.log("internalAngle2=",internalAngle2);
-            var length02 = 1.;
-            var sin0 = Math.sin(internalAngle0);
-            var sin1 = Math.sin(internalAngle1);
-            var sin2 = Math.sin(internalAngle2);
-            console.log("sin0=",sin0);
-            console.log("sin1=",sin1);
-            console.log("sin2=",sin2);
-            var length01 = sin2/sin1;
-            console.log("length01=",length01);
-            var length12 = sin0/sin1;
-            console.log("length12=",length12);
-            var x1 = length01 * Math.cos(dir01);
-            var y1 = length01 * Math.sin(dir01);
-            console.log("x2=",x2," y2=",y2);
-            console.log("x1=",x1," y1=",y1);
-
+        var makeThePaths = function(x1,y1, x2,y2, nNeighbors)
+        {
             {
-                // use complex numbers, represented as pairs
-                var p1 = [x1,y1];
-                var p2 = [x2,y2];
-                var p3 = analogy(p1,p2,p2);
-                console.log("p1 = "+p1);
-                console.log("p2 = "+p2);
-                console.log("p3 = "+p3);
-                var p4 = analogy(p2,p3,p3);
-                console.log("p4 = "+p4);
-                console.log("p4 = "+p4);
-                var p0 = analogy(p2,p1,p1);
-                var p_1 = analogy(p1,p0,p0);
-                var p_2 = analogy(p0,p_1,p_1);
-                var p_3 = analogy(p_1,p_2,p_2);
+                var len2 = Math.sqrt(x2*x2+y2*y2);
+                x2 /= len2;
+                y2 /= len2;
+                x1 /= len2;
+                y1 /= len2;
+                len2 = undefined;
+            }
 
-                //var mainAnswer = ' M .4 0 L 0 1 L -1 0 L 0 -1 L 1 0'
+            var d0 = [x1,y1]
+            var d1 = [x2,y2]
+            var p0 = [cross(d0,d1),dot(d0,d1)]
+            var p1 = [0,1]
+            var p2 = analogy(p0,p1,p1)
+            var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
+            console.log("qLength = "+qLength);
+            var q0 = plus(p1,scaled(normalized([y2-y1,x1-x2]),qLength));
 
-                var mainAnswer = "";
-                mainAnswer += " M 0 0";
-                mainAnswer += " L "+p1[0]+" "+p1[1];
-                mainAnswer += " L "+p2[0]+" "+p2[1];
-                mainAnswer += " L 0 0";
 
-                var neighborsAnswer = "";
-                var z = p1;
-                var Z = p2;
+            var dudleyMainPath = "M 0 0 L "+d0[0]+" "+d0[1]+" L "+d1[0]+" "+d1[1]+" L 0 0";
+
+            // scratch
+            var z;
+            var Z;
+            var temp;
+
+            var dudleyNeighborsPath = "";
+            {
+                z = d0;
+                Z = d1;
                 for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
                 {
-                    var temp = analogy(z,Z,Z);
+                    temp = analogy(z,Z,Z);
                     z = Z;
                     Z = temp;
-                    neighborsAnswer += " M "+z[0]+" "+z[1]
-                    neighborsAnswer += " L "+Z[0]+" "+Z[1]
-                    neighborsAnswer += " L 0 0"
+                    dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
                 }
+                z = d0;
+                Z = d1;
+                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                {
+                    temp = analogy(Z,z,z);
+                    Z = z;
+                    z = temp;
+                    dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0"
+                }
+            }
+
+
+            var priscillaMainPath = "M "+p0[0]+" "+p0[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
+            var priscillaNeighborsPath = "";
+            if (1)
+            {
                 z = p1;
                 Z = p2;
                 for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
                 {
-                    var temp = analogy(Z,z,z);
-                    Z = z;
-                    z = temp;
-                    neighborsAnswer += " M "+Z[0]+" "+Z[1];
-                    neighborsAnswer += " L "+z[0]+" "+z[1];;
-                    neighborsAnswer += " L 0 0";
-                }
-            }
-
-            // Okay that was dudley, what about priscilla?
-            // she starts at <0,1>...
-            {
-                Z = [0,1];
-                var length = Math.sin(dir01)/Math.sin(dir02);
-                console.log("dir02-dir01="+(dir02-dir01)/DTOR);
-                console.log("length = "+length);
-                //z = [length*Math.sin(dir01), length*Math.cos(dir01)]
-                z = [length*Math.sin(dir02-dir01), length*Math.cos(dir02-dir01)]
-                console.log("z = "+z)
-                console.log("Z = "+Z)
-                var ZZ = analogy(z,Z,Z);
-                console.log("ZZ = "+ZZ);
-                var qLength = norm(minus(Z,z))*norm(minus(p2,p1))/norm(p1)
-                console.log("qLength = "+qLength);
-                // no, that's elegant but too small.  fudge something else.
-                qLength = norm(minus(Z,z));
-                console.log("qLength = "+qLength);
-
-                var q = [qLength*Math.sin(dir12),1-qLength*Math.cos(dir12)];
-                console.log("q = "+q);
-
-                var priscillaMainAnswer = "";
-                priscillaMainAnswer += " M "+z[0]+" "+z[1];
-                priscillaMainAnswer += " L "+Z[0]+" "+Z[1];
-                priscillaMainAnswer += " L "+ZZ[0]+" "+ZZ[1];
-                priscillaMainAnswer += " M "+Z[0]+" "+Z[1];
-                priscillaMainAnswer += " L "+q[0]+" "+q[1];
-
-                var priscillaNeighborsAnswer = " M 0 0";
-                var zSaved = z;
-                var ZSaved = Z;
-                var ZZSaved = ZZ;
-                var qSaved = q;
-                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
-                {
-                    var temp = analogy(Z,ZZ,ZZ);
+                    temp = analogy(z,Z,Z);
                     z = Z;
-                    Z = ZZ;
-                    ZZ = temp;
-                    q = analogy(ZSaved,qSaved,Z);
-                    priscillaNeighborsAnswer += " M "+ZZ[0]+" "+ZZ[1];;
-                    priscillaNeighborsAnswer += " L "+Z[0]+" "+Z[1];
-                    priscillaNeighborsAnswer += " L "+q[0]+" "+q[1];
+                    Z = temp;
+                    q = analogy(p1,q0,z);
+                    priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
                 }
-                z = zSaved;
-                Z = ZSaved;
-                ZZ = ZZSaved;
+                z = p0;
+                Z = p1;
                 for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
                 {
-                    var temp = analogy(Z,z,z);
-                    ZZ = Z;
+                    temp = analogy(Z,z,z);
                     Z = z;
                     z = temp;
-                    q = analogy(ZSaved,qSaved,Z);
-                    priscillaNeighborsAnswer += " M "+z[0]+" "+z[1];;
-                    priscillaNeighborsAnswer += " L "+Z[0]+" "+Z[1];
-                    priscillaNeighborsAnswer += " L "+q[0]+" "+q[1];
+                    q = analogy(p1,q0,Z);
+                    priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
                 }
             }
 
 
-            return [mainAnswer,neighborsAnswer,
-                    priscillaMainAnswer,priscillaNeighborsAnswer,
-                    p1,p2];
-        } // makeDudleyAndPriscilla
+            if (priscillaNeighborsPath == "")
+            {
+                priscillaNeighborsPath = "M 0 0";
+            }
+            if (dudleyNeighborsPath == "")
+            {
+                dudleyNeighborsPath = "M 0 0";
+            }
+
+            return [dudleyMainPath,dudleyNeighborsPath,
+                    priscillaMainPath,priscillaNeighborsPath,
+                    d0,d1];
+        } // makeThePaths
 
         var doIt = function() {
             console.log("    in doIt");
@@ -217,11 +176,19 @@
             var d1transform = jQuery('#d1transform');
             console.log("        dudleyMainPath = ",dudleyMainPath);
             console.log("        dudleyMainPath.attr('d') = ",dudleyMainPath.attr('d'));
-            var ang01 = 15;
-            var ang02 = 25;
-            var ang12 = 60;
-            var nNeighbors = 1;
-            var paths = makeDudleyAndPriscilla(ang01,ang02,ang12, nNeighbors);
+
+
+            if (1)
+            {
+                var x1 = 6;
+                var y1 = 2;
+                var x2 = 8;
+                var y2 = 6;
+                var nNeighbors = 10;
+                var paths = makeThePaths(x1,y1,x2,y2, nNeighbors);
+            }
+
+
             dudleyMainPath.attr('d', paths[0]);
             dudleyNeighborsPath.attr('d', paths[1]);
             priscillaMainPath.attr('d', paths[2]);
@@ -293,22 +260,11 @@
         <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
 
         <g id="d0transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(5,10)">
-            <!-- woohoo, got an underline! -->
-            <text id="d0text">d</text>
-            <text id="d0text">_</text>
+            <text id="d0text" style="text-decoration:underline">d</text>
         </g> </g>
+
         <g id="d1transform" transform="translate(0,0)" style="font-size:13.5pt"><g transform="   scale(.005) scale(1,-1)  translate(10,5)">
-            <!-- tspan with baseline-shift works beautifully in firefox, but not in chrome :-( -->
-            <!--
-            <text id="d0text">d</text>
-            <text id="d0text">
-                <tspan style="baseline-shift: 100%;">_</tspan>
-            </text>
-            -->
-            <text id="d0text">d</text>
-            <text id="d0text">
-                <tspan x=1 y=-19>_</tspan> <!-- is this portable? should I set the font-size style to match? -->
-            </text>
+            <text id="d0text" style="text-decoration:overline">d</text>
         </g> </g>
     </g>
 </svg>
