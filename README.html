@@ -14,7 +14,6 @@
     Can't seem to adjust print font size by user :-(
     so messing with it in the style sheet here.
 
-    TODO: replace | | with || || throughout
     TODO: replace areaTri
     TODO: replace angle() with \anglesymbol()?
     TODO: why is it not jumping to #youarehere any more?? (is it a jquery thing?)
@@ -910,7 +909,7 @@ up to and including the first event
 (Priscilla stopping at
 $v_1$
 and Dudley starting moving),
-$rm = |m| = 0$,
+$rm = \|m\| = 0$,
 and so ($A$) doesn't hold
 (and ($C$),($D$) don't even make sense since
 $tm$
@@ -956,7 +955,7 @@ At this time, the moment accumulated so far is simply
 which is a nonzero scalar times the nonzero vector
 $p=v_1$,
 so
-$rm = |m| \gt 0$
+$rm = \|m\| \gt 0$
 (so ($A$) is satisfied, and
 $tm$
 is well-defined),
@@ -1246,10 +1245,10 @@ so ($^A$) is immediately satisfied and:
 \end{align}
 ($^B$) is proved as follows:
 \begin{align}
-    ^rm = |^m| = & |_m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position})| \\
-             \le & |_m| + (\text{area of Dudley's triangle}) * |_^p| \;\; \text{by triangle inequality} \\
+    ^rm = \|^m\| = & \|_m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position})\| \\
+             \le & \|_m\| + (\text{area of Dudley's triangle}) * \|_^p\| \;\; \text{by triangle inequality} \\
                = & _rm + (\text{area of Dudley's triangle}) * _^rp \\
-             \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \text{by ($_B$)} \\
+             \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \;\; \text{by ($_B$)} \\
                = & _^rp ((_rd \sin(_tp-_td))(_rd \cos(_tp-_td))/2 + (\text{area of Dudley's triangle})) \\
                = & _^rp (areaTri(0,\langle _^xd,0 \rangle,_d) + areaTri(0,_d,^d)) \\
                = & _^rp (areaTri(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two} \\
