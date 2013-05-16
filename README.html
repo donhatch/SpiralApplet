@@ -431,23 +431,25 @@ be the (odd) index of the vertex
 that is the global maximum distance from the origin
 of the entire primal polygon perimeter.
 So
-$vm$
+$v_m$
 is the only good exit,
 and distance-from=origin is strictly increasing
 from
 $\langle 0,-1\rangle$
-around CCW to vm,
-and then strictly decreasing from vm
+around CCW to
+$v_m$,
+and then strictly decreasing from
+$v_m$
 back around CCW to
 $\langle 0,-1\rangle$.
 <p>
 Consider the directions of the "quill" emanating
 from each vertex of this primal polygon.
 Since
-$vm$
+$v_m$
 is the only good exit,
 every quill *except* the one at
-$vm$
+$v_m$
 points more towards the origin than away from it
 (more precisely, the quill
 $i$'s direction's dot product with
@@ -572,6 +574,7 @@ Figure 1(a): 212
         <g transform="translate(-1,4)  scale(.033333) translate(-20,5) "> <text>v9</text> </g>
     </g>
 </svg>
+<br>
 Figure 1(a): 2 exits tilted too far CW, 1 good exit, 2 exits tilted too far CCW
 <p>
 <pre class="asciiprevis">
@@ -690,6 +693,7 @@ Figure 1(b): 211
         <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
     </g>
 </svg>
+<br>
 Figure 1(b): 2 exits tilted too far CW, 1 good exit, 1 exit tilted too far CW
 <p>
 <pre class="asciiprevis">
@@ -762,11 +766,16 @@ Figure 1(c): 310
         <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
     </g>
 </svg>
+<br>
 Figure 1(c): 3 exits tilted too far CW, 1 good exit
 <p>
-    Figure 1(d): mild spiral
+    Figure 1(d): gradual double spiral
 <p>
-    Figure 1(e): steep spiral
+    Figure 1(e): steep double spiral
+<p>
+    Figure 1(f): gradual double spiral
+<p>
+    Figure 1(g): steep double spiral
 <p>
 These examples satisfy all the properties
 of a single-exit single-polygon lagoon with the cc at the origin,
@@ -995,7 +1004,7 @@ $\pi/2$).
 <pre>
       Priscilla
        p=v_1*
-            :       * v'_2
+            :       * v'_2  (XXX reframe this so it's not in terms of these features)
             :       |
             :     / |
             :       | e'_1
