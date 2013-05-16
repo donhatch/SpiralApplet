@@ -14,11 +14,9 @@
     Can't seem to adjust print font size by user :-(
     so messing with it in the style sheet here.
 
-    TODO: replace areaTri
-    TODO: replace angle() with \anglesymbol()?
+
     TODO: why is it not jumping to #youarehere any more?? (is it a jquery thing?)
     TODO: my specified default zoom trigger not working?
-    TODO: areaTri?
     TODO: it would be awesome if it were possible to start typesetting
           at a particular place in the page, right after the anchor
           we started loading the page at
@@ -36,6 +34,8 @@
 
     Content:
         TODO: maybe r,l should be the edge indices (even) instead of the vert indices (odd)?  not sure, maybe it's fine the way it is.
+
+    Typesetting:
         TODO: legit equation numbering?
 
 
@@ -297,6 +297,7 @@ second thing: $_^yp$
 </div>
 
 <div class="doMyThing">
+$ \angle (x,y)
 $ \< 0 , 1 \> $
 $a^b {a}^{b}$
 $rp_$
@@ -1250,9 +1251,8 @@ so ($^A$) is immediately satisfied and:
                = & _rm + (\text{area of Dudley's triangle}) * _^rp \\
              \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \;\; \text{by ($_B$)} \\
                = & _^rp ((_rd \sin(_tp-_td))(_rd \cos(_tp-_td))/2 + (\text{area of Dudley's triangle})) \\
-               = & _^rp (areaTri(0,\langle _^xd,0 \rangle,_d) + areaTri(0,_d,^d)) \\
-               = & _^rp (areaTri(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two} \\
-                 & \text{XXX should we be using x's and y's in here somewhere?} \\
+               = & _^rp (\text{area}(\triangle(0,\langle _^xd,0 \rangle,_d)) + \text{area}(\triangle(0,_d,^d))) \\
+               = & _^rp \text{area}(\triangle(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two} \\
                = & _^rp rd^2 \cos(^td)\sin(^td) / 2 \\
                = & _^rp rd^2 \sin(\pi/2-^td)\cos(\pi/2-^td) / 2 \;\; \text{since $\cos(t)=\sin(\pi/2-t)$ in general} \\
                = & _^rp rd^2 \sin(_^tp-^td)\cos(_^tp-^td) / 2 \;\; \text{by (12)} \\
@@ -1293,7 +1293,9 @@ and assumption ($_C$) can be expressed as
     $$(_C') \;\; _d \times _m \gt 0$$
 (where $\times$ denotes the scalar cross product
 of two vectors in the plane; that is,
-$\vec{a} \times \vec{b} = \|\vec{a}\| \|\vec{b}\| \sin(angle(\vec{a},\vec{b}))$).
+the determinant of the
+$2 \times 2$
+matrix whose rows are the two vectors).
 <p>
 So we just need to prove ($^C'$) and we're done.
 \begin{align}
