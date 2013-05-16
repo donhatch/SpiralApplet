@@ -7,6 +7,30 @@
         body {font-size:large;}
     </style>
 
+
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                // make '$' delimit inline math
+                inlineMath: [['$','$'], ['\\(','\\)']],
+                // make \$ give a real dollar sign, even in non-math mode
+                processEscapes: true,
+            },
+            // don't typeset the document on startup;
+            // we're going to typeset specific things on demand,
+            // using MathJax.Hub.Queue(["Typeset",MathJax.Hub]).
+            // oh wait, maybe I don't care.
+            //skipStartupTypeset: true,
+        });
+    </script>
+    <!-- note, the particular config used below allows
+         both tex (using $...$)
+         and asciimath (using `...`) on same page -->
+    <script type="text/javascript"
+      src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML.js">
+    </script>
+
+
     <script
         src="http://code.jquery.com/jquery-1.7.1.min.js">
     </script>
@@ -89,51 +113,53 @@
             console.log("x2=",x2," y2=",y2);
             console.log("x1=",x1," y1=",y1);
 
-            // use complex numbers, represented as pairs
-            p1 = [x1,y1];
-            p2 = [x2,y2];
-            p3 = analogy(p1,p2,p2);
-            console.log("p1 = "+p1);
-            console.log("p2 = "+p2);
-            console.log("p3 = "+p3);
-            p4 = analogy(p2,p3,p3);
-            console.log("p4 = "+p4);
-            console.log("p4 = "+p4);
-            p0 = analogy(p2,p1,p1);
-            p_1 = analogy(p1,p0,p0);
-            p_2 = analogy(p0,p_1,p_1);
-            p_3 = analogy(p_1,p_2,p_2);
-
-            //var mainAnswer = ' M .4 0 L 0 1 L -1 0 L 0 -1 L 1 0'
-
-            var mainAnswer = "";
-            mainAnswer += " M 0 0";
-            mainAnswer += " L "+p1[0]+" "+p1[1];
-            mainAnswer += " L "+p2[0]+" "+p2[1];
-            mainAnswer += " L 0 0";
-
-            var neighborsAnswer = "";
-            var z = p1;
-            var Z = p2;
-            for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                var temp = analogy(z,Z,Z);
-                z = Z;
-                Z = temp;
-                neighborsAnswer += " M "+z[0]+" "+z[1]
-                neighborsAnswer += " L "+Z[0]+" "+Z[1]
-                neighborsAnswer += " L 0 0"
-            }
-            z = p1;
-            Z = p2;
-            for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
-            {
-                var temp = analogy(Z,z,z);
-                Z = z;
-                z = temp;
-                neighborsAnswer += " M "+Z[0]+" "+Z[1];
-                neighborsAnswer += " L "+z[0]+" "+z[1];;
-                neighborsAnswer += " L 0 0";
+                // use complex numbers, represented as pairs
+                var p1 = [x1,y1];
+                var p2 = [x2,y2];
+                var p3 = analogy(p1,p2,p2);
+                console.log("p1 = "+p1);
+                console.log("p2 = "+p2);
+                console.log("p3 = "+p3);
+                var p4 = analogy(p2,p3,p3);
+                console.log("p4 = "+p4);
+                console.log("p4 = "+p4);
+                var p0 = analogy(p2,p1,p1);
+                var p_1 = analogy(p1,p0,p0);
+                var p_2 = analogy(p0,p_1,p_1);
+                var p_3 = analogy(p_1,p_2,p_2);
+
+                //var mainAnswer = ' M .4 0 L 0 1 L -1 0 L 0 -1 L 1 0'
+
+                var mainAnswer = "";
+                mainAnswer += " M 0 0";
+                mainAnswer += " L "+p1[0]+" "+p1[1];
+                mainAnswer += " L "+p2[0]+" "+p2[1];
+                mainAnswer += " L 0 0";
+
+                var neighborsAnswer = "";
+                var z = p1;
+                var Z = p2;
+                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                {
+                    var temp = analogy(z,Z,Z);
+                    z = Z;
+                    Z = temp;
+                    neighborsAnswer += " M "+z[0]+" "+z[1]
+                    neighborsAnswer += " L "+Z[0]+" "+Z[1]
+                    neighborsAnswer += " L 0 0"
+                }
+                z = p1;
+                Z = p2;
+                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                {
+                    var temp = analogy(Z,z,z);
+                    Z = z;
+                    z = temp;
+                    neighborsAnswer += " M "+Z[0]+" "+Z[1];
+                    neighborsAnswer += " L "+z[0]+" "+z[1];;
+                    neighborsAnswer += " L 0 0";
+                }
             }
 
             // Okay that was dudley, what about priscilla?
@@ -199,7 +225,8 @@
 
 
             return [mainAnswer,neighborsAnswer,
-                    priscillaMainAnswer,priscillaNeighborsAnswer];
+                    priscillaMainAnswer,priscillaNeighborsAnswer,
+                    p1,p2];
         } // makeDudleyAndPriscilla
 
         var doIt = function() {
@@ -208,7 +235,9 @@
             var dudleyMainPath = jQuery('#dudleyMainPath');
             var dudleyNeighborsPath = jQuery('#dudleyNeighborsPath');
             var priscillaMainPath = jQuery('#priscillaMainPath');
-            var priscillaNeighborsAnswer = jQuery('#priscillaNeighborsPath');
+            var priscillaNeighborsPath = jQuery('#priscillaNeighborsPath');
+            var d0transform = jQuery('#d0transform');
+            var d1transform = jQuery('#d1transform');
             console.log("        dudleyMainPath = ",dudleyMainPath);
             console.log("        dudleyMainPath.attr('d') = ",dudleyMainPath.attr('d'));
             var ang01 = 15;
@@ -219,8 +248,13 @@
             dudleyMainPath.attr('d', paths[0]);
             dudleyNeighborsPath.attr('d', paths[1]);
             priscillaMainPath.attr('d', paths[2]);
-            priscillaNeighborsAnswer.attr('d', paths[3]);
-
+            priscillaNeighborsPath.attr('d', paths[3]);
+            var d0 = paths[4];
+            console.log("d0=",d0);
+            var d1 = paths[5];
+            console.log("d1=",d1);
+            d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
+            d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
             console.log("    out doIt");
         };
 
@@ -228,6 +262,8 @@
             console.log("in jquery document-ready function!");
 
             doIt();
+
+            // using MathJax.Hub.Queue(["Typeset",MathJax.Hub]).
 
             console.log("out jquery document-ready function!");
         }); // jquery document ready function
@@ -278,8 +314,37 @@
         <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
         <g transform="translate(0,0)   scale(.005) scale(1,-1)  translate(-5,15)"> <text>0</text> </g>
         <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
+
+        <g id="d0transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(7,-10)">
+            <!--
+            <text id="d0text">$\underline{d})$</text>
+            -->
+            <!-- the following works in firefox, not in chrome :-( -->
+            <foreignObject x="0" y="0" width="100" height="100">
+                <body xmlns="http://www.w3.org/1999/xhtml">
+                    <div>
+                        $\underline{d}$
+                    </div>
+                </body>
+            </foreignObject>
+        </g> </g>
+        <g id="d1transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(10,-15)">
+            <!--
+            <text id="d1text">$\overline{d})$</text>
+            -->
+            <foreignObject x="0" y="0" width="100" height="100">
+                <body xmlns="http://www.w3.org/1999/xhtml">
+                    <div>
+                        $\overline{d}$
+                    </div>
+                </body>
+            </foreignObject>
+        </g> </g>
     </g>
 </svg>
+$a^b$
 </body>
 </html>
+
+
 
