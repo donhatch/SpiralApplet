@@ -86,7 +86,12 @@
         /*
             messing with trying to keep pre's on one page.
             these directives probably don't mean anything on screen.
+            doesn't do much in firefox :-(
+            and at this point chrome won't even give me a preview screen :-(
         */
+        pre {
+            page-break-during: avoid;
+        }
         pre * {
             page-break-after: avoid;
             page-break-before: avoid;
