@@ -1025,7 +1025,7 @@ coord)
 by inductively proving that a stronger statement holds
 at each moment in Priscilla and Dudley's walk.
 The desired result follows from the following Lemma's
-statement ($B$) at the end of the walk.
+statement ($C$) at the end of the walk.
 XXX why? need to be more specific
 <p>
 Spiral Moment Lemma:
@@ -1041,6 +1041,7 @@ and dual as described above, at all times strictly after the first event:
 <p>
 Proof:
 <p>
+<span id="youarehere"></span>
 Note first of all the significance of the "after the first event"
 in the Spiral Moment Lemma statement.
 This clause is necessary because,
@@ -1050,24 +1051,31 @@ $v_1$
 and Dudley starting moving),
 $rm = |m| = 0$,
 and so ($A$) doesn't hold
-(and ($B$),($C$) don't even make sense since
+(and ($C$),($D$) don't even make sense since
 $tm$
 isn't even defined).
 <p>
-(XXX this can be moved out of the lemma and proof, it can just be an observation earlier)
-In any of Priscilla and Dudley's walks,
+Note also that
+in any of Priscilla and Dudley's walks,
 convexity of the primal polygon and the fact that it contains the origin
 in its interior implies that, at all times,
 Priscilla's position vector and her outward normal (right) vector
+(which is in the direction of Dudley's position vector, by definition)
 are strictly within
 $90^{\circ}$
 of each other.
-In other words (since Priscilla's outward normal vector
-is in the direction of Dudley's position vector, by definition)
-    $$(1) \;\; td \lt tp \lt td+\pi/2,$$
-so ($D$) is always satisfied during any walk on any primal polygon
-containing the origin.  (XXX wait, that's not true! argh! need to adjust this... say a true statement, and I think the only reason $td \lt tp$ is that we're in this spiral situation)
-We prove the other parts, ($A$),($B$),($C$) by induction on the number of events
+In this strict spiral case, we also know that
+$td &lt; tp$.
+So (C) and (D) are saying that
+$tm$ lies in the half-open interval
+$(td,tp]$ of size $< pi/2$.
+<p>
+XXX maybe note geometric interpretation of ... that it's a triangle area, or cross product
+<p>
+XXX maybe note geometric interpretation of lemma, that it says m is in a pie slice
+<p>
+
+We will prove the Lemma by induction on the number of events
 (as defined earlier) encountered so far.
 <p>
 The base case will be the case when
@@ -1087,15 +1095,14 @@ which is a nonzero scalar times the nonzero vector
 $p=v_1$,
 so
 $rm = |m| \gt 0$
-(so the first part of ($A$) is satisfied, and
+(so ($A$) is satisfied, and
 $tm$
 is well-defined),
 and
 $tm = tp$.
-Combining this with (1), we have:
-    $$td \lt tm = tp \lt td+\pi/2$$
-and so ($B$),($C$),($D$) are satisfied.
-We still have to prove that the second part of ($A$) holds in the base case.
+So ($C$) holds, and ($D$) immediately follows
+since this is a strictly outward spiral.
+We still have to prove that ($B$) holds in the base case.
 <p>
 For this base case,
 we temporarily rotate the entire picture
@@ -1108,7 +1115,7 @@ and so Dudley is traveling upwards along the now-vertical dual edge
 $e'_1$,
 as shown in Figure 3.
 Note that this temporary rotation of the picture
-does not change the truth or falsity of ($A$) that we are trying to prove,
+does not change the truth or falsity of ($B$) that we are trying to prove,
 since all of the quantities
 $rm$,
 $rp$,
@@ -1169,7 +1176,7 @@ Taking magnitude of both sides,
        &amp; = rp rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2 \\
        &amp; = rp rd^2 \sin(tp-td) \cos(tp-td) / 2
 \end{align}
-and so we've shown the second part of ($A$),
+and so we've shown ($B$),
 completing the proof of the base case.
 <p>
 For the inductive step,
@@ -1182,7 +1189,6 @@ Since the walk leading to any desired target time
 can be expressed as a finite number of steps of this form,
 this will prove that the Lemma statement holds at all times.
 <p>
-<span id="youarehere"></span>
 Using underbars and overbars to denote the respective values
 at times $\underline{t}$ and $\overline{t}$,
 the inductive hypothesis is that the Lemma statement holds at $\underline{t}$:
@@ -1269,31 +1275,29 @@ so her angle increased, but stayed less than $\pi/2$:
    $$(10) \;\; 0 \lt \sin(_tp) \lt \sin(^tp) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
    $$(11) \;\; 0 \lt \cos(^tp) \lt \cos(_tp) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
 <p>
-Proving ($^B$) is easy:
-\begin{align}
-    ^td & = _td  \;\; \text{by (5)} \\
-                        & \lt _tm  \;\; \text{by} (_B) \\
-                        & = ^tm  \;\; \text{by (7).}
-\end{align}
 Proving ($^C$) is easy:
 \begin{align}
+    ^td & = _td  \;\; \text{by (5)} \\
+                        & \lt _tm  \;\; \text{by} (_C) \\
+                        & = ^tm  \;\; \text{by (7).}
+\end{align}
+Proving ($^D$) is easy:
+\begin{align}
     ^tm & = _tm  \;\; \text{by (7)} \\
-                        & \leq _tp  \;\; \text{by} (_C) \\
+                        & \leq _tp  \;\; \text{by} (_D) \\
                         & \lt ^tp  \;\; \text{by (9)}
 \end{align}
-And ($D$) is always satisfied (recall it's not part of the induction). (XXX remove it from the inductive hypothesis and inductive step!)
 <p>
-We must prove ($^A$).
-The first inequality of ($^A$) is easy:
+Proving ($^A$) is easy:
 \begin{align}
     ^rm & = _rm  \;\; \text{by (6)} \\
                    & \gt 0  \;\; \text{by} (_A)
 \end{align}
 <p>
-Proceeding now to prove the second inequality of ($^A$):
+Proceeding now to prove ($^B$):
 \begin{align}
     ^rm & = _rm  \;\; \text{by (6)} \\
-                   & \lt _rp \, _rd^2 \sin(_tp-_td) \cos(_tp-_td) / 2  \;\; \text{by} (_A) \\
+                   & \lt _rp \, _rd^2 \sin(_tp-_td) \cos(_tp-_td) / 2  \;\; \text{by} (_B) \\
                    & = _rp \, _rd^2 \sin(_tp) \cos(_tp) / 2  \;\; \text{by (5)} \\
                    & = _rp \, ^rd^2 \sin(_tp) \cos(_tp) / 2  \;\; \text{by (4)} \\
                    & = (_rp \cos(_tp)) ^rd^2 \sin(_tp)/2   \;\; \text{(just rearranging terms)} \\
@@ -1305,7 +1309,7 @@ Proceeding now to prove the second inequality of ($^A$):
                    & = ^rp \, ^rd^2 \sin(^tp) \cos(^tp) / 2   \;\; \text{(just rearranging terms)} \\
                    & = ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2  \;\; \text{by (5)}
 \end{align}
-and so the second inequality of ($^A$) is proved,
+and so ($^B$) is proved,
 completing Case 1 of the inductive step.
 <p>
 Case 2: In the time from $\underline{t}$ to $\overline{t}$,
@@ -1365,9 +1369,9 @@ The moment changed as follows:
     (16.5)  = m + (\frac{1}{2} * (^yd-_yd)*_^xd) * <0,_^yp> \\
 \end{align}
 Therefore by (12), the moment moved purely upwards as well;
-furthermore ($_B$),($_C$),($_D$) say it started strictly inside the first quadrant
+furthermore ($_C$),($_D$) (and XXX) say it started strictly inside the first quadrant
 so it ended there as well;
-so the first part of ($^A$) is immediately satisfied and:
+so ($^A$) is immediately satisfied and:
 \begin{align}
     (17)  \;\;  0 & \lt _ym \lt ^ym \\
     (18)  \;\;  0 & \lt _xm = ^xm = _^xm \\
@@ -1376,17 +1380,17 @@ so the first part of ($^A$) is immediately satisfied and:
     (21)  \;\;  0 & \lt \cos(^tm) \lt \cos(_tm) \lt 1 \\
 \end{align}
 <p>
-($^C$) follows trivially:
+($^D$) follows trivially:
 \begin{align}
             ^tm \lt & \pi/2 \;\; by (18) \\
                   = & tp \;\; by (12) \\
 \end{align}
-The second part of ($^A$) is proved as follows:
+($^B$) is proved as follows:
 \begin{align}
     ^rm = |^m| = & |_m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position})| \\
              \le & |_m| + (\text{area of Dudley's triangle}) * |_^p| \\
                = & _rm + (\text{area of Dudley's triangle}) * _^rp \\
-             \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \text{by ($_A$)} \\
+             \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \text{by ($_B$)} \\
                = & _^rp ((_rd \sin(_tp-_td))(_rd \cos(_tp-_td))/2 + (\text{area of Dudley's triangle})) \\
                = & _^rp (areaTri(0,\langle _^xd,0 \rangle,_d) + areaTri(0,_d,^d)) \\
                = & _^rp (areaTri(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two tris} \\
@@ -1395,12 +1399,12 @@ The second part of ($^A$) is proved as follows:
                = & _^rp rd^2 \sin(\pi/2-^td)\cos(\pi/2-^td) / 2 \;\; \text{since $\cos(t)=\sin(\pi/2-t)$ in general} \\
                = & _^rp rd^2 \sin(_^tp-^td)\cos(_^tp-^td) / 2 \;\; \text{by (12)} \\
 \end{align}
-Having shown ($^A$), we must finally prove ($^B$).
+Having shown ($^B$), we must finally prove ($^C$).
 <p>
 For this, we first derive an intermediate result
 from the inductive hypothesis.
 The "all terms positive" claims throughout the following
-follow from (left side of) ($_A$), ($_B$),($_C$),($_D$).
+follow from ($_A$),($_C$),($_D$).
 \begin{align}
            _xm = & _rm \cos(_tm) \\
                = & _rm \sin(\pi/2 - _tm) \\
@@ -1411,7 +1415,7 @@ follow from (left side of) ($_A$), ($_B$),($_C$),($_D$).
                = & _rm \sin(_tp-_td)\cos(_tm-_td) - _rm \cos(_tp-_td)\sin(_tm-_td) \\
              \lt & _rm \sin(_tp-_td)\cos(_tm-_td) - 0 \;\; \text{since all terms positive} \\
              \lt & _rm \sin(_tp-_td) * 1 \;\; \text{since $\cos(_tm-_td) \lt 1$ and all terms positive} \\
-             \lt & (\frac{1}{2} _rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)) \sin(_tp-_td) \;\; \text{by} (_A) \\
+             \lt & (\frac{1}{2} _rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)) \sin(_tp-_td) \;\; \text{by} (_B) \\
                = & \frac{1}{2} _rp \cos(_tp-_td) (_rd \sin(_tp-_td))^2 \\
              \lt & \frac{1}{2} _rp (_rd \sin(_tp-_td))^2 \;\; \text{since $0 \lt \cos(_tp-_td) \lt 1$} \\
 
@@ -1423,11 +1427,11 @@ follow from (left side of) ($_A$), ($_B$),($_C$),($_D$).
 (XXX could phrase that in terms "m \times p \lt \frac{1}{2} (d \times p)^2",
 coordinate-free til the last second, if we wanted... maybe)
 <p>
-Now we proceed to prove ($^B$).
+Now we proceed to prove ($^C$).
 Since $^d$,$^m$,$_d$,$_m$ are all in the first quadrant,
-our goal ($^B$) can be expressed as
+our goal ($^C$) can be expressed as
     $$(^B') \;\; ^d \times ^m \gt 0$$
-and assumption ($_B$) can be expressed as
+and assumption ($_C$) can be expressed as
     $$(_B') \;\; _d \times _m \gt 0$$
 (where $\times$ denotes the scalar cross product
 of two vectors in the plane, i.e.
@@ -1441,7 +1445,7 @@ So we just need to prove ($^B'$) and we're done.
                  = & _^xd (_ym + \frac{1}{2} (^yd-_yd) _^xd _^yp) - (_yd + (^yd-_yd)) _^xm \\
                  = & (_^xd _ym - _yd _^xm) + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\; \text{(just rearranged terms)} \\
                  = &          _d \times _m          + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \\
-               \gt &             0             + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\; \text{by ($_B$)} \\
+               \gt &             0             + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\; \text{by ($_C$)} \\
                  = & (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \\
                  = & (^yd-_yd) (\frac{1}{2} _^xd ^2 _^rp - _^xm) \;\; \text{by ($11.5$)} \\
 
