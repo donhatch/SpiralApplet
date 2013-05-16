@@ -208,64 +208,23 @@
             console.log("in jquery document-ready function!");
             console.log("    calling mathjax typeset...");
 
-            console.log("what the hell?");
-            //console.log(jQuery(".doMyThing *"));
+            var nTimesToBeVerbose = 0;
 
-            if (1)
-            {
-                var mySimpleCallback = function(index,element) {
-                    if (element.nodeValue !== null)
-                    {
-                        element.nodeValue = (element.nodeValue
-                            .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
-                            .replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
-                            .replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
-
-                            .replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
-                            .replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
-                            .replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
-                            .replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
-
-                            .replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
-                            .replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
-
-                            .replace(/\\</g,'\\langle')
-                            .replace(/\\>/g,'\\rangle')
-                        );
-                    }
+            var myCallback = function(index,element) {
+                if (nTimesToBeVerbose-- >= 1)
+                {
+                    console.log("        in myCallback");
+                    console.log("            element=",element);
+                    console.log("            element.tagName=",element.tagName);
+                    console.log("            element.nodeValue=",element.nodeValue);
+                    console.log("            element.innerText=",element.innerText);
+                    console.log("            element.outerText=",element.outerText);
+                    console.log("            element.innerHTML=",element.innerHTML);
+                    console.log("            element.outerHTML=",element.outerHTML);
                 }
-                var mySimpleCallbackAll = function(element,someAncestorEnabled) {
-                    if (element.className === 'doMyThing')
-                    {
-                        console.log("HO! tagName="+element.tagName+" className="+element.className);
-                    }
-                    if (element.tagName === 'PRE')
-                    {
-                        console.log('skipping PRE: ',element)
-                    }
-                    if (element.tagName !== 'PRE')
-                    {
-                        var enabled = (someAncestorEnabled || element.className == 'doMyThing');
-                        if (enabled)
-                        {
-                            mySimpleCallback(0,element);
-                        }
-                        for (var child = element.firstChild; child !== null; child = child.nextSibling)
-                        {
-                            mySimpleCallbackAll(child,enabled);
-                        }
-                    }
-                }
-                mySimpleCallbackAll(document,false);
-            }
-
-            if (0)
-            {
-                var myCallback = function(index,element) {
-                    var $element = jQuery(element);
-                    var text = $element.text();
-                    //console.log("            before: ",text);
-                    text = (text
+                if (element.nodeValue !== null)
+                {
+                    element.nodeValue = (element.nodeValue
                         .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
                         .replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
                         .replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
@@ -281,18 +240,31 @@
                         .replace(/\\</g,'\\langle')
                         .replace(/\\>/g,'\\rangle')
                     );
-                    //console.log("            after: ",text);
-                    $element.text(text);
-                };
-
-                // for all descendants (including self) of class="doMyThing" elements...
-                var query = jQuery(".doMyThing");
-                query = query.find("*");
-                query = query.andSelf();
-                if (1) {
-                    query.each(myCallback);
                 }
             }
+
+            // the logic I want is:
+            // if under class='doMyThing'
+            // and there's no ancestor <PRE> strictly closer than the class='doMyThing',
+            // then do the substitutions.
+            // I don't think there's any jQuery selector that does such a thing... ?
+
+            var myCallbackAll = function(element,callback,parentEnabled) {
+                var enabled = ((parentEnabled
+                             && element.tagName !== 'PRE')
+                            || element.className == 'doMyThing');
+                if (enabled)
+                {
+                    callback(0,element);
+                }
+                for (var child = element.firstChild; child !== null; child = child.nextSibling)
+                {
+                    myCallbackAll(child,callback,enabled);
+                }
+            }
+
+            myCallbackAll(document,myCallback,false);
+
 
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
             console.log("    returned from mathjax typeset.");
@@ -302,6 +274,7 @@
 </head>
 <body>
 <hr> <!--============================================================-->
+<span id="youarehere"></span>
 
 <div class="doMyThing">
 first thing: $xp$
@@ -838,7 +811,6 @@ or any other linear combination
 $a(v_m-v_{m+2}) + b(v_m-v_{m-2})$
 such that $a$ and $b$ are nonnegative and not both zero.
 <p>
-<span id="youarehere"></span>
 The important property of u is that the directions of each of the four vectors:
 \begin{align}
     n^- = & \text{outward normal of last edge $e_{m-1}$ before (CW from) the good exit} \\
