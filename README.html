@@ -14,6 +14,10 @@
     Can't seem to adjust print font size by user :-(
     so messing with it in the style sheet here.
 
+    TODO: replace | | with || || throughout
+    TODO: replace areaTri
+    TODO: replace angle() with \anglesymbol()?
+    TODO: why is it not jumping to #youarehere any more?? (is it a jquery thing?)
     TODO: my specified default zoom trigger not working?
     TODO: areaTri?
     TODO: it would be awesome if it were possible to start typesetting
@@ -236,13 +240,14 @@
                         .replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
                         .replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
 
-                        .replace(/\^_([trxy]?[dmp]|[ABCD])\b/g,'\\overline{\\underline $1}')
-                        .replace(/_\^([trxy]?[dmp]|[ABCD])\b/g,'\\underline{\\overline $1}')
-                        .replace(/_([trxy]?[dmp]|[ABCD])\b/g,'\\underline $1')
-                        .replace(/\^([trxy]?[dmp]|[ABCD])\b/g,'\\overline $1')
+                        .replace(/\^_([trxy]?[dmp]|[ABCD]'?)\b/g,'\\overline{\\underline $1}')
+                        .replace(/_\^([trxy]?[dmp]|[ABCD]'?)\b/g,'\\underline{\\overline $1}')
+                        .replace(/_([trxy]?[dmp]|[ABCD]'?)\b/g,'\\underline $1')
+                        .replace(/\^([trxy]?[dmp]|[ABCD]'?)\b/g,'\\overline $1')
 
                         .replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
                         .replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
+                        .replace(/\b(C')/g,'{$1}') // makes sure we get \underline{C'} instead of \underline{C} '
 
                         .replace(/\\</g,'\\langle')
                         .replace(/\\>/g,'\\rangle')
@@ -842,153 +847,6 @@ $v_m$ is blunt, we've narrowed the direction of the cc (from the origin),
 within a small range.
 The range to which we've narrowed the cc's direction is precisely the supplement
 of the internal angle at $v_m$.  See Figure XXX.
-<hr> <!--==============================================================================-->
-GET RID OF THE FOLLOWING AFTER SALVAGING WHATEVER
-The important property of u is that
-\begin{align}
-    (v_m-v_{m-2}) \times u \le 0
-    (v_m-v_{m+2}) \times u \ge 0
-\end{align}
-i.e.
-(v_m-v_{m-2})
-points at-or-to-left-of
-$u$
-and
-$(v_m-v_{m+2})$
-points at-or-to-right-of $u$.
-So as we walk CCW around the perimeter along
-$e_0,v_1,e_2,...,$
-progressively turning to the left,
-there will be some first (odd) vertex index
-$r \lt m$
-such that
-$(v_{r+1}-v_r)$
-points at-or-to-left-of
-$u$.
-Likewise there will be some last (odd) vertex index
-$l \gt m$
-such that (v_{l-2}-v_l) points at-or-to-right-of $u$.
-(XXX this description isn't right, in the case when m=1 or mirror image,
-i.e. when farthest vert is incident on closest edge)
-<hr> <!--==============================================================================-->
-GET RID OF THE FOLLOWING AFTER SALVAGING WHATEVER
-<p>
-So, assume we are given such a candidate primal polygon,
-and a point in its interior such that there is only one good exit
-with respect to that point.
-Choose a coordinate system that places that point at the origin,
-with the polygon rotated so that
-$vm$
-(the "apex")
-has highest y coordinate,
-and
-$\text{slope}(e_{m-1}) = -\text{slope}(e_{m+1})$.
-So
-$v_{m-2}$
-is to the lower-right of
-$v_m$
-and
-$v_{m+2}$
-is to the lower-left of
-$v_m$.
-$e_0$
-will always be the single edge closest to the origin (though
-it need not be horizontal any more).
-Figure 2(a-e) shows the same polygons as Figure 1(a-e),
-rotated in this way.
-<p>
-We will now show that, in this chosen coordinate system,
-the cc's y coordinate is strictly positive,
-and so the origin is not the cc.
-<p>
-Let
-$r$
-be the lowest-numbered (most CW) index such that
-$v_{r+2}$'s
-$x$
-coord
-is
-$\leq$
-that of
-$v_r$'s
-(i.e. such that
-$e_{r+1}$
-emerges north or northwest out of
-$v_r$).
-Let
-$l$
-be the highest-numbered (most CCW) index such that
-$v_{l-1}$'s
-$x$
-coord is
-$\ge$
-that of
-$v_l$'s.
-<p>
-Since
-$e_{r+1}$
-emerges north or northwest from
-$v_r$
-and the quill at
-$v_r$
-leans CW by more than
-$90^{\circ}$
-from outward,
-it must be that
-$v_r$
-has positive
-$y$
-coord
-(otherwise the angle formed by the quill and
-$e_{r+1}$
-would be greater than
-$180^{\circ}$,
-which is illegal).
-Similarly
-$v_l$
-has positive
-$y$
-coord,
-and so by convexity all vertices between them,
-$v_{r+2}, ..., v_{l-2}$
-have positive
-$y$
-coord as well.
-<p>
-The crux of this proof will be to show that the cc of all the vertices
-$v_1..v_r$
-has positive
-$y$
-coord, or equivalently,
-that their moment (cc times total curvature) has positive
-$y$
-coord.
-<p>
-Then by symmetric reasoning,
-the cc (or equivalently the moment) of
-$v_r..v{2n-1}$
-also has positive
-$y$
-coord;
-furthermore as previously mentioned, each of the vertices
-$v_{r+2}..v_{l-2}$
-has positive
-$y$
-coord as well, so then:
-\begin{align}
-    \text{moment}(v_1..v_{2n-1}) = & \text{moment}(v_1..v_r) \\
-                                 + & \text{moment}(v_{r+2}..v_m..v_{l-2}) \\
-                                 + & \text{moment}(v_l..v_{2n-1})
-\end{align}
-being the sum of three quantities each with positive y coord,
-has positive $y$ coord as well, and we are done.
-<p>
-So, we just need to show that the moment
-of the initial vertices
-$v_1..v_r$
-has positive
-$y$
-coord.
 <div id="priscillaAndDudleyStuff" class="doMyThing">
 <p>
 We let Priscilla and Dudley compute the moment
@@ -1011,6 +869,7 @@ in which one or more of the following happen:
          from negative to positive $y$ coordinate
          (this will be a separate event
          iff no dual vertex lies on the $x$ axis).
+         XXX this is no longer relevant, I don't think
 </ul>
 <p>
 The accumulated moment vector starts as zero;
@@ -1034,10 +893,8 @@ statement ($C$) at the end of the walk.
 XXX why? need to be more specific
 <p>
 Spiral Moment Lemma:
-During Priscilla and Dudley walk's around the primal (from
-$e_0$
-to
-$e_{r+1}$)
+During Priscilla's and Dudley's simultaneous walk around
+the CCW-outward-spiraling part of the primal (starting with $e_0$)
 and dual as described above, at all times strictly after the first event:
 \begin{alignat*}{3}
     0 & \;\overset{(A)}\lt\;  &  rm & \;\overset{(B)}\lt\;  rp \, rd^2 \sin(tp-td) \cos(tp-td) / 2 \\
@@ -1046,7 +903,6 @@ and dual as described above, at all times strictly after the first event:
 <p>
 Proof:
 <p>
-<span id="youarehere"></span>
 Note first of all the significance of the "after the first event"
 in the Spiral Moment Lemma statement.
 This clause is necessary because,
@@ -1069,17 +925,18 @@ Priscilla's position vector and her outward normal (right) vector
 are strictly within
 $90^{\circ}$
 of each other.
-In this strict spiral case, we also know that
+In this strict spiral case (spiraling CCW outwards), we also know that
 $td &lt; tp$.
 So (C) and (D) are saying that
 $tm$ lies in the half-open interval
-$(td,tp]$ of size $< pi/2$.
+$(td,tp]$ of size $< \pi/2$.
+Combining this with ($A$),($B$),
+the Lemma is saying that the moment $m$
+lies in (or on the boundary of)
+a certain pie-shaped region.
 <p>
 XXX maybe note geometric interpretation of ... that it's a triangle area, or cross product
 <p>
-XXX maybe note geometric interpretation of lemma, that it says m is in a pie slice
-<p>
-
 We will prove the Lemma by induction on the number of events
 (as defined earlier) encountered so far.
 <p>
@@ -1094,7 +951,7 @@ $v_1$
 and Dudley has been moving along the corresponding edge
 $e'_1$
 in the dual diagram.
-At this time, the moment accumulated so far is
+At this time, the moment accumulated so far is simply
     $$(2) \;\;  m = (\text{Dudley's triangle area so far})*(\text{Priscilla's position})$$
 which is a nonzero scalar times the nonzero vector
 $p=v_1$,
@@ -1105,8 +962,8 @@ $tm$
 is well-defined),
 and
 $tm = tp$.
-So ($C$) holds, and ($D$) immediately follows
-since this is a strictly outward spiral.
+So ($D$) holds, and ($D$) immediately follows
+(since we always have $td < tp$ throughout any strictly CCW-outward spiral).
 We still have to prove that ($B$) holds in the base case.
 <p>
 For this base case,
@@ -1135,7 +992,6 @@ have changed-- specifically,
 $tp$
 is now
 $\pi/2$).
-(XXX Alternatively, could denote these rotated coords by carat'ing them)
 <pre>
       Priscilla
        p=v_1*
@@ -1162,24 +1018,19 @@ as follows:
 \begin{align}
     & \text{Dudley's triangle area so far} \\
     & \;\; = \text{area}(\triangle(0,v'_0,d)) \\
-    & \;\; &lt; \text{area}(\triangle(0,\langle xd,0\rangle,d)) \;\; \text{since the former triangle is included in the latter, since v'_0 has y coord &gt; 0 (XXX prove this!)} \\
+    & \;\; &lt; \text{area}(\triangle(0,\langle xd,0\rangle,d)) \;\; \text{since the former triangle is included in the latter, since $v'_0$ has $y$ coord &gt; 0 (XXX prove this!)} \\
     & \;\; = xd yd / 2 \\
     & \;\; = (rd \cos(td)) (rd \sin(td)) / 2\\
     & \;\; = (rd \sin(\pi/2-td)) (rd \cos(\pi/2-td)) / 2\\
 (3) & \;\; = rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2
 \end{align}
 <p>
-Recalling (2),
-\begin{align}
-     m &amp;= (\text{Dudley's triangle area so far})*(\text{Priscilla's position}) \\
-       &amp;= (\text{Dudley's triangle area so far})*p
-\end{align}
-Taking magnitude of both sides,
+Taking magnitudes of both sides of (2),
 \begin{align}
    rm &amp; = (\text{Dudley's triangle area so far}) * rp \\
-       &amp; &lt; (rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2 ) * rp  \;\; by (3) \\
+       &amp; &lt; (rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2 ) * rp  \;\; \text{by (3)} \\
        &amp; = rp rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2 \\
-       &amp; = rp rd^2 \sin(tp-td) \cos(tp-td) / 2
+       &amp; = rp rd^2 \sin(tp-td) \cos(tp-td) / 2 \;\; (by XXX if I rearrange the above to state trivial facts first, like the other cases)
 \end{align}
 and so we've shown ($B$),
 completing the proof of the base case.
@@ -1262,6 +1113,8 @@ $0$).
 
         Figure 4: Inductive step, Case 1: Priscilla has moved
 </pre>
+XXX rearrange and use underoverline for all of the following, like in case 2
+<br>
 In this case we have the following relationships between the previous event's values
 and the current values.
 Dudley didn't move:
@@ -1270,7 +1123,7 @@ Dudley didn't move:
 nor did the moment (since the moment only changes when Dudley moves):
     $$(6) \;\; ^rm = _rm$$
     $$(7) \;\; ^tm = _tm  \;\; \text{(assuming $_tm$ is well-defined-- which it is, by inductive hypothesis)}$$
-Priscilla moved purely upwards, within the first quadrant: (XXX may need to make very clear why this is true! it follows from B and/or C but it's a bit of a train wreck at the moment :-( )
+Priscilla moved purely upwards, within the first quadrant: (XXX may need to make very clear why this is true! it follows from C and/or D but it's a bit of a train wreck at the moment :-( )
 \begin{align}
              0 & \lt _yp \lt ^yp \\
     (8) \;\; 0 & \lt _xp = ^xp
@@ -1278,7 +1131,7 @@ Priscilla moved purely upwards, within the first quadrant: (XXX may need to make
 so her angle increased, but stayed less than $\pi/2$:
     $$(9) \;\; 0 \lt _tp \lt ^tp \lt \pi/2$$
    $$(10) \;\; 0 \lt \sin(_tp) \lt \sin(^tp) \lt 1  \;\; \text{(follows from (9) since $\sin$ is increasing in this range)}$$
-   $$(11) \;\; 0 \lt \cos(^tp) \lt \cos(_tp) \lt 1  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
+   $$(11) \;\; 1 \gt \cos(_tp) \gt \cos(^tp) \gt 0  \;\; \text{(follows from (9) since $\cos$ is decreasing in this range)}$$
 <p>
 Proving ($^C$) is easy:
 \begin{align}
@@ -1310,8 +1163,9 @@ Proceeding now to prove ($^B$):
                    & = _xp \, ^rd^2 \sin(_tp)/2 \\
                    & = ^xp \, ^rd^2 \sin(_tp)/2   \;\; \text{by (8)} \\
                    & = (^rp \cos(^tp)) ^rd^2 \sin(_tp)/2 \\
-                   & \lt (^rp \cos(tp)) ^rd^2 \sin(^tp)/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
-                   & = ^rp \, ^rd^2 \sin(^tp) \cos(^tp) / 2   \;\; \text{(just rearranging terms)} \\
+                   & \lt (^rp \cos(^tp)) ^rd^2 \sin(^tp)/2  \;\; \text{by (10), since all factors are positive (by (10) and (11))} \\
+                   & = ^rp \, ^rd^2 \cos(^tp) \sin(^tp) / 2   \;\; \text{(just rearranging terms)} \\
+                   & = ^rp \, ^rd^2 \cos(^tp - 0) \sin(^tp - 0) / 2 \\
                    & = ^rp \, ^rd^2 \sin(^tp-^td) \cos(^tp-^td) / 2  \;\; \text{by (5)}
 \end{align}
 and so ($^B$) is proved,
@@ -1350,28 +1204,28 @@ as shown in Figure 5.
 </pre>
 We denote quantities that are stationary at this step
 by giving them both an underbar and overbar.
-Priscilla is on the +y axis and didn't move:
+Priscilla is on the $+y$ axis and didn't move:
 \begin{align}
-    (11.5)  _^rp = & _^yp \gt 0 \\
-            _^xp = & 0 \\
-    (12)    _^tp = & \pi/2 \\
+    (11.5) \;\; _^rp = & _^yp \gt 0 \\
+                _^xp = & 0 \\
+    (12)   \;\; _^tp = & \pi/2 \\
 \end{align}
 Dudley moved purely upwards, strictly within the first quadrant:
 (XXX may need more clarification, just like previous case)
 \begin{align}
-    (13)    0 \lt & _yd \lt ^yd \\
-            0 \lt & _xd = ^xd = _^xd \\
+    (13) \;\; 0 \lt & _yd \lt ^yd \\
+              0 \lt & _xd = ^xd = _^xd \\
 \end{align}
 so his angle increased, but stayed less than $\pi/2$:
 \begin{align}
-    (14)    0 \lt & _td \lt ^td \lt \pi/2 \\
-    (15)    0 \lt & \sin(_td) \lt \sin(^td) \lt 1 \;\; \text{(follows from (14) since $\sin$ is increasing in this range)} \\
-    (16)    0 \lt & \cos(^td) \lt \cos(_td) \lt 1 \;\; \text{(follows from (14) since $\cos$ is decreasing in this range)} \\
+    (14) \;\; 0 \lt & _td \lt ^td \lt \pi/2 \\
+    (15) \;\; 0 \lt & \sin(_td) \lt \sin(^td) \lt 1 \;\; \text{(follows from (14) since $\sin$ is increasing in this range)} \\
+    (16) \;\; 1 \gt & \cos(_td) \gt \cos(^td) \gt 0 \;\; \text{(follows from (14) since $\cos$ is decreasing in this range)} \\
 \end{align}
 The moment changed as follows:
 \begin{align}
-         ^m = m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position}) \\
-    (16.5)  = m + (\frac{1}{2} * (^yd-_yd)*_^xd) * <0,_^yp> \\
+         ^m = & _m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position}) \\
+    (16.5)  = & _m + (\frac{1}{2} * (^yd-_yd)*_^xd) * \langle 0,_^yp \rangle \\
 \end{align}
 Therefore by (12), the moment moved purely upwards as well;
 furthermore ($_C$),($_D$) (and XXX) say it started strictly inside the first quadrant
@@ -1387,76 +1241,76 @@ so ($^A$) is immediately satisfied and:
 <p>
 ($^D$) follows trivially:
 \begin{align}
-            ^tm \lt & \pi/2 \;\; by (18) \\
-                  = & tp \;\; by (12) \\
+            ^tm \lt & \pi/2 \;\; \text{by (19)} \\
+                  = & ^tp \;\; \text{by (12)} \\
 \end{align}
 ($^B$) is proved as follows:
 \begin{align}
     ^rm = |^m| = & |_m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position})| \\
-             \le & |_m| + (\text{area of Dudley's triangle}) * |_^p| \\
+             \le & |_m| + (\text{area of Dudley's triangle}) * |_^p| \;\; \text{by triangle inequality} \\
                = & _rm + (\text{area of Dudley's triangle}) * _^rp \\
              \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \text{by ($_B$)} \\
                = & _^rp ((_rd \sin(_tp-_td))(_rd \cos(_tp-_td))/2 + (\text{area of Dudley's triangle})) \\
                = & _^rp (areaTri(0,\langle _^xd,0 \rangle,_d) + areaTri(0,_d,^d)) \\
-               = & _^rp (areaTri(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two tris} \\
-                  XXX should we be using x's and y's in here somewhere? \\
+               = & _^rp (areaTri(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two} \\
+                 & \text{XXX should we be using x's and y's in here somewhere?} \\
                = & _^rp rd^2 \cos(^td)\sin(^td) / 2 \\
                = & _^rp rd^2 \sin(\pi/2-^td)\cos(\pi/2-^td) / 2 \;\; \text{since $\cos(t)=\sin(\pi/2-t)$ in general} \\
                = & _^rp rd^2 \sin(_^tp-^td)\cos(_^tp-^td) / 2 \;\; \text{by (12)} \\
 \end{align}
-Having shown ($^B$), we must finally prove ($^C$).
+So that proves ($^B$); all we have left to prove is ($^C$).
 <p>
 For this, we first derive an intermediate result
 from the inductive hypothesis.
 The "all terms positive" claims throughout the following
 follow from ($_A$),($_C$),($_D$).
 \begin{align}
-           _xm = & _rm \cos(_tm) \\
-               = & _rm \sin(\pi/2 - _tm) \\
+ _rm \sin(_tp - _tm) = & _rm \sin((_tp-_td)-(_tm-_td)) \\
+                     = & _rm (\sin(_tp-_td)\cos(_tm-_td) - \cos(_tp-_td)\sin(_tm-_td)) \;\; \text{by double-angle identity} \\
+                     = & _rm \sin(_tp-_td)\cos(_tm-_td) - _rm \cos(_tp-_td)\sin(_tm-_td) \\
+                   \lt & _rm \sin(_tp-_td)\cos(_tm-_td) - 0 \;\; \text{since all terms positive} \\
+                   \lt & _rm \sin(_tp-_td) * 1 \;\; \text{since $\cos(_tm-_td) \lt 1$ and all terms positive} \\
+                   \lt & (\frac{1}{2} _rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)) \sin(_tp-_td) \;\; \text{by} (_B) \\
+                     = & \frac{1}{2} _rp \cos(_tp-_td) (_rd \sin(_tp-_td))^2 \\
+                   \lt & \frac{1}{2} _rp (_rd \sin(_tp-_td))^2 \;\; \text{since $0 \lt \cos(_tp-_td) \lt 1$} \\
+                     = & \frac{1}{2} _rp (_rd \sin(\pi/2-_td))^2 \;\; \text{by (12)} \\
+                     = & \frac{1}{2} _rp (_rd \cos(_td))^2 \\
 
-               = & _rm \sin(_tp - _tm) \;\; \text{by (12)} \\
-               = & _rm \sin((_tp-_td)-(_tm-_td)) \\
-               = & _rm (\sin(_tp-_td)\cos(_tm-_td) - \cos(_tp-_td)\sin(_tm-_td)) \;\; \text{by double-angle identity} \\
-               = & _rm \sin(_tp-_td)\cos(_tm-_td) - _rm \cos(_tp-_td)\sin(_tm-_td) \\
-             \lt & _rm \sin(_tp-_td)\cos(_tm-_td) - 0 \;\; \text{since all terms positive} \\
-             \lt & _rm \sin(_tp-_td) * 1 \;\; \text{since $\cos(_tm-_td) \lt 1$ and all terms positive} \\
-             \lt & (\frac{1}{2} _rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)) \sin(_tp-_td) \;\; \text{by} (_B) \\
-               = & \frac{1}{2} _rp \cos(_tp-_td) (_rd \sin(_tp-_td))^2 \\
-             \lt & \frac{1}{2} _rp (_rd \sin(_tp-_td))^2 \;\; \text{since $0 \lt \cos(_tp-_td) \lt 1$} \\
-
-               = & \frac{1}{2} _rp (_rd \sin(\pi/2-_td))^2 \;\; \text{by (12)} \\
-               = & \frac{1}{2} _rp (_rd \cos(_td))^2 \\
-               = & \frac{1}{2} _rp _xd^2 \\
-    (22) _xm \lt & \frac{1}{2} _rp _xd^2. \\
 \end{align}
-(XXX could phrase that in terms "m \times p \lt \frac{1}{2} (d \times p)^2",
+In this Priscilla-aligned coordinate system, that's the same as saying:
+\begin{align}
+                                         _xm &lt; & \frac{1}{2} _rp _xd^2; \;\; \text{that is,} \\
+       (22) \;\; \frac{1}{2} _rp _xd^2 - _xm &gt; & 0.
+\end{align}
+(XXX could phrase that in terms "$m \times p \lt \frac{1}{2} (d \times p)^2$",
 coordinate-free til the last second, if we wanted... maybe)
 <p>
+<span id="youarehere"></span>
 Now we proceed to prove ($^C$).
 Since $^d$,$^m$,$_d$,$_m$ are all in the first quadrant,
 our goal ($^C$) can be expressed as
-    $$(^B') \;\; ^d \times ^m \gt 0$$
+    $$(^C') \;\; ^d \times ^m \gt 0$$
 and assumption ($_C$) can be expressed as
-    $$(_B') \;\; _d \times _m \gt 0$$
+    $$(_C') \;\; _d \times _m \gt 0$$
 (where $\times$ denotes the scalar cross product
-of two vectors in the plane, i.e.
-$v_0 \times v_1 = |v_0| |v_1| \sin(angle(v0,v1))$).
+of two vectors in the plane; that is,
+$\vec{a} \times \vec{b} = \|\vec{a}\| \|\vec{b}\| \sin(angle(\vec{a},\vec{b}))$).
 <p>
-So we just need to prove ($^B'$) and we're done.
+So we just need to prove ($^C'$) and we're done.
 \begin{align}
     ^d \times ^m = & \langle _^xd,^yd \rangle \times \langle _^xm,^ym \rangle \\
                  = & _^xd ^ym  -  ^yd _^xm \\
-                 = & _^xd (_ym + \frac{1}{2} (^yd-_yd) _^xd _^yp) - ^yd _^xm  \text{by (16.5)  (XXX neaten that up)} \\
-                 = & _^xd (_ym + \frac{1}{2} (^yd-_yd) _^xd _^yp) - (_yd + (^yd-_yd)) _^xm \\
-                 = & (_^xd _ym - _yd _^xm) + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\; \text{(just rearranged terms)} \\
+                 = & _^xd (_ym + \frac{1}{2} (^yd-_yd) _^xd _^yp) - ^yd _^xm \;\; \text{by (16.5)} \\
+                 = & _^xd (_ym + \frac{1}{2} (^yd-_yd) _^xd _^yp) - (_yd + (^yd-_yd)) _^xm \;\;\;\; \text{since $^yd = _yd + (^yd-_yd)$} \\
+                 = & (_^xd _ym - _yd _^xm) + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\;\;\; \text{(just rearranged terms)} \\
                  = &          _d \times _m          + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \\
-               \gt &             0             + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\; \text{by ($_C$)} \\
+               \gt &             0             + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\; \text{by ($_C'$)} \\
                  = & (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \\
                  = & (^yd-_yd) (\frac{1}{2} _^xd ^2 _^rp - _^xm) \;\; \text{by ($11.5$)} \\
 
                \gt & 0, \;\; \text{by (13) and (22).} \\
 \end{align}
-So ($^B'$) is proved, completing the induction
+So ($^C'$) is proved, completing the induction
 and the proof of the Spiral Moment Lemma.
 </div> <!-- priscillaAndDudleyStuff -->
 
