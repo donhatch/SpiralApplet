@@ -7,30 +7,6 @@
         body {font-size:large;}
     </style>
 
-
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            tex2jax: {
-                // make '$' delimit inline math
-                inlineMath: [['$','$'], ['\\(','\\)']],
-                // make \$ give a real dollar sign, even in non-math mode
-                processEscapes: true,
-            },
-            // don't typeset the document on startup;
-            // we're going to typeset specific things on demand,
-            // using MathJax.Hub.Queue(["Typeset",MathJax.Hub]).
-            // oh wait, maybe I don't care.
-            //skipStartupTypeset: true,
-        });
-    </script>
-    <!-- note, the particular config used below allows
-         both tex (using $...$)
-         and asciimath (using `...`) on same page -->
-    <script type="text/javascript"
-      src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_HTMLorMML.js">
-    </script>
-
-
     <script
         src="http://code.jquery.com/jquery-1.7.1.min.js">
     </script>
@@ -255,7 +231,6 @@
             var d1 = paths[5];
             console.log("d1=",d1);
             d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
-            d0transform1.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
             d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
             console.log("    out doIt");
         };
@@ -317,38 +292,26 @@
         <g transform="translate(0,0)   scale(.005) scale(1,-1)  translate(-5,15)"> <text>0</text> </g>
         <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
 
-        <g id="d0transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(7,-10)">
-            <!--
-            <text id="d0text">$\underline{d})$</text>
-            -->
-            <!-- the following works in firefox, not in chrome :-( -->
-            <foreignObject x="0" y="0" width="100" height="100">
-                <body xmlns="http://www.w3.org/1999/xhtml">
-                    <div>
-                        $\underline{d}$
-                    </div>
-                </body>
-            </foreignObject>
-        </g> </g>
-        <g id="d0transform1" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(0,0)">
+        <g id="d0transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(5,10)">
+            <!-- woohoo, got an underline! -->
             <text id="d0text">d</text>
             <text id="d0text">_</text>
         </g> </g>
-        <g id="d1transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(10,-15)">
+        <g id="d1transform" transform="translate(0,0)" style="font-size:13.5pt"><g transform="   scale(.005) scale(1,-1)  translate(10,5)">
+            <!-- tspan with baseline-shift works beautifully in firefox, but not in chrome :-( -->
             <!--
-            <text id="d1text">$\overline{d})$</text>
+            <text id="d0text">d</text>
+            <text id="d0text">
+                <tspan style="baseline-shift: 100%;">_</tspan>
+            </text>
             -->
-            <foreignObject x="0" y="0" width="100" height="100">
-                <body xmlns="http://www.w3.org/1999/xhtml">
-                    <div>
-                        $\overline{d}$
-                    </div>
-                </body>
-            </foreignObject>
+            <text id="d0text">d</text>
+            <text id="d0text">
+                <tspan x=1 y=-19>_</tspan> <!-- is this portable? should I set the font-size style to match? -->
+            </text>
         </g> </g>
     </g>
 </svg>
-$a^b$
 </body>
 </html>
 
