@@ -237,6 +237,7 @@
             var priscillaMainPath = jQuery('#priscillaMainPath');
             var priscillaNeighborsPath = jQuery('#priscillaNeighborsPath');
             var d0transform = jQuery('#d0transform');
+            var d0transform1 = jQuery('#d0transform1');
             var d1transform = jQuery('#d1transform');
             console.log("        dudleyMainPath = ",dudleyMainPath);
             console.log("        dudleyMainPath.attr('d') = ",dudleyMainPath.attr('d'));
@@ -254,6 +255,7 @@
             var d1 = paths[5];
             console.log("d1=",d1);
             d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
+            d0transform1.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
             d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
             console.log("    out doIt");
         };
@@ -327,6 +329,10 @@
                     </div>
                 </body>
             </foreignObject>
+        </g> </g>
+        <g id="d0transform1" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(0,0)">
+            <text id="d0text">d</text>
+            <text id="d0text">_</text>
         </g> </g>
         <g id="d1transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(10,-15)">
             <!--
