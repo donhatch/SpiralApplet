@@ -71,10 +71,13 @@
                 - in firefox, @media print large
                   is bigger (and more to my liking)
                   than regular print large!
+                  OH I think it's because the screen one leaked into 
+                  the print one? some subtlety of the print previewer?
+                  it's corrupt, too... didn't notice that before.
         */
 
         @media screen {
-            body {font-size:medium;}
+            body {font-size:large;}
         }
         @media print {
             body {font-size:large;}
@@ -206,7 +209,6 @@
         // when the document is loaded
         jQuery(document).ready(function() {
             console.log("in jquery document-ready function!");
-            console.log("    calling mathjax typeset...");
 
             var nTimesToBeVerbose = 0;
 
@@ -263,9 +265,12 @@
                 }
             }
 
+            console.log("    doing my preprocessing...");
             myCallbackAll(document,myCallback,false);
+            console.log("    done my preprocessing.");
 
 
+            console.log("    calling mathjax typeset...");
             MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
             console.log("    returned from mathjax typeset.");
             console.log("out jquery document-ready function!");
