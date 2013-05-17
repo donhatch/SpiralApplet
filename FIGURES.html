@@ -95,7 +95,7 @@
             var p1 = [0,1]
             var p2 = analogy(p0,p1,p1)
             var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
-            var q0 = plus(p1,normalized(perpDot(minus(d1,d2)),qLength));
+            var q0 = plus(p1,times(normalized(perpDot(minus(d1,d2))),qLength));
 
 
             var dudleyMainPath = "M 0 0 L "+d1[0]+" "+d1[1]+" L "+d2[0]+" "+d2[1]+" L 0 0";
@@ -213,7 +213,7 @@
             global_d0 = [0,0];
             global_d1 = [6,2];
             global_d2 = [8,6];
-            global_nNeighbors = 10;
+            global_nNeighbors = 2;
             {
                 var rescale = 1./dist(global_d0, global_d2);
                 global_d2 = plus(global_d0,times(minus(global_d2,global_d0), rescale));
@@ -228,7 +228,7 @@
             var localToScreenMatrix = [
                 [200.,      undefined, undefined],
                 [undefined, -200.,      undefined],
-                [250.+9,    220.+19,   undefined],
+                [250.+9,    320.+19,   undefined],
             ];
             var localToScreen = function(localXY) {
                 var x = localXY[0];
@@ -296,12 +296,17 @@
                 return bestIndex;
             };
 
-            // install press/drag/release handlers
-            var theFigure = jQueryExpectingOneThing('#theFigure');
+
+            var theDiv = jQueryExpectingOneThing('#theDiv');
+            var theSource = jQueryExpectingOneThing('#theSource');
+            theSource.text(theDiv[0].innerHTML);
+
+            var theFigure = jQueryExpectingOneThing('#figure5');
             var threshold = 10;
             var dragging = false;
             var indexOfThingBeingDragged = false;
             var nTimesMouseMoveCalled = 0;
+            var prevX=undefined, prevY=undefined;;
             theFigure.mousedown(function(e) {
                 console.log("mouse down: ",e);
                 dragging = true;
@@ -310,20 +315,30 @@
                 console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
                 //doIt(global_d0, global_d1, global_d2, global_nNeighbors);
+                prevX = e.clientX;
+                prevY = e.clientY;
             });
             theFigure.mouseup(function(e) {
                 console.log("mouse up: ",e);
                 dragging = false;
+                prevX = e.clientX;
+                prevY = e.clientY;
+                theSource.text(theDiv[0].innerHTML);
             });
             theFigure.mousemove(function(e) {
                 // wtf? on chrome, this keeps firing every 1 second
                 // when in window, even if mouse not moving??
                 // what a waste!
 
-                console.log(""+nTimesMouseMoveCalled+" mouse move: buttons="+e.buttons+" button="+e.button);
+                if (e.clientX === prevX && e.clientY === prevY)
+                {
+                    //console.log("WTF? didn't really move?");
+                    return;
+                }
+                //console.log(""+nTimesMouseMoveCalled+" mouse move: buttons="+e.buttons+" button="+e.button);
                 nTimesMouseMoveCalled++;
 
-                console.log("    dragging = "+dragging);
+                //console.log("    dragging = "+dragging);
                 if (dragging)
                 {
                     var localXY = screenToLocal([e.clientX,e.clientY]);
@@ -337,14 +352,18 @@
                     else if (indexOfThingBeingDragged == 1)
                     {
                         global_d1 = localXY;
+                        console.log("d1 changed to "+global_d1);
                     }
                     else if (indexOfThingBeingDragged == 2)
                     {
                         global_d2 = localXY;
+                        console.log("d2 changed to "+global_d1);
                     }
 
                     doIt(global_d0, global_d1, global_d2, global_nNeighbors);
                 }
+                prevX = e.clientX;
+                prevY = e.clientY;
             });
 
             console.log("out jquery document-ready function!");
@@ -355,57 +374,97 @@
 
 <p>
 
-<svg id="theFigure" xmlns="http://www.w3.org/2000/svg"
-     version="1.1"
-     height="500"
-     width="500"
-     >
-    <!-- 1 unit = 20 pixels -->
-    <g id="theGraphic"
-       transform="translate(250,220) scale(1,-1) scale(200)">
-       
-        <path
-            id="dudleyMainPath"
-            vector-effect="non-scaling-stroke"
-            style="stroke: blue; stroke-width: 3.0; fill: none; stroke-miterlimit:1.414"
-            d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
-        />
-        <path
-            id="dudleyNeighborsPath"
-            vector-effect="non-scaling-stroke"
-            style="stroke:rgb(220,220,255); stroke-width: 1.0; fill: none; stroke-opacity:1."
-            d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
-        />
-        <path
-            id="priscillaMainPath"
-            vector-effect="non-scaling-stroke"
-            style="stroke: red; stroke-width: 1.0; fill: none; stroke-opacity:.2"
-            d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
-        />
-        <path
-            id="priscillaNeighborsPath"
-            vector-effect="non-scaling-stroke"
-            style="stroke:rgb(255,220,220); stroke-width: 1.0; fill: none; stroke-opacity:1."
-            d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
-        />
-        <circle
-            cx="0" cy="1" r=".025"
-            style="stroke: none; fill: red;"
-        />
-            
-        <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
-        <g transform="translate(0,0)   scale(.005) scale(1,-1)  translate(-5,15)"> <text>0</text> </g>
-        <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
+    <!--
+    <svg id="figure5" xmlns="http://www.w3.org/2000/svg"
+         version="1.1"
+         height="500"
+         width="500"
+         >
+        <!-- 1 unit = 20 pixels - ->
+        <g id="theGraphic"
+           transform="translate(250,320) scale(1,-1) scale(200)">
+           
+            <path
+                id="dudleyMainPath"
+                vector-effect="non-scaling-stroke"
+                style="stroke: blue; stroke-width: 3.0; fill: none; stroke-miterlimit:1.414"
+                d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
+            />
+            <path
+                id="dudleyNeighborsPath"
+                vector-effect="non-scaling-stroke"
+                style="stroke:rgb(220,220,255); stroke-width: 1.0; fill: none; stroke-opacity:1."
+                d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
+            />
+            <path
+                id="priscillaMainPath"
+                vector-effect="non-scaling-stroke"
+                style="stroke: red; stroke-width: 1.0; fill: none; stroke-opacity:.2"
+                d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
+            />
+            <path
+                id="priscillaNeighborsPath"
+                vector-effect="non-scaling-stroke"
+                style="stroke:rgb(255,220,220); stroke-width: 1.0; fill: none; stroke-opacity:1."
+                d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
+            />
+            <circle
+                cx="0" cy="1" r=".025"
+                style="stroke: none; fill: red;"
+            />
+                
+            <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text - ->
+            <g transform="translate(0,0)   scale(.005) scale(1,-1)  translate(-5,15)"> <text>0</text> </g>
+            <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
 
-        <g id="d0transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(5,10)">
-            <text id="d0text" style="text-decoration:underline">d</text>
-        </g> </g>
+            <g id="d0transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(5,10)">
+                <text id="d0text" style="text-decoration:underline">d</text>
+            </g> </g>
 
-        <g id="d1transform" transform="translate(0,0)" style="font-size:13.5pt"><g transform="   scale(.005) scale(1,-1)  translate(10,5)">
-            <text id="d0text" style="text-decoration:overline">d</text>
-        </g> </g>
-    </g>
-</svg>
+            <g id="d1transform" transform="translate(0,0)" style="font-size:13.5pt"><g transform="   scale(.005) scale(1,-1)  translate(10,5)">
+                <text id="d0text" style="text-decoration:overline">d</text>
+            </g> </g>
+        </g>
+    </svg>
+    -->
+<!-- ======================================================================== -->
+<div id="theDiv">
+<svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="500" width="500">
+        <!-- 1 unit = 20 pixels -->
+        <g id="theGraphic" transform="translate(250,320) scale(1,-1) scale(200)">
+           
+            <path id="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 3.0; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.745 0.395 L 0.8 0.6000000000000001 L 0 0"></path>
+            <path id="dudleyNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(220,220,255); stroke-width: 1.0; fill: none; stroke-opacity:1." d=" M 0.8 0.6000000000000001 L 0.8266647915055201 0.8502918219534495 L 0 0 M 0.8266647915055201 0.8502918219534495 L 0.8117903700839553 1.1484230017220263 L 0 0 M 0.745 0.395 L 0.6723299999999999 0.23143999999999995 L 0 0 M 0.6723299999999999 0.23143999999999995 L 0.5903695299999998 0.10471428999999996 L 0 0"></path>
+            <path id="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 1.0; fill: none; stroke-opacity:.2" d="M 0.131 0.833 L 0 1 L -0.1842345826594473 1.1715069263764855 M 0 1 L 0.20500000000000002 0.945"></path>
+            <path id="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,220,220); stroke-width: 1.0; fill: none; stroke-opacity:1." d=" M -0.4316641793272473 1.3384860971003794 L -0.1842345826594473 1.1715069263764855 L 0.06605723929400181 1.1448421348709654 M -0.7522930034452524 1.4885182636843353 L -0.4316641793272473 1.3384860971003794 L -0.13353299955867093 1.3533605185219442 M 0.29456 0.76033 L 0.131 0.833 L 0.218246 0.676728 M 0.34497171 0.5947675299999999 L 0.218246 0.676728 L 0.27045028600000004 0.535124198"></path>
+            <circle cx="0" cy="1" r=".025" style="stroke: none; fill: red;"></circle>
+                
+            <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
+            <g transform="translate(0,0)   scale(.005) scale(1,-1)  translate(-5,15)"> <text>0</text> </g>
+            <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
+
+            <g id="d0transform" transform="translate(0.745,0.395)"><g transform="   scale(.005) scale(1,-1)  translate(5,10)">
+                <text id="d0text" style="text-decoration:underline">d</text>
+            </g> </g>
+
+            <g id="d1transform" transform="translate(0.8,0.6000000000000001)" style="font-size:13.5pt"><g transform="   scale(.005) scale(1,-1)  translate(10,5)">
+                <text id="d0text" style="text-decoration:overline">d</text>
+            </g> </g>
+        </g>
+    </svg>
+</div>
+<!-- ======================================================================== -->
+
+<!-- I don't think I really need this
+<button id="theButton">
+    Update source
+</button>
+-->
+The source:
+<pre id="theSource">
+(this should be replaced by the svg source code)
+</pre>
+
 </body>
 </html>
 
