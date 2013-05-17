@@ -1,10 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!--
+        TODO: fix picking to work regardless of where the svg is in the window!
+        TODO: overline of x_d isn't quite right- try to use borders instead? maybe not supported
+        TODO: more descriptive than "dragging thing with"
+        TODO: little circles on movable parts
+        TODO: text highlights when dragging, make it not do that
+        TODO: constraints
+        TODO: show values somewhere on screen instead of console log
+    -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Figures for The Spiral Moment Lemma: There's No Single-Exit Lagoon</title>
     <style type="text/css">
         body {font-size:large;}
+        /* "smaller" seems to mean 80% */
+        #theSource {font-size: 58.119653701782230115213678800500929355622%;} /* minimum that stays black instead of turning gray */
+
+        svg {
+            border: 1px dashed black;
+        }
     </style>
 
     <script
@@ -12,7 +27,7 @@
     </script>
     <script>
 	// make $ not be an alias for jQuery
-        // since I think that's ridiculous...
+        // since I think that's ridiculous
         jQuery.noConflict();
     </script>
 
@@ -153,8 +168,6 @@
                     priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
                 }
             }
-
-
             if (priscillaNeighborsPath == "")
             {
                 priscillaNeighborsPath = "M 0 0";
@@ -164,13 +177,18 @@
                 dudleyNeighborsPath = "M 0 0";
             }
 
-            return [dudleyMainPath,dudleyNeighborsPath,
-                    priscillaMainPath,priscillaNeighborsPath,
+            var otherStuffPath = "M 0 0 L "+d2[0]+" 0 L "+d2[0]+" "+d2[1]+" M "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+"";
+
+            return [dudleyMainPath,
+                    dudleyNeighborsPath,
+                    priscillaMainPath,
+                    priscillaNeighborsPath,
+                    otherStuffPath,
                     d1,d2];
         } // makeThePaths
 
-        var doIt = function(d0,d1,d2,nNeighbors) {
-            console.log("    in doIt");
+        var recomputeSVG = function(d0,d1,d2,nNeighbors) {
+            console.log("    recomputing svg");
 
             var paths = makeThePaths(d0,d1,d2, nNeighbors);
 
@@ -179,11 +197,14 @@
             global_dudleyNeighborsPath.attr('d', paths[1]);
             global_priscillaMainPath.attr('d', paths[2]);
             global_priscillaNeighborsPath.attr('d', paths[3]);
-            var d0 = paths[4];
-            var d1 = paths[5];
-            global_d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
-            global_d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
-            console.log("    out doIt");
+            global_otherStuffPath.attr('d', paths[4]);
+            var d0 = paths[5];
+            var d1 = paths[6];
+            global_d1transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
+            global_d2transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
+            global_xd1transform.attr('transform', 'translate('+d0[0]+',0)');
+            global_xd2transform.attr('transform', 'translate('+d1[0]+',0)');
+            //console.log("    done recomputing svg");
         };
 
         jQuery(document).ready(function() {
@@ -206,15 +227,49 @@
             global_dudleyNeighborsPath = jQueryExpectingOneThing('#dudleyNeighborsPath');
             global_priscillaMainPath = jQueryExpectingOneThing('#priscillaMainPath');
             global_priscillaNeighborsPath = jQueryExpectingOneThing('#priscillaNeighborsPath');
-            global_d0transform = jQueryExpectingOneThing('#d0transform');
+            global_otherStuffPath = jQueryExpectingOneThing('#otherStuffPath');
             global_d1transform = jQueryExpectingOneThing('#d1transform');
+            global_d2transform = jQueryExpectingOneThing('#d2transform');
+            global_xd1transform = jQueryExpectingOneThing('#xd1transform');
+            global_xd2transform = jQueryExpectingOneThing('#xd2transform');
 
-            global_p = [0,1];
-            global_d0 = [0,0];
-            global_d1 = [6,2];
-            global_d2 = [8,6];
-            global_nNeighbors = 2;
+            if (false)
             {
+                // This was the bootstrapping way...
+                global_p = [0,1];
+                global_d0 = [0,0];
+                global_d1 = [6,2];
+                global_d2 = [8,6];
+                global_nNeighbors = 1;
+            }
+            else
+            {
+                // these days we get it from the existing svg transform elements
+                global_p = [0,1];
+                global_d0 = [0,0]; // still not used
+                var scratch = global_d1transform.attr('transform')
+                // 'translate(0,0)'
+                global_d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+                             Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+                scratch = global_d2transform.attr('transform')
+                global_d2 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+                             Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+                console.log('d1 = '+global_d1);
+                console.log('d2 = '+global_d2);
+
+                // really hacky way to deduce nNeighbors--
+                // figure it out from the size of the neighborsPaths.
+                var pTemp = jQuery.trim(global_priscillaNeighborsPath.attr('d')).split(/ +/).length;
+                var dTemp = jQuery.trim(global_dudleyNeighborsPath.attr('d')).split(/ +/).length;
+                //console.log('length of d neighbors path = '+pTemp);
+                //console.log('length of p neighbors path = '+dTemp);
+                if (pTemp !== dTemp) throw "ERROR: priscillaNeighborsPath and dudleyNeighborsPath have different numbers of tokens! "+pTemp+" vs "+dTemp+"";
+                if (pTemp % 18 !== 0) throw "ERROR: neighbors path length "+pTemp+" is not a multiple of 18!"
+                global_nNeighbors = pTemp / 18;
+            }
+
+            {
+                // rescale d1 and d2 so that length of d2 is 1
                 var rescale = 1./dist(global_d0, global_d2);
                 global_d2 = plus(global_d0,times(minus(global_d2,global_d0), rescale));
                 global_d1 = plus(global_d0,times(minus(global_d1,global_d0), rescale));
@@ -223,7 +278,12 @@
 
 
             // do it the first time
-            doIt(global_d0, global_d1, global_d2, global_nNeighbors);
+            recomputeSVG(global_d0, global_d1, global_d2, global_nNeighbors);
+
+                var pTemp = jQuery.trim(global_priscillaNeighborsPath.attr('d')).split(/ +/).length;;
+                var dTemp = jQuery.trim(global_dudleyNeighborsPath.attr('d')).split(/ +/).length;;
+                console.log('length of d neighbors path = '+pTemp);
+                console.log('length of p neighbors path = '+dTemp);
 
             var localToScreenMatrix = [
                 [200.,      undefined, undefined],
@@ -253,6 +313,8 @@
                     localToScreen(global_d1),
                     localToScreen(global_d2),
                     localToScreen(global_p),
+                    localToScreen(analogy(global_d2,global_d1,global_d1)), // first CW neighbor
+                    localToScreen(analogy(global_d1,global_d2,global_d2)), // first CCW neighbor
                 ];
                 if (debug)
                 {
@@ -299,7 +361,7 @@
 
             var theDiv = jQueryExpectingOneThing('#theDiv');
             var theSource = jQueryExpectingOneThing('#theSource');
-            theSource.text(theDiv[0].innerHTML);
+            theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
 
             var theFigure = jQueryExpectingOneThing('#figure5');
             var threshold = 10;
@@ -308,13 +370,24 @@
             var nTimesMouseMoveCalled = 0;
             var prevX=undefined, prevY=undefined;;
             theFigure.mousedown(function(e) {
-                console.log("mouse down: ",e);
+                //console.log("mouse down: ",e);
                 dragging = true;
 
                 indexOfThingBeingDragged = pickClosestThingIndex([e.clientX,e.clientY],threshold);
                 console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
-                //doIt(global_d0, global_d1, global_d2, global_nNeighbors);
+                // XXX HACKY way to change nNeighbors!
+                if (indexOfThingBeingDragged === 4)
+                {
+                    global_nNeighbors--;
+                }
+                else if (indexOfThingBeingDragged === 5)
+                {
+                    global_nNeighbors++;
+                }
+
+                recomputeSVG(global_d0, global_d1, global_d2, global_nNeighbors);
+
                 prevX = e.clientX;
                 prevY = e.clientY;
             });
@@ -323,7 +396,7 @@
                 dragging = false;
                 prevX = e.clientX;
                 prevY = e.clientY;
-                theSource.text(theDiv[0].innerHTML);
+                theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
             });
             theFigure.mousemove(function(e) {
                 // wtf? on chrome, this keeps firing every 1 second
@@ -342,25 +415,37 @@
                 if (dragging)
                 {
                     var localXY = screenToLocal([e.clientX,e.clientY]);
-                    if (indexOfThingBeingDragged == 0)
+                    if (indexOfThingBeingDragged == 0) // d0
                     {
+                        // XXX doesn't work yet
                         global_d1 = localXY + minus(global_d1,global_d0);
                         global_d2 = localXY + minus(global_d2,global_d0);
                         global_p  = localXY + minus(global_p,global_d0);
                         global_d0 = localXY;
                     }
-                    else if (indexOfThingBeingDragged == 1)
+                    else if (indexOfThingBeingDragged == 1) // d1
                     {
                         global_d1 = localXY;
                         console.log("d1 changed to "+global_d1);
                     }
-                    else if (indexOfThingBeingDragged == 2)
+                    else if (indexOfThingBeingDragged == 2) // d2
                     {
-                        global_d2 = localXY;
-                        console.log("d2 changed to "+global_d1);
+                        global_d2 = normalized(localXY);
+                        console.log("d2 changed to "+global_d2);
+                    }
+                    else if (indexOfThingBeingDragged == 3) // p
+                    {
+                    }
+                    else if (indexOfThingBeingDragged == 4) // CW neighbor
+                    {
+                        // nothing-- already did it on mouse down
+                    }
+                    else if (indexOfThingBeingDragged == 5) // CCW neighbor
+                    {
+                        // nothing-- already did it on mouse down
                     }
 
-                    doIt(global_d0, global_d1, global_d2, global_nNeighbors);
+                    recomputeSVG(global_d0, global_d1, global_d2, global_nNeighbors);
                 }
                 prevX = e.clientX;
                 prevY = e.clientY;
@@ -373,96 +458,81 @@
 <body>
 
 <p>
-
-    <!--
-    <svg id="figure5" xmlns="http://www.w3.org/2000/svg"
-         version="1.1"
-         height="500"
-         width="500"
-         >
-        <!-- 1 unit = 20 pixels - ->
-        <g id="theGraphic"
-           transform="translate(250,320) scale(1,-1) scale(200)">
-           
-            <path
-                id="dudleyMainPath"
-                vector-effect="non-scaling-stroke"
-                style="stroke: blue; stroke-width: 3.0; fill: none; stroke-miterlimit:1.414"
-                d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
-            />
-            <path
-                id="dudleyNeighborsPath"
-                vector-effect="non-scaling-stroke"
-                style="stroke:rgb(220,220,255); stroke-width: 1.0; fill: none; stroke-opacity:1."
-                d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
-            />
-            <path
-                id="priscillaMainPath"
-                vector-effect="non-scaling-stroke"
-                style="stroke: red; stroke-width: 1.0; fill: none; stroke-opacity:.2"
-                d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
-            />
-            <path
-                id="priscillaNeighborsPath"
-                vector-effect="non-scaling-stroke"
-                style="stroke:rgb(255,220,220); stroke-width: 1.0; fill: none; stroke-opacity:1."
-                d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
-            />
-            <circle
-                cx="0" cy="1" r=".025"
-                style="stroke: none; fill: red;"
-            />
-                
-            <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text - ->
-            <g transform="translate(0,0)   scale(.005) scale(1,-1)  translate(-5,15)"> <text>0</text> </g>
-            <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
-
-            <g id="d0transform" transform="translate(0,0)"><g transform="   scale(.005) scale(1,-1)  translate(5,10)">
-                <text id="d0text" style="text-decoration:underline">d</text>
-            </g> </g>
-
-            <g id="d1transform" transform="translate(0,0)" style="font-size:13.5pt"><g transform="   scale(.005) scale(1,-1)  translate(10,5)">
-                <text id="d0text" style="text-decoration:overline">d</text>
-            </g> </g>
-        </g>
-    </svg>
-    -->
 <!-- ======================================================================== -->
 <div id="theDiv">
-<svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="500" width="500">
+    <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="350" width="500">
         <!-- 1 unit = 20 pixels -->
-        <g id="theGraphic" transform="translate(250,320) scale(1,-1) scale(200)">
+        <g id="theGraphic" transform="translate(250,320) scale(200,-200)">
            
-            <path id="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 3.0; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.745 0.395 L 0.8 0.6000000000000001 L 0 0"></path>
-            <path id="dudleyNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(220,220,255); stroke-width: 1.0; fill: none; stroke-opacity:1." d=" M 0.8 0.6000000000000001 L 0.8266647915055201 0.8502918219534495 L 0 0 M 0.8266647915055201 0.8502918219534495 L 0.8117903700839553 1.1484230017220263 L 0 0 M 0.745 0.395 L 0.6723299999999999 0.23143999999999995 L 0 0 M 0.6723299999999999 0.23143999999999995 L 0.5903695299999998 0.10471428999999996 L 0 0"></path>
-            <path id="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 1.0; fill: none; stroke-opacity:.2" d="M 0.131 0.833 L 0 1 L -0.1842345826594473 1.1715069263764855 M 0 1 L 0.20500000000000002 0.945"></path>
-            <path id="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,220,220); stroke-width: 1.0; fill: none; stroke-opacity:1." d=" M -0.4316641793272473 1.3384860971003794 L -0.1842345826594473 1.1715069263764855 L 0.06605723929400181 1.1448421348709654 M -0.7522930034452524 1.4885182636843353 L -0.4316641793272473 1.3384860971003794 L -0.13353299955867093 1.3533605185219442 M 0.29456 0.76033 L 0.131 0.833 L 0.218246 0.676728 M 0.34497171 0.5947675299999999 L 0.218246 0.676728 L 0.27045028600000004 0.535124198"></path>
-            <circle cx="0" cy="1" r=".025" style="stroke: none; fill: red;"></circle>
+            <!-- note, the super-light gray here might not be appropriate for printing or most displays; mine seems to have some issues -->
+            <path id="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1." d="M 0 1 L 0 0"></path>
+
+            <path id="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1." d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0.6 0 L 0.6 0.35"></path>
+
+            <path id="dudleyNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1." d=" M 0.7423346382855579 0.6700293163746269 L 0.8485866059822484 1.1629443805492827 L 0 0 M 0.6 0.35 L 0.4577167894701633 0.15264858544096044 L 0 0"></path>
+            <path id="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6 0.35 L 0.7423346382855579 0.6700293163746269 L 0 0"></path>
+            <path id="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1." d=" M -0.8305934015249383 1.8988238275266283 L -0.29471599259032316 1.4091420594869517 L 0.1981990715843327 1.302890091790261 M 0.33955188098387046 0.5376278331726174 L 0.14220046642483092 0.6799110437024541 L 0.19336733508376516 0.44205805469712106"></path>
+            <path id="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.14220046642483092 0.6799110437024541 L 0 1 L -0.29471599259032316 1.4091420594869517 M 0 1 L 0.32002931637462695 0.8576653617144421"></path>
+
+            <circle id="priscillaPoint" cx="0" cy="1" r=".025" style="stroke: none; fill: red;"></circle>
                 
-            <!-- final local scale must undo effect of global scale! otherwise we get wrong sized text -->
-            <g transform="translate(0,0)   scale(.005) scale(1,-1)  translate(-5,15)"> <text>0</text> </g>
-            <g transform="translate(0,1)   scale(.005) scale(1,-1)  translate(10,-10)"> <text>p</text> </g>
+            <g transform="translate(0,1)">
+                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                    <g transform="translate(10,-10)">
+                        <text>p</text>
+                    </g>
+                </g>
+            </g>
+            <g transform="translate(0,0)">
+                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                    <g transform="translate(-5,15)">
+                        <text>0</text>
+                    </g>
+                </g>
+            </g>
 
-            <g id="d0transform" transform="translate(0.745,0.395)"><g transform="   scale(.005) scale(1,-1)  translate(5,10)">
-                <text id="d0text" style="text-decoration:underline">d</text>
-            </g> </g>
+            <g id="d1transform" transform="translate(0.6,0.35)">
+                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                    <g transform="translate(5,10)">
+                        <text id="d1text" style="text-decoration:underline">d</text>
+                    </g>
+                </g>
+            </g>
+            <g id="xd1transform" transform="translate(0.6,0)">
+                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                    <g transform="translate(-15,17)">
+                        <text id="xd1text">
+                            <tspan style="text-decoration:underline">x</tspan
+                            ><tspan dy="5" font-size="70%">d</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
 
-            <g id="d1transform" transform="translate(0.8,0.6000000000000001)" style="font-size:13.5pt"><g transform="   scale(.005) scale(1,-1)  translate(10,5)">
-                <text id="d0text" style="text-decoration:overline">d</text>
-            </g> </g>
+            <g id="d2transform" transform="translate(0.7423346382855579,0.6700293163746269)">
+                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                    <g transform="translate(10,5)">
+                        <text id="d2text" style="text-decoration:overline">d</text>
+                    </g>
+                </g>
+            </g>
+            <g id="xd2transform" transform="translate(0.7423346382855579,0)">
+                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                    <g transform="translate(0,17)">
+                        <text id="xd2text">
+                            <tspan style="text-decoration:overline">x</tspan
+                            ><tspan dy="5" font-size="70%">d</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
         </g>
     </svg>
 </div>
 <!-- ======================================================================== -->
 
-<!-- I don't think I really need this
-<button id="theButton">
-    Update source
-</button>
--->
-The source:
 <pre id="theSource">
-(this should be replaced by the svg source code)
+(this should get replaced by the svg source code)
 </pre>
 
 </body>
