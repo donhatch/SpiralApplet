@@ -36,6 +36,7 @@
         TODO: maybe r,l should be the edge indices (even) instead of the vert indices (odd)?  not sure, maybe it's fine the way it is.
 
     Typesetting:
+        TODO: typeset in priority order!
         TODO: legit equation numbering?
         TODO: URL params:
                 - don't typeset
@@ -302,14 +303,21 @@
                 }
             }
 
-            console.log("    doing my preprocessing...");
-            myCallbackAll(document,myCallback,false);
-            console.log("    done my preprocessing.");
+            if (true)
+            {
+                console.log("    doing my preprocessing...");
+                myCallbackAll(document,myCallback,false);
+                console.log("    done my preprocessing.");
+            }
 
 
-            console.log("    calling mathjax typeset...");
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-            console.log("    returned from mathjax typeset.");
+            if (true)
+            {
+                console.log("    calling mathjax typeset...");
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                console.log("    returned from mathjax typeset.");
+            }
+
             console.log("out jquery document-ready function!");
         }); // jquery document ready function
     </script>
@@ -1245,13 +1253,13 @@ Priscilla is on the $+y$ axis and didn't move:
                 _^xp = & 0 \\
     (12)   \;\; _^tp = & \pi/2 \\
 \end{align}
-Dudley moved purely upwards, strictly within the first quadrant:
+Dudley moved northwest, strictly within the first quadrant:
 (XXX may need more clarification, just like previous case)
 \begin{align}
     (13) \;\; 0 \lt & _yd \lt ^yd \\
-              0 \lt & _xd = ^xd = _^xd \\
+              0 \lt & _xd \lt ^xd
 \end{align}
-so his angle increased, but stayed less than $\pi/2$:
+and his angle increased (XXX WHY??), but stayed less than $\pi/2$:
 \begin{align}
     (14) \;\; 0 \lt & _td \lt ^td \lt \pi/2 \\
     (15) \;\; 0 \lt & \sin(_td) \lt \sin(^td) \lt 1 \;\; \text{(follows from (14) since $\sin$ is increasing in this range)} \\
@@ -1260,9 +1268,10 @@ so his angle increased, but stayed less than $\pi/2$:
 The moment changed as follows:
 \begin{align}
          ^m = & _m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position}) \\
+            = & \text{BAD ASSUMPTION HERE-- there is no _^xd} \\
     (16.5)  = & _m + (\frac{1}{2} * (^yd-_yd)*_^xd) * \langle 0,_^yp \rangle \\
 \end{align}
-Therefore by (12), the moment moved purely upwards as well;
+Therefore by (12), the moment moved purely upwards;
 furthermore ($_C$),($_D$) (and XXX) say it started strictly inside the first quadrant
 so it ended there as well;
 so ($^A$) is immediately satisfied and:
@@ -1271,7 +1280,7 @@ so ($^A$) is immediately satisfied and:
     (18)  \;\;  0 & \lt _xm = ^xm = _^xm \\
     (19)  \;\;  0 & \lt _tm \lt ^tm \lt \pi/2 \\
     (20)  \;\;  0 & \lt \sin(_tm) \lt \sin(^tm) \lt 1 \\
-    (21)  \;\;  0 & \lt \cos(^tm) \lt \cos(_tm) \lt 1 \\
+    (21)  \;\;  1 & \gt \cos(_tm) \gt \cos(^tm) \gt 0 \\
 \end{align}
 <p>
 ($^D$) follows trivially:
@@ -1279,6 +1288,7 @@ so ($^A$) is immediately satisfied and:
             ^tm \lt & \pi/2 \;\; \text{by (19)} \\
                   = & ^tp \;\; \text{by (12)} \\
 \end{align}
+<span id="youarehere" style="color:green">YOU ARE HERE<br></span>
 ($^B$) is proved as follows:
 \begin{align}
     ^rm = \|^m\| = & \|_m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position})\| \\
@@ -1286,6 +1296,7 @@ so ($^A$) is immediately satisfied and:
                = & _rm + (\text{area of Dudley's triangle}) * _^rp \\
              \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \;\; \text{by ($_B$)} \\
                = & _^rp ((_rd \sin(_tp-_td))(_rd \cos(_tp-_td))/2 + (\text{area of Dudley's triangle})) \\
+                 & \text{XXX here's where I made a bad assumption} \\
                = & _^rp (\text{area}(\triangle(0,\langle _^xd,0 \rangle,_d)) + \text{area}(\triangle(0,_d,^d))) \\
                = & _^rp \text{area}(\triangle(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two} \\
                = & _^rp rd^2 \cos(^td)\sin(^td) / 2 \\
@@ -1319,7 +1330,6 @@ In this Priscilla-aligned coordinate system, that's the same as saying:
 (XXX could phrase that in terms "$m \times p \lt \frac{1}{2} (d \times p)^2$",
 coordinate-free til the last second, if we wanted... maybe)
 <p>
-<span id="youarehere"></span>
 Now we proceed to prove ($^C$).
 Since $^d$,$^m$,$_d$,$_m$ are all in the first quadrant,
 our goal ($^C$) can be expressed as
