@@ -85,9 +85,12 @@
         };
 
 
-        // XXX TODO: d0 not currently used
         var makeThePaths = function(d0,d1,d2, nNeighbors)
         {
+            // work mostly in a space in which d0 is at the origin
+            d1 = minus(d1, d0);
+            d2 = minus(d2, d0);
+
             var p0 = [cross(d1,d2),dot(d1,d2)]
             var p1 = [0,1]
             var p2 = analogy(p0,p1,p1)
@@ -206,6 +209,7 @@
             global_d0transform = jQueryExpectingOneThing('#d0transform');
             global_d1transform = jQueryExpectingOneThing('#d1transform');
 
+            global_p = [0,1];
             global_d0 = [0,0];
             global_d1 = [6,2];
             global_d2 = [8,6];
@@ -224,40 +228,121 @@
             var localToScreenMatrix = [
                 [200.,      undefined, undefined],
                 [undefined, -200.,      undefined],
-                [250.+9,    400.+19,   undefined],
+                [250.+9,    220.+19,   undefined],
             ];
-            var localToScreen = function(xLocal,yLocal) {
-                return [xLocal*localToScreenMatrix[0][0]
-                       +localToScreenMatrix[2][0],
-                       +yLocal*localToScreenMatrix[1][1]
-                       +localToScreenMatrix[2][1]];
+            var localToScreen = function(localXY) {
+                var x = localXY[0];
+                var y = localXY[1];
+                var M = localToScreenMatrix;
+                return [x*M[0][0]+M[2][0],
+                        y*M[1][1]+M[2][1]];
             };
-            var screenToLocal = function(xScreen,yScreen) {
-                return [(xScreen-localToScreenMatrix[2][0])/localToScreenMatrix[0][0],
-                        (yScreen-localToScreenMatrix[2][1])/localToScreenMatrix[1][1]];
+            var screenToLocal = function(screenXY) {
+                var x = screenXY[0];
+                var y = screenXY[1];
+                var M = localToScreenMatrix;
+                return [(x-M[2][0])/M[0][0],
+                        (y-M[2][1])/M[1][1]];
+            };
+
+            var pickClosestThingIndex = function(screenXY,threshold) {
+                var debug = false; // manually set this to true to debug
+                var threshold2 = threshold*threshold;
+                var things = [
+                    localToScreen(global_d0),
+                    localToScreen(global_d1),
+                    localToScreen(global_d2),
+                    localToScreen(global_p),
+                ];
+                if (debug)
+                {
+                    console.log("    in pickClosestThing");
+                    console.log("            things = "+things);
+                    console.log("            screenXY = "+screenXY);
+                }
+                var bestDist2;
+                var bestIndex = -1;
+                var thisDist2;
+                for (var i = 0; i < things.length; ++i)
+                {
+                    thisDist2 = dist2(screenXY, things[i]);
+                    if (debug)
+                    {
+                        console.log("        things["+i+"] = "+things[i]);
+                        console.log("            thisDist = "+Math.sqrt(thisDist2));
+                    }
+                    if (thisDist2 <= threshold2
+                     && (bestIndex==-1 || thisDist2 < bestDist2))
+                    {
+                        bestDist2 = thisDist2;
+                        bestIndex = i;
+                        if (debug)
+                        {
+                            console.log("                updated closest index to "+i);
+                        }
+                    }
+                    else
+                    {
+                        if (debug)
+                        {
+                            console.log("                (didn't update closest)");
+                        }
+                    }
+                }
+                if (debug)
+                {
+                    console.log("    in pickClosestThing, returning "+bestIndex);
+                }
+                return bestIndex;
             };
 
             // install press/drag/release handlers
             var theFigure = jQueryExpectingOneThing('#theFigure');
+            var threshold = 10;
             var dragging = false;
+            var indexOfThingBeingDragged = false;
+            var nTimesMouseMoveCalled = 0;
             theFigure.mousedown(function(e) {
                 console.log("mouse down: ",e);
                 dragging = true;
 
-                global_d1 = screenToLocal(e.clientX,e.clientY);
+                indexOfThingBeingDragged = pickClosestThingIndex([e.clientX,e.clientY],threshold);
+                console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
-                doIt(global_d0, global_d1, global_d2, global_nNeighbors);
+                //doIt(global_d0, global_d1, global_d2, global_nNeighbors);
             });
             theFigure.mouseup(function(e) {
                 console.log("mouse up: ",e);
                 dragging = false;
             });
             theFigure.mousemove(function(e) {
-                //console.log("mouse move: buttons="+e.buttons+" button="+e.button);
-                //console.log("    dragging = "+dragging);
+                // wtf? on chrome, this keeps firing every 1 second
+                // when in window, even if mouse not moving??
+                // what a waste!
+
+                console.log(""+nTimesMouseMoveCalled+" mouse move: buttons="+e.buttons+" button="+e.button);
+                nTimesMouseMoveCalled++;
+
+                console.log("    dragging = "+dragging);
                 if (dragging)
                 {
-                    global_d1 = screenToLocal(e.clientX,e.clientY);
+                    var localXY = screenToLocal([e.clientX,e.clientY]);
+                    if (indexOfThingBeingDragged == 0)
+                    {
+                        global_d1 = localXY + minus(global_d1,global_d0);
+                        global_d2 = localXY + minus(global_d2,global_d0);
+                        global_p  = localXY + minus(global_p,global_d0);
+                        global_d0 = localXY;
+                    }
+                    else if (indexOfThingBeingDragged == 1)
+                    {
+                        global_d1 = localXY;
+                    }
+                    else if (indexOfThingBeingDragged == 2)
+                    {
+                        global_d2 = localXY;
+                    }
+
                     doIt(global_d0, global_d1, global_d2, global_nNeighbors);
                 }
             });
@@ -277,7 +362,7 @@
      >
     <!-- 1 unit = 20 pixels -->
     <g id="theGraphic"
-       transform="translate(250,400) scale(1,-1) scale(200)">
+       transform="translate(250,220) scale(1,-1) scale(200)">
        
         <path
             id="dudleyMainPath"
@@ -288,7 +373,7 @@
         <path
             id="dudleyNeighborsPath"
             vector-effect="non-scaling-stroke"
-            style="stroke: blue; stroke-width: 1.0; fill: none; stroke-opacity:.2"
+            style="stroke:rgb(220,220,255); stroke-width: 1.0; fill: none; stroke-opacity:1."
             d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
         />
         <path
@@ -300,7 +385,7 @@
         <path
             id="priscillaNeighborsPath"
             vector-effect="non-scaling-stroke"
-            style="stroke: red; stroke-width: 1.0; fill: none; stroke-opacity:.2"
+            style="stroke:rgb(255,220,220); stroke-width: 1.0; fill: none; stroke-opacity:1."
             d=" M 1 0 L 0 1 L -1 0 L 0 -1 L 1 0 "
         />
         <circle

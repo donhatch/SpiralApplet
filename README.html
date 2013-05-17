@@ -37,6 +37,11 @@
 
     Typesetting:
         TODO: legit equation numbering?
+        TODO: URL params:
+                - don't typeset
+                - don't even preprocess
+                - initial x1,x2,y1,y2 etc.
+                - ability to typeset only delimited by "you are here" stuff?
 
 
 -->
@@ -100,6 +105,29 @@
             page-break-before: avoid;
         }
         p.breakhere {page-break-before:always;}
+
+
+        /*
+        * text-decoration:underline and overline have problems:
+        *      - underline too close to text
+        *      - overline gets split, e.g. when overlining x_d
+        *  so use box borders instead.
+        *  http://stackoverflow.com/questions/1734618/css-underline-possible-to-increase-gap
+        */
+        .ul {
+            border-bottom: 1px solid black;
+            padding-bottom: 1px;
+        }
+        .ol {
+            border-top: 1px solid black;
+            padding-top: 0px;
+        }
+        .uol {
+            border-top: 1px solid black;
+            padding-top: 0px;
+            border-bottom: 1px solid black;
+            padding-bottom: 1px;
+        }
     </style>
 
 
@@ -1004,21 +1032,21 @@ $\pi/2$).
 <pre>
       Priscilla
        p=v_1*
-            :       * v'_2  (XXX reframe this so it's not in terms of these features)
+            :       * v'<sub>2</sub>  (XXX reframe this so it's not in terms of these features)
             :       |
             :     / |
-            :       | e'_1
+            :       | e'<sub>1</sub>
             :    /  |
             :       |  Dudley     ^
-            :   /   * d=&lt;x_d,y_d&gt; |
+            :   /   * d=&lt;x<sub>d</sub>,y<sub>d</sub>&gt; |
             :      /|             |
             :  /  / |
             :    /  |
-            : / /  _* v'_0
+            : / /  _* v'<sub>0</sub>
             :  / _/ :
             ://_/   :
             ://     :
-           0*.......* &lt;x_d,0&gt;
+           0*.......* &lt;x<sub>d</sub>,0&gt;
 
         Figure 3: Base case, in temporarily rotated coord system
 </pre>
@@ -1102,23 +1130,22 @@ $0$).
             .....
             .....
             *....
-                      _  __ __
-                    * p=&lt;xp,yp&gt;
-                    |    --
+                    * <span class="ol">p</span>=&lt;<span class="uol">x<sub>p</sub></span>,<span class="ol">y<sub>p</sub></span>&gt;
+                    |
                   . |
                     | ^
-                 .  | |                           _
-                    | | Priscilla walks from p to p
-                .   | |                      -
-                    | | (perpendicular to Dudley's stationary position)
+                 .  | |
+                    | | Priscilla walks from <span class="ul">p</span> to <span class="ol">p</span>
+                .   | | (perpendicular to Dudley's stationary position)
+                    | |
                .    |
-                    |    __   
-              .     * p=&lt;xp,yp&gt;
-                  .   -  -- --
+                    |
+              .     * <span class="ul">p</span>=&lt;<span class="uol">x<sub>p</sub></span>,<span class="ul">y<sub>p</sub></span>&gt;
+                  .
              .  .
-              .         Dudley _
-          0 *----------------* d
-                               -
+              .          Dudley
+          0 *----------------* <span class="uol">d</span>
+                              
 
         Figure 4: Inductive step, Case 1: Priscilla has moved
 </pre>
@@ -1188,26 +1215,25 @@ in which Priscilla's (stationary) position is on the +y axis,
 so Dudley is traveling upwards along a now-vertical dual edge,
 as shown in Figure 5.
 <pre>
-        Priscilla ___
-            *p=&lt;0,y_p&gt;
-            :     ---
-            :         _
-            :       * d
+        Priscilla
+            *<span class="uol">p</span>=&lt;0,<span class="uol">y_p</span>&gt;
+            :
+            :
+            :       * <span class="ol">d</span>
             :       |  
             :     / |
             :       | ^
             :    /  | |
-            :       | | Dudley walks from _d to ^d
-            :   /   | | (parallel to Priscilla's stationary position)
+            :       | | Dudley walks from <span class="ul">d</span> to <span class="ol">d</span>
+            :   /   | |
             :       | |
             :  /    |
             :       |
-            : /    _* d
-            :    _/ : -
+            : /    _* <span class="ul">d</span>
+            :    _/ :
             :/ _/   :
-            : /     :  ___
-          0 *.......* &lt;x_d,0&gt;
-                       ---
+            : /     :     
+          0 *.......* &lt;<span class="uol">x<sub>d</sub></span>,0&gt;
 
         Figure 5: Inductive step, Case 2: Dudley has moved
 </pre>
