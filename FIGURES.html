@@ -24,6 +24,14 @@
         // with complex numbers represented as [x,y]
         //
         var times = function(z0,z1) {
+            if (typeof(z1) === "number") // XXX surely there's a non-string-based way?
+            {
+                z1 = [z1,0];
+            }
+            if (typeof(z0) === "number") // XXX surely there's a non-string-based way?
+            {
+                z0 = [z0,0];
+            }
             return [z0[0]*z1[0]-z0[1]*z1[1],
                     z0[0]*z1[1]+z0[1]*z1[0]];
         };
@@ -59,6 +67,12 @@
         var length = function(z) {
             return Math.sqrt(length2(z));
         };
+        var dist2 = function(z0,z1) {
+            return length2(minus(z1,z0));
+        };
+        var dist = function(z0,z1) {
+            return Math.sqrt(dist2(z0,z1));
+        };
         var normalized = function(z) {
             var l = length(z);
             return [z[0]/l, z[1]/l];
@@ -71,27 +85,17 @@
         };
 
 
-        var makeThePaths = function(x1,y1, x2,y2, nNeighbors)
+        // XXX TODO: d0 not currently used
+        var makeThePaths = function(d0,d1,d2, nNeighbors)
         {
-            {
-                var len2 = Math.sqrt(x2*x2+y2*y2);
-                x2 /= len2;
-                y2 /= len2;
-                x1 /= len2;
-                y1 /= len2;
-                len2 = undefined;
-            }
-
-            var d0 = [x1,y1]
-            var d1 = [x2,y2]
-            var p0 = [cross(d0,d1),dot(d0,d1)]
+            var p0 = [cross(d1,d2),dot(d1,d2)]
             var p1 = [0,1]
             var p2 = analogy(p0,p1,p1)
             var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
-            var q0 = plus(p1,scaled(normalized([y2-y1,x1-x2]),qLength));
+            var q0 = plus(p1,normalized(perpDot(minus(d1,d2)),qLength));
 
 
-            var dudleyMainPath = "M 0 0 L "+d0[0]+" "+d0[1]+" L "+d1[0]+" "+d1[1]+" L 0 0";
+            var dudleyMainPath = "M 0 0 L "+d1[0]+" "+d1[1]+" L "+d2[0]+" "+d2[1]+" L 0 0";
 
             // scratch
             var z;
@@ -100,8 +104,8 @@
 
             var dudleyNeighborsPath = "";
             {
-                z = d0;
-                Z = d1;
+                z = d1;
+                Z = d2;
                 for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
                 {
                     temp = analogy(z,Z,Z);
@@ -109,8 +113,8 @@
                     Z = temp;
                     dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
                 }
-                z = d0;
-                Z = d1;
+                z = d1;
+                Z = d2;
                 for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
                 {
                     temp = analogy(Z,z,z);
@@ -159,47 +163,104 @@
 
             return [dudleyMainPath,dudleyNeighborsPath,
                     priscillaMainPath,priscillaNeighborsPath,
-                    d0,d1];
+                    d1,d2];
         } // makeThePaths
 
-        var doIt = function(x1,y1,x2,y2,nNeighbors) {
+        var doIt = function(d0,d1,d2,nNeighbors) {
             console.log("    in doIt");
 
-            var dudleyMainPath = jQuery('#dudleyMainPath');
-            var dudleyNeighborsPath = jQuery('#dudleyNeighborsPath');
-            var priscillaMainPath = jQuery('#priscillaMainPath');
-            var priscillaNeighborsPath = jQuery('#priscillaNeighborsPath');
-            var d0transform = jQuery('#d0transform');
-            var d1transform = jQuery('#d1transform');
-            console.log("        dudleyMainPath = ",dudleyMainPath);
-            console.log("        dudleyMainPath.attr('d') = ",dudleyMainPath.attr('d'));
+            var paths = makeThePaths(d0,d1,d2, nNeighbors);
 
 
-            var paths = makeThePaths(x1,y1,x2,y2, nNeighbors);
-
-
-            dudleyMainPath.attr('d', paths[0]);
-            dudleyNeighborsPath.attr('d', paths[1]);
-            priscillaMainPath.attr('d', paths[2]);
-            priscillaNeighborsPath.attr('d', paths[3]);
+            global_dudleyMainPath.attr('d', paths[0]);
+            global_dudleyNeighborsPath.attr('d', paths[1]);
+            global_priscillaMainPath.attr('d', paths[2]);
+            global_priscillaNeighborsPath.attr('d', paths[3]);
             var d0 = paths[4];
             var d1 = paths[5];
-            d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
-            d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
+            global_d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
+            global_d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
             console.log("    out doIt");
         };
 
         jQuery(document).ready(function() {
             console.log("in jquery document-ready function!");
 
-            var global_x1 = 6;
-            var global_y1 = 2;
-            var global_x2 = 8;
-            var global_y2 = 6;
-            var global_nNeighbors = 10;
-            doIt(global_x1, global_y1, global_x2, global_y2, global_nNeighbors);
+            // jQuery(s), throwing an error if the result
+            // has length other than 1.
+            var jQueryExpectingOneThing = function(s) {
+                var answer = jQuery(s);
+                if (answer.length != 1)
+                {
+                    // XXX TODO: get this back onto the page somehow
+                    throw("ERROR: got "+answer.length+" results from jQuery('"+s+"'), expected 1")
+                }
+                return answer;
+            };
 
-            // using MathJax.Hub.Queue(["Typeset",MathJax.Hub]).
+            // global constants (just a cache)
+            global_dudleyMainPath = jQueryExpectingOneThing('#dudleyMainPath');
+            global_dudleyNeighborsPath = jQueryExpectingOneThing('#dudleyNeighborsPath');
+            global_priscillaMainPath = jQueryExpectingOneThing('#priscillaMainPath');
+            global_priscillaNeighborsPath = jQueryExpectingOneThing('#priscillaNeighborsPath');
+            global_d0transform = jQueryExpectingOneThing('#d0transform');
+            global_d1transform = jQueryExpectingOneThing('#d1transform');
+
+            global_d0 = [0,0];
+            global_d1 = [6,2];
+            global_d2 = [8,6];
+            global_nNeighbors = 10;
+            {
+                var rescale = 1./dist(global_d0, global_d2);
+                global_d2 = plus(global_d0,times(minus(global_d2,global_d0), rescale));
+                global_d1 = plus(global_d0,times(minus(global_d1,global_d0), rescale));
+                rescale = undefined;
+            }
+
+
+            // do it the first time
+            doIt(global_d0, global_d1, global_d2, global_nNeighbors);
+
+            var localToScreenMatrix = [
+                [200.,      undefined, undefined],
+                [undefined, -200.,      undefined],
+                [250.+9,    400.+19,   undefined],
+            ];
+            var localToScreen = function(xLocal,yLocal) {
+                return [xLocal*localToScreenMatrix[0][0]
+                       +localToScreenMatrix[2][0],
+                       +yLocal*localToScreenMatrix[1][1]
+                       +localToScreenMatrix[2][1]];
+            };
+            var screenToLocal = function(xScreen,yScreen) {
+                return [(xScreen-localToScreenMatrix[2][0])/localToScreenMatrix[0][0],
+                        (yScreen-localToScreenMatrix[2][1])/localToScreenMatrix[1][1]];
+            };
+
+            // install press/drag/release handlers
+            var theFigure = jQueryExpectingOneThing('#theFigure');
+            var dragging = false;
+            theFigure.mousedown(function(e) {
+                console.log("mouse down: ",e);
+                dragging = true;
+
+                global_d1 = screenToLocal(e.clientX,e.clientY);
+
+                doIt(global_d0, global_d1, global_d2, global_nNeighbors);
+            });
+            theFigure.mouseup(function(e) {
+                console.log("mouse up: ",e);
+                dragging = false;
+            });
+            theFigure.mousemove(function(e) {
+                //console.log("mouse move: buttons="+e.buttons+" button="+e.button);
+                //console.log("    dragging = "+dragging);
+                if (dragging)
+                {
+                    global_d1 = screenToLocal(e.clientX,e.clientY);
+                    doIt(global_d0, global_d1, global_d2, global_nNeighbors);
+                }
+            });
 
             console.log("out jquery document-ready function!");
         }); // jquery document ready function
