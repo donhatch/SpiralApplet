@@ -2,13 +2,13 @@
 <html>
 <head>
     <!--
-        TODO: fix picking to work regardless of where the svg is in the window!
         TODO: overline of x_d isn't quite right- try to use borders instead? maybe not supported
         TODO: more descriptive than "dragging thing with"
-        TODO: little circles on movable parts
         TODO: text highlights when dragging, make it not do that
         TODO: constraints
         TODO: show values somewhere on screen instead of console log
+        TODO: make drag handle bigger on hover
+        TODO: dragging origin isn't working!
     -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Figures for The Spiral Moment Lemma: There's No Single-Exit Lagoon</title>
@@ -271,7 +271,7 @@
             global_xd1transform = jQueryExpectingOneThing('#xd1transform');
             global_xd2transform = jQueryExpectingOneThing('#xd2transform');
             global_undoScales = jQuery('.undoScaleForSvgText');
-            console.log('scales = ',global_undoScales);
+            //console.log('scales = ',global_undoScales);
 
             if (false)
             {
@@ -345,7 +345,7 @@
             var localToScreenMatrix = [
                 [xScale,    undefined, undefined],
                 [undefined, yScale,    undefined],
-                [xTrans+9,  yTrans+19, undefined],
+                [xTrans,    yTrans,    undefined],
             ];
 
             // do it the first time
@@ -429,23 +429,39 @@
             var theSource = jQueryExpectingOneThing('#theSource');
             theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
 
-            var theFigure = jQueryExpectingOneThing('#figure5');
+            var theSVG = jQueryExpectingOneThing('svg'); // XXX will have to change this when doing more than one figure
             var threshold = 10;
             var dragging = false;
             var indexOfThingBeingDragged = false;
             var nTimesMouseMoveCalled = 0;
             var prevX=undefined, prevY=undefined;;
-            theFigure.mousedown(function(e) {
+            theSVG.mousedown(function(e) {
                 //console.log("mouse down: ",e);
+
+
+                if (true)
+                {
+                    // trying to figure out x,y wrt the figure
+                    console.log("in mouse down:",e);
+                }
+
+
+
+
+
+
                 dragging = true;
 
-                indexOfThingBeingDragged = pickClosestThingIndex([e.clientX,e.clientY],threshold);
+                indexOfThingBeingDragged = pickClosestThingIndex([e.offsetX,e.offsetY],threshold);
                 console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
-                // XXX HACKY way to change nNeighbors!
+                // XXX HACKY obscure way to change nNeighbors!
                 if (indexOfThingBeingDragged === 4)
                 {
-                    global_nNeighbors--;
+                    if (global_nNeighbors > 1)
+                    {
+                        global_nNeighbors--;
+                    }
                 }
                 else if (indexOfThingBeingDragged === 5)
                 {
@@ -454,22 +470,22 @@
 
                 recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
 
-                prevX = e.clientX;
-                prevY = e.clientY;
+                prevX = e.offsetX;
+                prevY = e.offsetY;
             });
-            theFigure.mouseup(function(e) {
-                console.log("mouse up: ",e);
+            theSVG.mouseup(function(e) {
+                //console.log("mouse up: ",e);
                 dragging = false;
-                prevX = e.clientX;
-                prevY = e.clientY;
+                prevX = e.offsetX;
+                prevY = e.offsetY;
                 theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
             });
-            theFigure.mousemove(function(e) {
+            theSVG.mousemove(function(e) {
                 // wtf? on chrome, this keeps firing every 1 second
                 // when in window, even if mouse not moving??
                 // what a waste!
 
-                if (e.clientX === prevX && e.clientY === prevY)
+                if (e.offsetX === prevX && e.offsetY === prevY)
                 {
                     //console.log("WTF? didn't really move?");
                     return;
@@ -480,7 +496,7 @@
                 //console.log("    dragging = "+dragging);
                 if (dragging)
                 {
-                    var localXY = screenToLocal([e.clientX,e.clientY]);
+                    var localXY = screenToLocal([e.offsetX,e.offsetY]);
                     if (indexOfThingBeingDragged === 0) // d0
                     {
                         // XXX doesn't work yet
@@ -513,8 +529,8 @@
 
                     recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
                 }
-                prevX = e.clientX;
-                prevY = e.clientY;
+                prevX = e.offsetX;
+                prevY = e.offsetY;
             });
 
             console.log("out jquery document-ready function!");
@@ -528,9 +544,9 @@
 <div id="theDiv">
     <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="350" width="450">
         <!-- 1 unit = 20 pixels -->
-        <g id="theGraphic" transform="translate(150,320) scale(200,-200)">
+        <g id="theGraphic" transform="translate(150,300) scale(200,-200)">
            
-            <!-- note, the super-light gray here might not be appropriate for printing or most displays; mine seems to have some issues -->
+            <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
             <path id="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1." d="M 0 1 L 0 0"></path>
 
             <path id="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1." d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0 0 L 0.6 0 L 0.6 0.35"></path>
@@ -540,54 +556,59 @@
             <path id="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1." d=" M -0.8305934015249383 1.8988238275266283 L -0.29471599259032316 1.4091420594869517 L 0.1981990715843327 1.302890091790261 M 0.33955188098387046 0.5376278331726174 L 0.14220046642483092 0.6799110437024541 L 0.19336733508376516 0.44205805469712106"></path>
             <path id="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.14220046642483092 0.6799110437024541 L 0 1 L -0.29471599259032316 1.4091420594869517 M 0 1 L 0.32002931637462695 0.8576653617144421"></path>
 
-            <circle id="priscillaPoint" cx="0" cy="1" r=".025" style="stroke: none; fill: red;"></circle>
                 
             <g transform="translate(0,1)">
-                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle id="priscillaPoint" cx="0" cy="0" r="5" style="stroke: none; fill: red;"></circle>
+                </g>
+            </g>
+            <g transform="translate(0,0)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"/>
+                    <g transform="translate(-10,15)">
+                        <text>0</text>
+                    </g>
+                </g>
+            </g>
+            <g transform="translate(0,1)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(10,-10)">
                         <text>p</text>
                     </g>
                 </g>
             </g>
-            <g transform="translate(0,0)">
-                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
-                    <g transform="translate(-5,15)">
-                        <text>0</text>
-                    </g>
-                </g>
-            </g>
 
             <g id="d1transform" transform="translate(0.6,0.35)">
-                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"/>
                     <g transform="translate(5,10)">
                         <text id="d1text" style="text-decoration:underline">d</text>
                     </g>
                 </g>
             </g>
             <g id="xd1transform" transform="translate(0.6,0)">
-                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(-15,17)">
                         <text id="xd1text">
-                            <tspan style="text-decoration:underline">x</tspan
-                            ><tspan dy="5" font-size="70%">d</tspan>
+                            <tspan style="text-decoration:underline">x</tspan><tspan dy="5" font-size="70%">d</tspan>
                         </text>
                     </g>
                 </g>
             </g>
 
             <g id="d2transform" transform="translate(0.7423346382855579,0.6700293163746269)">
-                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"/>
                     <g transform="translate(10,5)">
                         <text id="d2text" style="text-decoration:overline">d</text>
                     </g>
                 </g>
             </g>
             <g id="xd2transform" transform="translate(0.7423346382855579,0)">
-                <g class="undoScaleForSvgText" transform="scale(.005,-.005)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(0,17)">
                         <text id="xd2text">
-                            <tspan style="text-decoration:overline">x</tspan
-                            ><tspan dy="5" font-size="70%">d</tspan>
+                            <tspan style="text-decoration:overline">x</tspan><tspan dy="5" font-size="70%">d</tspan>
                         </text>
                     </g>
                 </g>
