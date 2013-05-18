@@ -44,14 +44,12 @@
         }
 
 
+        /* TODO: figure out how to hard code this */
+        .assertFail:before {  
+            color: red;  
+            font-weight: bold;  
+        }  
 
-        /* for the assertion failures */
-            .assertFail:before {  
-                content: 'ASSERT FAIL: ';  
-                color: red;  
-                font-weight: bold;  
-                  
-            }  
     </style>
 
     <!-- 1.9.1 provokes warnings in firefox:
@@ -248,6 +246,7 @@
                         {
                             var li = document.createElement('li');  
                             li.className = 'assertFail';  
+                            text = "ASSERT FAIL: " + text; // TODO: color:red;font-weight:bold  
                             li.appendChild(document.createTextNode(text));
                             assertOutputList.appendChild(li);  
                         }
