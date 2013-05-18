@@ -2,16 +2,18 @@
 <html>
 <head>
     <!--
+        TODO: text highlights when dragging, make it not do that
+        TODO: make it not change into a text cursor when dragging? (when on text too)
         TODO: make it draggable even when in other document!
-
 
         TODO: overline of x_d isn't quite right- try to use borders instead? maybe not supported
         TODO: more descriptive than "dragging thing with"
-        TODO: text highlights when dragging, make it not do that
-        TODO: constraints
+        TODO: constraints?
         TODO: show values somewhere on screen instead of console log
         TODO: make drag handle bigger on hover
-        TODO: dragging origin isn't working!
+
+        TODO: dragging 0 should change global translate
+        TODO: dragging p should change global scale
     -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Figures for The Spiral Moment Lemma: There's No Single-Exit Lagoon</title>
@@ -23,6 +25,22 @@
         svg {
             border: 1px dashed black;
         }
+
+        text {
+            /* make it so the text doesn't get highlighted
+               if the mouse is over it during dragging,
+               since that got pretty distracting. */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+
+            /* fill: green; */
+        }
+
+
 
         /* for the assertion failures */
             .assertFail:before {  
@@ -309,9 +327,6 @@
                 assert(pTemp === dTemp, "priscillaNeighborsPath and dudleyNeighborsPath have different numbers of tokens! "+pTemp+" vs "+dTemp+"");
                 assert(pTemp % 18 === 0, "neighbors path length "+pTemp+" is not a multiple of 18!");
                 global_nNeighbors = pTemp / 18;
-                var a = 0;
-                console.assert(true, "oh no!"+(a=100));
-                console.log("a = "+a);
             }
 
             {
@@ -353,11 +368,6 @@
 
             // do it the first time
             recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
-
-                var pTemp = jQuery.trim(global_priscillaNeighborsPath.attr('d')).split(/ +/).length;;
-                var dTemp = jQuery.trim(global_dudleyNeighborsPath.attr('d')).split(/ +/).length;;
-                console.log('length of d neighbors path = '+pTemp);
-                console.log('length of p neighbors path = '+dTemp);
 
             var localToScreen = function(localXY) {
                 var x = localXY[0];
