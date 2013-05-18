@@ -187,7 +187,8 @@
                 dudleyNeighborsPath = "M 0 0";
             }
 
-            var otherStuffPath = "M 0 0 L "+d2[0]+" 0 L "+d2[0]+" "+d2[1]+" M "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+"";
+            // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
+            var otherStuffPath = "M 0 0 L "+d2[0]+" 0 L "+d2[0]+" "+d2[1]+" M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+"";
 
             return [dudleyMainPath,
                     dudleyNeighborsPath,
@@ -525,14 +526,14 @@
 <p>
 <!-- ======================================================================== -->
 <div id="theDiv">
-    <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="350" width="500">
+    <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="350" width="450">
         <!-- 1 unit = 20 pixels -->
         <g id="theGraphic" transform="translate(150,320) scale(200,-200)">
            
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; mine seems to have some issues -->
             <path id="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1." d="M 0 1 L 0 0"></path>
 
-            <path id="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1." d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0.6 0 L 0.6 0.35"></path>
+            <path id="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1." d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0 0 L 0.6 0 L 0.6 0.35"></path>
 
             <path id="dudleyNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1." d=" M 0.7423346382855579 0.6700293163746269 L 0.8485866059822484 1.1629443805492827 L 0 0 M 0.6 0.35 L 0.4577167894701633 0.15264858544096044 L 0 0"></path>
             <path id="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6 0.35 L 0.7423346382855579 0.6700293163746269 L 0 0"></path>
