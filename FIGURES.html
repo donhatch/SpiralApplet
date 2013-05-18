@@ -14,6 +14,7 @@
 
         TODO: dragging 0 should change global translate
         TODO: dragging p should change global scale
+        TODO: doesn't detect mouse clicks in firefox?
     -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Figures for The Spiral Moment Lemma: There's No Single-Exit Lagoon</title>
@@ -35,7 +36,7 @@
             -khtml-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
-            user-select: none;
+            /* user-select: none; */
 
             /* fill: green; */
         }
@@ -51,9 +52,11 @@
             }  
     </style>
 
-    <script
-        src="http://code.jquery.com/jquery-1.7.1.min.js">
-    </script>
+    <!-- 1.9.1 provokes warnings in firefox:
+         Unknown property 'box-sizing'. Declaration dropped.
+         :-(
+    -->
+    <script src="http://code.jquery.com/jquery-1.9.1.min.js"/>
     <script>
 	// make $ not be an alias for jQuery
         // since I think that's ridiculous
@@ -62,188 +65,161 @@
 
 
     <script>
-        // http://net.tutsplus.com/tutorials/javascript-ajax/quick-tip-quick-and-easy-javascript-testing-with-assert/
 
+        // assumes jQuery has been loaded and document is ready
 
-        //
-        // complex arithmetic, 
-        // with complex numbers represented as [x,y]
-        //
-        var times = function(z0,z1) {
-            if (typeof(z1) === "number") // XXX surely there's a non-string-based way?
+        var initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
+
+            if (typeof jQuery === "undefined")
             {
-                z1 = [z1,0];
+                window.alert("Oh no! initFigure5Interaction() called but jQuery hasn't been loaded or something! bailing!");
+                return;
             }
-            if (typeof(z0) === "number") // XXX surely there's a non-string-based way?
+            if (!jQuery.isReady)
             {
-                z0 = [z0,0];
+                // XXX TODO: this may be too strict, maybe call live()?
+                window.alert("Hey! initFigure5Interaction() called when document not ready! You need to call this through jQuery.ready()");
+                return;
             }
-            return [z0[0]*z1[0]-z0[1]*z1[1],
-                    z0[0]*z1[1]+z0[1]*z1[0]];
-        };
-        var plus = function(z0,z1) {
-            return [z0[0]+z1[0],z0[1]+z1[1]];
-        };
-        var minus = function(z0,z1) {
-            return [z0[0]-z1[0],z0[1]-z1[1]];
-        };
-        var inverse = function(z) {
-            return scaled(conj(z),1/length2(z));
-        };
-        var dividedby = function(z0,z1) {
-            return times(z0,inverse(z1));
-        };
-        var conj = function(z) {
-            return [z[0],-z[1]];
-        };
-        // z00:z01 :: z10 : ?
-        // answer is z01*z10/z00.
-        var analogy = function(z00,z01,z10) {
-            return dividedby(times(z01,z10),z00);
-        };
-        var cross = function(a,b) {
-            return a[0]*b[1] - a[1]*b[0];
-        };
-        var dot = function(a,b) {
-            return a[0]*b[0] + a[1]*b[1];
-        };
-        var length2 = function(z) {
-            return dot(z,z);
-        };
-        var length = function(z) {
-            return Math.sqrt(length2(z));
-        };
-        var dist2 = function(z0,z1) {
-            return length2(minus(z1,z0));
-        };
-        var dist = function(z0,z1) {
-            return Math.sqrt(dist2(z0,z1));
-        };
-        var normalized = function(z) {
-            var l = length(z);
-            return [z[0]/l, z[1]/l];
-        };
-        var perpDot = function(z) {
-            return [-z[1], z[0]];
-        };
-        var scaled = function(z,s) {
-            return [z[0]*s, z[1]*s];
-        };
 
+            //
+            // complex arithmetic, with a complex number represented as z=[x,y]
+            //
+            var times = function(z0,z1) {
+                if (typeof z0 === "number") return [z0*z1[0], z0*z1[1]]
+                if (typeof z1 === "number") return [z0[0]*z1, z0[1]*z1]
+                return [z0[0]*z1[0] - z0[1]*z1[1], z0[0]*z1[1] + z0[1]*z1[0]];
+            };
+            var plus = function(z0,z1) { return [z0[0]+z1[0], z0[1]+z1[1]]; };
+            var minus = function(z0,z1) { return [z0[0]-z1[0], z0[1]-z1[1]]; };
+            var inverse = function(z) { return scaled(conj(z),1/length2(z)); };
+            var dividedby = function(z0,z1) { return times(z0,inverse(z1)); };
+            var conj = function(z) { return [z[0], -z[1]]; };
+            var cross = function(a,b) { return a[0]*b[1] - a[1]*b[0]; };
+            var dot = function(a,b) { return a[0]*b[0] + a[1]*b[1]; };
+            var length2 = function(z) { return dot(z, z); };
+            var length = function(z) { return Math.sqrt(length2(z)); };
+            var dist2 = function(z0,z1) { return length2(minus(z1,z0)); };
+            var dist = function(z0,z1) { return Math.sqrt(dist2(z0,z1)); };
+            var normalized = function(z) { var l = length(z); return [z[0]/l, z[1]/l]; };
+            var perpDot = function(z) { return [-z[1], z[0]]; };
+            var scaled = function(z,s) { return [z[0]*s, z[1]*s]; };
 
-        var makeThePaths = function(d0,d1,d2, nNeighbors)
-        {
-            // work mostly in a space in which d0 is at the origin
-            d1 = minus(d1, d0);
-            d2 = minus(d2, d0);
+            // Very useful function for creating log spirals...
+            // a:b :: A:?
+            // answer is b/a*A.
+            var analogy = function(a,b,A) { return times(dividedby(b,a),A); };
 
-            var p0 = [cross(d1,d2),dot(d1,d2)]
-            var p1 = [0,1]
-            var p2 = analogy(p0,p1,p1)
-            var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
-            var q0 = plus(p1,times(normalized(perpDot(minus(d1,d2))),qLength));
-
-
-            var dudleyMainPath = "M 0 0 L "+d1[0]+" "+d1[1]+" L "+d2[0]+" "+d2[1]+" L 0 0";
-
-            // scratch
-            var z;
-            var Z;
-            var temp;
-
-            var dudleyNeighborsPath = "";
+            var makeThePaths = function(d0,d1,d2, nNeighbors)
             {
-                z = d1;
-                Z = d2;
-                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                // work mostly in a space in which d0 is at the origin
+                d1 = minus(d1, d0);
+                d2 = minus(d2, d0);
+
+                var p0 = [cross(d1,d2),dot(d1,d2)]
+                var p1 = [0,1]
+                var p2 = analogy(p0,p1,p1)
+                var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
+                var q0 = plus(p1,times(normalized(perpDot(minus(d1,d2))),qLength));
+
+
+                var dudleyMainPath = "M 0 0 L "+d1[0]+" "+d1[1]+" L "+d2[0]+" "+d2[1]+" L 0 0";
+
+                // scratch
+                var z;
+                var Z;
+                var temp;
+
+                var dudleyNeighborsPath = "";
                 {
-                    temp = analogy(z,Z,Z);
-                    z = Z;
-                    Z = temp;
-                    dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
+                    z = d1;
+                    Z = d2;
+                    for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                    {
+                        temp = analogy(z,Z,Z);
+                        z = Z;
+                        Z = temp;
+                        dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
+                    }
+                    z = d1;
+                    Z = d2;
+                    for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                    {
+                        temp = analogy(Z,z,z);
+                        Z = z;
+                        z = temp;
+                        dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0"
+                    }
                 }
-                z = d1;
-                Z = d2;
-                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+
+
+                var priscillaMainPath = "M "+p0[0]+" "+p0[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
+                var priscillaNeighborsPath = "";
+                if (1)
                 {
-                    temp = analogy(Z,z,z);
-                    Z = z;
-                    z = temp;
-                    dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0"
+                    z = p1;
+                    Z = p2;
+                    for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                    {
+                        temp = analogy(z,Z,Z);
+                        z = Z;
+                        Z = temp;
+                        q = analogy(p1,q0,z);
+                        priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
+                    }
+                    z = p0;
+                    Z = p1;
+                    for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                    {
+                        temp = analogy(Z,z,z);
+                        Z = z;
+                        z = temp;
+                        q = analogy(p1,q0,Z);
+                        priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
+                    }
                 }
-            }
-
-
-            var priscillaMainPath = "M "+p0[0]+" "+p0[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
-            var priscillaNeighborsPath = "";
-            if (1)
-            {
-                z = p1;
-                Z = p2;
-                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                if (priscillaNeighborsPath === "")
                 {
-                    temp = analogy(z,Z,Z);
-                    z = Z;
-                    Z = temp;
-                    q = analogy(p1,q0,z);
-                    priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
+                    priscillaNeighborsPath = "M 0 0";
                 }
-                z = p0;
-                Z = p1;
-                for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
+                if (dudleyNeighborsPath === "")
                 {
-                    temp = analogy(Z,z,z);
-                    Z = z;
-                    z = temp;
-                    q = analogy(p1,q0,Z);
-                    priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
+                    dudleyNeighborsPath = "M 0 0";
                 }
-            }
-            if (priscillaNeighborsPath === "")
-            {
-                priscillaNeighborsPath = "M 0 0";
-            }
-            if (dudleyNeighborsPath === "")
-            {
-                dudleyNeighborsPath = "M 0 0";
-            }
 
-            // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
-            var otherStuffPath = "M 0 0 L "+d2[0]+" 0 L "+d2[0]+" "+d2[1]+" M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+"";
+                // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
+                var otherStuffPath = "M 0 0 L "+d2[0]+" 0 L "+d2[0]+" "+d2[1]+" M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+"";
 
-            return [dudleyMainPath,
-                    dudleyNeighborsPath,
-                    priscillaMainPath,
-                    priscillaNeighborsPath,
-                    otherStuffPath,
-                    d1,d2];
-        } // makeThePaths
+                return [dudleyMainPath,
+                        dudleyNeighborsPath,
+                        priscillaMainPath,
+                        priscillaNeighborsPath,
+                        otherStuffPath,
+                        d1,d2];
+            } // makeThePaths
 
-        var recomputeSVG = function(M,d0,d1,d2,nNeighbors) {
-            console.log("    recomputing svg");
+            var recomputeSVG = function(M,d0,d1,d2,nNeighbors) {
+                console.log("    recomputing svg");
 
-            var paths = makeThePaths(d0,d1,d2, nNeighbors);
+                var paths = makeThePaths(d0,d1,d2, nNeighbors);
 
 
-            global_dudleyMainPath.attr('d', paths[0]);
-            global_dudleyNeighborsPath.attr('d', paths[1]);
-            global_priscillaMainPath.attr('d', paths[2]);
-            global_priscillaNeighborsPath.attr('d', paths[3]);
-            global_otherStuffPath.attr('d', paths[4]);
-            var d0 = paths[5];
-            var d1 = paths[6];
-            global_d1transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
-            global_d2transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
-            global_xd1transform.attr('transform', 'translate('+d0[0]+',0)');
-            global_xd2transform.attr('transform', 'translate('+d1[0]+',0)');
-            global_undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
-            //console.log("    done recomputing svg");
-        };
+                global_dudleyMainPath.attr('d', paths[0]);
+                global_dudleyNeighborsPath.attr('d', paths[1]);
+                global_priscillaMainPath.attr('d', paths[2]);
+                global_priscillaNeighborsPath.attr('d', paths[3]);
+                global_otherStuffPath.attr('d', paths[4]);
+                var d0 = paths[5];
+                var d1 = paths[6];
+                global_d1transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
+                global_d2transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
+                global_xd1transform.attr('transform', 'translate('+d0[0]+',0)');
+                global_xd2transform.attr('transform', 'translate('+d1[0]+',0)');
+                global_undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
+                //console.log("    done recomputing svg");
+            };
 
-        jQuery(document).ready(function() {
-            console.log("in jquery document-ready function!");
-
-            var assertOutputList = document.getElementById('assertOutputList');
+            // http://net.tutsplus.com/tutorials/javascript-ajax/quick-tip-quick-and-easy-javascript-testing-with-assert/
             var assert = function(condition, description) {
                 if (!condition)
                 {
@@ -258,19 +234,28 @@
                         theStackLine = theStackLine.replace(/at HTMLDocument\..anonymous. \((.*)\)$/, '$1');
                         theStackLine = theStackLine.replace(/.*\//, ''); // get rid of all but trailing component of file name
                         theStackLine = theStackLine.replace(/:\d+$/, ''); // don't need the char position
-
-                        var li = document.createElement('li');  
-                        li.className = 'assertFail';  
                         var text = theStackLine;
                         if (description !== undefined)
                         {
                             text += ": "+description;
                         }
-                        li.appendChild(document.createTextNode(text));
-                        assertOutputList.appendChild(li);  
+
+                        // if there's a list called "assertOutputList", then append to it...
+                        var assertOutputList = document.getElementById('assertOutputList');
+                        if (assertOutputList !== null)
+                        {
+                            var li = document.createElement('li');  
+                            li.className = 'assertFail';  
+                            li.appendChild(document.createTextNode(text));
+                            assertOutputList.appendChild(li);  
+                        }
+                        else
+                        {
+                            window.alert("Oh no! Assertion failed! "+text);
+                        }
                     }
                 }
-            };
+            }; // assert
 
             // jQuery(s), throwing an error if the result
             // has length other than 1.
@@ -281,16 +266,16 @@
             };
 
             // global constants (just a cache)
-            global_theGraphic = jQueryExpectingOneThing('#theGraphic');
-            global_dudleyMainPath = jQueryExpectingOneThing('#dudleyMainPath');
-            global_dudleyNeighborsPath = jQueryExpectingOneThing('#dudleyNeighborsPath');
-            global_priscillaMainPath = jQueryExpectingOneThing('#priscillaMainPath');
-            global_priscillaNeighborsPath = jQueryExpectingOneThing('#priscillaNeighborsPath');
-            global_otherStuffPath = jQueryExpectingOneThing('#otherStuffPath');
-            global_d1transform = jQueryExpectingOneThing('#d1transform');
-            global_d2transform = jQueryExpectingOneThing('#d2transform');
-            global_xd1transform = jQueryExpectingOneThing('#xd1transform');
-            global_xd2transform = jQueryExpectingOneThing('#xd2transform');
+            global_theGraphic = jQueryExpectingOneThing('.theGraphic');
+            global_dudleyMainPath = jQueryExpectingOneThing('.dudleyMainPath');
+            global_dudleyNeighborsPath = jQueryExpectingOneThing('.dudleyNeighborsPath');
+            global_priscillaMainPath = jQueryExpectingOneThing('.priscillaMainPath');
+            global_priscillaNeighborsPath = jQueryExpectingOneThing('.priscillaNeighborsPath');
+            global_otherStuffPath = jQueryExpectingOneThing('.otherStuffPath');
+            global_d1transform = jQueryExpectingOneThing('.d1transform');
+            global_d2transform = jQueryExpectingOneThing('.d2transform');
+            global_xd1transform = jQueryExpectingOneThing('.xd1transform');
+            global_xd2transform = jQueryExpectingOneThing('.xd2transform');
             global_undoScales = jQuery('.undoScaleForSvgText');
             //console.log('scales = ',global_undoScales);
 
@@ -438,9 +423,7 @@
             };
 
 
-            var theDiv = jQueryExpectingOneThing('#theDiv');
-            var theSource = jQueryExpectingOneThing('#theSource');
-            theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
+            callThisWhenSVGSourceChanges();
 
             var theSVG = jQueryExpectingOneThing('svg'); // XXX will have to change this when doing more than one figure
             var threshold = 10;
@@ -491,7 +474,7 @@
                 dragging = false;
                 prevX = e.offsetX;
                 prevY = e.offsetY;
-                theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
+                callThisWhenSVGSourceChanges();
             });
             theSVG.mousemove(function(e) {
                 // wtf? on chrome, this keeps firing every 1 second
@@ -545,6 +528,17 @@
                 prevX = e.offsetX;
                 prevY = e.offsetY;
             });
+        }; // initFigure5Interaction
+
+        jQuery(document).ready(function() {
+            console.log("in jquery document-ready function!");
+
+            var theDiv = jQuery('#theDiv');
+            var theSource = jQuery('#theSource');
+            initFigure5Interaction(function() {
+                // this gets called when svg source changes
+                theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
+            });
 
             console.log("out jquery document-ready function!");
         }); // jquery document ready function
@@ -557,22 +551,22 @@
 <div id="theDiv">
     <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="330" width="450">
         <!-- 1 unit = 20 pixels -->
-        <g id="theGraphic" transform="translate(150,300) scale(200,-200)">
+        <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
            
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
-            <path id="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1." d="M 0 1 L 0 0"></path>
+            <path class="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 1 L 0 0"></path>
 
-            <path id="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1." d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0 0 L 0.6 0 L 0.6 0.35"></path>
+            <path class="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0 0 L 0.6 0 L 0.6 0.35"></path>
 
-            <path id="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1." d=" M 0.7423346382855579 0.6700293163746269 L 0.8485866059822484 1.1629443805492827 L 0 0 M 0.6 0.35 L 0.4577167894701633 0.15264858544096044 L 0 0"></path>
-            <path id="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6 0.35 L 0.7423346382855579 0.6700293163746269 L 0 0"></path>
-            <path id="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1." d=" M -0.8305934015249383 1.8988238275266283 L -0.29471599259032316 1.4091420594869517 L 0.1981990715843327 1.302890091790261 M 0.33955188098387046 0.5376278331726174 L 0.14220046642483092 0.6799110437024541 L 0.19336733508376516 0.44205805469712106"></path>
-            <path id="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.14220046642483092 0.6799110437024541 L 0 1 L -0.29471599259032316 1.4091420594869517 M 0 1 L 0.32002931637462695 0.8576653617144421"></path>
+            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1" d=" M 0.7423346382855579 0.6700293163746269 L 0.8485866059822484 1.1629443805492827 L 0 0 M 0.6 0.35 L 0.4577167894701633 0.15264858544096044 L 0 0"></path>
+            <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6 0.35 L 0.7423346382855579 0.6700293163746269 L 0 0"></path>
+            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1" d=" M -0.8305934015249383 1.8988238275266283 L -0.29471599259032316 1.4091420594869517 L 0.1981990715843327 1.302890091790261 M 0.33955188098387046 0.5376278331726174 L 0.14220046642483092 0.6799110437024541 L 0.19336733508376516 0.44205805469712106"></path>
+            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.14220046642483092 0.6799110437024541 L 0 1 L -0.29471599259032316 1.4091420594869517 M 0 1 L 0.32002931637462695 0.8576653617144421"></path>
 
                 
             <g transform="translate(0,1)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle id="priscillaPoint" cx="0" cy="0" r="5" style="stroke: none; fill: red;"></circle>
+                    <circle class="priscillaPoint" cx="0" cy="0" r="5" style="stroke: none; fill: red;"></circle>
                 </g>
             </g>
             <g transform="translate(0,0)">
@@ -591,36 +585,36 @@
                 </g>
             </g>
 
-            <g id="d1transform" transform="translate(0.6,0.35)">
+            <g class="d1transform" transform="translate(0.6,0.35)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(5,10)">
-                        <text id="d1text" style="text-decoration:underline">d</text>
+                        <text class="d1text" style="text-decoration:underline">d</text>
                     </g>
                 </g>
             </g>
-            <g id="xd1transform" transform="translate(0.6,0)">
+            <g class="xd1transform" transform="translate(0.6,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(-15,17)">
-                        <text id="xd1text">
+                        <text class="xd1text">
                             <tspan style="text-decoration:underline">x</tspan><tspan dy="5" font-size="70%">d</tspan>
                         </text>
                     </g>
                 </g>
             </g>
 
-            <g id="d2transform" transform="translate(0.7423346382855579,0.6700293163746269)">
+            <g class="d2transform" transform="translate(0.7423346382855579,0.6700293163746269)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(10,5)">
-                        <text id="d2text" style="text-decoration:overline">d</text>
+                        <text class="d2text" style="text-decoration:overline">d</text>
                     </g>
                 </g>
             </g>
-            <g id="xd2transform" transform="translate(0.7423346382855579,0)">
+            <g class="xd2transform" transform="translate(0.7423346382855579,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(0,17)">
-                        <text id="xd2text">
+                        <text class="xd2text">
                             <tspan style="text-decoration:overline">x</tspan><tspan dy="5" font-size="70%">d</tspan>
                         </text>
                     </g>
