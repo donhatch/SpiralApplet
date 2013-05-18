@@ -20,6 +20,14 @@
         svg {
             border: 1px dashed black;
         }
+
+        /* for the assertion failures */
+            .assertFail:before {  
+                content: 'ASSERT FAIL: ';  
+                color: red;  
+                font-weight: bold;  
+                  
+            }  
     </style>
 
     <script
@@ -33,6 +41,8 @@
 
 
     <script>
+        // http://net.tutsplus.com/tutorials/javascript-ajax/quick-tip-quick-and-easy-javascript-testing-with-assert/
+
 
         //
         // complex arithmetic, 
@@ -168,11 +178,11 @@
                     priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
                 }
             }
-            if (priscillaNeighborsPath == "")
+            if (priscillaNeighborsPath === "")
             {
                 priscillaNeighborsPath = "M 0 0";
             }
-            if (dudleyNeighborsPath == "")
+            if (dudleyNeighborsPath === "")
             {
                 dudleyNeighborsPath = "M 0 0";
             }
@@ -211,15 +221,40 @@
         jQuery(document).ready(function() {
             console.log("in jquery document-ready function!");
 
+            var assertOutputList = document.getElementById('assertOutputList');
+            var assert = function(condition, description) {
+                if (!condition)
+                {
+                    // throw to get a stack trace
+                    try {
+                        throw Error();
+                    }
+                    catch(e)
+                    {
+                        var stackLines = e.stack.split('\n');
+                        var theStackLine = jQuery.trim(stackLines[3]);
+                        theStackLine = theStackLine.replace(/at HTMLDocument\..anonymous. \((.*)\)$/, '$1');
+                        theStackLine = theStackLine.replace(/.*\//, ''); // get rid of all but trailing component of file name
+                        theStackLine = theStackLine.replace(/:\d+$/, ''); // don't need the char position
+
+                        var li = document.createElement('li');  
+                        li.className = 'assertFail';  
+                        var text = theStackLine;
+                        if (description !== undefined)
+                        {
+                            text += ": "+description;
+                        }
+                        li.appendChild(document.createTextNode(text));
+                        assertOutputList.appendChild(li);  
+                    }
+                }
+            };
+
             // jQuery(s), throwing an error if the result
             // has length other than 1.
             var jQueryExpectingOneThing = function(s) {
                 var answer = jQuery(s);
-                if (answer.length != 1)
-                {
-                    // XXX TODO: get this back onto the page somehow
-                    throw("ERROR: got "+answer.length+" results from jQuery('"+s+"'), expected 1")
-                }
+                assert(answer.length === 1, "got "+answer.length+" results from jQuery('"+s+"'), expected 1");
                 return answer;
             };
 
@@ -267,9 +302,12 @@
                 var dTemp = jQuery.trim(global_dudleyNeighborsPath.attr('d')).split(/ +/).length;
                 //console.log('length of d neighbors path = '+pTemp);
                 //console.log('length of p neighbors path = '+dTemp);
-                if (pTemp !== dTemp) throw "ERROR: priscillaNeighborsPath and dudleyNeighborsPath have different numbers of tokens! "+pTemp+" vs "+dTemp+"";
-                if (pTemp % 18 !== 0) throw "ERROR: neighbors path length "+pTemp+" is not a multiple of 18!"
+                assert(pTemp === dTemp, "priscillaNeighborsPath and dudleyNeighborsPath have different numbers of tokens! "+pTemp+" vs "+dTemp+"");
+                assert(pTemp % 18 === 0, "neighbors path length "+pTemp+" is not a multiple of 18!");
                 global_nNeighbors = pTemp / 18;
+                var a = 0;
+                console.assert(true, "oh no!"+(a=100));
+                console.log("a = "+a);
             }
 
             {
@@ -280,7 +318,8 @@
                 rescale = undefined;
             }
 
-            // this was the old bootstrapping way... these get clobbered by values extracted from the svg.
+            // this was the old bootstrapping way...
+            // these days, these get clobbered by values extracted from the svg.
             var xTrans = 250;
             var yTrans = 320;
             var xScale = 200;
@@ -296,6 +335,7 @@
                 yTrans = Number(match[2]);
                 xScale = Number(match[3]);
                 yScale = Number(match[4]);
+                
                 scratch = undefined;
                 match = undefined;
             }
@@ -440,7 +480,7 @@
                 if (dragging)
                 {
                     var localXY = screenToLocal([e.clientX,e.clientY]);
-                    if (indexOfThingBeingDragged == 0) // d0
+                    if (indexOfThingBeingDragged === 0) // d0
                     {
                         // XXX doesn't work yet
                         global_d1 = localXY + minus(global_d1,global_d0);
@@ -448,24 +488,24 @@
                         global_p  = localXY + minus(global_p,global_d0);
                         global_d0 = localXY;
                     }
-                    else if (indexOfThingBeingDragged == 1) // d1
+                    else if (indexOfThingBeingDragged === 1) // d1
                     {
                         global_d1 = localXY;
                         console.log("d1 changed to "+global_d1);
                     }
-                    else if (indexOfThingBeingDragged == 2) // d2
+                    else if (indexOfThingBeingDragged === 2) // d2
                     {
                         global_d2 = normalized(localXY);
                         console.log("d2 changed to "+global_d2);
                     }
-                    else if (indexOfThingBeingDragged == 3) // p
+                    else if (indexOfThingBeingDragged === 3) // p
                     {
                     }
-                    else if (indexOfThingBeingDragged == 4) // CW neighbor
+                    else if (indexOfThingBeingDragged === 4) // CW neighbor
                     {
                         // nothing-- already did it on mouse down
                     }
-                    else if (indexOfThingBeingDragged == 5) // CCW neighbor
+                    else if (indexOfThingBeingDragged === 5) // CCW neighbor
                     {
                         // nothing-- already did it on mouse down
                     }
@@ -555,6 +595,8 @@
     </svg>
 </div>
 <!-- ======================================================================== -->
+<ul id="assertOutputList">
+</ul>  
 
 <pre id="theSource">
 (this should get replaced by the svg source code)
