@@ -39,8 +39,6 @@
         TODO: typeset in priority order!
         TODO: legit equation numbering?
         TODO: URL params:
-                - don't typeset
-                - don't even preprocess
                 - initial x1,x2,y1,y2 etc.
                 - ability to typeset only delimited by "you are here" stuff?
 
@@ -51,6 +49,8 @@
 
         /* hide anything with class="asciiprevis" */
         .asciiprevis {display:none;}
+        /* hide anything with class="debug" */
+        .debug {display:none;}
 
 
         /*
@@ -383,47 +383,51 @@
     </script>
 </head>
 <body>
-<hr> <!--============================================================-->
 
-<div class="doMyThing">
-<span id="youarehere" style="color:green">YOU ARE HERE<br></span>
-first thing: $xp$
+
+<div class="debug">
+    <hr> <!--============================================================-->
+
+    <div class="doMyThing">
+    <span id="youarehere" style="color:green">YOU ARE HERE<br></span>
+    first thing: $xp$
+    </div>
+    <div class="doMyThing">
+    second thing: $_^yp$
+    </div>
+
+    <div class="doMyThing">
+    $ \angle (x,y)
+    $ \< 0 , 1 \> $
+    $a^b {a}^{b}$
+    $rp_$
+    $_rp$
+    $\underline{hey}$ $xp$ $yp$ $tp$ $_xp$ $_^xp$ $^xp$
+    ... when `x \lt y^2` we have ...
+    ... when $x \lt y^2$ we have ...
+    `(:
+        (a,=,b),
+        ( ,=, c)
+    :)`
+    will this work? $_x$
+    how bout this? $^x$
+    ok how about a simple little regex
+    that turns those into \underline and \overline?
+
+    $\underline{\overline{x}}$
+    $\underoverline{x}$
+    $\_x$
+    $\^x$
+    $a ^ b$
+    </div> <!-- doMyThing -->
+
+    <pre>
+
+    </pre>
+
+    <hr> <!--============================================================-->
 </div>
-<div class="doMyThing">
-second thing: $_^yp$
-</div>
 
-<div class="doMyThing">
-$ \angle (x,y)
-$ \< 0 , 1 \> $
-$a^b {a}^{b}$
-$rp_$
-$_rp$
-$\underline{hey}$ $xp$ $yp$ $tp$ $_xp$ $_^xp$ $^xp$
-... when `x \lt y^2` we have ...
-... when $x \lt y^2$ we have ...
-`(:
-    (a,=,b),
-    ( ,=, c)
-:)`
-will this work? $_x$
-how bout this? $^x$
-ok how about a simple little regex
-that turns those into \underline and \overline?
-
-$\underline{\overline{x}}$
-$\underoverline{x}$
-$\_x$
-$\^x$
-$a ^ b$
-</div> <!-- doMyThing -->
-
-<pre>
-
-</pre>
-
-
-<hr> <!--============================================================-->
 Visualizing an infinite spiral
 to try to prove the every-lagoon-has-at-least-two-good-exits conjecture.
 <p>
