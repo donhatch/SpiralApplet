@@ -401,8 +401,6 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     var indexOfThingBeingDragged = -1;
     var nTimesMouseMoveCalled = 0;
     var prevXY = [NaN,NaN]
-    //jQuery('#theDiv').mousedown(function(e) {
-    //jQuery('.theGraphic').mousedown(function(e) {
     theSVG.mousedown(function(e) {
         //console.log("mouse down: ",e);
 
@@ -451,14 +449,22 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         dragging = false;
         prevXY = XY;
     });
-    theSVG.mouseleave(function(e) {
-        console.log("mouse leave: ",e);
-        // have to set dragging to false,
-        // otherwise we'll lose of whether mouse was up or down
-        var XY = figureOutOffsetXY(e);
-        dragging = false;
-        prevXY = XY;
-    });
+
+
+    // ARGH! we get spurious leave events when children get leave events! (even though the jquery doc says we shouldn't) so don't do this!
+    if (false)
+    {
+        theSVG.mouseleave(function(e) {
+            console.log("mouse leave: ",e);
+            // have to set dragging to false,
+            // otherwise we'll lose of whether mouse was up or down
+            var XY = figureOutOffsetXY(e);
+            dragging = false;
+            prevXY = XY;
+        });
+    }
+
+
     theSVG.mousemove(function(e) {
         // wtf? on chrome, this keeps firing every 1 second
         // when in window, even if mouse not moving??
