@@ -113,6 +113,23 @@
         p.breakhere {page-break-before:always;}
 
 
+        text {
+            /* make it so the svg text doesn't get highlighted
+               if the mouse is over it during dragging,
+               since that got pretty distracting.
+               the user-select one is commented out because it provokes a warning in firefox.
+               */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            /* user-select: none; */
+
+            /* fill: green; */
+        }
+
+
         /*
         * text-decoration:underline and overline have problems:
         *      - underline too close to text
@@ -1262,6 +1279,7 @@ as shown in Figure 5.
             : /     :     
           0 *.......* &lt;<span class="uol">x<sub>d</sub></span>,0&gt;
 </pre>
+<div> <!-- svg needs to be wrapped alone in a div for dragging scheme to work -->
     <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="330" width="450">
         <!-- 1 unit = 20 pixels -->
         <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
@@ -1335,6 +1353,7 @@ as shown in Figure 5.
             </g>
         </g>
     </svg>
+</div>
 <br>
 Figure 5: Inductive step, Case 2: Dudley walks from $_d$ to $^d$.
  
@@ -1390,9 +1409,8 @@ so ($^A$) is immediately satisfied and:
                = & _rm + (\text{area of Dudley's triangle}) * _^rp \\
              \lt & _^rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)/2 + (\text{area of Dudley's triangle}) * _^rp \;\; \text{by ($_B$)} \\
                = & _^rp ((_rd \sin(_tp-_td))(_rd \cos(_tp-_td))/2 + (\text{area of Dudley's triangle})) \\
-                 & \text{XXX here's where I made a bad assumption} \\
-               = & _^rp (\text{area}(\triangle(0,\langle _^xd,0 \rangle,_d)) + \text{area}(\triangle(0,_d,^d))) \\
-               = & _^rp \text{area}(\triangle(0,\langle _^xd,0 \rangle,^d)) \;\; \text{since this tri is the disjoint union of the previous two} \\
+               = & _^rp (\text{area}(\triangle(0,\langle _xd,0 \rangle,_d)) + \text{area}(\triangle(0,_d,^d))) \\
+             \lt & _^rp \text{area}(\triangle(0,\langle ^xd,0 \rangle,^d)) \;\; \text{since this tri strictly contains the disjoint union of the previous two} \\
                = & _^rp rd^2 \cos(^td)\sin(^td) / 2 \\
                = & _^rp rd^2 \sin(\pi/2-^td)\cos(\pi/2-^td) / 2 \;\; \text{since $\cos(t)=\sin(\pi/2-t)$ in general} \\
                = & _^rp rd^2 \sin(_^tp-^td)\cos(_^tp-^td) / 2 \;\; \text{by (12)} \\
