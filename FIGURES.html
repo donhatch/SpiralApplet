@@ -187,7 +187,7 @@
                     d1,d2];
         } // makeThePaths
 
-        var recomputeSVG = function(d0,d1,d2,nNeighbors) {
+        var recomputeSVG = function(M,d0,d1,d2,nNeighbors) {
             console.log("    recomputing svg");
 
             var paths = makeThePaths(d0,d1,d2, nNeighbors);
@@ -204,6 +204,7 @@
             global_d2transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
             global_xd1transform.attr('transform', 'translate('+d0[0]+',0)');
             global_xd2transform.attr('transform', 'translate('+d1[0]+',0)');
+            global_undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
             //console.log("    done recomputing svg");
         };
 
@@ -223,6 +224,7 @@
             };
 
             // global constants (just a cache)
+            global_theGraphic = jQueryExpectingOneThing('#theGraphic');
             global_dudleyMainPath = jQueryExpectingOneThing('#dudleyMainPath');
             global_dudleyNeighborsPath = jQueryExpectingOneThing('#dudleyNeighborsPath');
             global_priscillaMainPath = jQueryExpectingOneThing('#priscillaMainPath');
@@ -232,6 +234,8 @@
             global_d2transform = jQueryExpectingOneThing('#d2transform');
             global_xd1transform = jQueryExpectingOneThing('#xd1transform');
             global_xd2transform = jQueryExpectingOneThing('#xd2transform');
+            global_undoScales = jQuery('.undoScaleForSvgText');
+            console.log('scales = ',global_undoScales);
 
             if (false)
             {
@@ -276,20 +280,41 @@
                 rescale = undefined;
             }
 
+            // this was the old bootstrapping way... these get clobbered by values extracted from the svg.
+            var xTrans = 250;
+            var yTrans = 320;
+            var xScale = 200;
+            var yScale = -200;
+            if (true)
+            {
+                // extract the top-level graphic's translation and scale.
+                // the attr looks like:
+                //     transform="translate(250,320) scale(200,-200)"
+                var scratch = global_theGraphic.attr('transform');
+                var match = scratch.match(/^translate\((.*),(.*)\) scale\((.*),(.*)\)$/);
+                xTrans = Number(match[1]);
+                yTrans = Number(match[2]);
+                xScale = Number(match[3]);
+                yScale = Number(match[4]);
+                scratch = undefined;
+                match = undefined;
+            }
+
+
+            var localToScreenMatrix = [
+                [xScale,    undefined, undefined],
+                [undefined, yScale,    undefined],
+                [xTrans+9,  yTrans+19, undefined],
+            ];
 
             // do it the first time
-            recomputeSVG(global_d0, global_d1, global_d2, global_nNeighbors);
+            recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
 
                 var pTemp = jQuery.trim(global_priscillaNeighborsPath.attr('d')).split(/ +/).length;;
                 var dTemp = jQuery.trim(global_dudleyNeighborsPath.attr('d')).split(/ +/).length;;
                 console.log('length of d neighbors path = '+pTemp);
                 console.log('length of p neighbors path = '+dTemp);
 
-            var localToScreenMatrix = [
-                [200.,      undefined, undefined],
-                [undefined, -200.,      undefined],
-                [250.+9,    320.+19,   undefined],
-            ];
             var localToScreen = function(localXY) {
                 var x = localXY[0];
                 var y = localXY[1];
@@ -386,7 +411,7 @@
                     global_nNeighbors++;
                 }
 
-                recomputeSVG(global_d0, global_d1, global_d2, global_nNeighbors);
+                recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
 
                 prevX = e.clientX;
                 prevY = e.clientY;
@@ -445,7 +470,7 @@
                         // nothing-- already did it on mouse down
                     }
 
-                    recomputeSVG(global_d0, global_d1, global_d2, global_nNeighbors);
+                    recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
                 }
                 prevX = e.clientX;
                 prevY = e.clientY;
@@ -462,7 +487,7 @@
 <div id="theDiv">
     <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="350" width="500">
         <!-- 1 unit = 20 pixels -->
-        <g id="theGraphic" transform="translate(250,320) scale(200,-200)">
+        <g id="theGraphic" transform="translate(150,320) scale(200,-200)">
            
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; mine seems to have some issues -->
             <path id="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1." d="M 0 1 L 0 0"></path>
