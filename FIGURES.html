@@ -30,7 +30,9 @@
         text {
             /* make it so the text doesn't get highlighted
                if the mouse is over it during dragging,
-               since that got pretty distracting. */
+               since that got pretty distracting.
+               the user-select one is commented out because it provokes a warning in firefox.
+               */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
@@ -56,7 +58,7 @@
          Unknown property 'box-sizing'. Declaration dropped.
          :-(
     -->
-    <script src="http://code.jquery.com/jquery-1.9.1.min.js"/>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"/>
     <script>
 	// make $ not be an alias for jQuery
         // since I think that's ridiculous
@@ -259,24 +261,26 @@
 
             // jQuery(s), throwing an error if the result
             // has length other than 1.
-            var jQueryExpectingOneThing = function(s) {
-                var answer = jQuery(s);
-                assert(answer.length === 1, "got "+answer.length+" results from jQuery('"+s+"'), expected 1");
+            var findExpectingOneThing = function(node,query) {
+                var answer = node.find(query);
+                assert(answer.length === 1, "got "+answer.length+" results from node.find('"+query+"'), expected 1");
                 return answer;
             };
 
             // global constants (just a cache)
-            global_theGraphic = jQueryExpectingOneThing('.theGraphic');
-            global_dudleyMainPath = jQueryExpectingOneThing('.dudleyMainPath');
-            global_dudleyNeighborsPath = jQueryExpectingOneThing('.dudleyNeighborsPath');
-            global_priscillaMainPath = jQueryExpectingOneThing('.priscillaMainPath');
-            global_priscillaNeighborsPath = jQueryExpectingOneThing('.priscillaNeighborsPath');
-            global_otherStuffPath = jQueryExpectingOneThing('.otherStuffPath');
-            global_d1transform = jQueryExpectingOneThing('.d1transform');
-            global_d2transform = jQueryExpectingOneThing('.d2transform');
-            global_xd1transform = jQueryExpectingOneThing('.xd1transform');
-            global_xd2transform = jQueryExpectingOneThing('.xd2transform');
-            global_undoScales = jQuery('.undoScaleForSvgText');
+            var theSVG = jQuery('#figure5');
+            assert(theSVG.length === 1, "oh no! "+theSVG.length+" results matching #figure5?");
+            global_theGraphic = findExpectingOneThing(theSVG, '.theGraphic');
+            global_dudleyMainPath = findExpectingOneThing(theSVG, '.dudleyMainPath');
+            global_dudleyNeighborsPath = findExpectingOneThing(theSVG, '.dudleyNeighborsPath');
+            global_priscillaMainPath = findExpectingOneThing(theSVG, '.priscillaMainPath');
+            global_priscillaNeighborsPath = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
+            global_otherStuffPath = findExpectingOneThing(theSVG, '.otherStuffPath');
+            global_d1transform = findExpectingOneThing(theSVG, '.d1transform');
+            global_d2transform = findExpectingOneThing(theSVG, '.d2transform');
+            global_xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
+            global_xd2transform = findExpectingOneThing(theSVG, '.xd2transform');
+            global_undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
             //console.log('scales = ',global_undoScales);
 
             if (false)
@@ -425,7 +429,6 @@
 
             callThisWhenSVGSourceChanges();
 
-            var theSVG = jQueryExpectingOneThing('svg'); // XXX will have to change this when doing more than one figure
             var threshold = 10;
             var dragging = false;
             var indexOfThingBeingDragged = false;
@@ -630,6 +633,9 @@
 <pre id="theSource">
 (this should get replaced by the svg source code)
 </pre>
+
+<!-- decoy, make sure this works -->
+<p class="theGraphic">
 
 </body>
 </html>
