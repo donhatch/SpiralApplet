@@ -2,6 +2,9 @@
 <html>
 <head>
     <!--
+        TODO: make it draggable even when in other document!
+
+
         TODO: overline of x_d isn't quite right- try to use borders instead? maybe not supported
         TODO: more descriptive than "dragging thing with"
         TODO: text highlights when dragging, make it not do that
@@ -542,7 +545,7 @@
 <p>
 <!-- ======================================================================== -->
 <div id="theDiv">
-    <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="350" width="450">
+    <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="330" width="450">
         <!-- 1 unit = 20 pixels -->
         <g id="theGraphic" transform="translate(150,300) scale(200,-200)">
            
@@ -551,7 +554,7 @@
 
             <path id="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1." d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0 0 L 0.6 0 L 0.6 0.35"></path>
 
-            <path id="dudleyNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1." d=" M 0.7423346382855579 0.6700293163746269 L 0.8485866059822484 1.1629443805492827 L 0 0 M 0.6 0.35 L 0.4577167894701633 0.15264858544096044 L 0 0"></path>
+            <path id="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1." d=" M 0.7423346382855579 0.6700293163746269 L 0.8485866059822484 1.1629443805492827 L 0 0 M 0.6 0.35 L 0.4577167894701633 0.15264858544096044 L 0 0"></path>
             <path id="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6 0.35 L 0.7423346382855579 0.6700293163746269 L 0 0"></path>
             <path id="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1." d=" M -0.8305934015249383 1.8988238275266283 L -0.29471599259032316 1.4091420594869517 L 0.1981990715843327 1.302890091790261 M 0.33955188098387046 0.5376278331726174 L 0.14220046642483092 0.6799110437024541 L 0.19336733508376516 0.44205805469712106"></path>
             <path id="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.14220046642483092 0.6799110437024541 L 0 1 L -0.29471599259032316 1.4091420594869517 M 0 1 L 0.32002931637462695 0.8576653617144421"></path>
@@ -564,7 +567,7 @@
             </g>
             <g transform="translate(0,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"/>
+                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(-10,15)">
                         <text>0</text>
                     </g>
@@ -580,7 +583,7 @@
 
             <g id="d1transform" transform="translate(0.6,0.35)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"/>
+                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(5,10)">
                         <text id="d1text" style="text-decoration:underline">d</text>
                     </g>
@@ -598,7 +601,7 @@
 
             <g id="d2transform" transform="translate(0.7423346382855579,0.6700293163746269)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"/>
+                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(10,5)">
                         <text id="d2text" style="text-decoration:overline">d</text>
                     </g>
