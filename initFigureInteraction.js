@@ -161,9 +161,12 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             {
                 var stackLines = e.stack.split('\n');
                 var theStackLine = jQuery.trim(stackLines[3]);
-                theStackLine = theStackLine.replace(/at HTMLDocument\..anonymous. \((.*)\)$/, '$1');
+                theStackLine = theStackLine.replace(/at .* \(([^ ]*)\)$/, '$1');
+                console.log("theStackLine = "+theStackLine);
                 theStackLine = theStackLine.replace(/.*\//, ''); // get rid of all but trailing component of file name
+                console.log("theStackLine = "+theStackLine);
                 theStackLine = theStackLine.replace(/:\d+$/, ''); // don't need the char position
+                console.log("theStackLine = "+theStackLine);
                 var text = theStackLine;
                 if (description !== undefined)
                 {
@@ -199,6 +202,12 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     // global constants (just a cache)
     var theSVG = jQuery('#figure5');
     assert(theSVG.length === 1, "oh no! "+theSVG.length+" results matching #figure5?");
+    var theDiv = theSVG.parent();
+    console.log("theDiv[0].tagName = "+theDiv[0].tagName);
+    assert(theDiv.length === 1 && theDiv[0].tagName == "DIV", "oh no! the SVG has to have a div as a parent! dragging won't work!");
+    var theDivsChildren = theDiv.children();
+    assert(theDivsChildren.length === 1 && theDiv[0].tagName == "DIV", "oh no! the SVG has siblings! dragging won't work!");
+
     global_theGraphic = findExpectingOneThing(theSVG, '.theGraphic');
     global_dudleyMainPath = findExpectingOneThing(theSVG, '.dudleyMainPath');
     global_dudleyNeighborsPath = findExpectingOneThing(theSVG, '.dudleyNeighborsPath');
@@ -278,53 +287,53 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     }
 
 
-    var localToScreenMatrix = [
+    var localToWindowMatrix = [
         [xScale,    undefined, undefined],
         [undefined, yScale,    undefined],
         [xTrans,    yTrans,    undefined],
     ];
 
     // do it the first time
-    recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
+    recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
 
-    var localToScreen = function(localXY) {
+    var localToWindow = function(localXY) {
         var x = localXY[0];
         var y = localXY[1];
-        var M = localToScreenMatrix;
+        var M = localToWindowMatrix;
         return [x*M[0][0]+M[2][0],
                 y*M[1][1]+M[2][1]];
     };
-    var screenToLocal = function(screenXY) {
+    var worldToLocal = function(screenXY) {
         var x = screenXY[0];
         var y = screenXY[1];
-        var M = localToScreenMatrix;
+        var M = localToWindowMatrix;
         return [(x-M[2][0])/M[0][0],
                 (y-M[2][1])/M[1][1]];
     };
 
-    var pickClosestThingIndex = function(screenXY,threshold) {
+    var pickClosestThingIndex = function(pickXY,threshold) {
         var debug = false; // manually set this to true to debug
         var threshold2 = threshold*threshold;
         var things = [
-            localToScreen(global_d0),
-            localToScreen(global_d1),
-            localToScreen(global_d2),
-            localToScreen(global_p),
-            localToScreen(analogy(global_d2,global_d1,global_d1)), // first CW neighbor
-            localToScreen(analogy(global_d1,global_d2,global_d2)), // first CCW neighbor
+            localToWindow(global_d0),
+            localToWindow(global_d1),
+            localToWindow(global_d2),
+            localToWindow(global_p),
+            localToWindow(analogy(global_d2,global_d1,global_d1)), // first CW neighbor
+            localToWindow(analogy(global_d1,global_d2,global_d2)), // first CCW neighbor
         ];
         if (debug)
         {
             console.log("    in pickClosestThing");
             console.log("            things = "+things);
-            console.log("            screenXY = "+screenXY);
+            console.log("            pickXY = "+pickXY);
         }
         var bestDist2;
         var bestIndex = -1;
         var thisDist2;
         for (var i = 0; i < things.length; ++i)
         {
-            thisDist2 = dist2(screenXY, things[i]);
+            thisDist2 = dist2(pickXY, things[i]);
             if (debug)
             {
                 console.log("        things["+i+"] = "+things[i]);
@@ -350,37 +359,73 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         }
         if (debug)
         {
+            console.log("            pickXY = "+pickXY);
             console.log("    in pickClosestThing, returning "+bestIndex);
         }
         return bestIndex;
     };
 
 
+    // We want the location of e
+    // with respect to the upper-left corner of the SVG element.
+    // In Chrome, e.offsetX,e.offsetY apparently works,
+    // but in Firefox those are undefined
+    // so we have to do some other hack.
+    var figureOutOffsetXY = function(e) {
+        //
+        // Okay, we have pageX,pageY,
+        // which is where the click was with respect to the *page*,
+        // i.e. the *body* element.
+        // But we want it with respect to the SVG element.
+        // How do we find the offset?
+        //
+        // Supposedly theSVGELement.getBoundingClientRect()
+        // is supposed to work, but it doesn't! (In firefox)
+        // It returns a huge rectangle like 4 million by 4 million,
+        // which is nothing like what we want.
+        // So what we do is, assume the SVG is inside a DIV,
+        // and get the client rect of that div.
+        // (in that case maybe we should be using clientX,clientY instead);
+
+        var theDivRect = theDiv[0].getBoundingClientRect(); // XXX don't do this every time!
+        var offsetX = e.clientX - theDivRect.left;
+        var offsetY = e.clientY - theDivRect.top;
+
+        return [offsetX,offsetY];
+    };
+
     callThisWhenSVGSourceChanges();
 
     var threshold = 10;
     var dragging = false;
-    var indexOfThingBeingDragged = false;
+    var indexOfThingBeingDragged = -1;
     var nTimesMouseMoveCalled = 0;
-    var prevX=undefined, prevY=undefined;;
+    var prevXY = [NaN,NaN]
+    //jQuery('#theDiv').mousedown(function(e) {
+    //jQuery('.theGraphic').mousedown(function(e) {
     theSVG.mousedown(function(e) {
         //console.log("mouse down: ",e);
 
-
-        if (true)
-        {
-            // trying to figure out x,y wrt the figure
-            console.log("in mouse down:",e);
-        }
-
-
-
-
-
+        var XY = figureOutOffsetXY(e);
+        //console.log("    XY = "+XY);
 
         dragging = true;
 
-        indexOfThingBeingDragged = pickClosestThingIndex([e.offsetX,e.offsetY],threshold);
+        // XXX OH NO! offsetX,offsetY give the right thing in chrome, but they are undefined in firefox!!! how do we figure this out??
+        // on firefox, there are:
+        /*
+            offsetX/Y: undefined undefined (!?)
+            clientX/Y: 10 6
+            originalEvent.pageX/Y: 10 21
+            originalEvent.screenX/Y: 27 89
+        */
+        // I think this guy figured it out...
+        //     http://www.jacklmoore.com/notes/mouse-position/
+        // nope!
+        // more thorough here:
+        //     http://www.quirksmode.org/js/events_properties.html#position
+
+        indexOfThingBeingDragged = pickClosestThingIndex(XY,10);
         console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
         // XXX HACKY obscure way to change nNeighbors!
@@ -389,31 +434,38 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             if (global_nNeighbors > 1)
             {
                 global_nNeighbors--;
+                recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
             }
         }
         else if (indexOfThingBeingDragged === 5)
         {
             global_nNeighbors++;
+            recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
         }
 
-        recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
-
-        prevX = e.offsetX;
-        prevY = e.offsetY;
+        prevXY = XY;
     });
     theSVG.mouseup(function(e) {
         //console.log("mouse up: ",e);
+        var XY = figureOutOffsetXY(e);
         dragging = false;
-        prevX = e.offsetX;
-        prevY = e.offsetY;
-        callThisWhenSVGSourceChanges();
+        prevXY = XY;
+    });
+    theSVG.mouseleave(function(e) {
+        console.log("mouse leave: ",e);
+        // have to set dragging to false,
+        // otherwise we'll lose of whether mouse was up or down
+        var XY = figureOutOffsetXY(e);
+        dragging = false;
+        prevXY = XY;
     });
     theSVG.mousemove(function(e) {
         // wtf? on chrome, this keeps firing every 1 second
         // when in window, even if mouse not moving??
         // what a waste!
 
-        if (e.offsetX === prevX && e.offsetY === prevY)
+        var XY = figureOutOffsetXY(e);
+        if (XY[0] == prevXY[0] && XY[1] == prevXY[1])
         {
             //console.log("WTF? didn't really move?");
             return;
@@ -424,7 +476,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         //console.log("    dragging = "+dragging);
         if (dragging)
         {
-            var localXY = screenToLocal([e.offsetX,e.offsetY]);
+            var localXY = worldToLocal(XY)
             if (indexOfThingBeingDragged === 0) // d0
             {
                 // XXX doesn't work yet
@@ -432,16 +484,19 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                 global_d2 = localXY + minus(global_d2,global_d0);
                 global_p  = localXY + minus(global_p,global_d0);
                 global_d0 = localXY;
+                recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 1) // d1
             {
                 global_d1 = localXY;
                 console.log("d1 changed to "+global_d1);
+                recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 2) // d2
             {
                 global_d2 = normalized(localXY);
                 console.log("d2 changed to "+global_d2);
+                recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 3) // p
             {
@@ -454,10 +509,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             {
                 // nothing-- already did it on mouse down
             }
-
-            recomputeSVG(localToScreenMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
         }
-        prevX = e.offsetX;
-        prevY = e.offsetY;
+        prevXY = XY;
     });
 }; // initFigure5Interaction
