@@ -95,8 +95,9 @@
             <path class="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 1 L 0 0"></path>
 
             <path class="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0 0 L 0.6 0 L 0.6 0.35"></path>
-            <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 1 0  A1,1 0 0,1 0,1"></path>
-            <path class="m2arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 1 0  A1,1 0 0,1 0,1"></path>
+            <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.18139356918867103 0.10581291536005809 A0.21,0.21 0 0,1 0,0.21 L 0 0"></path>
+            <path class="m2arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.3692268342853975 0.33326318159526136 A0.4973859702116783,0.4973859702116783 0 0,1 0,0.4973859702116783 L 0 0"></path>
+            <path class="m3arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0.14735799629516158 L 0.18139356918867103 0.25317091165521965 A0.21,0.21 0 0,1 0,0.3573579962951616 L 0 0.14735799629516158"></path>
 
             <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1" d=" M 0.7423346382855579 0.6700293163746269 L 0.8485866059822487 1.162944380549283 L 0 0 M 0.6 0.35 L 0.4577167894701633 0.15264858544096038 L 0 0"></path>
             <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6 0.35 L 0.7423346382855579 0.6700293163746269 L 0 0"></path>
@@ -104,9 +105,12 @@
             <path class="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.14220046642483092 0.6799110437024541 L 0 1 L -0.29471599259032316 1.4091420594869517 M 0 1 L 0.32002931637462695 0.8576653617144421"></path>
 
                 
-            <g transform="translate(0,1)">
+            <g class="ptransform" transform="translate(0,1)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle class="priscillaPoint" cx="0" cy="0" r="5" style="stroke: none; fill: red;"></circle>
+                    <circle class="priscillaPoint" cx="0" cy="0" r="4" style="stroke-width:2; stroke: red; fill: white;"></circle>
+                    <g transform="translate(10,-10)">
+                        <text>p</text>
+                    </g>
                 </g>
             </g>
             <g transform="translate(0,0)">
@@ -114,13 +118,6 @@
                     <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(-10,15)">
                         <text>0</text>
-                    </g>
-                </g>
-            </g>
-            <g transform="translate(0,1)">
-                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <g transform="translate(10,-10)">
-                        <text>p</text>
                     </g>
                 </g>
             </g>

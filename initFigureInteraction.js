@@ -40,7 +40,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     // answer is b/a*A.
     var analogy = function(a,b,A) { return times(dividedby(b,a),A); };
 
-    var makeThePaths = function(d0,d1,d2, nNeighbors)
+    var makeThePaths = function(p,d0,d1,d2, nNeighbors)
     {
         // work mostly in a space in which d0 is at the origin
         d1 = minus(d1, d0);
@@ -123,14 +123,17 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         var m2maxRadius = length2(d2)*Math.sin(2*theta2)/4.;
 
         // FUDGE!
-        m1maxRadius *= 2;
-        m2maxRadius *= 2;
+        //m1maxRadius *= 2;
+        //m2maxRadius *= 2;
 
-        // <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 1 0  A1,1 0 0,1 0,1"></path>
+        // <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 1.414 1.414  A1,1 0 0,1 0,1 L 0 0"></path>
         var m1arcStart = times(d1, m1maxRadius/length(d1));
-        var m1arcPath = "M "+m1arcStart[0]+" "+m1arcStart[1]+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 0,"+m1maxRadius+"";
+        var m1arcPath = "M 0 0 L "+m1arcStart[0]+" "+m1arcStart[1]+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 0,"+m1maxRadius+" L 0 0";
         var m2arcStart = times(d2, m2maxRadius/length(d2));
-        var m2arcPath = "M "+m2arcStart[0]+" "+m2arcStart[1]+" A"+m2maxRadius+","+m2maxRadius+" 0 0,1 0,"+m2maxRadius+"";
+        var m2arcPath = "M 0 0 L "+m2arcStart[0]+" "+m2arcStart[1]+" A"+m2maxRadius+","+m2maxRadius+" 0 0,1 0,"+m2maxRadius+" L 0 0";
+
+        var deltam = cross(p1,p2)*.5;
+        var m3arcPath = "M 0 "+deltam+" L "+m1arcStart[0]+" "+(m1arcStart[1]+deltam)+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 0,"+(m1maxRadius+deltam)+" L 0 "+deltam+"";
 
         // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
         var otherStuffPath = "M 0 0 L "+d2[0]+" 0 L "+d2[0]+" "+d2[1]+" M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+"";
@@ -140,15 +143,16 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                 priscillaMainPath,
                 priscillaNeighborsPath,
                 otherStuffPath,
-                d1,d2,
+                d1,d2, // the fudged ones XXX is this what I want??
                 m1arcPath,
-                m2arcPath];
+                m2arcPath,
+                m3arcPath];
     } // makeThePaths
 
-    var recomputeSVG = function(M,d0,d1,d2,nNeighbors) {
+    var recomputeSVG = function(M,p,d0,d1,d2,nNeighbors) {
         console.log("    recomputing svg");
 
-        var paths = makeThePaths(d0,d1,d2, nNeighbors);
+        var paths = makeThePaths(p,d0,d1,d2, nNeighbors);
 
 
         global_dudleyMainPath.attr('d', paths[0]);
@@ -156,16 +160,19 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         global_priscillaMainPath.attr('d', paths[2]);
         global_priscillaNeighborsPath.attr('d', paths[3]);
         global_otherStuffPath.attr('d', paths[4]);
-        var d0 = paths[5];
-        var d1 = paths[6];
-        global_d1transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
-        global_d2transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
-        global_xd1transform.attr('transform', 'translate('+d0[0]+',0)');
-        global_xd2transform.attr('transform', 'translate('+d1[0]+',0)');
+        var d1 = paths[5];
+        var d2 = paths[6];
+        global_ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
+        global_d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
+        global_d2transform.attr('transform', 'translate('+d2[0]+','+d2[1]+')');
+        global_xd1transform.attr('transform', 'translate('+d1[0]+',0)');
+        global_xd2transform.attr('transform', 'translate('+d2[0]+',0)');
         var m1arcPath = paths[7];
         var m2arcPath = paths[8];
+        var m3arcPath = paths[9];
         global_m1arc.attr('d', m1arcPath);
         global_m2arc.attr('d', m2arcPath);
+        global_m3arc.attr('d', m3arcPath);
         global_undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
 
         //console.log("    done recomputing svg");
@@ -236,12 +243,14 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     global_priscillaMainPath = findExpectingOneThing(theSVG, '.priscillaMainPath');
     global_priscillaNeighborsPath = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
     global_otherStuffPath = findExpectingOneThing(theSVG, '.otherStuffPath');
+    global_ptransform = findExpectingOneThing(theSVG, '.ptransform');
     global_d1transform = findExpectingOneThing(theSVG, '.d1transform');
     global_d2transform = findExpectingOneThing(theSVG, '.d2transform');
     global_xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
     global_xd2transform = findExpectingOneThing(theSVG, '.xd2transform');
     global_m1arc = findExpectingOneThing(theSVG, '.m1arc');
     global_m2arc = findExpectingOneThing(theSVG, '.m2arc');
+    global_m3arc = findExpectingOneThing(theSVG, '.m3arc');
     global_undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
     //console.log('scales = ',global_undoScales);
 
@@ -256,16 +265,20 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     }
     else
     {
+        var scratch;
         // these days we get it from the existing svg transform elements
-        global_p = [0,1];
         global_d0 = [0,0]; // still not used
-        var scratch = global_d1transform.attr('transform')
+        scratch = global_d1transform.attr('transform')
         // 'translate(0,0)'
         global_d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
                      Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
         scratch = global_d2transform.attr('transform')
         global_d2 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
                      Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+        scratch = global_ptransform.attr('transform')
+        global_p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+                    Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+        console.log('p = '+global_p);
         console.log('d1 = '+global_d1);
         console.log('d2 = '+global_d2);
 
@@ -318,7 +331,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     ];
 
     // do it the first time
-    recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
+    recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_d2, global_nNeighbors);
 
     var localToWindow = function(localXY) {
         var x = localXY[0];
@@ -453,16 +466,16 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         // XXX HACKY obscure way to change nNeighbors!
         if (indexOfThingBeingDragged === 4)
         {
-            if (global_nNeighbors > 1)
+            //if (global_nNeighbors > 1)
             {
                 global_nNeighbors--;
-                recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_d2, global_nNeighbors);
             }
         }
         else if (indexOfThingBeingDragged === 5)
         {
             global_nNeighbors++;
-            recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
+            recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_d2, global_nNeighbors);
         }
 
         prevXY = XY;
@@ -524,19 +537,19 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                 global_d2 = localXY + minus(global_d2,global_d0);
                 global_p  = localXY + minus(global_p,global_d0);
                 global_d0 = localXY;
-                recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_d2, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 1) // d1
             {
                 global_d1 = localXY;
                 console.log("d1 changed to "+global_d1);
-                recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_d2, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 2) // d2
             {
                 global_d2 = normalized(localXY);
                 console.log("d2 changed to "+global_d2);
-                recomputeSVG(localToWindowMatrix, global_d0, global_d1, global_d2, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_d2, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 3) // p
             {
