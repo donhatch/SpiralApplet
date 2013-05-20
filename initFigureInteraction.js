@@ -117,6 +117,21 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             dudleyNeighborsPath = "M 0 0";
         }
 
+        var theta1 = Math.atan2(d1[1],d1[0]);
+        var m1maxRadius = length2(d1)*Math.sin(2*theta1)/4.;
+        var theta2 = Math.atan2(d2[1],d2[0]);
+        var m2maxRadius = length2(d2)*Math.sin(2*theta2)/4.;
+
+        // FUDGE!
+        m1maxRadius *= 2;
+        m2maxRadius *= 2;
+
+        // <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 1 0  A1,1 0 0,1 0,1"></path>
+        var m1arcStart = times(d1, m1maxRadius/length(d1));
+        var m1arcPath = "M "+m1arcStart[0]+" "+m1arcStart[1]+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 0,"+m1maxRadius+"";
+        var m2arcStart = times(d2, m2maxRadius/length(d2));
+        var m2arcPath = "M "+m2arcStart[0]+" "+m2arcStart[1]+" A"+m2maxRadius+","+m2maxRadius+" 0 0,1 0,"+m2maxRadius+"";
+
         // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
         var otherStuffPath = "M 0 0 L "+d2[0]+" 0 L "+d2[0]+" "+d2[1]+" M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+"";
 
@@ -125,7 +140,9 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                 priscillaMainPath,
                 priscillaNeighborsPath,
                 otherStuffPath,
-                d1,d2];
+                d1,d2,
+                m1arcPath,
+                m2arcPath];
     } // makeThePaths
 
     var recomputeSVG = function(M,d0,d1,d2,nNeighbors) {
@@ -145,7 +162,12 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         global_d2transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
         global_xd1transform.attr('transform', 'translate('+d0[0]+',0)');
         global_xd2transform.attr('transform', 'translate('+d1[0]+',0)');
+        var m1arcPath = paths[7];
+        var m2arcPath = paths[8];
+        global_m1arc.attr('d', m1arcPath);
+        global_m2arc.attr('d', m2arcPath);
         global_undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
+
         //console.log("    done recomputing svg");
     };
 
@@ -218,6 +240,8 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     global_d2transform = findExpectingOneThing(theSVG, '.d2transform');
     global_xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
     global_xd2transform = findExpectingOneThing(theSVG, '.xd2transform');
+    global_m1arc = findExpectingOneThing(theSVG, '.m1arc');
+    global_m2arc = findExpectingOneThing(theSVG, '.m2arc');
     global_undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
     //console.log('scales = ',global_undoScales);
 
@@ -452,16 +476,26 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
 
 
     // ARGH! we get spurious leave events when children get leave events! (even though the jquery doc says we shouldn't) so don't do this!
-    if (false)
+    // oh wait, now I'm trying it again, and I'm not getting those bogus leave events?? weird. okay leaving it on for now.
+    if (true)
     {
+        // have to set dragging to false when mouse leaves the svg,
+        // otherwise we'll lose of whether mouse was up or down
         theSVG.mouseleave(function(e) {
-            console.log("mouse leave: ",e);
-            // have to set dragging to false,
-            // otherwise we'll lose of whether mouse was up or down
+            //console.log("mouse leave: ",e);
+            //console.log("    e.target = ",e.target);
             var XY = figureOutOffsetXY(e);
             dragging = false;
             prevXY = XY;
         });
+        /*
+        theSVG.mouseout(function(e) {
+            console.log("mouse out: ",e);
+            console.log("    e.target = ",e.target);
+            var XY = figureOutOffsetXY(e);
+            prevXY = XY;
+        });
+        */
     }
 
 
