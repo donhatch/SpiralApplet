@@ -23,8 +23,13 @@
         /* "smaller" seems to mean 80% */
         #theSource {font-size: 58.119653701782230115213678800500929355622%;} /* minimum that stays black instead of turning gray */
 
-        svg {
-            border: 1px dashed black;
+        div.figure {
+            width:60%; /* XXX ARGH! don't want to have to do this! */
+            margin:auto;
+            outline: 1px dashed #d0d0d0;
+        }
+        svg.figure {
+            outline: 1px dashed black;
         }
 
         text {
@@ -71,7 +76,7 @@
         jQuery(document).ready(function() {
             console.log("in jquery document-ready function!");
 
-            var theDiv = jQuery('#theDiv');
+            var theDiv = jQuery('svg').parent();
             var theSource = jQuery('#theSource');
             initFigure5Interaction(function() {
                 // this gets called when svg source changes
@@ -86,8 +91,8 @@
 
 <p>
 <!-- ======================================================================== -->
-<div id="theDiv">
-    <svg id="figure5" xmlns="http://www.w3.org/2000/svg" version="1.1" height="330" width="450">
+<div id="theDiv" class="figure" width="450" height="330">
+    <svg id="figure5" class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
         <!-- 1 unit = 20 pixels -->
         <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
            

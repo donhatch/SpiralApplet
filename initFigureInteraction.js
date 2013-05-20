@@ -12,6 +12,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         return;
     }
 
+
     //
     // complex arithmetic, with a complex number represented as z=[x,y]
     //
@@ -20,9 +21,12 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         if (typeof z1 === "number") return [z0[0]*z1, z0[1]*z1];
         return [z0[0]*z1[0] - z0[1]*z1[1], z0[0]*z1[1] + z0[1]*z1[0]];
     };
+    var inverse = function(z) {
+        if (typeof z === "number") return 1./z;
+        return scaled(conj(z),1/length2(z));
+    };
     var plus = function(z0,z1) { return [z0[0]+z1[0], z0[1]+z1[1]]; };
     var minus = function(z0,z1) { return [z0[0]-z1[0], z0[1]-z1[1]]; };
-    var inverse = function(z) { return scaled(conj(z),1/length2(z)); };
     var dividedby = function(z0,z1) { return times(z0,inverse(z1)); };
     var conj = function(z) { return [z[0], -z[1]]; };
     var cross = function(a,b) { return a[0]*b[1] - a[1]*b[0]; };
@@ -35,15 +39,22 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     var perpDot = function(z) { return [-z[1], z[0]]; };
     var scaled = function(z,s) { return [z[0]*s, z[1]*s]; };
 
-    // Very useful function for creating log spirals...
+    // Very useful function for creating log spirals and things...
     // a:b :: A:?
     // answer is b/a*A.
     var analogy = function(a,b,A) { return times(dividedby(b,a),A); };
+    var nextInLogSpiral = function(a,b) { return analogy(a,b,b); }
+
+
 
     var makeThePaths = function(p,d1,d2, nNeighbors)
     {
-        var p0 = [cross(d1,d2),dot(d1,d2)]
-        var p1 = [0,1]
+        console.log(times([1,2],[.5,0]));
+        console.log(dividedby([1,2],[2,0]));
+        console.log(dividedby([1,2],2));
+        var length2d2 = length2(d2);
+        var p1 = p;
+        var p0 = analogy([0,1],dividedby([cross(d1,d2),dot(d1,d2)],length2d2),p1);
         var p2 = analogy(p0,p1,p1)
         var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
         var q0 = plus(p1,times(normalized(perpDot(minus(d1,d2))),qLength));
