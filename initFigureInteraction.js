@@ -16,8 +16,8 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     // complex arithmetic, with a complex number represented as z=[x,y]
     //
     var times = function(z0,z1) {
-        if (typeof z0 === "number") return [z0*z1[0], z0*z1[1]]
-        if (typeof z1 === "number") return [z0[0]*z1, z0[1]*z1]
+        if (typeof z0 === "number") return [z0*z1[0], z0*z1[1]];
+        if (typeof z1 === "number") return [z0[0]*z1, z0[1]*z1];
         return [z0[0]*z1[0] - z0[1]*z1[1], z0[0]*z1[1] + z0[1]*z1[0]];
     };
     var plus = function(z0,z1) { return [z0[0]+z1[0], z0[1]+z1[1]]; };
@@ -124,7 +124,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         var m2arcStart = times(d2, m2maxRadius/length(d2));
         var m2arcPath = "M 0 0 L "+m2arcStart[0]+" "+m2arcStart[1]+" A"+m2maxRadius+","+m2maxRadius+" 0 0,1 0,"+m2maxRadius+" L 0 0";
 
-        var deltam = times(p,cross(d1,d2))
+        var deltam = times(p,cross(d1,d2)*.5)
         var m3arcPath = "M "+deltam[0]+" "+deltam[1]+" L "+(m1arcStart[0]+deltam[0])+" "+(m1arcStart[1]+deltam[1])+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 "+(0+deltam[0])+","+(m1maxRadius+deltam[1])+" L "+deltam[0]+" "+deltam[1]+"";
 
         // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
@@ -534,7 +534,8 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             }
             else if (indexOfThingBeingDragged === 2) // d2
             {
-                global_d2 = normalized(localXY);
+                global_d2 = localXY;
+                //global_d2 = normalized(global_d2); // constrain to unit length
                 console.log("d2 changed to "+global_d2);
                 recomputeSVG(localToWindowMatrix, global_p, global_d1, global_d2, global_nNeighbors);
             }
