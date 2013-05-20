@@ -47,20 +47,20 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
 
 
 
-    var makeThePaths = function(p,d1,d2, nNeighbors)
+    var makeThePaths = function(p,d0,d1, nNeighbors)
     {
         console.log(times([1,2],[.5,0]));
         console.log(dividedby([1,2],[2,0]));
         console.log(dividedby([1,2],2));
-        var length2d2 = length2(d2);
+        var length2d1 = length2(d1);
         var p1 = p;
-        var p0 = analogy([0,1],dividedby([cross(d1,d2),dot(d1,d2)],length2d2),p1);
+        var p0 = analogy([0,1],dividedby([cross(d0,d1),dot(d0,d1)],length2d1),p1);
         var p2 = analogy(p0,p1,p1)
         var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
-        var q0 = plus(p1,times(normalized(perpDot(minus(d1,d2))),qLength));
+        var q0 = plus(p1,times(normalized(perpDot(minus(d0,d1))),qLength));
 
 
-        var dudleyMainPath = "M 0 0 L "+d1[0]+" "+d1[1]+" L "+d2[0]+" "+d2[1]+" L 0 0";
+        var dudleyMainPath = "M 0 0 L "+d0[0]+" "+d0[1]+" L "+d1[0]+" "+d1[1]+" L 0 0";
 
         // scratch
         var z;
@@ -69,8 +69,8 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
 
         var dudleyNeighborsPath = "";
         {
-            z = d1;
-            Z = d2;
+            z = d0;
+            Z = d1;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
                 temp = analogy(z,Z,Z);
@@ -78,8 +78,8 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                 Z = temp;
                 dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
             }
-            z = d1;
-            Z = d2;
+            z = d0;
+            Z = d1;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
                 temp = analogy(Z,z,z);
@@ -124,38 +124,38 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             dudleyNeighborsPath = "M 0 0";
         }
 
-        var theta1 = Math.atan2(d1[1],d1[0]);
-        var m1maxRadius = length(p)*length2(d1)*Math.sin(2*theta1)/4.;
-        var theta2 = Math.atan2(d2[1],d2[0]);
-        var m2maxRadius = length(p)*length2(d2)*Math.sin(2*theta2)/4.;
+        var theta1 = Math.atan2(d0[1],d0[0]);
+        var m1maxRadius = length(p)*length2(d0)*Math.sin(2*theta1)/4.;
+        var theta2 = Math.atan2(d1[1],d1[0]);
+        var m2maxRadius = length(p)*length2(d1)*Math.sin(2*theta2)/4.;
 
         // <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 1.414 1.414  A1,1 0 0,1 0,1 L 0 0"></path>
-        var m1arcStart = times(d1, m1maxRadius/length(d1));
+        var m1arcStart = times(d0, m1maxRadius/length(d0));
         var m1arcPath = "M 0 0 L "+m1arcStart[0]+" "+m1arcStart[1]+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 0,"+m1maxRadius+" L 0 0";
-        var m2arcStart = times(d2, m2maxRadius/length(d2));
+        var m2arcStart = times(d1, m2maxRadius/length(d1));
         var m2arcPath = "M 0 0 L "+m2arcStart[0]+" "+m2arcStart[1]+" A"+m2maxRadius+","+m2maxRadius+" 0 0,1 0,"+m2maxRadius+" L 0 0";
 
-        var deltam = times(p,cross(d1,d2)*.5)
+        var deltam = times(p,cross(d0,d1)*.5)
         var m3arcPath = "M "+deltam[0]+" "+deltam[1]+" L "+(m1arcStart[0]+deltam[0])+" "+(m1arcStart[1]+deltam[1])+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 "+(0+deltam[0])+","+(m1maxRadius+deltam[1])+" L "+deltam[0]+" "+deltam[1]+"";
 
         // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
-        var otherStuffPath = "M 0 0 L "+d2[0]+" 0 L "+d2[0]+" "+d2[1]+" M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+"";
+        var otherStuffPath = "M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]+"";
 
         return [dudleyMainPath,
                 dudleyNeighborsPath,
                 priscillaMainPath,
                 priscillaNeighborsPath,
                 otherStuffPath,
-                d1,d2, // the fudged ones XXX is this what I want??
+                d0,d1, // the fudged ones XXX is this what I want??
                 m1arcPath,
                 m2arcPath,
                 m3arcPath];
     } // makeThePaths
 
-    var recomputeSVG = function(M,p,d1,d2,nNeighbors) {
+    var recomputeSVG = function(M,p,d0,d1,nNeighbors) {
         console.log("    recomputing svg");
 
-        var paths = makeThePaths(p,d1,d2, nNeighbors);
+        var paths = makeThePaths(p,d0,d1, nNeighbors);
 
 
         global_dudleyMainPath.attr('d', paths[0]);
@@ -163,13 +163,13 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         global_priscillaMainPath.attr('d', paths[2]);
         global_priscillaNeighborsPath.attr('d', paths[3]);
         global_otherStuffPath.attr('d', paths[4]);
-        var d1 = paths[5];
-        var d2 = paths[6];
+        var d0 = paths[5];
+        var d1 = paths[6];
         global_ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
+        global_d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
         global_d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
-        global_d2transform.attr('transform', 'translate('+d2[0]+','+d2[1]+')');
+        global_xd0transform.attr('transform', 'translate('+d0[0]+',0)');
         global_xd1transform.attr('transform', 'translate('+d1[0]+',0)');
-        global_xd2transform.attr('transform', 'translate('+d2[0]+',0)');
         var m1arcPath = paths[7];
         var m2arcPath = paths[8];
         var m3arcPath = paths[9];
@@ -247,10 +247,10 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     global_priscillaNeighborsPath = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
     global_otherStuffPath = findExpectingOneThing(theSVG, '.otherStuffPath');
     global_ptransform = findExpectingOneThing(theSVG, '.ptransform');
+    global_d0transform = findExpectingOneThing(theSVG, '.d0transform');
     global_d1transform = findExpectingOneThing(theSVG, '.d1transform');
-    global_d2transform = findExpectingOneThing(theSVG, '.d2transform');
+    global_xd0transform = findExpectingOneThing(theSVG, '.xd0transform');
     global_xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
-    global_xd2transform = findExpectingOneThing(theSVG, '.xd2transform');
     global_m1arc = findExpectingOneThing(theSVG, '.m1arc');
     global_m2arc = findExpectingOneThing(theSVG, '.m2arc');
     global_m3arc = findExpectingOneThing(theSVG, '.m3arc');
@@ -261,27 +261,27 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     {
         // This was the bootstrapping way...
         global_p = [0,1];
-        global_d1 = [6,2];
-        global_d2 = [8,6];
+        global_d0 = [6,2];
+        global_d1 = [8,6];
         global_nNeighbors = 1;
     }
     else
     {
         var scratch;
         // these days we get it from the existing svg transform elements
-        scratch = global_d1transform.attr('transform')
+        scratch = global_d0transform.attr('transform')
         // 'translate(0,0)'
-        global_d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+        global_d0 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
                      Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-        scratch = global_d2transform.attr('transform')
-        global_d2 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+        scratch = global_d1transform.attr('transform')
+        global_d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
                      Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
         scratch = global_ptransform.attr('transform')
         global_p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
                     Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
         console.log('p = '+global_p);
+        console.log('d0 = '+global_d0);
         console.log('d1 = '+global_d1);
-        console.log('d2 = '+global_d2);
 
         // really hacky way to deduce nNeighbors--
         // figure it out from the size of the neighborsPaths.
@@ -295,10 +295,10 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     }
 
     {
-        // rescale d1 and d2 so that length of d2 is 1
-        var rescale = 1./length(global_d2);
-        global_d2 = times(global_d2, rescale);
+        // rescale d0 and d1 so that length of d1 is 1
+        var rescale = 1./length(global_d1);
         global_d1 = times(global_d1, rescale);
+        global_d0 = times(global_d0, rescale);
         rescale = undefined;
     }
 
@@ -332,7 +332,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     ];
 
     // do it the first time
-    recomputeSVG(localToWindowMatrix, global_p, global_d1, global_d2, global_nNeighbors);
+    recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
 
     var localToWindow = function(localXY) {
         var x = localXY[0];
@@ -351,14 +351,14 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
 
     var pickClosestThingIndex = function(pickXY,threshold) {
         var debug = false; // manually set this to true to debug
-        var threshold2 = threshold*threshold;
+        var threshold1 = threshold*threshold;
         var things = [
             localToWindow([0,0]),
+            localToWindow(global_d0),
             localToWindow(global_d1),
-            localToWindow(global_d2),
             localToWindow(global_p),
-            localToWindow(analogy(global_d2,global_d1,global_d1)), // first CW neighbor
-            localToWindow(analogy(global_d1,global_d2,global_d2)), // first CCW neighbor
+            localToWindow(analogy(global_d1,global_d0,global_d0)), // first CW neighbor
+            localToWindow(analogy(global_d0,global_d1,global_d1)), // first CCW neighbor
         ];
         if (debug)
         {
@@ -377,7 +377,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                 console.log("        things["+i+"] = "+things[i]);
                 console.log("            thisDist = "+Math.sqrt(thisDist2));
             }
-            if (thisDist2 <= threshold2
+            if (thisDist2 <= threshold1
              && (bestIndex==-1 || thisDist2 < bestDist2))
             {
                 bestDist2 = thisDist2;
@@ -470,13 +470,13 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             //if (global_nNeighbors > 1)
             {
                 global_nNeighbors--;
-                recomputeSVG(localToWindowMatrix, global_p, global_d1, global_d2, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
             }
         }
         else if (indexOfThingBeingDragged === 5)
         {
             global_nNeighbors++;
-            recomputeSVG(localToWindowMatrix, global_p, global_d1, global_d2, global_nNeighbors);
+            recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
         }
 
         prevXY = XY;
@@ -537,25 +537,25 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             {
                 // XXX doesn't work yet
             }
-            else if (indexOfThingBeingDragged === 1) // d1
+            else if (indexOfThingBeingDragged === 1) // d0
+            {
+                global_d0 = localXY;
+                console.log("d0 changed to "+global_d0);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+            }
+            else if (indexOfThingBeingDragged === 2) // d1
             {
                 global_d1 = localXY;
+                //global_d1 = normalized(global_d1); // constrain to unit length
                 console.log("d1 changed to "+global_d1);
-                recomputeSVG(localToWindowMatrix, global_p, global_d1, global_d2, global_nNeighbors);
-            }
-            else if (indexOfThingBeingDragged === 2) // d2
-            {
-                global_d2 = localXY;
-                //global_d2 = normalized(global_d2); // constrain to unit length
-                console.log("d2 changed to "+global_d2);
-                recomputeSVG(localToWindowMatrix, global_p, global_d1, global_d2, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 3) // p
             {
                 global_p = localXY;
                 global_p[0] = 0; // constrain to y axis
                 console.log("p changed to "+global_p);
-                recomputeSVG(localToWindowMatrix, global_p, global_d1, global_d2, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 4) // CW neighbor
             {
