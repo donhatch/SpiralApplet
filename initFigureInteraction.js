@@ -286,6 +286,30 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     global_m2arc = findExpectingOneThing(theSVG, '.m2arc');
     global_m3arc = findExpectingOneThing(theSVG, '.m3arc');
     global_undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
+
+
+    global_mouseins_subelementsElement = findExpectingOneThing(jQuery(document), "#mouseins_subelements");
+    global_mouseins_svgElement = findExpectingOneThing(jQuery(document), "#mouseins_svg");
+    global_mouseentersElement = findExpectingOneThing(jQuery(document), "#mouseenters");
+    global_mousemovesElement = findExpectingOneThing(jQuery(document), "#mousemoves");
+    global_mousedownsElement = findExpectingOneThing(jQuery(document), "#mousedowns");
+    global_mousedragsElement = findExpectingOneThing(jQuery(document), "#mousedrags");
+    global_mouseupsElement = findExpectingOneThing(jQuery(document), "#mouseups");
+    global_mouseleavesElement = findExpectingOneThing(jQuery(document), "#mouseleaves");
+    global_mouseouts_svgElement = findExpectingOneThing(jQuery(document), "#mouseouts_svg");
+    global_mouseouts_subelementsElement = findExpectingOneThing(jQuery(document), "#mouseouts_subelements");
+
+    global_mouseins_subelementsCount = 0;
+    global_mouseins_svgCount = 0;
+    global_mouseentersCount = 0;
+    global_mousemovesCount = 0;
+    global_mousedownsCount = 0;
+    global_mousedragsCount = 0;
+    global_mouseupsCount = 0;
+    global_mouseleavesCount = 0;
+    global_mouseouts_svgCount = 0;
+    global_mouseouts_subelementsCount = 0;
+
     //console.log('scales = ',global_undoScales);
 
     if (true)
@@ -478,8 +502,13 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     var indexOfThingBeingDragged = -1;
     var nTimesMouseMoveCalled = 0;
     var prevXY = [NaN,NaN]
+
     theSVG.mousedown(function(e) {
         //console.log("mouse down: ",e);
+
+        global_mousedownsCount++;
+        global_mousedownsElement.text(""+global_mousedownsCount+" mousedowns");
+
 
         var XY = figureOutOffsetXY(e);
         //console.log("    XY = "+XY);
@@ -519,17 +548,39 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         }
 
         prevXY = XY;
+
+
+        // prevent browser from doing flakey things
+        // (e.g. mousemove and mouseover stop firing) if it thinks drag-n-drop is going on.
+        // http://unixpapa.com/js/mouse.html#preventdefault
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue= false;
+        return false;
     });
     theSVG.mouseup(function(e) {
         //console.log("mouse up: ",e);
+
+        global_mouseupsCount++;
+        global_mouseupsElement.text(""+global_mouseupsCount+" mouseups");
+
         var XY = figureOutOffsetXY(e);
         dragging = false;
         prevXY = XY;
     });
 
 
+    theSVG.mouseenter(function(e) {
+        //console.log("mouse enter: ",e);
+        //console.log("    e.target = ",e.target);
+        global_mouseentersCount++;
+        global_mouseentersElement.text(""+global_mouseentersCount+" mouseenters");
+    });
+
     // ARGH! we get spurious leave events when children get leave events! (even though the jquery doc says we shouldn't) so don't do this!
     // oh wait, now I'm trying it again, and I'm not getting those bogus leave events?? weird. okay leaving it on for now.
+    // oh! I think the problem is just on firefox?
     if (true)
     {
         // have to set dragging to false when mouse leaves the svg,
@@ -537,18 +588,41 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         theSVG.mouseleave(function(e) {
             //console.log("mouse leave: ",e);
             //console.log("    e.target = ",e.target);
-            var XY = figureOutOffsetXY(e);
+            global_mouseleavesCount++;
+            global_mouseleavesElement.text(""+global_mouseleavesCount+" mouseleaves");
+
             dragging = false;
-            prevXY = XY;
         });
-        /*
         theSVG.mouseout(function(e) {
-            console.log("mouse out: ",e);
-            console.log("    e.target = ",e.target);
-            var XY = figureOutOffsetXY(e);
-            prevXY = XY;
+            //console.log("mouse out: ",e);
+            //console.log("    e.target = ",e.target);
+
+            if (e.target == theSVG[0])
+            {
+                global_mouseouts_svgCount++;
+                global_mouseouts_svgElement.text(""+global_mouseouts_svgCount+" mouseouts svg");
+            }
+            else
+            {
+                global_mouseouts_subelementsCount++;
+                global_mouseouts_subelementsElement.text(""+global_mouseouts_subelementsCount+" mouseouts sub-elements");
+            }
         });
-        */
+        theSVG.mouseover(function(e) {
+            //console.log("mouse in: ",e);
+            //console.log("    e.target = ",e.target);
+
+            if (e.target == theSVG[0])
+            {
+                global_mouseins_svgCount++;
+                global_mouseins_svgElement.text(""+global_mouseins_svgCount+" mouseins svg");
+            }
+            else
+            {
+                global_mouseins_subelementsCount++;
+                global_mouseins_subelementsElement.text(""+global_mouseins_subelementsCount+" mouseouts sub-elements");
+            }
+        });
     }
 
 
@@ -556,6 +630,18 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         // wtf? on chrome, this keeps firing every 1 second
         // when in window, even if mouse not moving??
         // what a waste!
+
+        if (dragging)
+        {
+            global_mousedragsCount++;
+            global_mousedragsElement.text(""+global_mousedragsCount+" mousedrags");
+        }
+        else
+        {
+            global_mousemovesCount++;
+            global_mousemovesElement.text(""+global_mousemovesCount+" mousemoves");
+        }
+
 
         var XY = figureOutOffsetXY(e);
         if (XY[0] == prevXY[0] && XY[1] == prevXY[1])
@@ -622,5 +708,17 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             }
         }
         prevXY = XY;
+
+        /*
+        // prevent browser from doing flakey things
+        // (e.g. mousemove and mouseover stop firing) if it thinks drag-n-drop is going on.
+        // http://unixpapa.com/js/mouse.html#preventdefault
+        if (e.preventDefault)
+            e.preventDefault();
+        else
+            e.returnValue= false;
+        return false;
+        */
+
     });
 }; // initFigure5Interaction
