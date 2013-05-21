@@ -377,8 +377,8 @@
             if (typesetParam !== "no")
             {
                 console.log("    calling mathjax typeset...");
-                //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"typesetJustMe"]);
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                //MathJax.Hub.Queue(["Typeset",MathJax.Hub,"typesetJustMe"]);
                 console.log("    returned from mathjax typeset.");
             }
 
@@ -516,7 +516,10 @@ the entire dual diagram (triangle complex) is thus determined.
 It consists of
 $n$
 triangles, each having one vertex at the origin.
+<p>
+XXX do we really want to nail down the rotation like that? I don't think it's necessary
 </div> <!-- doMyThing -->
+
 <p>
 We'll number the primal features in CCW order:
 primal edges have even indices and primal vertices have odd indices:
