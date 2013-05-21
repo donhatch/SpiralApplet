@@ -1397,8 +1397,7 @@ as shown in Figure 5.
 </div>
 <br>
 Figure 5: Inductive step, Case 2: Dudley walks from $_d$ to $^d$.
- 
-<hr>
+<p>
 We denote quantities that are stationary at this step
 by giving them both an underbar and overbar.
 Priscilla is on the $+y$ axis and didn't move:
@@ -1422,9 +1421,14 @@ and his angle increased (XXX WHY??), but stayed less than $\pi/2$:
 The moment changed as follows:
 \begin{align}
          ^m = & _m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position}) \\
-            = & \text{BAD ASSUMPTION HERE-- there is no }_^xd \\
-    (16.5)  = & _m + (\frac{1}{2} * (^yd-_yd)*_^xd) * \langle 0,_^yp \rangle \\
+    (16.5)  = & _m + (\frac{1}{2} _d \times ^d) * \langle 0,_^yp \rangle \\
 \end{align}
+(where $\times$ denotes the scalar cross product
+of two vectors in the plane; that is,
+the determinant of the
+$2 \times 2$
+matrix whose rows are the two vectors).
+(XXX 16.5 not used? straighten this out)<br>
 Therefore by (12), the moment moved purely upwards;
 furthermore ($_C$),($_D$) (and XXX) say it started strictly inside the first quadrant
 so it ended there as well;
@@ -1487,14 +1491,14 @@ coordinate-free til the last second, if we wanted... maybe)
 <p>
 Now we proceed to prove ($^C$).
 Since $^d$,$^m$,$_d$,$_m$ are all in the first quadrant,
-our goal ($^C$) can be expressed as
+their
+$\theta$'s
+are all strictly within
+$90^{\circ}$
+of each other,
+and our goal ($^C$) can be expressed as
 $^d \times ^m \gt 0$,
-and assumption ($_C$) is that $_d \times _m \gt 0$
-(where $\times$ denotes the scalar cross product
-of two vectors in the plane; that is,
-the determinant of the
-$2 \times 2$
-matrix whose rows are the two vectors).
+and assumption ($_C$) is that $_d \times _m \gt 0$.
 <p>
 So we just need to prove $^d \times ^m \gt 0$ and we're done.
 <p>
