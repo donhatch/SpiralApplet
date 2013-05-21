@@ -310,6 +310,7 @@
                 {
                     element.nodeValue = (element.nodeValue
                         .replace(/\b(([trxy]?_?[dmp]|[ABCD])[_^][^2])/g,'\\color{red}{\\fbox{BAD0: $1}}')
+                        // force always using td instead of t_d, etc.
                         .replace(/\b(([trxy]_[dmp])\b)/g,'\\color{green}{\\fbox{BAD1: $1}}')
                         .replace(/(\\theta_)/g,'\\color{blue}{\\fbox{BAD2: $1}}')
 
@@ -374,6 +375,7 @@
             {
                 console.log("    calling mathjax typeset...");
                 MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                //MathJax.Hub.Queue(["Typeset",MathJax.Hub,"typesetJustMe"]);
                 console.log("    returned from mathjax typeset.");
             }
 
@@ -1290,7 +1292,7 @@ Dudley has moved (in a straight line) and Priscilla has stayed still.
 <p>
 As in the base case, we work in a rotated coordinate system
 in which Priscilla's (stationary) position is on the +y axis,
-so Dudley is traveling upwards along a now-vertical dual edge,
+so Dudley is traveling along a dual edge,
 as shown in Figure 5.
 <pre class="asciiprevis">
         Priscilla
@@ -1473,34 +1475,101 @@ In this Priscilla-aligned coordinate system, that's the same as saying:
 \end{align}
 (XXX could phrase that in terms "$m \times p \lt \frac{1}{2} (d \times p)^2$",
 coordinate-free til the last second, if we wanted... maybe)
+<div id="typesetJustMe">
 <p>
 Now we proceed to prove ($^C$).
 Since $^d$,$^m$,$_d$,$_m$ are all in the first quadrant,
 our goal ($^C$) can be expressed as
-    $$(^C') \;\; ^d \times ^m \gt 0$$
-and assumption ($_C$) can be expressed as
-    $$(_C') \;\; _d \times _m \gt 0$$
+$^d \times ^m \gt 0$,
+and assumption ($_C$) is that $_d \times _m \gt 0$
 (where $\times$ denotes the scalar cross product
 of two vectors in the plane; that is,
 the determinant of the
 $2 \times 2$
 matrix whose rows are the two vectors).
 <p>
-So we just need to prove ($^C'$) and we're done.
+So we just need to prove $^d \times ^m \gt 0$ and we're done.
+<p>
+It will be convenient to work with an intermediate point
+$\hat{d} = \langle \hat{xd},\hat{yd} \rangle$,
+which we define to be the intersection of the vertical line through
+$_d$
+and the line through
+$^d$
+parallel to the line through
+the origin and
+$_d$.
+Solving for explicit coordinates of
+$\hat{d}$,
+we have:
 \begin{align}
-    ^d \times ^m = & \langle _^xd,^yd \rangle \times \langle _^xm,^ym \rangle \\
-                 = & _^xd ^ym  -  ^yd _^xm \\
-                 = & _^xd (_ym + \frac{1}{2} (^yd-_yd) _^xd _^yp) - ^yd _^xm \;\; \text{by (16.5)} \\
-                 = & _^xd (_ym + \frac{1}{2} (^yd-_yd) _^xd _^yp) - (_yd + (^yd-_yd)) _^xm \;\;\;\; \text{since $^yd = _yd + (^yd-_yd)$} \\
-                 = & (_^xd _ym - _yd _^xm) + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\;\;\; \text{(just rearranged terms)} \\
-                 = &          _d \times _m          + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \\
-               \gt &             0             + (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \;\; \text{by ($_C'$)} \\
-                 = & (^yd-_yd) (\frac{1}{2} _^xd ^2 _^yp - _^xm) \\
-                 = & (^yd-_yd) (\frac{1}{2} _^xd ^2 _^rp - _^xm) \;\; \text{by ($11.5$)} \\
-
-               \gt & 0, \;\; \text{by (13) and (22).} \\
+     (22.5) \;\; \hat{d} = & ^d - _d (^xd-_xd)/_xd \\
+    (22.6) \;\; \hat{yd} = & ^yd - _yd (^xd-_xd)/_xd \\
+                \hat{xd} = & ^xd - _xd (^xd-_xd)/_xd \\
+    (22.7) \;\;          = & _xd
 \end{align}
-So ($^C'$) is proved, completing the induction
+(The fact that $_d$ lies on the two lines as claimed
+follows immediately from (22.7) and (22.5).)
+<p>
+Some nice properties of $\hat{d}$:
+\begin{align}
+            _d \times \hat{d} = & _d \times (^d - _d (^xd-_xd)/_xd) \;\; \text{by (22.5)} \\
+                              = & _d \times ^d  - (_d \times _d) (^xd-_xd)/_xd \\
+                              = & _d \times ^d  - 0 * (^xd-_xd)/_xd \\
+(22.8) \;\;                   = & _d \times ^d \\
+                                & \\
+            \hat{yd}          = & _yd + (_d \times ^d)/xd \;\; \text{XXX DERIVE THIS, it's not hard} \\
+\end{align}
+so by (XXX) and (XXX),
+\begin{align}
+            (22.9)      _yd \lt & \hat{yd}
+\end{align}
+Also,
+\begin{align}
+
+            ^d \times \hat{d} = & ^d \times (^d - _d (^xd-_xd)/_xd) \;\; \text{by (22.5)} \\
+                              = & ^d \times ^d - (^d \times _d) (^xd-_xd)/_xd \\
+                              = & 0 - (^d \times _d) (^xd-_xd)/_xd \\
+                              = & -(^d \times _d) (^xd-_xd)/_xd \\
+                              = & (_d \times ^d) (^xd-_xd)/_xd \\
+                            \gt & 0 \;\; \text{by (14), (13.5 right part), (13.5 left part)}
+\end{align}
+That is,
+\begin{align}
+(22.10) \;\;      \hat{td} > ^td.
+\end{align}
+So if we can just show that $^tm > \hat{td}$,
+that will imply by (22.10) that
+$^tm \gt ^td$,
+i.e.
+($^C$)
+as desired.
+So our final goal is now to prove that $^tm \gt \hat{td}$,
+i.e. that $\hat{d} \times ^m \gt 0$.
+
+<hr>
+\begin{align}
+ \hat{d} \times ^m = & \langle \hat{xd},\hat{yd} \rangle \times \langle _^xm,^ym \rangle \\
+                   = & \langle _xd,\hat{yd} \rangle \times \langle _^xm,^ym \rangle \;\; \text{by (22.7)} \\
+                   = & _xd ^ym  -  \hat{yd} _^xm \\
+                   = & _xd (_ym + \frac{1}{2} _^yp (_d \times ^d))  -  \hat{yd} \, _^xm \;\; \text{by XXXsomething} \\
+                   = & _xd (_ym + \frac{1}{2} _^yp (_d \times \hat{d}))  -  \hat{yd} \, _^xm \;\; \text{by (22.8)} \\
+                   = & _xd (_ym + \frac{1}{2} _^yp (_xd (\hat{yd}-_yd))  -  \hat{yd} \, _^xm \\
+                   & \\
+                   = & _xd (_ym + \frac{1}{2} _^yp (_xd (\hat{yd}-_yd))  -  (_yd + (\hat{yd}-_yd)) _^xm \;\; \text{since $\hat{yd} = _yd + (\hat{yd}-_yd)$} \\
+                   & \\
+
+                   = & (_xd _ym - _yd _^xm) + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \;\;\;\; \text{(just rearranged terms)} \\
+                   = &          _d \times _m          + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \\
+                 \gt &             0             + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \;\; \text{by ($_C'$)} \\
+                   = & (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \\
+                   = & (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^rp - _^xm) \;\; \text{by ($11.5$)} \\
+  
+                 \gt & 0, \;\; \text{by (22.9) and (22).} \\
+\end{align}
+</div>
+<hr>
+So ($^C$) is proved, completing the induction
 and the proof of the Spiral Moment Lemma.
 </div> <!-- priscillaAndDudleyStuff -->
 
