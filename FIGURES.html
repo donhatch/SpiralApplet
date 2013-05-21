@@ -6,7 +6,6 @@
         TODO: make it not change into a text cursor when dragging? (when on text too)
         TODO: make it draggable even when in other document!
 
-        TODO: overline of x_d isn't quite right- try to use borders instead? maybe not supported
         TODO: more descriptive than "dragging thing with"
         TODO: constraints?
         TODO: show values somewhere on screen instead of console log
@@ -147,7 +146,10 @@
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(5,10)">
-                        <text class="d0text" style="text-decoration:underline">d</text>
+                        <text class="d0text" style="text-decoration:underline">
+                            <tspan x="0" y="0">d</tspan>
+                            <tspan x="0" y="0">_</tspan>
+                        </text>
                     </g>
                 </g>
             </g>
@@ -155,7 +157,9 @@
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(-15,17)">
                         <text class="xd0text">
-                            <tspan style="text-decoration:underline">x</tspan><tspan dy="5" font-size="70%">d</tspan>
+                            <tspan>x</tspan><tspan dy="5" font-size="70%">d</tspan>
+                            <tspan x="0" y="3">_</tspan>
+                            <tspan x="6" y="3">_</tspan>
                         </text>
                     </g>
                 </g>
@@ -165,7 +169,10 @@
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(10,5)">
-                        <text class="d1text" style="text-decoration:overline">d</text>
+                        <text class="d1text">
+                            <tspan x="0" y="0">d</tspan>
+                            <tspan x="0" y="-19">_</tspan>
+                        </text>
                     </g>
                 </g>
             </g>
@@ -173,7 +180,9 @@
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(0,17)">
                         <text class="xd1text">
-                            <tspan style="text-decoration:overline">x</tspan><tspan dy="5" font-size="70%">d</tspan>
+                            <tspan>x</tspan><tspan dy="5" font-size="70%">d</tspan>
+                            <tspan x="0" y="-15">_</tspan>
+                            <tspan x="6" y="-15">_</tspan>
                         </text>
                     </g>
                 </g>
