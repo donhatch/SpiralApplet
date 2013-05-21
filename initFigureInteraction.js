@@ -156,15 +156,25 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         var deltam = times(p,cross(d0,d1)*.5)
         var m3arcPath = "M "+deltam[0]+" "+deltam[1]+" L "+(m1arcStart[0]+deltam[0])+" "+(m1arcStart[1]+deltam[1])+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 "+(0+deltam[0])+","+(m1maxRadius+deltam[1])+" L "+deltam[0]+" "+deltam[1]+"";
 
+
+        var dhat = [d0[0], d1[1] - d0[1]*(d1[0]-d0[0])/(d0[0]==0?1:d0[0])]
+
         // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
-        var otherStuffPath = "M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]+"";
+        var otherStuffPath = "M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]+" M 0 0 L "+dhat[0]+" "+dhat[1]+" L "+d1[0]+" "+d1[1];
+        var otherStuffPath = ("M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]
+                            +" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]
+                            +" L "+dhat[0]+" "+dhat[1]
+                            +" L "+d1[0]+" "+d1[1]
+                            +" M 0 0 L "+dhat[0]+" "+dhat[1]
+                            );
+
 
         return [dudleyMainPath,
                 dudleyNeighborsPath,
                 priscillaMainPath,
                 priscillaNeighborsPath,
                 otherStuffPath,
-                d0,d1, // the fudged ones XXX is this what I want??
+                d0,d1,dhat,
                 m1arcPath,
                 m2arcPath,
                 m3arcPath];
@@ -183,14 +193,16 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         global_otherStuffPath.attr('d', paths[4]);
         var d0 = paths[5];
         var d1 = paths[6];
+        var dhat = paths[7];
         global_ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
         global_d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
         global_d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
+        global_dhattransform.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
         global_xd0transform.attr('transform', 'translate('+d0[0]+',0)');
         global_xd1transform.attr('transform', 'translate('+d1[0]+',0)');
-        var m1arcPath = paths[7];
-        var m2arcPath = paths[8];
-        var m3arcPath = paths[9];
+        var m1arcPath = paths[8];
+        var m2arcPath = paths[9];
+        var m3arcPath = paths[10];
         global_m1arc.attr('d', m1arcPath);
         global_m2arc.attr('d', m2arcPath);
         global_m3arc.attr('d', m3arcPath);
@@ -267,6 +279,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     global_ptransform = findExpectingOneThing(theSVG, '.ptransform');
     global_d0transform = findExpectingOneThing(theSVG, '.d0transform');
     global_d1transform = findExpectingOneThing(theSVG, '.d1transform');
+    global_dhattransform = findExpectingOneThing(theSVG, '.dhattransform');
     global_xd0transform = findExpectingOneThing(theSVG, '.xd0transform');
     global_xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
     global_m1arc = findExpectingOneThing(theSVG, '.m1arc');
