@@ -288,16 +288,17 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     global_undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
 
 
-    global_mouseins_subelementsElement = findExpectingOneThing(jQuery(document), "#mouseins_subelements");
-    global_mouseins_svgElement = findExpectingOneThing(jQuery(document), "#mouseins_svg");
-    global_mouseentersElement = findExpectingOneThing(jQuery(document), "#mouseenters");
-    global_mousemovesElement = findExpectingOneThing(jQuery(document), "#mousemoves");
-    global_mousedownsElement = findExpectingOneThing(jQuery(document), "#mousedowns");
-    global_mousedragsElement = findExpectingOneThing(jQuery(document), "#mousedrags");
-    global_mouseupsElement = findExpectingOneThing(jQuery(document), "#mouseups");
-    global_mouseleavesElement = findExpectingOneThing(jQuery(document), "#mouseleaves");
-    global_mouseouts_svgElement = findExpectingOneThing(jQuery(document), "#mouseouts_svg");
-    global_mouseouts_subelementsElement = findExpectingOneThing(jQuery(document), "#mouseouts_subelements");
+    // these may or may not exist on the page... if they don't, we'll have no-ops
+    global_mouseins_subelementsElement = jQuery("#mouseins_subelements");
+    global_mouseins_svgElement = jQuery("#mouseins_svg");
+    global_mouseentersElement = jQuery("#mouseenters");
+    global_mousemovesElement = jQuery("#mousemoves");
+    global_mousedownsElement = jQuery("#mousedowns");
+    global_mousedragsElement = jQuery("#mousedrags");
+    global_mouseupsElement = jQuery("#mouseups");
+    global_mouseleavesElement = jQuery("#mouseleaves");
+    global_mouseouts_svgElement = jQuery("#mouseouts_svg");
+    global_mouseouts_subelementsElement = jQuery("#mouseouts_subelements");
 
     global_mouseins_subelementsCount = 0;
     global_mouseins_svgCount = 0;
@@ -620,7 +621,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             else
             {
                 global_mouseins_subelementsCount++;
-                global_mouseins_subelementsElement.text(""+global_mouseins_subelementsCount+" mouseouts sub-elements");
+                global_mouseins_subelementsElement.text(""+global_mouseins_subelementsCount+" mouseins sub-elements");
             }
         });
     }
