@@ -15,6 +15,8 @@
     so messing with it in the style sheet here.
 
 
+    TODO: make interaction purely delta-based, not requiring any absolute positioning at all?
+    TODO: validator says width/height not allowed on div at that point
     TODO: why is it not jumping to #youarehere any more?? (is it a jquery thing?)
     TODO: my specified default zoom trigger not working?
     TODO: it would be awesome if it were possible to start typesetting
@@ -30,6 +32,7 @@
         ERROR: Attribute vector-effect not allowed on element path at this point.
         oh no! and if I try to change version from 1.1 to 1.2 it says:
             Unsupported SVG version specified. This validator only supports SVG 1.1. The recommended way to suppress this warning is to remove the version attribute altogether.
+        argh!
     TODO: can I preprocess the preprocessed stuff so that _x and ^x mean \underline{x} and \overline{x}? YES! but make it nicer
 
     Content:
@@ -399,7 +402,7 @@
 
     <div class="doMyThing">
     $ \angle (x,y)
-    $ \< 0 , 1 \> $
+    $  0 , 1  $
     $a^b {a}^{b}$
     $rp_$
     $_rp$
@@ -1046,7 +1049,7 @@ In this strict spiral case (spiraling CCW outwards), we also know that
 $td &lt; tp$.
 So (C) and (D) are saying that
 $tm$ lies in the half-open interval
-$(td,tp]$ of size $< \pi/2$.
+$(td,tp]$ of size $\lt \pi/2$.
 Combining this with ($A$),($B$),
 the Lemma is saying that the moment $m$
 lies in (or on the boundary of)
@@ -1080,7 +1083,7 @@ is well-defined),
 and
 $tm = tp$.
 So ($D$) holds, and ($D$) immediately follows
-(since we always have $td < tp$ throughout any strictly CCW-outward spiral).
+(since we always have $td \lt tp$ throughout any strictly CCW-outward spiral).
 We still have to prove that ($B$) holds in the base case.
 <p>
 For this base case,
@@ -1344,7 +1347,7 @@ as shown in Figure 5.
             </g>
             <g transform="translate(0,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(-10,15)">
                         <text>0</text>
                     </g>
@@ -1353,7 +1356,7 @@ as shown in Figure 5.
 
             <g class="d0transform" transform="translate(0.6000000000000001,0.2)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(5,10)">
                         <text class="d0text" style="text-decoration:underline">d</text>
                     </g>
@@ -1371,7 +1374,7 @@ as shown in Figure 5.
 
             <g class="d1transform" transform="translate(0.8,0.6000000000000001)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(10,5)">
                         <text class="d1text" style="text-decoration:overline">d</text>
                     </g>
