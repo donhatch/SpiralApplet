@@ -49,13 +49,31 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
 
     var makeThePaths = function(p,d0,d1, nNeighbors)
     {
-        console.log(times([1,2],[.5,0]));
-        console.log(dividedby([1,2],[2,0]));
-        console.log(dividedby([1,2],2));
-        var length2d1 = length2(d1);
-        var p1 = p;
-        var p0 = analogy([0,1],dividedby([cross(d0,d1),dot(d0,d1)],length2d1),p1);
-        var p2 = analogy(p0,p1,p1)
+        if (true)
+        {
+            // solve:
+            //     analogy(d1,d0,[1,0]) dot <x,y> = 0
+            //     (<0,1>-<x,y>) dot d0 = 0
+            //         => <x,y> dot d0 = <0,1> dot d0
+            // it's a straightforward system of linear equations,
+            // but it simplifies (worked this out on paper):
+            var temp = analogy(d1,d0,[0,1])
+            var p0 = times(temp,d0[1]/dot(temp,d0));
+            // woops, but that was assuming p=<0,1>.
+            // now do it for general p=<0,yp>.
+            p0 = times(p0, length(p));
+
+            var p1 = p;
+            var p2 = analogy(p0,p1,p1)
+        }
+        if (true)
+        {
+            console.log("dot(p0,analogy(d1,d0,[1,0])) = ", dot(p0,analogy(d1,d0,[1,0])));
+            console.log("dot(minus(p,p0),d0) = ", dot(minus([0,1],p0),d0));
+            assert(Math.abs(dot(minus(p0,p0),d0)) < 1e-6);
+            assert(Math.abs(dot(p0,analogy(d1,d0,[1,0]))) < 1e-6);
+        }
+
         var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
         var q0 = plus(p1,times(normalized(perpDot(minus(d0,d1))),qLength));
 
@@ -257,7 +275,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     global_undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
     //console.log('scales = ',global_undoScales);
 
-    if (false)
+    if (true)
     {
         // This was the bootstrapping way...
         global_p = [0,1];
@@ -292,6 +310,14 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         assert(pTemp === dTemp, "priscillaNeighborsPath and dudleyNeighborsPath have different numbers of tokens! "+pTemp+" vs "+dTemp+"");
         assert(pTemp % 18 === 0, "neighbors path length "+pTemp+" is not a multiple of 18!");
         global_nNeighbors = pTemp / 18;
+    }
+
+    if (false) // change to true to debug a simple case
+    {
+        global_p = [0,1];
+        global_d0 = [Math.sqrt(.5),Math.sqrt(.5)/2];
+        global_d1 = [Math.sqrt(.5),Math.sqrt(.5)];
+        global_nNeighbors = 1;
     }
 
     {
@@ -524,7 +550,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             //console.log("WTF? didn't really move?");
             return;
         }
-        //console.log(""+nTimesMouseMoveCalled+" mouse move: buttons="+e.buttons+" button="+e.button);
+        //console.log(""+nTimesMouseMoveCalled+" mouse move:",e);
         nTimesMouseMoveCalled++;
 
         //console.log("    dragging = "+dragging);
@@ -539,13 +565,29 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             }
             else if (indexOfThingBeingDragged === 1) // d0
             {
-                global_d0 = localXY;
+                if (e.ctrlKey)
+                {
+                    // constrain to same angle
+                    global_d0 = times(global_d0, length(localXY)/length(global_d0));
+                }
+                else
+                {
+                    global_d0 = localXY;
+                }
                 console.log("d0 changed to "+global_d0);
                 recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
             }
             else if (indexOfThingBeingDragged === 2) // d1
             {
-                global_d1 = localXY;
+                if (e.ctrlKey)
+                {
+                    // constrain to same angle
+                    global_d1 = times(global_d1, length(localXY)/length(global_d1));
+                }
+                else
+                {
+                    global_d1 = localXY;
+                }
                 //global_d1 = normalized(global_d1); // constrain to unit length
                 console.log("d1 changed to "+global_d1);
                 recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);

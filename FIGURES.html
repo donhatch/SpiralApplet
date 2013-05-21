@@ -70,6 +70,8 @@
         jQuery.noConflict();
     </script>
 
+    <script src="ZeroClipboard.js"></script>
+
     <script src="initFigure5Interaction.js"></script> <!-- do NOT self-close, that causes weirdness -->
 
     <script>
@@ -78,9 +80,23 @@
 
             var theDiv = jQuery('svg').parent();
             var theSource = jQuery('#theSource');
+            var theButton = jQuery('#copy-button');
+            console.log("theButton = ",theButton);
             initFigure5Interaction(function() {
                 // this gets called when svg source changes
                 theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
+                console.log("setting the text!");
+                console.log("theButton = ",theButton);
+                theButton.attr('data-clipboard-text', jQuery.trim(theDiv[0].innerHTML));
+            });
+
+            // NOTE ZeroClipboard only works over a web server
+            // (not via file://).
+            // To start a web server:
+            //     python -m SimpleHTTPServer
+            var clip = new ZeroClipboard( document.getElementById("copy-button"), { moviePath: "ZeroClipboard.swf" } );
+            clip.on('complete', function(client,args) {
+                console.log("Copied "+theButton.attr('data-clipboard-text').length+" bytes of text to clipboard");
             });
 
             console.log("out jquery document-ready function!");
@@ -99,15 +115,15 @@
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
             <path class="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 1 L 0 0"></path>
 
-            <path class="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.7423346382855579 0 L 0.7423346382855579 0.6700293163746269 M 0 0 L 0.6 0 L 0.6 0.35"></path>
-            <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.18139356918867103 0.10581291536005809 A0.21,0.21 0 0,1 0,0.21 L 0 0"></path>
-            <path class="m2arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.3692268342853975 0.33326318159526136 A0.4973859702116783,0.4973859702116783 0 0,1 0,0.4973859702116783 L 0 0"></path>
-            <path class="m3arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0.14735799629516158 L 0.18139356918867103 0.25317091165521965 A0.21,0.21 0 0,1 0,0.3573579962951616 L 0 0.14735799629516158"></path>
+            <path class="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2"></path>
+            <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.056920997883030844 0.01897366596101028 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.06000000000000002 L 0 0"></path>
+            <path class="m2arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.19200000000000006 0.14400000000000007 A0.24000000000000007,0.24000000000000007 0 0,1 0,0.24000000000000007 L 0 0"></path>
+            <path class="m3arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0.10000000000000003 L 0.056920997883030844 0.1189736659610103 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.16000000000000006 L 0 0.10000000000000003"></path>
 
-            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1" d=" M 0.7423346382855579 0.6700293163746269 L 0.8485866059822487 1.162944380549283 L 0 0 M 0.6 0.35 L 0.4577167894701633 0.15264858544096038 L 0 0"></path>
-            <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6 0.35 L 0.7423346382855579 0.6700293163746269 L 0 0"></path>
-            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1" d=" M -0.8305934015249383 1.8988238275266283 L -0.29471599259032316 1.4091420594869517 L 0.1981990715843327 1.302890091790261 M 0.33955188098387046 0.5376278331726174 L 0.14220046642483092 0.6799110437024541 L 0.19336733508376516 0.44205805469712106"></path>
-            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.14220046642483092 0.6799110437024541 L 0 1 L -0.29471599259032316 1.4091420594869517 M 0 1 L 0.32002931637462695 0.8576653617144421"></path>
+            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1" d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0"></path>
+            <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6000000000000001 0.2 L 0.8 0.6000000000000001 L 0 0"></path>
+            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1" d=" M -2.160000000000001 2.88 L -0.6000000000000003 1.8 L 0.3899494936611664 1.6585786437626908 M 0.3630852169962633 0.3035814496704034 L 0.1666666666666667 0.49999999999999994 L 0.16666666666666669 0.22222222222222215"></path>
+            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.1666666666666667 0.49999999999999994 L 0 1 L -0.6000000000000003 1.8 M 0 1 L 0.47140452079103173 0.7642977396044842"></path>
 
                 
             <g class="ptransform" transform="translate(0,1)">
@@ -127,7 +143,7 @@
                 </g>
             </g>
 
-            <g class="d0transform" transform="translate(0.6,0.35)">
+            <g class="d0transform" transform="translate(0.6000000000000001,0.2)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(5,10)">
@@ -135,7 +151,7 @@
                     </g>
                 </g>
             </g>
-            <g class="xd0transform" transform="translate(0.6,0)">
+            <g class="xd0transform" transform="translate(0.6000000000000001,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(-15,17)">
                         <text class="xd0text">
@@ -145,7 +161,7 @@
                 </g>
             </g>
 
-            <g class="d1transform" transform="translate(0.7423346382855579,0.6700293163746269)">
+            <g class="d1transform" transform="translate(0.8,0.6000000000000001)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle x="0" y="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(10,5)">
@@ -153,7 +169,7 @@
                     </g>
                 </g>
             </g>
-            <g class="xd1transform" transform="translate(0.7423346382855579,0)">
+            <g class="xd1transform" transform="translate(0.8,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <g transform="translate(0,17)">
                         <text class="xd1text">
@@ -168,6 +184,7 @@
 <!-- ======================================================================== -->
 <ul id="assertOutputList">
 </ul>  
+<button id="copy-button" data-clipboard-text="Copy Me!" title="Click to copy me.">Copy to Clipboard</button>
 
 <pre id="theSource">
 (this should get replaced by the svg source code)
