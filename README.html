@@ -377,8 +377,8 @@
             if (typesetParam !== "no")
             {
                 console.log("    calling mathjax typeset...");
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-                //MathJax.Hub.Queue(["Typeset",MathJax.Hub,"typesetJustMe"]);
+                //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"typesetJustMe"]);
                 console.log("    returned from mathjax typeset.");
             }
 
@@ -1454,10 +1454,12 @@ so ($^A$) is immediately satisfied and:
 \end{align}
 So that proves ($^B$); all we have left to prove is ($^C$).
 <p>
-For this, we first derive an intermediate result
-from the inductive hypothesis.
+<div id="typesetJustMe">
+For this, we first derive a tighter bound on $_xm$,
+from the pie-slice-shaped bounds on $_rm$ and $_tm$
+given in the inductive hypothesis.
 The "all terms positive" claims throughout the following
-follow from ($_A$),($_C$),($_D$).
+follow from ($_A$),($_C$),($_D$).  (XXX maybe tighten this up)
 \begin{align}
  _rm \sin(_tp - _tm) = & _rm \sin((_tp-_td)-(_tm-_td)) \\
                      = & _rm (\sin(_tp-_td)\cos(_tm-_td) - \cos(_tp-_td)\sin(_tm-_td)) \;\; \text{by double-angle identity} \\
@@ -1467,18 +1469,18 @@ follow from ($_A$),($_C$),($_D$).
                    \lt & (\frac{1}{2} _rp _rd^2 \sin(_tp-_td)\cos(_tp-_td)) \sin(_tp-_td) \;\; \text{by} (_B) \\
                      = & \frac{1}{2} _rp \cos(_tp-_td) (_rd \sin(_tp-_td))^2 \\
                    \lt & \frac{1}{2} _rp (_rd \sin(_tp-_td))^2 \;\; \text{since $0 \lt \cos(_tp-_td) \lt 1$} \\
-                     = & \frac{1}{2} _rp (_rd \sin(\pi/2-_td))^2 \;\; \text{by (12)} \\
-                     = & \frac{1}{2} _rp (_rd \cos(_td))^2 \\
-
 \end{align}
 In this Priscilla-aligned coordinate system, that's the same as saying:
 \begin{align}
-                                         _xm &lt; & \frac{1}{2} _rp _xd^2; \;\; \text{that is,} \\
-       (22) \;\; \frac{1}{2} _rp _xd^2 - _xm &gt; & 0.
+                _rm \sin(\pi/2 - _tm) \lt & \frac{1}{2} rp (rd \sin(pi/2 - _td))^2 \\
+                _rm \cos(_tm) \lt & \frac{1}{2} rp (rd \cos(_td))^2 \\
+
+                                         _xm \lt & \frac{1}{2} _rp _xd^2 \\
+       (22) \;\; \frac{1}{2} _rp _xd^2 - _xm \gt & 0.
 \end{align}
 (XXX could phrase that in terms "$m \times p \lt \frac{1}{2} (d \times p)^2$",
 coordinate-free til the last second, if we wanted... maybe)
-<div id="typesetJustMe">
+</div>
 <p>
 Now we proceed to prove ($^C$).
 Since $^d$,$^m$,$_d$,$_m$ are all in the first quadrant,
@@ -1569,7 +1571,6 @@ i.e. that $\hat{d} \times ^m \gt 0$.
   
                  \gt & 0, \;\; \text{by (22.9) and (22).} \\
 \end{align}
-</div>
 So ($^C$) is proved, completing the induction
 and the proof of the Spiral Moment Lemma.
 </div> <!-- priscillaAndDudleyStuff -->
