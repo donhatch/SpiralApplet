@@ -160,20 +160,18 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         var dhat = [d0[0], d1[1] - d0[1]*(d1[0]-d0[0])/(d0[0]==0?1:d0[0])]
 
         // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
-        var otherStuffPath = "M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]+" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]+" M 0 0 L "+dhat[0]+" "+dhat[1]+" L "+d1[0]+" "+d1[1];
-        var otherStuffPath = ("M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]
-                            +" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]
-                            +" L "+dhat[0]+" "+dhat[1]
-                            +" L "+d1[0]+" "+d1[1]
-                            +" M 0 0 L "+dhat[0]+" "+dhat[1]
-                            );
-
+        var orthoDottedPath = ("M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]
+                                       +" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]);
+        var dhatDottedPath = "M "+d1[0]+" "+d1[1]+" L "+dhat[0]+" "+dhat[1]
+        var dhatSolidPath = "M "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]+" 0 0";
 
         return [dudleyMainPath,
                 dudleyNeighborsPath,
                 priscillaMainPath,
                 priscillaNeighborsPath,
-                otherStuffPath,
+                orthoDottedPath,
+                dhatDottedPath,
+                dhatSolidPath,
                 d0,d1,dhat,
                 m1arcPath,
                 m2arcPath,
@@ -190,19 +188,21 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         global_dudleyNeighborsPath.attr('d', paths[1]);
         global_priscillaMainPath.attr('d', paths[2]);
         global_priscillaNeighborsPath.attr('d', paths[3]);
-        global_otherStuffPath.attr('d', paths[4]);
-        var d0 = paths[5];
-        var d1 = paths[6];
-        var dhat = paths[7];
+        global_orthoDottedPath.attr('d', paths[4]);
+        global_dhatDottedPath.attr('d', paths[5]);
+        global_dhatSolidPath.attr('d', paths[6]);
+        var d0 = paths[7];
+        var d1 = paths[8];
+        var dhat = paths[9];
         global_ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
         global_d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
         global_d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
         global_dhattransform.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
         global_xd0transform.attr('transform', 'translate('+d0[0]+',0)');
         global_xd1transform.attr('transform', 'translate('+d1[0]+',0)');
-        var m1arcPath = paths[8];
-        var m2arcPath = paths[9];
-        var m3arcPath = paths[10];
+        var m1arcPath = paths[10];
+        var m2arcPath = paths[11];
+        var m3arcPath = paths[12];
         global_m1arc.attr('d', m1arcPath);
         global_m2arc.attr('d', m2arcPath);
         global_m3arc.attr('d', m3arcPath);
@@ -275,7 +275,10 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     global_dudleyNeighborsPath = findExpectingOneThing(theSVG, '.dudleyNeighborsPath');
     global_priscillaMainPath = findExpectingOneThing(theSVG, '.priscillaMainPath');
     global_priscillaNeighborsPath = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
-    global_otherStuffPath = findExpectingOneThing(theSVG, '.otherStuffPath');
+    global_orthoDottedPath = findExpectingOneThing(theSVG, '.orthoDottedPath');
+    global_dhatDottedPath = findExpectingOneThing(theSVG, '.dhatDottedPath');
+    global_dhatSolidPath = findExpectingOneThing(theSVG, '.dhatSolidPath');
+
     global_ptransform = findExpectingOneThing(theSVG, '.ptransform');
     global_d0transform = findExpectingOneThing(theSVG, '.d0transform');
     global_d1transform = findExpectingOneThing(theSVG, '.d1transform');
@@ -395,8 +398,11 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         [xTrans,    yTrans,    undefined],
     ];
 
-    // do it the first time
-    recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+    if (false)
+    {
+        // do it the first time
+        recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+    }
 
     var localToWindow = function(localXY) {
         var x = localXY[0];
@@ -501,7 +507,6 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     var threshold = 10;
     var dragging = false;
     var indexOfThingBeingDragged = -1;
-    var nTimesMouseMoveCalled = 0;
     var prevXY = [NaN,NaN]
 
     theSVG.mousedown(function(e) {
@@ -628,9 +633,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
 
 
     theSVG.mousemove(function(e) {
-        // wtf? on chrome, this keeps firing every 1 second
-        // when in window, even if mouse not moving??
-        // what a waste!
+        //console.log(""+global_mousemovesCount+" mouse move:",e);
 
         if (dragging)
         {
@@ -645,13 +648,17 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
 
 
         var XY = figureOutOffsetXY(e);
+
+
+        // wtf? on chrome, this keeps firing every 1 second
+        // when in window, even if mouse not moving??
+        // what a waste!
         if (XY[0] == prevXY[0] && XY[1] == prevXY[1])
         {
             //console.log("WTF? didn't really move?");
             return;
         }
-        //console.log(""+nTimesMouseMoveCalled+" mouse move:",e);
-        nTimesMouseMoveCalled++;
+
 
         //console.log("    dragging = "+dragging);
         if (dragging)
@@ -709,17 +716,5 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             }
         }
         prevXY = XY;
-
-        /*
-        // prevent browser from doing flakey things
-        // (e.g. mousemove and mouseover stop firing) if it thinks drag-n-drop is going on.
-        // http://unixpapa.com/js/mouse.html#preventdefault
-        if (e.preventDefault)
-            e.preventDefault();
-        else
-            e.returnValue= false;
-        return false;
-        */
-
     });
 }; // initFigure5Interaction
