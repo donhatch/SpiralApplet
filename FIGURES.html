@@ -103,17 +103,75 @@
         jQuery(document).ready(function() {
             console.log("in jquery document-ready function!");
 
-            var theDiv = jQuery('svg').parent();
+            var templateDiv = jQuery('#figureTemplateDiv');
+            var templateSVG = templateDiv.children();
             var theSource = jQuery('#theSource');
             var theButton = jQuery('#copy-button');
-            console.log("theButton = ",theButton);
-            initFigure5Interaction(function() {
-                // this gets called when svg source changes
-                theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
-                console.log("setting the text!");
-                console.log("theButton = ",theButton);
-                theButton.attr('data-clipboard-text', "    "+jQuery.trim(theDiv[0].innerHTML));
+
+            var figure5div = jQuery('#figure5div');
+            var figure6div = jQuery('#figure6div');
+            var figure7div = jQuery('#figure7div');
+
+            var figureDivs = jQuery([figure5div[0],figure6div[0],figure7div[0]]);
+
+            // replace the contents of each figure div
+            // with a cloned copy of the template svg.
+            figureDivs.empty().append(templateSVG.clone()); // XXX why doesn't this work? shouldn't it be same as the other?
+
+
+            var globals = function() {
+                answer = [];
+                for (var key in window)
+                    answer.push(key);
+                return answer;
+            }
+
+            // return all values in array a that are not in array b
+            var difference = function(a,b) {
+                var bSet = Object(); // 
+                for (var i in b)
+                    bSet[b[i]] = true;
+                var answer = []
+                for (var i in a)
+                    if (!(a[i] in bSet))
+                        answer.push(a[i]);
+                return answer;
+            };
+
+            var globals0 = globals();
+            console.log("number of globals 0: = ",globals0.length);
+
+            initFigureInteraction(figure5div, function() {
             });
+
+            var globals1 = globals();
+            console.log("after init figure5: globals = ",globals1.length);
+            console.log("added items: ",difference(globals1,globals0));
+            console.log("deleted items: ",difference(globals0,globals1));
+
+            initFigureInteraction(figure6div, function() {
+            });
+
+            var globals2 = globals();
+            console.log("after init figure6: globals = ",globals2.length);
+            console.log("added items: ",difference(globals2,globals1));
+            console.log("deleted items: ",difference(globals1,globals2));
+
+            initFigureInteraction(figure7div, function() {
+            });
+
+            var globals3 = globals();
+            console.log("after init figure7: globals = ",globals3.length);
+
+            initFigureInteraction(templateDiv, function() {
+                // this gets called when the svg source changes
+                theSource.text("    "+jQuery.trim(templateDiv[0].innerHTML));
+                console.log("setting text for copy-to-clipboard button");
+                theButton.attr('data-clipboard-text', "    "+jQuery.trim(templateDiv[0].innerHTML));
+            });
+
+            var globals4 = globals();
+            console.log("after init template: globals = ",globals4.length);
 
             // NOTE ZeroClipboard only works over a web server
             // (not via file://).
@@ -133,8 +191,27 @@
 <ul id="assertOutputList"></ul>  
 <p>
 <!-- ======================================================================== -->
-<div id="theDiv" class="figure" width="450" height="330">
-    <svg id="figures_5_6_7" class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
+<hr>
+<div id="figure5div" class="figure" width="450" height="330">
+    (placeholder -- this should get replaced by the figure 5 svg)
+</div>
+<br>
+Figure 5
+<hr>
+<div id="figure6div" class="figure" width="450" height="330">
+    (placeholder -- this should get replaced by the figure 6 svg)
+</div>
+<br>
+Figure 6
+<hr>
+<div id="figure7div" class="figure" width="450" height="330">
+    (placeholder -- this should get replaced by the figure 7 svg)
+</div>
+<br>
+Figure 7
+<hr>
+<div id="figureTemplateDiv" class="figure" width="450" height="330">
+    <svg class="figureTemplate" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
         <!-- 1 unit = 20 pixels -->
         <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
            
@@ -232,6 +309,9 @@
         </g>
     </svg>
 </div>
+<br>
+Figures 5,6,7 template (all elements that appear in any of them).
+<hr>
 <!-- ======================================================================== -->
 
 <ul style="font-size:70%;list-style:none">
