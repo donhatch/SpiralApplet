@@ -770,7 +770,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
         for (var key in a)
             if (key in b)
                 if (a[key] !== b[key])
-                    answer.push(key);
+                    answer.push(key+":"+a[key]+"->"+b[key]);
         return answer;
     }
     var globals0 = globals();
@@ -833,13 +833,20 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                           true,
                           callThisWhenSVGSourceChanges);
 
-    var globals1 = globals();
-    if (difference(globals0,globals1).length != 0
-     || difference(globals1,globals0).length != 0
-     || whatChanged(globals0,globals1).length != 0)
+    if (false)
     {
-        window.alert("hey! someone polluted the global namespace while initializing figure5div! added: ["+difference(globals1,globals0)+"] deleted: ["+difference(globals0,globals1)+"] changed: ["+whatChanged(globals0,globals1)+"]");
-        globals0 = globals1;
+        // XXX currently can't do this,
+        // since scrollMaxX and scrollMaxY change, in firefox.
+        // and even if we make an exception for that,
+        // I guess it's still not safe.
+        var globals1 = globals();
+        if (difference(globals0,globals1).length != 0
+         || difference(globals1,globals0).length != 0
+         || whatChanged(globals0,globals1).length != 0)
+        {
+            window.alert("hey! someone polluted the global namespace while initializing figure5div! added: ["+difference(globals1,globals0)+"] deleted: ["+difference(globals0,globals1)+"] changed: ["+whatChanged(globals0,globals1)+"]");
+            globals0 = globals1;
+        }
     }
 
 
