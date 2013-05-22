@@ -1,4 +1,8 @@
-initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors, callThisWhenSVGSourceChanges) {
+initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
+                                 showDottedLines,
+                                 showArcs,
+                                 showDhatStuff,
+                                 callThisWhenSVGSourceChanges) {
 
     if (typeof jQuery === "undefined")
     {
@@ -256,11 +260,14 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors, callThisWhenSVGS
     }; // assert
 
     // jQuery(s), throwing an error if the result
-    // has length other than 1.
-    var findExpectingOneThing = function(node,query) {
+    // has length other than nExpected.
+    var findExpectingNThings = function(node,query,nExpected) {
         var answer = node.find(query);
-        assert(answer.length === 1, "got "+answer.length+" results from node.find('"+query+"'), expected 1");
+        assert(answer.length === nExpected, "got "+answer.length+" results from node.find('"+query+"'), expected "+nExpected);
         return answer;
+    };
+    var findExpectingOneThing = function(node,query) {
+        return findExpectingNThings(node, query, 1);
     };
 
     // global constants (just a cache)
@@ -725,6 +732,13 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors, callThisWhenSVGS
         }
         prevXY = XY;
     });
+
+    if (!showDottedLines)
+        findExpectingNThings(theSVG,'.orthoDottedPathStuff',2).attr('display', 'none');
+    if (!showArcs)
+        findExpectingOneThing(theSVG,'.arcsStuff').attr('display', 'none');
+    if (!showDhatStuff)
+        findExpectingNThings(theSVG,'.dhatStuff',2).attr('display', 'none');
 
     // in case some param was actually defined...
     recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
