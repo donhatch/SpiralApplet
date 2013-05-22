@@ -1056,7 +1056,7 @@ $(td,tp]$ of size $\lt \pi/2$.
 Combining this with ($A$),($B$),
 the Lemma is saying that the moment $m$
 lies in (or on the boundary of)
-a certain pie-shaped region.
+a certain pie-slice-shaped region.
 <p>
 XXX maybe note geometric interpretation of ... that it's a triangle area, or cross product
 <p>
@@ -1085,20 +1085,20 @@ $tm$
 is well-defined),
 and
 $tm = tp$.
-So ($D$) holds, and ($D$) immediately follows
+So ($D$) holds, and ($C$) immediately follows
 (since we always have $td \lt tp$ throughout any strictly CCW-outward spiral).
 We still have to prove that ($B$) holds in the base case.
 <p>
 For this base case,
 we temporarily rotate the entire picture
 so that Priscilla's position
-$p$
+$p$ (a vertex)
 is on the
 $+y$
 axis,
-and so Dudley is traveling upwards along the now-vertical dual edge
-$e'_1$,
-as shown in Figure 3.
+and so Dudley is traveling northwest along the corresponding dual edge
+$e'_1$ within the first quadrant,
+as shown in Figure 3.  XXX it shows the edge vertical, that's not right
 Note that this temporary rotation of the picture
 does not change the truth or falsity of ($B$) that we are trying to prove,
 since all of the quantities
@@ -1153,7 +1153,7 @@ Taking magnitudes of both sides of (2),
    rm &amp; = (\text{Dudley's triangle area so far}) * rp \\
        &amp; &lt; (rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2 ) * rp  \;\; \text{by (3)} \\
        &amp; = rp rd^2 \sin(\pi/2-td) \cos(\pi/2-td) / 2 \\
-       &amp; = rp rd^2 \sin(tp-td) \cos(tp-td) / 2 \;\; (by XXX if I rearrange the above to state trivial facts first, like the other cases)
+       &amp; = rp rd^2 \sin(tp-td) \cos(tp-td) / 2 \;\; \text{(by XXX if I rearrange the above to state trivial facts first, like the other cases)} \\
 \end{align}
 and so we've shown ($B$),
 completing the proof of the base case.
@@ -1329,10 +1329,14 @@ as shown in Figure 5.
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
             <path class="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 1 L 0 0"></path>
 
-            <path class="otherStuffPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2 L 0.6000000000000001 0.5333333333333334 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0.5333333333333334"></path>
             <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.056920997883030844 0.01897366596101028 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.06000000000000002 L 0 0"></path>
             <path class="m2arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.19200000000000006 0.14400000000000007 A0.24000000000000007,0.24000000000000007 0 0,1 0,0.24000000000000007 L 0 0"></path>
             <path class="m3arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0.10000000000000003 L 0.056920997883030844 0.1189736659610103 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.16000000000000006 L 0 0.10000000000000003"></path>
+
+            <path class="orthoDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2"></path>
+            <path class="dhatDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0.8 0.6000000000000001 L 0.6000000000000001 0.5333333333333334"></path>
+            <path class="dhatSolidPath" vector-effect="non-scaling-stroke" style="stroke:#8080ff; stroke-width:2; fill: none; stroke-opacity:1" d="M 0.6000000000000001 0.2 L 0.6000000000000001 0.5333333333333334 L 0 0"></path>
+
 
             <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1" d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0"></path>
             <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6000000000000001 0.2 L 0.8 0.6000000000000001 L 0 0"></path>
@@ -1468,7 +1472,13 @@ so ($^A$) is immediately satisfied and:
             ^tm \lt & \pi/2 \;\; \text{by (19)} \\
                   = & ^tp \;\; \text{by (12)} \\
 \end{align}
-($^B$) is proved as follows:
+<div class="figure">
+    <svg id="figure6">
+    </svg>
+<br>
+Figure 6: Proving ($^B$) in inductive step case 2
+</div>
+($^B$) is proved as follows (see figure 6):
 \begin{align}
     ^rm = \|^m\| = & \|_m + (\text{area of Dudley's triangle}) * (\text{Priscilla's position})\| \\
              \le & \|_m\| + (\text{area of Dudley's triangle}) * \|_^p\| \;\; \text{by triangle inequality} \\
@@ -1532,7 +1542,13 @@ and the line through
 $^d$
 parallel to the line through
 the origin and
-$_d$.
+$_d$, as shown in Figure 7.
+<div class="figure">
+    <svg id="figure7">
+    </svg>
+<br>
+Figure 7: Proving ($^C$) in inductive step case 2
+</div>
 Solving for explicit coordinates of
 $\hat{d}$,
 we have:
@@ -1547,8 +1563,11 @@ follows immediately from (22.7) and (22.5).)
 <p>
 Then the triangle $\triangle(0,_d,\hat{d})$
 has the same area as $\triangle(0,_d,^d)$.
-This can be seen geometrically since the two triangles have the same
-base and altitude, or algebraically:
+This is easy to see from Figure 7 since the two triangles
+have the same base and altitude
+(since the two apices $^d$ and $\hat{d}$ differ
+by a displacement parallel to the base).
+Algebraically, it can be seen as follows:
 \begin{align}
             _d \times \hat{d} = & _d \times (^d - _d * \text{something}) \;\; \text{by (22.5)} \\
                               = & _d \times ^d  - (_d \times _d) * \text{something}\\

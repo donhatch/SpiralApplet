@@ -68,8 +68,8 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         }
         if (true)
         {
-            console.log("dot(p0,analogy(d1,d0,[1,0])) = ", dot(p0,analogy(d1,d0,[1,0])));
-            console.log("dot(minus(p,p0),d0) = ", dot(minus([0,1],p0),d0));
+            //console.log("dot(p0,analogy(d1,d0,[1,0])) = ", dot(p0,analogy(d1,d0,[1,0])));
+            //console.log("dot(minus(p,p0),d0) = ", dot(minus([0,1],p0),d0));
             assert(Math.abs(dot(minus(p0,p0),d0)) < 1e-6);
             assert(Math.abs(dot(p0,analogy(d1,d0,[1,0]))) < 1e-6);
         }
@@ -178,7 +178,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                 m3arcPath];
     } // makeThePaths
 
-    var recomputeSVG = function(M,p,d0,d1,nNeighbors) {
+    var recomputeSVG = function(M,p,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
         console.log("    recomputing svg");
 
         var paths = makeThePaths(p,d0,d1, nNeighbors);
@@ -207,6 +207,8 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         global_m2arc.attr('d', m2arcPath);
         global_m3arc.attr('d', m3arcPath);
         global_undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
+
+        callThisWhenSVGSourceChanges();
 
         //console.log("    done recomputing svg");
     };
@@ -401,7 +403,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     if (false)
     {
         // do it the first time
-        recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+        recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
     }
 
     var localToWindow = function(localXY) {
@@ -544,13 +546,13 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
             //if (global_nNeighbors > 1)
             {
                 global_nNeighbors--;
-                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
             }
         }
         else if (indexOfThingBeingDragged === 5)
         {
             global_nNeighbors++;
-            recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+            recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
         }
 
         prevXY = XY;
@@ -663,9 +665,9 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
         //console.log("    dragging = "+dragging);
         if (dragging)
         {
-            console.log("XY = ",XY);
+            //console.log("XY = ",XY);
             var localXY = worldToLocal(XY)
-            console.log("localXY = ",localXY);
+            //console.log("localXY = ",localXY);
             if (indexOfThingBeingDragged === 0) // origin
             {
                 // XXX doesn't work yet
@@ -682,7 +684,7 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                     global_d0 = localXY;
                 }
                 console.log("d0 changed to "+global_d0);
-                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 2) // d1
             {
@@ -697,14 +699,14 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
                 }
                 //global_d1 = normalized(global_d1); // constrain to unit length
                 console.log("d1 changed to "+global_d1);
-                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 3) // p
             {
                 global_p = localXY;
                 global_p[0] = 0; // constrain to y axis
                 console.log("p changed to "+global_p);
-                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors);
+                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 4) // CW neighbor
             {

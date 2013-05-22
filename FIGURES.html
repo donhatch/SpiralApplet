@@ -14,6 +14,32 @@
         TODO: dragging 0 should change global translate
         TODO: dragging p should change global scale
         TODO: doesn't detect mouse clicks in firefox?
+
+        TODO: parametrize the figure, going to use it 3 times
+              Figure 5:  Inductive step case 2: Dudley walks from _d to ^d.
+                d0 = .745 .415
+                d1 = .8 .6
+                nNeighbors=2
+                don't show dotted lines
+                don't show arcs
+                don't show dhat stuff
+              Figure 6: Proving (^B) in inductive step case 2
+                d0 = .6 .2
+                d1 = .8 .6
+                nNeighbors=0
+                show dotted lines
+                don't show arcs
+                don't show dhat stuff
+              Figure 7: Proving (^C) in inductive step case 2
+                p = 0 1.42
+                d0 = .635 .34
+                d1 = .855 1.175
+                nNeighbors=0
+                don't show dotted lines
+                show arcs
+                show dhat stuff
+
+
     -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Figures for The Spiral Moment Lemma: There's No Single-Exit Lagoon</title>
@@ -86,7 +112,7 @@
                 theSource.text("    "+jQuery.trim(theDiv[0].innerHTML));
                 console.log("setting the text!");
                 console.log("theButton = ",theButton);
-                theButton.attr('data-clipboard-text', jQuery.trim(theDiv[0].innerHTML));
+                theButton.attr('data-clipboard-text', "    "+jQuery.trim(theDiv[0].innerHTML));
             });
 
             // NOTE ZeroClipboard only works over a web server
