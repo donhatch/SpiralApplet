@@ -493,31 +493,16 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
 
 
     // We want the location of e
+    // in the space of the SVG element.
     // with respect to the upper-left corner of the SVG element.
     // In Chrome, e.offsetX,e.offsetY apparently works,
-    // but in Firefox those are undefined
-    // so we have to do some other hack.
+    // but in Firefox those are undefined so we have to do something more robust.
     var figureOutOffsetXY = function(e) {
-        //
-        // Okay, we have pageX,pageY,
-        // which is where the click was with respect to the *page*,
-        // i.e. the *body* element.
-        // But we want it with respect to the SVG element.
-        // How do we find the offset?
-        //
-        // Supposedly theSVGELement.getBoundingClientRect()
-        // is supposed to work, but it doesn't! (In firefox)
-        // It returns a huge rectangle like 4 million by 4 million,
-        // which is nothing like what we want.
-        // So what we do is, assume the SVG is inside a DIV,
-        // and get the client rect of that div.
-        // (in that case maybe we should be using clientX,clientY instead);
-
-        var theDivRect = theDiv[0].getBoundingClientRect(); // XXX don't do this every time!
-        var offsetX = e.clientX - theDivRect.left;
-        var offsetY = e.clientY - theDivRect.top;
-
-        return [offsetX,offsetY];
+        var clientP = theSVG[0].createSVGPoint();
+        clientP.x = e.clientX;
+        clientP.y = e.clientY;
+        var svgP = clientP.matrixTransform(theSVG[0].getScreenCTM().inverse());
+        return [svgP.x,svgP.y];
     };
 
     var threshold = 10;
