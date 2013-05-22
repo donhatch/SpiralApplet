@@ -161,13 +161,12 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         var m3arcPath = "M "+deltam[0]+" "+deltam[1]+" L "+(m1arcStart[0]+deltam[0])+" "+(m1arcStart[1]+deltam[1])+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 "+(0+deltam[0])+","+(m1maxRadius+deltam[1])+" L "+deltam[0]+" "+deltam[1]+"";
 
 
-        var dhat = [d0[0], d1[1] - d0[1]*(d1[0]-d0[0])/(d0[0]==0?1:d0[0])]
+        var dhat = [d0[0], d0[0]/d1[0]*d1[1]];
 
         // note, we do the line from origin to _x_d_ even though it's redundant with the one from ^x_d^, for in case it gets dragged so that's not true
         var orthoDottedPath = ("M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]
                                        +" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]);
-        var dhatDottedPath = "M "+d1[0]+" "+d1[1]+" L "+dhat[0]+" "+dhat[1]
-        var dhatSolidPath = "M "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]+" L 0 0";
+        var dhatDottedPath = "M "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]
 
         return [dudleyMainPath,
                 dudleyNeighborsPath,
@@ -175,7 +174,6 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 priscillaNeighborsPath,
                 orthoDottedPath,
                 dhatDottedPath,
-                dhatSolidPath,
                 d0,d1,dhat,
                 m1arcPath,
                 m2arcPath,
@@ -194,19 +192,18 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         priscillaNeighborsPath.attr('d', paths[3]);
         orthoDottedPath.attr('d', paths[4]);
         dhatDottedPath.attr('d', paths[5]);
-        dhatSolidPath.attr('d', paths[6]);
-        var d0 = paths[7];
-        var d1 = paths[8];
-        var dhat = paths[9];
+        var d0 = paths[6];
+        var d1 = paths[7];
+        var dhat = paths[8];
         ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
         d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
         d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
         dhattransform.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
         xd0transform.attr('transform', 'translate('+d0[0]+',0)');
         xd1transform.attr('transform', 'translate('+d1[0]+',0)');
-        var m1arcPath = paths[10];
-        var m2arcPath = paths[11];
-        var m3arcPath = paths[12];
+        var m1arcPath = paths[9];
+        var m2arcPath = paths[10];
+        var m3arcPath = paths[11];
         m1arc.attr('d', m1arcPath);
         m2arc.attr('d', m2arcPath);
         m3arc.attr('d', m3arcPath);
@@ -296,7 +293,6 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
     var priscillaNeighborsPath = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
     var orthoDottedPath = findExpectingOneThing(theSVG, '.orthoDottedPath');
     var dhatDottedPath = findExpectingOneThing(theSVG, '.dhatDottedPath');
-    var dhatSolidPath = findExpectingOneThing(theSVG, '.dhatSolidPath');
 
     var ptransform = findExpectingOneThing(theSVG, '.ptransform');
     var d0transform = findExpectingOneThing(theSVG, '.d0transform');
@@ -338,9 +334,14 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
 
     //console.log('scales = ',undoScales);
 
+    var someParamWasDefined = (typeof p !== 'undefined'
+                            || typeof d0 !== 'undefined'
+                            || typeof d1 !== 'undefined'
+                            || typeof nNeighbors !== 'undefined');
+
     // any values not given as params
     // are extracted from the svg
-    if (typeof p == 'undefined')
+    if (typeof p === 'undefined')
     {
         var scratch = ptransform.attr('transform');
         p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
@@ -740,8 +741,10 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
     if (!showDhatStuff)
         findExpectingNThings(theSVG,'.dhatStuff',2).attr('display', 'none');
 
-    // in case some param was actually defined...
-    recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+    if (someParamWasDefined)
+    {
+        recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+    }
 
 }; // initFigureInteraction
 
@@ -814,9 +817,9 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                           function() {});
 
     initFigureInteraction(figure7div,
-                          [0,1.4], // p
-                          [.635, .34], // d0
-                          [.855, 1.175], // d1
+                          [0,1.3], // p
+                          [.63, .69], // d0
+                          [.78, 1.3], // d1
                           0, // nNeighbors
                           false, // don't show dotted lines
                           true, // show arcs

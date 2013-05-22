@@ -1440,8 +1440,14 @@ So we just need to prove $^d \times ^m \gt 0$ and we're done.
 Define
 $\hat{d} = \langle \hat{xd},\hat{yd} \rangle$
 to be the intersection of the vertical line through $_d$
-with the line through the origin and $^d$,
-as shown in Figure 7.
+with the line through the origin and $^d$.
+Figure 7 shows $^d$,
+and it also shows the possible locations of $_m$ according
+to the inductive hypothesis (the lower small pie slice),
+and the corresponding possible locations of $^m$ (the upper small pie slice),
+and the region in which we are trying to prove $^m$ lies in
+(the large pie slice).  The entire inductive step (all 4 parts)
+state that the upper small pie slice is contained in the large pie slice.
 <div id="figure7div" class="figure">
     (placeholder -- this should get replaced by the figure 5 svg)
 </div>
@@ -1531,8 +1537,7 @@ and the proof of the Spiral Moment Lemma.
                 <path class="m3arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0.10000000000000003 L 0.056920997883030844 0.1189736659610103 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.16000000000000006 L 0 0.10000000000000003"></path>
             </g>
             <g class="dhatStuff"> <!-- note there's more than one dhatStuff -->
-                <path class="dhatDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0.8 0.6000000000000001 L 0.6000000000000001 0.5333333333333334"></path>
-                <path class="dhatSolidPath" vector-effect="non-scaling-stroke" style="stroke:#8080ff; stroke-width:2; fill: none; stroke-opacity:1" d="M 0.6000000000000001 0.2 L 0.6000000000000001 0.5333333333333334 L 0 0"></path>
+                <path class="dhatDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0.6 0.2 L 0.6 0.45"></path>
             </g>
 
             <g class="orthoDottedPathStuff">
@@ -1563,9 +1568,9 @@ and the proof of the Spiral Moment Lemma.
             </g>
 
             <g class="dhatStuff"> <!-- note there's more than one dhatStuff -->
-                <g class="dhattransform" transform="translate(0.6000000000000001,0.5333333333333334)">
+                <g class="dhattransform" transform="translate(0.6000000000000001,0.45)">
                     <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                        <circle cx="0" cy="0" r="3" style="stroke:none;fill:blue"></circle>
+                        <circle cx="0" cy="0" r="4" style="stroke:none;fill:blue"></circle>
                         <g transform="translate(-15,0)">
                             <text class="d0text">
                                 <tspan x="0" y="0">d</tspan>
