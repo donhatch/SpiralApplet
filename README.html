@@ -326,7 +326,6 @@
 
                         .replace(/\b(t)([dmp])\b/g,'{\\theta_$2}')
                         .replace(/\b([rxy])([dmp])\b/g,'{$1_$2}')
-                        .replace(/\b(C')/g,'{$1}') // makes sure we get \underline{C'} instead of \underline{C} '
 
                         .replace(/\\</g,'\\langle')
                         .replace(/\\>/g,'\\rangle')
@@ -377,8 +376,8 @@
             if (typesetParam !== "no")
             {
                 console.log("    calling mathjax typeset...");
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-                //MathJax.Hub.Queue(["Typeset",MathJax.Hub,"typesetJustMe"]);
+                //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub,"typesetJustMe"]);
                 console.log("    returned from mathjax typeset.");
             }
 
@@ -393,7 +392,6 @@
     <hr> <!--============================================================-->
 
     <div class="doMyThing">
-    <span id="youarehere" style="color:green">YOU ARE HERE<br></span>
     first thing: $xp$
     </div>
     <div class="doMyThing">
@@ -1397,7 +1395,6 @@ Figure 6: Proving ($^B$) in inductive step case 2
 \end{align}
 So that proves ($^B$); all we have left to prove is ($^C$).
 <p>
-<div id="typesetJustMe">
 For this, we first derive a tighter bound on $_xm$,
 from the pie-slice-shaped bounds on $_rm$ and $_tm$
 given in the inductive hypothesis.
@@ -1423,7 +1420,6 @@ In this Priscilla-aligned coordinate system, that's the same as saying:
 \end{align}
 (XXX could phrase that in terms "$m \times p \lt \frac{1}{2} (d \times p)^2$",
 coordinate-free til the last second, if we wanted... maybe)
-</div>
 <p>
 Now we proceed to prove ($^C$).
 Since $^d$,$^m$,$_d$,$_m$ are all in the first quadrant,
@@ -1437,6 +1433,98 @@ $^d \times ^m \gt 0$,
 and assumption ($_C$) is that $_d \times _m \gt 0$.
 <p>
 So we just need to prove $^d \times ^m \gt 0$ and we're done.
+
+<hr>
+<span id="youarehere" style="color:green">YOU ARE HERE<br></span>
+BEGIN NEW WAY
+<br>
+<div id="typesetJustMe">
+Define
+$\hat{d} = \langle \hat{xd},\hat{yd} \rangle$
+to be the intersection of the vertical line through $_d$
+with the line through the origin and $^d$,
+as shown in Figure 7.
+<div id="figure7div" class="figure">
+    (placeholder -- this should get replaced by the figure 5 svg)
+</div>
+<br>
+Figure 7: Proving ($^C$) in inductive step case 2
+<p>
+Some very easy facts about $\hat{d}$:
+\begin{align}
+   (22.5) \;\;  \hat{xd} = & _xd \\
+   (22.6) \;\;  \hat{yd} = & (_xd/^xd) ^yd. \\
+\end{align}
+(22.6) and (13.5) imply:
+\begin{align}
+   (22.7) \;\;  \hat{yd} \lt & ^yd
+\end{align}
+Also,
+\begin{align}
+            \hat{td} = & ^td \\
+                   \gt & _td \;\;  by (14)
+\end{align}
+and all these angles are in the interval $(0,\pi/2)$ by (14), so
+\begin{align}
+   (22.8) \;\;  \tan(\hat{td}) \gt \tan{_td} \gt 0
+\end{align}
+So then,
+\begin{align}
+
+                 \hat{yd} = & \hat{xd} \tan(\hat{td}) \\
+                          = & \hat{xd} \tan(\hat{td}) \\
+                          = & \hat{xd} \tan(^td) \;\; \text{since $\hat{td} = ^td$} \\
+                          = & _xd \tan(^td) \;\; \text{by (22.5)} \\
+                        \gt & _xd \tan(_td) \;\; \text{by (22.8)} \\
+                          = & _yd \\
+   (22.9) \;\; \hat{yd} \gt & _yd. \\
+\end{align}
+So 22.7 and 22.9 say:
+\begin{align}
+            _yd \lt \hat{yd} \lt ^yd
+\end{align}
+(all of which is obvious from the picture).
+<p>
+So our goal ($^C$),
+which is to prove $tm \gt ^td$,
+is the same as proving $_tm \gt \hat{td}$,
+i.e. that $\hat{d} \times ^m \gt 0$.
+So that's what we'll show in order to complete the proof.
+
+\begin{align}
+ \hat{d} \times ^m = & \langle \hat{xd},\hat{yd} \rangle \times \langle _^xm,^ym \rangle \\
+                   = & \langle _xd,\hat{yd} \rangle \times \langle _^xm,^ym \rangle \;\; \text{by (22.7)} \\
+                   = & _xd ^ym  -  \hat{yd} _^xm \\
+
+                   = & _xd (_ym + \text{area}(\triangle(0,_d,^d)) _^yp) - \hat{yd} _^xm \\
+                   > & _xd (_ym + \text{area}(\triangle(0,_d,\hat{d})) _^yp) - \hat{yd} _^xm \;\; \text{since this triangle is strictly smaller} \\
+                   = & _xd (_ym + \frac{1}{2} _xd (\hat{yd}-_yd) _^yp) - \hat{yd} _^xm \\
+                   & \\
+
+                   = & _xd (_ym + \frac{1}{2} _xd (\hat{yd}-_yd) _^yp)  -  (_yd + (\hat{yd}-_yd)) _^xm \;\; \text{since $\hat{yd} = _yd + (\hat{yd}-_yd)$} \\
+                   & \\
+
+                   = & (_xd _ym - _yd _^xm) + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \;\;\;\; \text{(just rearranged terms)} \\
+                   = &          _d \times _m          + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \\
+                 \gt &             0             + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \;\; \text{by ($_C$)} \\
+                   = & (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \\
+                   = & (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^rp - _^xm) \;\; \text{by ($11.5$)} \\
+  
+                 \gt & 0, \;\; \text{by (22.9) and (22).} \\
+\end{align}
+So ($^C$) is proved, completing the induction
+and the proof of the Spiral Moment Lemma.
+</div> <!-- typesetJustMe -->
+
+
+
+<br>
+END NEW WAY
+<hr>
+
+
+<hr>
+BEGIN OLD WAY... MORE COMPLICATED THAN NECESSARY I THINK
 <p>
 It will be convenient to work with an intermediate point
 $\hat{d} = \langle \hat{xd},\hat{yd} \rangle$,
@@ -1522,7 +1610,7 @@ i.e. that $\hat{d} \times ^m \gt 0$.
 
                    = & (_xd _ym - _yd _^xm) + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \;\;\;\; \text{(just rearranged terms)} \\
                    = &          _d \times _m          + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \\
-                 \gt &             0             + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \;\; \text{by ($_C'$)} \\
+                 \gt &             0             + (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \;\; \text{by ($_C$)} \\
                    = & (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^yp - _^xm) \\
                    = & (\hat{yd}-_yd) (\frac{1}{2} _xd ^2 _^rp - _^xm) \;\; \text{by ($11.5$)} \\
   
@@ -1530,6 +1618,9 @@ i.e. that $\hat{d} \times ^m \gt 0$.
 \end{align}
 So ($^C$) is proved, completing the induction
 and the proof of the Spiral Moment Lemma.
+END OLD WAY
+<hr>
+
 </div> <!-- priscillaAndDudleyStuff -->
 
 
