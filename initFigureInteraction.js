@@ -750,19 +750,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
 
 var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
 {
-    var templateDiv = jQuery('#figureTemplateDiv');
-    var templateSVG = templateDiv.children();
-    var figure5div = jQuery('#figure5div');
-    var figure6div = jQuery('#figure6div');
-    var figure7div = jQuery('#figure7div');
-
-    var figureDivs = jQuery([figure5div[0],figure6div[0],figure7div[0]]);
-
-    // replace the contents of each figure div
-    // with a cloned copy of the template svg.
-    figureDivs.empty().append(templateSVG.clone()); // XXX why doesn't this work? shouldn't it be same as the other?
-
-
+    // Make sure I'm not modifying any global vars...
     var globals = function() {
         var answer = Object();
         for (var key in window)
@@ -785,9 +773,25 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                     answer.push(key);
         return answer;
     }
-
     var globals0 = globals();
-    console.log("number of globals 0: = ",globals0.length);
+    console.log("before: number of globals 0: = ",globals0.length);
+
+
+
+    var templateDiv = jQuery('#figureTemplateDiv');
+    var templateSVG = templateDiv.children();
+    var figure5div = jQuery('#figure5div');
+    var figure6div = jQuery('#figure6div');
+    var figure7div = jQuery('#figure7div');
+
+    var figureDivs = jQuery([figure5div[0],figure6div[0],figure7div[0]]);
+
+    // replace the contents of each figure div
+    // with a cloned copy of the template svg.
+    figureDivs.empty().append(templateSVG.clone()); // XXX why doesn't this work? shouldn't it be same as the other?
+
+
+
 
     initFigureInteraction(figure5div,
                           [0,1], // p
@@ -799,15 +803,6 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                           false, // don't show dhat stuff
                           function() {});
 
-    var globals1 = globals();
-    if (difference(globals0,globals1).length != 0
-     || difference(globals1,globals0).length != 0
-     || whatChanged(globals0,globals1).length != 0)
-    {
-        window.alert("hey! someone polluted the global namespace while initializing figure5div! added: "+difference(globals1,globals0)+" deleted: "+difference(globals0,globals1)+" changed: "+whatChanged(globals0,globals1));
-        globals0 = globals1;
-    }
-
     initFigureInteraction(figure6div,
                           [0,1], // p
                           [.6, .2], // d0
@@ -818,14 +813,6 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                           false, // don't show dhat stuff
                           function() {});
 
-    var globals1 = globals();
-    if (globals1.length != globals0.length)
-    {
-        window.alert("hey! someone polluted the global namespace while initializing figure6div! added: "+difference(globals1,globals0)+" deleted: "+difference(globals0,globals1));
-        globals0 = globals1;
-    }
-
-
     initFigureInteraction(figure7div,
                           [0,1.4], // p
                           [.635, .34], // d0
@@ -835,13 +822,6 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                           true, // show arcs
                           true, // show dhat stuff
                           function() {});
-
-    var globals1 = globals();
-    if (globals1.length != globals0.length)
-    {
-        window.alert("hey! someone polluted the global namespace while initializing figure7div! added: "+difference(globals1,globals0)+" deleted: "+difference(globals0,globals1));
-        globals0 = globals1;
-    }
 
     initFigureInteraction(templateDiv,
                           undefined,
@@ -854,9 +834,13 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                           callThisWhenSVGSourceChanges);
 
     var globals1 = globals();
-    if (globals1.length != globals0.length)
+    if (difference(globals0,globals1).length != 0
+     || difference(globals1,globals0).length != 0
+     || whatChanged(globals0,globals1).length != 0)
     {
-        window.alert("hey! someone polluted the global namespace while initializing templateDiv! added: "+difference(globals1,globals0)+" deleted: "+difference(globals0,globals1));
+        window.alert("hey! someone polluted the global namespace while initializing figure5div! added: ["+difference(globals1,globals0)+"] deleted: ["+difference(globals0,globals1)+"] changed: ["+whatChanged(globals0,globals1)+"]");
         globals0 = globals1;
     }
+
+
 } // initFigures567Interaction
