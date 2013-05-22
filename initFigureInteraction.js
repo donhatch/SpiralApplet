@@ -264,8 +264,8 @@ initFigure5Interaction = function(callThisWhenSVGSourceChanges) {
     };
 
     // global constants (just a cache)
-    var theSVG = jQuery('#figure5');
-    assert(theSVG.length === 1, "oh no! "+theSVG.length+" results matching #figure5?");
+    var theSVG = jQuery('#figures_5_6_7');
+    assert(theSVG.length === 1, "oh no! "+theSVG.length+" results matching #figures_5_6_7?");
     var theDiv = theSVG.parent();
     console.log("theDiv[0].tagName = "+theDiv[0].tagName);
     assert(theDiv.length === 1 && theDiv[0].tagName == "DIV", "oh no! the SVG has to have a div as a parent! dragging won't work!");
