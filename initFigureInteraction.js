@@ -184,29 +184,29 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         var paths = makeThePaths(p,d0,d1, nNeighbors);
 
 
-        global_dudleyMainPath.attr('d', paths[0]);
-        global_dudleyNeighborsPath.attr('d', paths[1]);
-        global_priscillaMainPath.attr('d', paths[2]);
-        global_priscillaNeighborsPath.attr('d', paths[3]);
-        global_orthoDottedPath.attr('d', paths[4]);
-        global_dhatDottedPath.attr('d', paths[5]);
-        global_dhatSolidPath.attr('d', paths[6]);
+        dudleyMainPath.attr('d', paths[0]);
+        dudleyNeighborsPath.attr('d', paths[1]);
+        priscillaMainPath.attr('d', paths[2]);
+        priscillaNeighborsPath.attr('d', paths[3]);
+        orthoDottedPath.attr('d', paths[4]);
+        dhatDottedPath.attr('d', paths[5]);
+        dhatSolidPath.attr('d', paths[6]);
         var d0 = paths[7];
         var d1 = paths[8];
         var dhat = paths[9];
-        global_ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
-        global_d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
-        global_d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
-        global_dhattransform.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
-        global_xd0transform.attr('transform', 'translate('+d0[0]+',0)');
-        global_xd1transform.attr('transform', 'translate('+d1[0]+',0)');
+        ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
+        d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
+        d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
+        dhattransform.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
+        xd0transform.attr('transform', 'translate('+d0[0]+',0)');
+        xd1transform.attr('transform', 'translate('+d1[0]+',0)');
         var m1arcPath = paths[10];
         var m2arcPath = paths[11];
         var m3arcPath = paths[12];
-        global_m1arc.attr('d', m1arcPath);
-        global_m2arc.attr('d', m2arcPath);
-        global_m3arc.attr('d', m3arcPath);
-        global_undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
+        m1arc.attr('d', m1arcPath);
+        m2arc.attr('d', m2arcPath);
+        m3arc.attr('d', m3arcPath);
+        undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
 
         callThisWhenSVGSourceChanges();
 
@@ -283,102 +283,102 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
 
     // XXX note, the following aren't really global!  I thought they would have to be, but they don't
 
-    var global_theGraphic = findExpectingOneThing(theSVG, '.theGraphic');
-    var global_dudleyMainPath = findExpectingOneThing(theSVG, '.dudleyMainPath');
-    var global_dudleyNeighborsPath = findExpectingOneThing(theSVG, '.dudleyNeighborsPath');
-    var global_priscillaMainPath = findExpectingOneThing(theSVG, '.priscillaMainPath');
-    var global_priscillaNeighborsPath = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
-    var global_orthoDottedPath = findExpectingOneThing(theSVG, '.orthoDottedPath');
-    var global_dhatDottedPath = findExpectingOneThing(theSVG, '.dhatDottedPath');
-    var global_dhatSolidPath = findExpectingOneThing(theSVG, '.dhatSolidPath');
+    var theGraphic = findExpectingOneThing(theSVG, '.theGraphic');
+    var dudleyMainPath = findExpectingOneThing(theSVG, '.dudleyMainPath');
+    var dudleyNeighborsPath = findExpectingOneThing(theSVG, '.dudleyNeighborsPath');
+    var priscillaMainPath = findExpectingOneThing(theSVG, '.priscillaMainPath');
+    var priscillaNeighborsPath = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
+    var orthoDottedPath = findExpectingOneThing(theSVG, '.orthoDottedPath');
+    var dhatDottedPath = findExpectingOneThing(theSVG, '.dhatDottedPath');
+    var dhatSolidPath = findExpectingOneThing(theSVG, '.dhatSolidPath');
 
-    var global_ptransform = findExpectingOneThing(theSVG, '.ptransform');
-    var global_d0transform = findExpectingOneThing(theSVG, '.d0transform');
-    var global_d1transform = findExpectingOneThing(theSVG, '.d1transform');
-    var global_dhattransform = findExpectingOneThing(theSVG, '.dhattransform');
-    var global_xd0transform = findExpectingOneThing(theSVG, '.xd0transform');
-    var global_xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
-    var global_m1arc = findExpectingOneThing(theSVG, '.m1arc');
-    var global_m2arc = findExpectingOneThing(theSVG, '.m2arc');
-    var global_m3arc = findExpectingOneThing(theSVG, '.m3arc');
-    var global_undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
+    var ptransform = findExpectingOneThing(theSVG, '.ptransform');
+    var d0transform = findExpectingOneThing(theSVG, '.d0transform');
+    var d1transform = findExpectingOneThing(theSVG, '.d1transform');
+    var dhattransform = findExpectingOneThing(theSVG, '.dhattransform');
+    var xd0transform = findExpectingOneThing(theSVG, '.xd0transform');
+    var xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
+    var m1arc = findExpectingOneThing(theSVG, '.m1arc');
+    var m2arc = findExpectingOneThing(theSVG, '.m2arc');
+    var m3arc = findExpectingOneThing(theSVG, '.m3arc');
+    var undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
 
 
     // these may or may not exist on the page... if they don't, we'll have no-ops
-    var global_mouseins_subelementsElement = jQuery("#mouseins_subelements");
-    var global_mouseins_svgElement = jQuery("#mouseins_svg");
-    var global_mouseentersElement = jQuery("#mouseenters");
-    var global_mousemovesElement = jQuery("#mousemoves");
-    var global_mousedownsElement = jQuery("#mousedowns");
-    var global_mousedragsElement = jQuery("#mousedrags");
-    var global_mouseupsElement = jQuery("#mouseups");
-    var global_mouseleavesElement = jQuery("#mouseleaves");
-    var global_mouseouts_svgElement = jQuery("#mouseouts_svg");
-    var global_mouseouts_subelementsElement = jQuery("#mouseouts_subelements");
+    var mouseins_subelementsElement = jQuery("#mouseins_subelements");
+    var mouseins_svgElement = jQuery("#mouseins_svg");
+    var mouseentersElement = jQuery("#mouseenters");
+    var mousemovesElement = jQuery("#mousemoves");
+    var mousedownsElement = jQuery("#mousedowns");
+    var mousedragsElement = jQuery("#mousedrags");
+    var mouseupsElement = jQuery("#mouseups");
+    var mouseleavesElement = jQuery("#mouseleaves");
+    var mouseouts_svgElement = jQuery("#mouseouts_svg");
+    var mouseouts_subelementsElement = jQuery("#mouseouts_subelements");
 
-    var global_mouseins_subelementsCount = 0;
-    var global_mouseins_svgCount = 0;
-    var global_mouseentersCount = 0;
-    var global_mousemovesCount = 0;
-    var global_mousedownsCount = 0;
-    var global_mousedragsCount = 0;
-    var global_mouseupsCount = 0;
-    var global_mouseleavesCount = 0;
-    var global_mouseouts_svgCount = 0;
-    var global_mouseouts_subelementsCount = 0;
+    var mouseins_subelementsCount = 0;
+    var mouseins_svgCount = 0;
+    var mouseentersCount = 0;
+    var mousemovesCount = 0;
+    var mousedownsCount = 0;
+    var mousedragsCount = 0;
+    var mouseupsCount = 0;
+    var mouseleavesCount = 0;
+    var mouseouts_svgCount = 0;
+    var mouseouts_subelementsCount = 0;
 
-    //console.log('scales = ',global_undoScales);
+    //console.log('scales = ',undoScales);
 
     if (true)
     {
         // This was the bootstrapping way...
-        var global_p = [0,1];
-        var global_d0 = [6,2];
-        var global_d1 = [8,6];
-        var global_nNeighbors = 1;
+        var p = [0,1];
+        var d0 = [6,2];
+        var d1 = [8,6];
+        var nNeighbors = 1;
     }
     else
     {
         var scratch;
         // these days we get it from the existing svg transform elements
-        scratch = global_d0transform.attr('transform')
+        scratch = d0transform.attr('transform')
         // 'translate(0,0)'
-        var global_d0 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+        var d0 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
                      Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-        scratch = global_d1transform.attr('transform')
-        var global_d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+        scratch = d1transform.attr('transform')
+        var d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
                      Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-        scratch = global_ptransform.attr('transform')
-        var global_p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+        scratch = ptransform.attr('transform')
+        var p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
                     Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-        console.log('p = '+global_p);
-        console.log('d0 = '+global_d0);
-        console.log('d1 = '+global_d1);
+        console.log('p = '+p);
+        console.log('d0 = '+d0);
+        console.log('d1 = '+d1);
 
         // really hacky way to deduce nNeighbors--
         // figure it out from the size of the neighborsPaths.
-        var pTemp = jQuery.trim(global_priscillaNeighborsPath.attr('d')).split(/ +/).length;
-        var dTemp = jQuery.trim(global_dudleyNeighborsPath.attr('d')).split(/ +/).length;
+        var pTemp = jQuery.trim(priscillaNeighborsPath.attr('d')).split(/ +/).length;
+        var dTemp = jQuery.trim(dudleyNeighborsPath.attr('d')).split(/ +/).length;
         //console.log('length of d neighbors path = '+pTemp);
         //console.log('length of p neighbors path = '+dTemp);
         assert(pTemp === dTemp, "priscillaNeighborsPath and dudleyNeighborsPath have different numbers of tokens! "+pTemp+" vs "+dTemp+"");
         assert(pTemp % 18 === 0, "neighbors path length "+pTemp+" is not a multiple of 18!");
-        var global_nNeighbors = pTemp / 18;
+        var nNeighbors = pTemp / 18;
     }
 
     if (false) // change to true to debug a simple case
     {
-        global_p = [0,1];
-        global_d0 = [Math.sqrt(.5),Math.sqrt(.5)/2];
-        global_d1 = [Math.sqrt(.5),Math.sqrt(.5)];
-        global_nNeighbors = 1;
+        p = [0,1];
+        d0 = [Math.sqrt(.5),Math.sqrt(.5)/2];
+        d1 = [Math.sqrt(.5),Math.sqrt(.5)];
+        nNeighbors = 1;
     }
 
     {
         // rescale d0 and d1 so that length of d1 is 1
-        var rescale = 1./length(global_d1);
-        global_d1 = times(global_d1, rescale);
-        global_d0 = times(global_d0, rescale);
+        var rescale = 1./length(d1);
+        d1 = times(d1, rescale);
+        d0 = times(d0, rescale);
         rescale = undefined;
     }
 
@@ -393,7 +393,7 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         // extract the top-level graphic's translation and scale.
         // the attr looks like:
         //     transform="translate(250,320) scale(200,-200)"
-        var scratch = global_theGraphic.attr('transform');
+        var scratch = theGraphic.attr('transform');
         var match = scratch.match(/^translate\((.*),(.*)\) scale\((.*),(.*)\)$/);
         xTrans = Number(match[1]);
         yTrans = Number(match[2]);
@@ -414,7 +414,7 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
     if (false)
     {
         // do it the first time
-        recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
+        recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
     }
 
     var localToWindow = function(localXY) {
@@ -437,11 +437,11 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         var threshold1 = threshold*threshold;
         var things = [
             localToWindow([0,0]),
-            localToWindow(global_d0),
-            localToWindow(global_d1),
-            localToWindow(global_p),
-            localToWindow(analogy(global_d1,global_d0,global_d0)), // first CW neighbor
-            localToWindow(analogy(global_d0,global_d1,global_d1)), // first CCW neighbor
+            localToWindow(d0),
+            localToWindow(d1),
+            localToWindow(p),
+            localToWindow(analogy(d1,d0,d0)), // first CW neighbor
+            localToWindow(analogy(d0,d1,d1)), // first CCW neighbor
         ];
         if (debug)
         {
@@ -525,8 +525,8 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
     theSVG.mousedown(function(e) {
         //console.log("mouse down: ",e);
 
-        global_mousedownsCount++;
-        global_mousedownsElement.text(""+global_mousedownsCount+" mousedowns");
+        mousedownsCount++;
+        mousedownsElement.text(""+mousedownsCount+" mousedowns");
 
 
         var XY = figureOutOffsetXY(e);
@@ -554,16 +554,16 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         // XXX HACKY obscure way to change nNeighbors!
         if (indexOfThingBeingDragged === 4)
         {
-            //if (global_nNeighbors > 1)
+            //if (nNeighbors > 1)
             {
-                global_nNeighbors--;
-                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
+                nNeighbors--;
+                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
         }
         else if (indexOfThingBeingDragged === 5)
         {
-            global_nNeighbors++;
-            recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
+            nNeighbors++;
+            recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
         }
 
         prevXY = XY;
@@ -581,8 +581,8 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
     theSVG.mouseup(function(e) {
         //console.log("mouse up: ",e);
 
-        global_mouseupsCount++;
-        global_mouseupsElement.text(""+global_mouseupsCount+" mouseups");
+        mouseupsCount++;
+        mouseupsElement.text(""+mouseupsCount+" mouseups");
 
         var XY = figureOutOffsetXY(e);
         dragging = false;
@@ -593,8 +593,8 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
     theSVG.mouseenter(function(e) {
         //console.log("mouse enter: ",e);
         //console.log("    e.target = ",e.target);
-        global_mouseentersCount++;
-        global_mouseentersElement.text(""+global_mouseentersCount+" mouseenters");
+        mouseentersCount++;
+        mouseentersElement.text(""+mouseentersCount+" mouseenters");
     });
 
     // ARGH! we get spurious leave events when children get leave events! (even though the jquery doc says we shouldn't) so don't do this!
@@ -607,8 +607,8 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         theSVG.mouseleave(function(e) {
             //console.log("mouse leave: ",e);
             //console.log("    e.target = ",e.target);
-            global_mouseleavesCount++;
-            global_mouseleavesElement.text(""+global_mouseleavesCount+" mouseleaves");
+            mouseleavesCount++;
+            mouseleavesElement.text(""+mouseleavesCount+" mouseleaves");
 
             dragging = false;
         });
@@ -618,13 +618,13 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
 
             if (e.target == theSVG[0])
             {
-                global_mouseouts_svgCount++;
-                global_mouseouts_svgElement.text(""+global_mouseouts_svgCount+" mouseouts svg");
+                mouseouts_svgCount++;
+                mouseouts_svgElement.text(""+mouseouts_svgCount+" mouseouts svg");
             }
             else
             {
-                global_mouseouts_subelementsCount++;
-                global_mouseouts_subelementsElement.text(""+global_mouseouts_subelementsCount+" mouseouts sub-elements");
+                mouseouts_subelementsCount++;
+                mouseouts_subelementsElement.text(""+mouseouts_subelementsCount+" mouseouts sub-elements");
             }
         });
         theSVG.mouseover(function(e) {
@@ -633,30 +633,30 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
 
             if (e.target == theSVG[0])
             {
-                global_mouseins_svgCount++;
-                global_mouseins_svgElement.text(""+global_mouseins_svgCount+" mouseins svg");
+                mouseins_svgCount++;
+                mouseins_svgElement.text(""+mouseins_svgCount+" mouseins svg");
             }
             else
             {
-                global_mouseins_subelementsCount++;
-                global_mouseins_subelementsElement.text(""+global_mouseins_subelementsCount+" mouseins sub-elements");
+                mouseins_subelementsCount++;
+                mouseins_subelementsElement.text(""+mouseins_subelementsCount+" mouseins sub-elements");
             }
         });
     }
 
 
     theSVG.mousemove(function(e) {
-        //console.log(""+global_mousemovesCount+" mouse move:",e);
+        //console.log(""+mousemovesCount+" mouse move:",e);
 
         if (dragging)
         {
-            global_mousedragsCount++;
-            global_mousedragsElement.text(""+global_mousedragsCount+" mousedrags");
+            mousedragsCount++;
+            mousedragsElement.text(""+mousedragsCount+" mousedrags");
         }
         else
         {
-            global_mousemovesCount++;
-            global_mousemovesElement.text(""+global_mousemovesCount+" mousemoves");
+            mousemovesCount++;
+            mousemovesElement.text(""+mousemovesCount+" mousemoves");
         }
 
 
@@ -688,36 +688,36 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
                 if (e.ctrlKey)
                 {
                     // constrain to same angle
-                    global_d0 = times(global_d0, length(localXY)/length(global_d0));
+                    d0 = times(d0, length(localXY)/length(d0));
                 }
                 else
                 {
-                    global_d0 = localXY;
+                    d0 = localXY;
                 }
-                console.log("d0 changed to "+global_d0);
-                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
+                console.log("d0 changed to "+d0);
+                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 2) // d1
             {
                 if (e.ctrlKey)
                 {
                     // constrain to same angle
-                    global_d1 = times(global_d1, length(localXY)/length(global_d1));
+                    d1 = times(d1, length(localXY)/length(d1));
                 }
                 else
                 {
-                    global_d1 = localXY;
+                    d1 = localXY;
                 }
-                //global_d1 = normalized(global_d1); // constrain to unit length
-                console.log("d1 changed to "+global_d1);
-                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
+                //d1 = normalized(d1); // constrain to unit length
+                console.log("d1 changed to "+d1);
+                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 3) // p
             {
-                global_p = localXY;
-                global_p[0] = 0; // constrain to y axis
-                console.log("p changed to "+global_p);
-                recomputeSVG(localToWindowMatrix, global_p, global_d0, global_d1, global_nNeighbors,callThisWhenSVGSourceChanges);
+                p = localXY;
+                p[0] = 0; // constrain to y axis
+                console.log("p changed to "+p);
+                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 4) // CW neighbor
             {
