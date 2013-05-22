@@ -1,4 +1,4 @@
-initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
+initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors, callThisWhenSVGSourceChanges) {
 
     if (typeof jQuery === "undefined")
     {
@@ -119,7 +119,7 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
                 temp = analogy(z,Z,Z);
                 z = Z;
                 Z = temp;
-                q = analogy(p1,q0,z);
+                var q = analogy(p1,q0,z);
                 priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
             }
             z = p0;
@@ -129,7 +129,7 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
                 temp = analogy(Z,z,z);
                 Z = z;
                 z = temp;
-                q = analogy(p1,q0,Z);
+                var q = analogy(p1,q0,Z);
                 priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
             }
         }
@@ -276,12 +276,11 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         throw null;
     }
 
+
     console.log("theDiv[0].tagName = "+theDiv[0].tagName);
     assert(theDiv.length === 1 && theDiv[0].tagName == "DIV", "oh no! the SVG has to have a div as a parent! dragging won't work!");
     var theDivsChildren = theDiv.children();
     assert(theDivsChildren.length === 1 && theDiv[0].tagName == "DIV", "oh no! the SVG has siblings! dragging won't work!");
-
-    // XXX note, the following aren't really global!  I thought they would have to be, but they don't
 
     var theGraphic = findExpectingOneThing(theSVG, '.theGraphic');
     var dudleyMainPath = findExpectingOneThing(theSVG, '.dudleyMainPath');
@@ -302,6 +301,9 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
     var m2arc = findExpectingOneThing(theSVG, '.m2arc');
     var m3arc = findExpectingOneThing(theSVG, '.m3arc');
     var undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
+
+
+
 
 
     // these may or may not exist on the page... if they don't, we'll have no-ops
@@ -329,32 +331,29 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
 
     //console.log('scales = ',undoScales);
 
-    if (true)
+    // any values not given as params
+    // are extracted from the svg
+    if (typeof p == 'undefined')
     {
-        // This was the bootstrapping way...
-        var p = [0,1];
-        var d0 = [6,2];
-        var d1 = [8,6];
-        var nNeighbors = 1;
+        var scratch = ptransform.attr('transform');
+        p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+             Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
     }
-    else
+    if (typeof d0 === 'undefined')
     {
-        var scratch;
-        // these days we get it from the existing svg transform elements
-        scratch = d0transform.attr('transform')
         // 'translate(0,0)'
-        var d0 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
-                     Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-        scratch = d1transform.attr('transform')
-        var d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
-                     Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-        scratch = ptransform.attr('transform')
-        var p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
-                    Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-        console.log('p = '+p);
-        console.log('d0 = '+d0);
-        console.log('d1 = '+d1);
-
+        var scratch = d0transform.attr('transform');
+        d0 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+              Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+    }
+    if (typeof d1 === 'undefined')
+    {
+        var scratch = d1transform.attr('transform');
+        d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+              Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+    }
+    if (typeof nNeighbors === 'undefined')
+    {
         // really hacky way to deduce nNeighbors--
         // figure it out from the size of the neighborsPaths.
         var pTemp = jQuery.trim(priscillaNeighborsPath.attr('d')).split(/ +/).length;
@@ -363,8 +362,14 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         //console.log('length of p neighbors path = '+dTemp);
         assert(pTemp === dTemp, "priscillaNeighborsPath and dudleyNeighborsPath have different numbers of tokens! "+pTemp+" vs "+dTemp+"");
         assert(pTemp % 18 === 0, "neighbors path length "+pTemp+" is not a multiple of 18!");
-        var nNeighbors = pTemp / 18;
+        nNeighbors = pTemp / 18;
     }
+
+
+    console.log('p = '+p);
+    console.log('d0 = '+d0);
+    console.log('d1 = '+d1);
+    console.log('nNeighbors = '+nNeighbors);
 
     if (false) // change to true to debug a simple case
     {
@@ -372,14 +377,6 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         d0 = [Math.sqrt(.5),Math.sqrt(.5)/2];
         d1 = [Math.sqrt(.5),Math.sqrt(.5)];
         nNeighbors = 1;
-    }
-
-    {
-        // rescale d0 and d1 so that length of d1 is 1
-        var rescale = 1./length(d1);
-        d1 = times(d1, rescale);
-        d0 = times(d0, rescale);
-        rescale = undefined;
     }
 
     // this was the old bootstrapping way...
@@ -514,8 +511,6 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
 
         return [offsetX,offsetY];
     };
-
-    callThisWhenSVGSourceChanges();
 
     var threshold = 10;
     var dragging = false;
@@ -730,4 +725,8 @@ initFigureInteraction = function(theDiv, callThisWhenSVGSourceChanges) {
         }
         prevXY = XY;
     });
+
+    // in case some param was actually defined...
+    recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+
 }; // initFigureInteraction
