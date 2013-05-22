@@ -16,28 +16,6 @@
         TODO: doesn't detect mouse clicks in firefox?
 
         TODO: parametrize the figure, going to use it 3 times
-              Figure 5:  Inductive step case 2: Dudley walks from _d to ^d.
-                d0 = .745 .415
-                d1 = .8 .6
-                nNeighbors=2
-                don't show dotted lines
-                don't show arcs
-                don't show dhat stuff
-              Figure 6: Proving (^B) in inductive step case 2
-                d0 = .6 .2
-                d1 = .8 .6
-                nNeighbors=0
-                show dotted lines
-                don't show arcs
-                don't show dhat stuff
-              Figure 7: Proving (^C) in inductive step case 2
-                p = 0 1.42
-                d0 = .635 .34
-                d1 = .855 1.175
-                nNeighbors=0
-                don't show dotted lines
-                show arcs
-                show dhat stuff
 
 
     -->
@@ -108,70 +86,123 @@
             var theSource = jQuery('#theSource');
             var theButton = jQuery('#copy-button');
 
-            var figure5div = jQuery('#figure5div');
-            var figure6div = jQuery('#figure6div');
-            var figure7div = jQuery('#figure7div');
+            var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
+            {
+                var figure5div = jQuery('#figure5div');
+                var figure6div = jQuery('#figure6div');
+                var figure7div = jQuery('#figure7div');
 
-            var figureDivs = jQuery([figure5div[0],figure6div[0],figure7div[0]]);
+                var figureDivs = jQuery([figure5div[0],figure6div[0],figure7div[0]]);
 
-            // replace the contents of each figure div
-            // with a cloned copy of the template svg.
-            figureDivs.empty().append(templateSVG.clone()); // XXX why doesn't this work? shouldn't it be same as the other?
+                // replace the contents of each figure div
+                // with a cloned copy of the template svg.
+                figureDivs.empty().append(templateSVG.clone()); // XXX why doesn't this work? shouldn't it be same as the other?
 
 
-            var globals = function() {
-                answer = [];
-                for (var key in window)
-                    answer.push(key);
-                return answer;
-            }
+                var globals = function() {
+                    var answer = Object();
+                    for (var key in window)
+                        answer[key] = window[key];
+                    return answer;
+                }
+                // return all keys in a that are not in b
+                var difference = function(a,b) {
+                    var answer = [];
+                    for (var key in a)
+                        if (!(key in b))
+                            answer.push(key);
+                    return answer;
+                }
+                var whatChanged = function(a,b) {
+                    var answer = [];
+                    for (var key in a)
+                        if (key in b)
+                            if (a[key] !== b[key])
+                                answer.push(key);
+                    return answer;
+                }
 
-            // return all values in array a that are not in array b
-            var difference = function(a,b) {
-                var bSet = Object(); // 
-                for (var i in b)
-                    bSet[b[i]] = true;
-                var answer = []
-                for (var i in a)
-                    if (!(a[i] in bSet))
-                        answer.push(a[i]);
-                return answer;
-            };
+                var globals0 = globals();
+                console.log("number of globals 0: = ",globals0.length);
 
-            var globals0 = globals();
-            console.log("number of globals 0: = ",globals0.length);
+                initFigureInteraction(figure5div,
+                                      [0,1], // p
+                                      [.745, .415], // d0
+                                      [.8, .6], // d1
+                                      2, // nNeighbors
+                                      false, // don't show dotted lines
+                                      false, // don't show arcs
+                                      false, // don't show dhat stuff
+                                      function() {});
 
-            initFigureInteraction(figure5div, function() {
-            });
+                var globals1 = globals();
+                if (difference(globals0,globals1).length != 0
+                 || difference(globals1,globals0).length != 0
+                 || whatChanged(globals0,globals1).length != 0)
+                {
+                    window.alert("hey! someone polluted the global namespace while initializing figure5div! added: "+difference(globals1,globals0)+" deleted: "+difference(globals0,globals1)+" changed: "+whatChanged(globals0,globals1));
+                    globals0 = globals1;
+                }
 
-            var globals1 = globals();
-            console.log("after init figure5: globals = ",globals1.length);
-            console.log("added items: ",difference(globals1,globals0));
-            console.log("deleted items: ",difference(globals0,globals1));
+                initFigureInteraction(figure6div,
+                                      [0,1], // p
+                                      [.6, .2], // d0
+                                      [.8, .6], // d1
+                                      0, // nNeighbors
+                                      true, // show dotted lines
+                                      false, // don't show arcs
+                                      false, // don't show dhat stuff
+                                      function() {});
 
-            initFigureInteraction(figure6div, function() {
-            });
+                var globals1 = globals();
+                if (globals1.length != globals0.length)
+                {
+                    window.alert("hey! someone polluted the global namespace while initializing figure6div! added: "+difference(globals1,globals0)+" deleted: "+difference(globals0,globals1));
+                    globals0 = globals1;
+                }
 
-            var globals2 = globals();
-            console.log("after init figure6: globals = ",globals2.length);
-            console.log("added items: ",difference(globals2,globals1));
-            console.log("deleted items: ",difference(globals1,globals2));
 
-            initFigureInteraction(figure7div, function() {
-            });
+                initFigureInteraction(figure7div,
+                                      [0,1.42], // p
+                                      [.635, .34], // d0
+                                      [.855, 1.175], // d1
+                                      0, // nNeighbors
+                                      false, // don't show dotted lines
+                                      true, // show arcs
+                                      true, // show dhat stuff
+                                      function() {});
 
-            var globals3 = globals();
-            console.log("after init figure7: globals = ",globals3.length);
+                var globals1 = globals();
+                if (globals1.length != globals0.length)
+                {
+                    window.alert("hey! someone polluted the global namespace while initializing figure7div! added: "+difference(globals1,globals0)+" deleted: "+difference(globals0,globals1));
+                    globals0 = globals1;
+                }
 
-            initFigureInteraction(templateDiv, function() {
+                initFigureInteraction(templateDiv,
+                                      undefined,
+                                      undefined,
+                                      undefined,
+                                      undefined,
+                                      true,
+                                      true,
+                                      true,
+                                      callThisWhenSVGSourceChanges);
+
+                var globals1 = globals();
+                if (globals1.length != globals0.length)
+                {
+                    window.alert("hey! someone polluted the global namespace while initializing templateDiv! added: "+difference(globals1,globals0)+" deleted: "+difference(globals0,globals1));
+                    globals0 = globals1;
+                }
+            } // initFigures567Interaction
+
+            initFigures567Interaction(function() {
                 // this gets called when the svg source changes
                 theSource.text("    "+jQuery.trim(templateDiv[0].innerHTML));
                 console.log("setting text for copy-to-clipboard button");
                 theButton.attr('data-clipboard-text', "    "+jQuery.trim(templateDiv[0].innerHTML));
             });
-
-            var globals4 = globals();
-            console.log("after init template: globals = ",globals4.length);
 
             // NOTE ZeroClipboard only works over a web server
             // (not via file://).
@@ -218,14 +249,19 @@ Figure 7
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
             <path class="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 1 L 0 0"></path>
 
-            <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.056920997883030844 0.01897366596101028 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.06000000000000002 L 0 0"></path>
-            <path class="m2arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.19200000000000006 0.14400000000000007 A0.24000000000000007,0.24000000000000007 0 0,1 0,0.24000000000000007 L 0 0"></path>
-            <path class="m3arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0.10000000000000003 L 0.056920997883030844 0.1189736659610103 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.16000000000000006 L 0 0.10000000000000003"></path>
+            <g class="dhatStuff"> <!-- note there's more than one dhatStuff -->
+                <path class="dhatDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0.8 0.6000000000000001 L 0.6000000000000001 0.5333333333333334"></path>
+                <path class="dhatSolidPath" vector-effect="non-scaling-stroke" style="stroke:#8080ff; stroke-width:2; fill: none; stroke-opacity:1" d="M 0.6000000000000001 0.2 L 0.6000000000000001 0.5333333333333334 L 0 0"></path>
+            </g>
+            <g class="arcsStuff">
+                <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.056920997883030844 0.01897366596101028 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.06000000000000002 L 0 0"></path>
+                <path class="m2arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 0.19200000000000006 0.14400000000000007 A0.24000000000000007,0.24000000000000007 0 0,1 0,0.24000000000000007 L 0 0"></path>
+                <path class="m3arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0.10000000000000003 L 0.056920997883030844 0.1189736659610103 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.16000000000000006 L 0 0.10000000000000003"></path>
+            </g>
 
-            <path class="orthoDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2"></path>
-            <path class="dhatDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0.8 0.6000000000000001 L 0.6000000000000001 0.5333333333333334"></path>
-            <path class="dhatSolidPath" vector-effect="non-scaling-stroke" style="stroke:#8080ff; stroke-width:2; fill: none; stroke-opacity:1" d="M 0.6000000000000001 0.2 L 0.6000000000000001 0.5333333333333334 L 0 0"></path>
-
+            <g class="orthoDottedPathStuff">
+                <path class="orthoDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2"></path>
+            </g>
 
             <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1" d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0"></path>
             <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6000000000000001 0.2 L 0.8 0.6000000000000001 L 0 0"></path>
@@ -250,17 +286,20 @@ Figure 7
                 </g>
             </g>
 
-            <g class="dhattransform" transform="translate(0.6000000000000001,0.5333333333333334)">
-                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle cx="0" cy="0" r="3" style="stroke:none;fill:blue"></circle>
-                    <g transform="translate(-15,0)">
-                        <text class="d0text">
-                            <tspan x="0" y="0">d</tspan>
-                            <tspan x="1" y="-9">^</tspan>
-                        </text>
+            <g class="dhatStuff"> <!-- note there's more than one dhatStuff -->
+                <g class="dhattransform" transform="translate(0.6000000000000001,0.5333333333333334)">
+                    <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                        <circle cx="0" cy="0" r="3" style="stroke:none;fill:blue"></circle>
+                        <g transform="translate(-15,0)">
+                            <text class="d0text">
+                                <tspan x="0" y="0">d</tspan>
+                                <tspan x="1" y="-9">^</tspan>
+                            </text>
+                        </g>
                     </g>
                 </g>
             </g>
+
             <g class="d0transform" transform="translate(0.6000000000000001,0.2)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
@@ -272,18 +311,6 @@ Figure 7
                     </g>
                 </g>
             </g>
-            <g class="xd0transform" transform="translate(0.6000000000000001,0)">
-                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <g transform="translate(-15,17)">
-                        <text class="xd0text">
-                            <tspan>x</tspan><tspan dy="5" font-size="70%">d</tspan>
-                            <tspan x="0" y="3">_</tspan>
-                            <tspan x="6" y="3">_</tspan>
-                        </text>
-                    </g>
-                </g>
-            </g>
-
             <g class="d1transform" transform="translate(0.8,0.6000000000000001)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
@@ -295,14 +322,27 @@ Figure 7
                     </g>
                 </g>
             </g>
-            <g class="xd1transform" transform="translate(0.8,0)">
-                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <g transform="translate(0,17)">
-                        <text class="xd1text">
-                            <tspan>x</tspan><tspan dy="5" font-size="70%">d</tspan>
-                            <tspan x="0" y="-15">_</tspan>
-                            <tspan x="6" y="-15">_</tspan>
-                        </text>
+            <g class="orthoDottedPathStuff">
+                <g class="xd0transform" transform="translate(0.6000000000000001,0)">
+                    <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                        <g transform="translate(-15,17)">
+                            <text class="xd0text">
+                                <tspan>x</tspan><tspan dy="5" font-size="70%">d</tspan>
+                                <tspan x="0" y="3">_</tspan>
+                                <tspan x="6" y="3">_</tspan>
+                            </text>
+                        </g>
+                    </g>
+                </g>
+                <g class="xd1transform" transform="translate(0.8,0)">
+                    <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                        <g transform="translate(0,17)">
+                            <text class="xd1text">
+                                <tspan>x</tspan><tspan dy="5" font-size="70%">d</tspan>
+                                <tspan x="0" y="-15">_</tspan>
+                                <tspan x="6" y="-15">_</tspan>
+                            </text>
+                        </g>
                     </g>
                 </g>
             </g>
