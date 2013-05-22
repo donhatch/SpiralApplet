@@ -167,7 +167,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         var orthoDottedPath = ("M 0 0 L "+d1[0]+" 0 L "+d1[0]+" "+d1[1]
                                        +" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]);
         var dhatDottedPath = "M "+d1[0]+" "+d1[1]+" L "+dhat[0]+" "+dhat[1]
-        var dhatSolidPath = "M "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]+" 0 0";
+        var dhatSolidPath = "M "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]+" L 0 0";
 
         return [dudleyMainPath,
                 dudleyNeighborsPath,
