@@ -90,6 +90,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         var temp;
 
         var dudleyNeighborsPath = "";
+        var dudleyNeighborsPathOpacities = "";
         {
             z = d0;
             Z = d1;
@@ -99,6 +100,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 z = Z;
                 Z = temp;
                 dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
+                dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors);
             }
             z = d0;
             Z = d1;
@@ -108,12 +110,14 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 Z = z;
                 z = temp;
                 dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0"
+                dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors);
             }
         }
 
 
         var priscillaMainPath = "M "+p0[0]+" "+p0[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
         var priscillaNeighborsPath = "";
+        var priscillaNeighborsPathOpacities = "";
         if (1)
         {
             z = p1;
@@ -125,6 +129,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 Z = temp;
                 var q = analogy(p1,q0,z);
                 priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
+                priscillaNeighborsPathOpacities += " "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
             }
             z = p0;
             Z = p1;
@@ -135,6 +140,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 z = temp;
                 var q = analogy(p1,q0,Z);
                 priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
+                priscillaNeighborsPathOpacities += " "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
             }
         }
         if (priscillaNeighborsPath === "")
@@ -170,8 +176,10 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
 
         return [dudleyMainPath,
                 dudleyNeighborsPath,
+                dudleyNeighborsPathOpacities,
                 priscillaMainPath,
                 priscillaNeighborsPath,
+                priscillaNeighborsPathOpacities,
                 orthoDottedPath,
                 dhatDottedPath,
                 d0,d1,dhat,
@@ -188,26 +196,32 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
 
         dudleyMainPath.attr('d', paths[0]);
         dudleyNeighborsPath.attr('d', paths[1]);
-        priscillaMainPath.attr('d', paths[2]);
-        priscillaNeighborsPath.attr('d', paths[3]);
-        orthoDottedPath.attr('d', paths[4]);
-        dhatDottedPath.attr('d', paths[5]);
-        var d0 = paths[6];
-        var d1 = paths[7];
-        var dhat = paths[8];
+        dudleyNeighborsPath.attr('vertex-opacities', paths[2]);
+        priscillaMainPath.attr('d', paths[3]);
+        priscillaNeighborsPath.attr('d', paths[4]);
+        priscillaNeighborsPath.attr('vertex-opacities', paths[5]);
+        orthoDottedPath.attr('d', paths[6]);
+        dhatDottedPath.attr('d', paths[7]);
+        var d0 = paths[8];
+        var d1 = paths[9];
+        var dhat = paths[10];
         ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
         d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
         d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
         dhattransform.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
         xd0transform.attr('transform', 'translate('+d0[0]+',0)');
         xd1transform.attr('transform', 'translate('+d1[0]+',0)');
-        var m1arcPath = paths[9];
-        var m2arcPath = paths[10];
-        var m3arcPath = paths[11];
+        var m1arcPath = paths[11];
+        var m2arcPath = paths[12];
+        var m3arcPath = paths[13];
         m1arc.attr('d', m1arcPath);
         m2arc.attr('d', m2arcPath);
         m3arc.attr('d', m3arcPath);
         undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
+
+        // XXX change this from setup to update when update can handle nVerts changes
+        setupVertexColoredPaths(dudleyNeighborsPath);
+        setupVertexColoredPaths(priscillaNeighborsPath);
 
         callThisWhenSVGSourceChanges();
 
@@ -766,6 +780,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
 
 
 
+
     var templateDiv = jQuery('#figureTemplateDiv');
     var templateSVG = templateDiv.children();
     var figure5div = jQuery('#figure5div');
@@ -820,6 +835,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                           true,
                           true,
                           callThisWhenSVGSourceChanges);
+
 
     if (false)
     {

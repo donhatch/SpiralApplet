@@ -26,6 +26,9 @@ Limitations:
     - You can't omit spaces around the L's and M's, e.g. this will be rejected: "M0 0L0 1L1 1"
     - the following element ids get generated, and must not be used elsewhere:
         vertexColors000000, vertexColors000001, etc.
+    - doesn't work properly when colors and opacities are hidden inside "style" elements--
+      you have to use explicit "stroke" and "stroke-opacity" attrs (for cases
+      when you don't give "vertex-colors" and "vertex-opacities").
 
 For example:
     <path id="thePath"
@@ -170,8 +173,10 @@ setupVertexColoredPaths = function(pathElements)
                     subPath.removeAttr('vertex-colors');
                     subPath.removeAttr('vertex-opacities');
                     subPath.attr('stroke', "url(#"+gradientId+")");
+
                     // apparently stroke-opacity is ignored if stroke is set to a gradient,
                     // but unset it anyway...
+                    // XXX this doesn't remove it, if it's in the style attr!
                     subPath.removeAttr('stroke-opacity');
 
                     subPath.attr('d', "M 0 0 1 1");

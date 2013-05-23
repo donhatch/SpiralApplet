@@ -91,11 +91,12 @@
             {
                 setupVertexColoredPaths(jQuery('.vertexColoredPath'));
                 // do it twice to test
+                console.log("(setting up colored paths again)");
                 setupVertexColoredPaths(jQuery('.vertexColoredPath'));
             }
 
 
-            if (false)
+            if (true)
             {
                 initFigures567Interaction(function() {
                     // this gets called when the svg source changes
@@ -165,13 +166,20 @@ Figure 7
                 <path class="orthoDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2"></path>
             </g>
 
-            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke-width: 2; fill: none; stroke-opacity:1"
+            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke-width: 2; fill: none"
                 stroke="rgb(192,192,255)"
+                stroke-opacity="1"
                 d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0"></path>
 
             <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6000000000000001 0.2 L 0.8 0.6000000000000001 L 0 0"></path>
-            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1" d=" M -2.160000000000001 2.88 L -0.6000000000000003 1.8 L 0.3899494936611664 1.6585786437626908 M 0.3630852169962633 0.3035814496704034 L 0.1666666666666667 0.49999999999999994 L 0.16666666666666669 0.22222222222222215"></path>
-            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.1666666666666667 0.49999999999999994 L 0 1 L -0.6000000000000003 1.8 M 0 1 L 0.47140452079103173 0.7642977396044842"></path>
+            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2; fill: none; stroke-opacity:1"
+                stroke="red"
+                stroke="rgb(255,192,192)"
+                d=" M -2.160000000000001 2.88 L -0.6000000000000003 1.8 L 0.3899494936611664 1.6585786437626908 M 0.3630852169962633 0.3035814496704034 L 0.1666666666666667 0.49999999999999994 L 0.16666666666666669 0.22222222222222215"></path>
+            <path class="priscillaMainPath" vector-effect="non-scaling-stroke"
+                stroke="red"
+                stroke-opacity="1"
+                style="stroke-width: 2; fill: none" d="M 0.1666666666666667 0.49999999999999994 L 0 1 L -0.6000000000000003 1.8 M 0 1 L 0.47140452079103173 0.7642977396044842"></path>
 
                 
             <g class="ptransform" transform="translate(0,1)">
