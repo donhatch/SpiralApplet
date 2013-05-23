@@ -220,7 +220,6 @@ updateVertexColoredPaths = function(pathElements,
         var nVerts = dTokens.length / 3;
 
         var colors = null;
-        var alphas = null;
         if (updateColorsFlag)
         {
             var colorsAttr = pathElement.attr('vertex-colors');
@@ -236,6 +235,7 @@ updateVertexColoredPaths = function(pathElements,
                     colors = [strokeAttr];
             }
         }
+        var alphas = null;
         if (updateAlphasFlag)
         {
             var alphasAttr = pathElement.attr('vertex-opacities');
@@ -252,12 +252,8 @@ updateVertexColoredPaths = function(pathElements,
             }
         }
 
-        var firstGradientElement = jQuery(pathElement.next()[0].firstChild.firstChild);
-        var firstSegElement = jQuery(pathElement.next()[0].firstChild.nextSibling);
-
-        var currentGradientElement = firstGradientElement;
-        // currentGradientElement is now at the first of the nSegs gradient elements
-        // that were placed immediately after the original path element
+        var currentGradientElement = jQuery(pathElement.next()[0].firstChild.firstChild);
+        var currentSegElement = jQuery(pathElement.next()[0].firstChild.nextSibling);
         for (var iVert = 1; iVert < nVerts; ++iVert) // skip 0
         {
             var command = dTokens[3*iVert];
@@ -280,20 +276,7 @@ updateVertexColoredPaths = function(pathElements,
                         jQuery(stops[1]).attr('stop-opacity', alphas[iVert%alphas.length]);
                     }
                 }
-                currentGradientElement = currentGradientElement.next();
-            }
-        }
-
-        var currentSegElement = firstSegElement;
-        currentGradientElement = firstGradientElement;
-        // currentGradientElement and currentSegElement now point
-        // to the first of the respective sequence of elements
-        if (updatePositionsFlag)
-        {
-            for (var iVert = 1; iVert < nVerts; ++iVert) // skip 0
-            {
-                var command = dTokens[3*iVert];
-                if (command === 'L')
+                if (updatePositionsFlag)
                 {
                     if (currentSegElement[0].tagName != 'path') throw "ERROR: expected a path element, got a "+currentSegElement[0].tagName;
                     var x1      = dTokens[3*iVert-2];
@@ -301,17 +284,15 @@ updateVertexColoredPaths = function(pathElements,
                     var x2      = dTokens[3*iVert+1];
                     var y2      = dTokens[3*iVert+2];
 
-
                     currentSegElement.attr("d", "M "+x1+" "+y1+" L "+x2+" "+y2);
 
                     currentGradientElement.attr("x1", x1);
                     currentGradientElement.attr("y1", y1);
                     currentGradientElement.attr("x2", x2);
                     currentGradientElement.attr("y2", y2);
-
-                    currentSegElement = currentSegElement.next();
-                    currentGradientElement = currentGradientElement.next();
                 }
+                currentGradientElement = currentGradientElement.next();
+                currentSegElement = currentSegElement.next();
             }
         }
     }); // each pathElement
