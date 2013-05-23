@@ -55,6 +55,23 @@ setupVertexColoredPaths = function(pathElements)
     pathElements.each(function(index,pathElement) {
 
         pathElement = jQuery(pathElement);
+
+        var previousContainerMaybe = pathElement.next();
+        if (previousContainerMaybe.length == 1
+         && previousContainerMaybe[0].nodeName === 'g'
+         && previousContainerMaybe.attr("class") === "vertexColoredPathSegments")
+        {
+            console.log("        setupVertexColoredPaths: deleting previous vertexColoredPathSegments");
+            previousContainerMaybe.remove();
+
+            // previous setup called pathElement.hide()
+            // so pathElement is (most likely) hidden.
+            // we need to show it again so when cloned, the clones don't end up hidden
+            // (we'll hide it again at the end).
+            // need the 0 argument to make this happen immediately!
+            pathElement.show(0);
+        }
+
         var dAttr = pathElement.attr('d');
         var colorsAttr = pathElement.attr('vertex-colors');
         var alphasAttr = pathElement.attr('vertex-opacities');
@@ -149,8 +166,7 @@ setupVertexColoredPaths = function(pathElements)
                 {
                     subPath = pathElement.clone();
 
-                    subPath.attr("class", "vertexColoredPathSegment");
-
+                    subPath.removeAttr("class");
                     subPath.removeAttr('vertex-colors');
                     subPath.removeAttr('vertex-opacities');
                     subPath.attr('stroke', "url(#"+gradientId+")");
@@ -178,7 +194,6 @@ setupVertexColoredPaths = function(pathElements)
         for (var i in subPaths)
             container.appendChild(subPaths[i][0]);
         pathElement.after(container); // insert container after pathElement
-
 
         pathElement.hide();
 
@@ -248,7 +263,7 @@ updateVertexColoredPaths = function(pathElements,
             var command = dTokens[3*iVert];
             if (command === 'L')
             {
-                if (currentGradientElement[0].tagName != 'linearGradient') throw "ERROR: expected a linearGradient element, got a "+currentGradientElement[0].tagName;
+                if (currentGradientElement[0].nodeName != 'linearGradient') throw "ERROR: expected a linearGradient element, got a "+currentGradientElement[0].nodeName;
                 if (colors !== null || alphas !== null)
                 {
                     var stops = currentGradientElement.children();
@@ -267,7 +282,7 @@ updateVertexColoredPaths = function(pathElements,
                 }
                 if (updatePositionsFlag)
                 {
-                    if (currentSegElement[0].tagName != 'path') throw "ERROR: expected a path element, got a "+currentSegElement[0].tagName;
+                    if (currentSegElement[0].nodeName != 'path') throw "ERROR: expected a path element, got a "+currentSegElement[0].nodeName;
                     var x1      = dTokens[3*iVert-2];
                     var y1      = dTokens[3*iVert-1];
                     var x2      = dTokens[3*iVert+1];
