@@ -51,7 +51,7 @@ global_numberOfGradientIdsEver = 0;
 
 setupVertexColoredPaths = function(pathElements)
 {
-    console.log("in setupVertexColoredPaths");
+    console.log("    in setupVertexColoredPaths");
     pathElements.each(function(index,pathElement) {
 
         pathElement = jQuery(pathElement);
@@ -111,6 +111,8 @@ setupVertexColoredPaths = function(pathElements)
             return null;
         }
 
+        var NS="http://www.w3.org/2000/svg";
+
         var subPaths = [];
         var gradients = [];
         for (var iVert = 1; iVert < nVerts; ++iVert) // yes, skip 0
@@ -132,7 +134,6 @@ setupVertexColoredPaths = function(pathElements)
                 var gradientId = "vertexColors"+zeropad(global_numberOfGradientIdsEver++, 6);
                 var gradient;
                 {
-                    var NS="http://www.w3.org/2000/svg";
                     gradient = document.createElementNS(NS, "linearGradient");
                     gradient.setAttribute("gradientUnits", "userSpaceOnUse");
                     var stop0 = document.createElementNS(NS, "stop");
@@ -153,7 +154,7 @@ setupVertexColoredPaths = function(pathElements)
                     gradient.appendChild(stop1);
                 }
                 gradient.setAttribute("id", gradientId);
-                gradients.push(jQuery(gradient));
+                gradients.push(gradient);
 
                 var subPath;
                 {
@@ -179,12 +180,16 @@ setupVertexColoredPaths = function(pathElements)
             }
         }
 
-
-        // XXX I thought there was a jQuery command that appended stuff from an array, without having to do the following?
-        for (var i in subPaths)
-            pathElement.after(subPaths[subPaths.length-1-i]);
+        var container = document.createElementNS(NS, "g");
+        container.setAttribute("class", "vertexColoredPathSegments");
+        var defs = document.createElementNS(NS, "defs");
         for (var i in gradients)
-            pathElement.after(gradients[gradients.length-1-i]);
+            defs.appendChild(gradients[i]);
+        container.appendChild(defs);
+        for (var i in subPaths)
+            container.appendChild(subPaths[i][0]);
+        pathElement.after(container); // insert container after pathElement
+
 
         pathElement.hide();
 
@@ -197,7 +202,7 @@ setupVertexColoredPaths = function(pathElements)
                              true,
                              true);
 
-    console.log("out setupVertexColoredPaths");
+    console.log("    out setupVertexColoredPaths");
     return undefined;
 } // setupVertexColoredPaths
 
@@ -247,7 +252,10 @@ updateVertexColoredPaths = function(pathElements,
             }
         }
 
-        var currentGradientElement = pathElement.next();
+        var firstGradientElement = jQuery(pathElement.next()[0].firstChild.firstChild);
+        var firstSegElement = jQuery(pathElement.next()[0].firstChild.nextSibling);
+
+        var currentGradientElement = firstGradientElement;
         // currentGradientElement is now at the first of the nSegs gradient elements
         // that were placed immediately after the original path element
         for (var iVert = 1; iVert < nVerts; ++iVert) // skip 0
@@ -275,9 +283,10 @@ updateVertexColoredPaths = function(pathElements,
                 currentGradientElement = currentGradientElement.next();
             }
         }
-        var currentSeqElement = currentGradientElement;
-        currentGradientElement = pathElement.next();
-        // currentGradientElement and currentSeqElement now point
+
+        var currentSegElement = firstSegElement;
+        currentGradientElement = firstGradientElement;
+        // currentGradientElement and currentSegElement now point
         // to the first of the respective sequence of elements
         if (updatePositionsFlag)
         {
@@ -286,21 +295,21 @@ updateVertexColoredPaths = function(pathElements,
                 var command = dTokens[3*iVert];
                 if (command === 'L')
                 {
-                    if (currentSeqElement[0].tagName != 'path') throw "ERROR: expected a path element, got a "+currentSeqElement[0].tagName;
+                    if (currentSegElement[0].tagName != 'path') throw "ERROR: expected a path element, got a "+currentSegElement[0].tagName;
                     var x1      = dTokens[3*iVert-2];
                     var y1      = dTokens[3*iVert-1];
                     var x2      = dTokens[3*iVert+1];
                     var y2      = dTokens[3*iVert+2];
 
 
-                    currentSeqElement.attr("d", "M "+x1+" "+y1+" L "+x2+" "+y2);
+                    currentSegElement.attr("d", "M "+x1+" "+y1+" L "+x2+" "+y2);
 
                     currentGradientElement.attr("x1", x1);
                     currentGradientElement.attr("y1", y1);
                     currentGradientElement.attr("x2", x2);
                     currentGradientElement.attr("y2", y2);
 
-                    currentSeqElement = currentSeqElement.next();
+                    currentSegElement = currentSegElement.next();
                     currentGradientElement = currentGradientElement.next();
                 }
             }
