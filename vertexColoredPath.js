@@ -130,7 +130,6 @@ setupVertexColoredPaths = function(pathElements)
                     while (answer.length < width) answer = "0" + answer;
                     return answer;
                 };
-
                 var gradientId = "vertexColors"+zeropad(global_numberOfGradientIdsEver++, 6);
                 var gradient;
                 {
@@ -140,16 +139,6 @@ setupVertexColoredPaths = function(pathElements)
                     var stop1 = document.createElementNS(NS, "stop");
                     stop0.setAttribute("offset", "0%");
                     stop1.setAttribute("offset", "100%");
-                    if (colorsAttr !== null)
-                    {
-                        stop0.setAttribute("stop-color", "black");
-                        stop1.setAttribute("stop-color", "black");
-                    }
-                    if (alphasAttr !== null)
-                    {
-                        stop0.setAttribute("stop-opacity", "1");
-                        stop1.setAttribute("stop-opacity", "1");
-                    }
                     gradient.appendChild(stop0);
                     gradient.appendChild(stop1);
                 }
