@@ -21,7 +21,9 @@ Limitations:
       (not m,l, nor any other construct such as close-path or curves).
     - You must specify all L's explicitly
         (e.g. "M 0 0 L 0 1 1 1" is not allowed; it must be spelled out
-        as "M 0 0 L 0 1 L 1 1").
+        as "M 0 0 L 0 1 L 1 1"
+        or "M 0,0 L 0,1 L 1,1" or whatever.
+    - You can't omit spaces around the L's and M's, e.g. this will be rejected: "M0 0L0 1L1 1"
     - the following element ids get generated, and must not be used elsewhere:
         vertexColors000000, vertexColors000001, etc.
 
@@ -79,7 +81,6 @@ setupVertexColoredPaths = function(pathElements)
         }
 
         var dTokens = jQuery.trim(dAttr).split(/(?:,|\s)+/);
-        console.log("dTokens = ",dTokens);
         if (dTokens.length === 0)
         {
             window.alert("ERROR: empty d attr: \""+dAttr+"\"");
@@ -292,7 +293,7 @@ updateVertexColoredPaths = function(pathElements,
                     var y2      = dTokens[3*iVert+2];
 
 
-                    if (false)
+                    if (true)
                     {
                         currentSeqElement.attr("d", "M "+x1+" "+y1+" L "+x2+" "+y2);
 
