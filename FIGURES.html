@@ -87,22 +87,33 @@
             var theButton = jQuery('#copy-button');
 
 
-            initFigures567Interaction(function() {
-                // this gets called when the svg source changes
-                theSource.text("    "+jQuery.trim(templateDiv[0].innerHTML));
-                console.log("setting text for copy-to-clipboard button");
-                theButton.attr('data-clipboard-text', "    "+jQuery.trim(templateDiv[0].innerHTML));
-            });
+            if (true)
+            {
+                setupVertexColoredPaths(jQuery('.vertexColoredPath'));
+            }
 
-            // NOTE ZeroClipboard only works over a web server
-            // (not via file://).
-            // To start a web server:
-            //     python -m SimpleHTTPServer
-            var clip = new ZeroClipboard( document.getElementById("copy-button"), { moviePath: "ZeroClipboard.swf" } );
-            clip.on('complete', function(client,args) {
-                console.log("Copied "+theButton.attr('data-clipboard-text').length+" bytes of text to clipboard");
-            });
 
+            if (false)
+            {
+                initFigures567Interaction(function() {
+                    // this gets called when the svg source changes
+                    theSource.text("    "+jQuery.trim(templateDiv[0].innerHTML));
+                    console.log("setting text for copy-to-clipboard button");
+                    theButton.attr('data-clipboard-text', "    "+jQuery.trim(templateDiv[0].innerHTML));
+                });
+            }
+
+            if (true)
+            {
+                // NOTE ZeroClipboard only works over a web server
+                // (not via file://).
+                // To start a web server:
+                //     python -m SimpleHTTPServer
+                var clip = new ZeroClipboard( document.getElementById("copy-button"), { moviePath: "ZeroClipboard.swf" } );
+                clip.on('complete', function(client,args) {
+                    console.log("Copied "+theButton.attr('data-clipboard-text').length+" bytes of text to clipboard");
+                });
+            }
             console.log("out jquery document-ready function!");
         }); // jquery document ready function
     </script>
@@ -133,7 +144,7 @@ Figure 7
 <hr>
 <div id="figureTemplateDiv" class="figure" width="450" height="330">
     <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
-        <!-- 1 unit = 20 pixels -->
+<?xml version="1.0" standalone="no"?>
         <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
            
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
@@ -152,7 +163,10 @@ Figure 7
                 <path class="orthoDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2"></path>
             </g>
 
-            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke:rgb(192,192,255); stroke-width: 2; fill: none; stroke-opacity:1" d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0"></path>
+            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke-width: 2; fill: none; stroke-opacity:1"
+                stroke="rgb(192,192,255)"
+                d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0"></path>
+
             <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6000000000000001 0.2 L 0.8 0.6000000000000001 L 0 0"></path>
             <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke:rgb(255,192,192); stroke-width: 2; fill: none; stroke-opacity:1" d=" M -2.160000000000001 2.88 L -0.6000000000000003 1.8 L 0.3899494936611664 1.6585786437626908 M 0.3630852169962633 0.3035814496704034 L 0.1666666666666667 0.49999999999999994 L 0.16666666666666669 0.22222222222222215"></path>
             <path class="priscillaMainPath" vector-effect="non-scaling-stroke" style="stroke: red; stroke-width: 2; fill: none; stroke-opacity:.2" d="M 0.1666666666666667 0.49999999999999994 L 0 1 L -0.6000000000000003 1.8 M 0 1 L 0.47140452079103173 0.7642977396044842"></path>
@@ -235,12 +249,82 @@ Figure 7
                     </g>
                 </g>
             </g>
+
         </g>
     </svg>
 </div> <!-- figureTemplateDiv -->
 <br>
 Figures 5,6,7 template (all elements that appear in any of them).
 <hr>
+<div id="vertexColoredPathTestDiv" class="figure" width="400" height="200">
+    <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="400" height="200">
+        <defs>
+            <linearGradient id="testGradient" gradientUnits="userSpaceOnUse" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stop-color="red"/>
+                <stop offset="50%" stop-color="black" stop-opacity="0"/>
+                <stop offset="100%" stop-color="blue"/>
+            </linearGradient>
+            <linearGradient id="blueGradient" gradientUnits="userSpaceOnUse" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stop-color="blue" stop-opacity="0"/>
+                <stop offset="100%" stop-color="blue" stop-opacity="1"/>
+            </linearGradient>
+        </defs>
+        <g class="theGraphic" transform="translate(200,100) scale(200,-200)">
+            <g display="block">
+                <path class="testPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none; stroke-opacity:1"
+                    stroke="url(#testGradient)"
+                    transform="matrix(.5,.5, -.5,.5, .5,.5)"
+                    d="M 0 0 L 1 0";
+
+                ></path>
+                <g transform="translate(-.5,0)">
+                    <g transform="scale(.25)">
+                        <path class="vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            stroke="url(#testGradient)"
+                            stroke-opacity="1"
+                            vertex-colors="red yellow green cyan blue magenta red"
+                            vertex-opacities="0 1 0 1 0 1 0"
+                            d="M 1 0 L .5 .866 L -.5 .866 L -1 0 L -.5 -.866 L .5 -.866 L 1 0"
+                        ></path>
+                    </g>
+                    <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                        <text transform="translate(-30,0)">vert rgba</text>
+                    </g>
+                </g>
+                <g transform="translate(0,0)">
+                    <g transform="scale(.25)">
+                        <path class="vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            stroke="url(#testGradient)"
+                            stroke-opacity=".25"
+                            vertex-colors="red yellow green cyan blue magenta red"
+                            d="M 1 0 L .5 .866 L -.5 .866 L -1 0 L -.5 -.866 L .5 -.866 L 1 0"
+                        ></path>
+                    </g>
+                    <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                        <text transform="translate(-30,0)">vert rgb</text>
+                    </g>
+                </g>
+                <g transform="translate(.5,0)">
+                    <g transform="scale(.25)">
+                        <path class="vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            stroke="red"
+                            stroke-opacity="url(#testGradient)"
+                            vertex-opacities="1 0 1 0 1 0 1"
+                            d="M 1 0 L .5 .866 L -.5 .866 L -1 0 L -.5 -.866 L .5 -.866 L 1 0"
+                        ></path>
+                    </g>
+                    <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                        <text transform="translate(-30,0)">vert alpha</text>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </svg>
+</div> <!-- vertexColoredPathTestDiv -->
+<br>
+Test of vertex-colored paths.
+<hr>
+
 <!-- ======================================================================== -->
 
 <ul style="font-size:70%;list-style:none">
