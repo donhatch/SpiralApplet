@@ -74,8 +74,8 @@
     </script>
 
     <script src="ZeroClipboard.js"></script>
-
     <script src="initFigureInteraction.js"></script> <!-- do NOT self-close, that causes weirdness -->
+    <script src="vertexColoredPath.js"></script>
 
     <script>
         jQuery(document).ready(function() {
@@ -89,6 +89,7 @@
 
             if (true)
             {
+                setupVertexColoredPaths(jQuery('.vertexColoredPath'));
                 setupVertexColoredPaths(jQuery('.vertexColoredPath'));
             }
 
@@ -256,8 +257,8 @@ Figure 7
 <br>
 Figures 5,6,7 template (all elements that appear in any of them).
 <hr>
-<div id="vertexColoredPathTestDiv" class="figure" width="400" height="200">
-    <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="400" height="200">
+<div id="vertexColoredPathTestDiv" class="figure" width="400" height="400">
+    <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="400" height="400">
         <defs>
             <linearGradient id="testGradient" gradientUnits="userSpaceOnUse" x1="0" x2="1" y1="0" y2="0">
                 <stop offset="0%" stop-color="red"/>
@@ -315,6 +316,63 @@ Figures 5,6,7 template (all elements that appear in any of them).
                     </g>
                     <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                         <text transform="translate(-30,0)">vert alpha</text>
+                    </g>
+                </g>
+
+
+                <linearGradient id="anotherGradient">
+                    <stop offset="0%" stop-color="green" stop-opacity="1"/>
+                    <stop offset="100%" stop-color="red" stop-opacity="1"/>
+                </linearGradient>
+                <linearGradient id="yetAnotherGradient" gradientUnits="userSpaceOnUse" x2="1">
+                    <stop offset="0%" stop-color="green" stop-opacity="1"/>
+                    <stop offset="100%" stop-color="red" stop-opacity="1"/>
+                </linearGradient>
+
+                <g transform="translate(-.5,-.5)">
+                    <g transform="scale(.25)">
+                        <path stroke="url(#anotherGradient)" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            d="M 0 0 L 1 1"/>
+                        <path stroke="url(#anotherGradient)" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            d="M 1.5 1 L .5 0"/>
+                        <path stroke="url(#anotherGradient)" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            d="M 0 1 L 1 0"/>
+                        <path stroke="url(#anotherGradient)" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            d="M 1.5 0 L 0.5 1"/>
+                    </g>
+                </g>
+                <g transform="translate(0,-.5)">
+                    <g transform="scale(.25)">
+                        <path stroke="url(#yetAnotherGradient)" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            transform="matrix(1,1 -1,1 0,0)"
+                            d="M 0 0 L 1 0"/>
+                        <path stroke="url(#yetAnotherGradient)" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            transform="matrix(-1,-1 1,-1 1.5,1)"
+                            d="M 0 0 L 1 0"/>
+                        <path stroke="url(#yetAnotherGradient)" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            transform="matrix(1,-1 1,1 0,1)"
+                            d="M 0 0 L 1 0"/>
+                        <path stroke="url(#yetAnotherGradient)" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                            transform="matrix(-1,1 -1,-1 1.5,0)"
+                            d="M 0 0 L 1 0"/>
+                    </g>
+                </g>
+
+                <!--
+                http://stackoverflow.com/questions/381668/can-a-two-dimensional-gradient-be-created-or-faked-in-svg
+                -->
+                <linearGradient id="blackToGreenNW" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2=".5" y2=".5">
+                    <stop offset="0%" stop-color="black" stop-opacity="1"/>
+                    <stop offset="100%" stop-color="green" stop-opacity="1"/>
+                </linearGradient>
+                <linearGradient id="transparentToBlueN" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="blue" stop-opacity="0"/>
+                    <stop offset="100%" stop-color="blue" stop-opacity="1"/>
+                </linearGradient>
+                <g transform="translate(-.5,-1.25)">
+                    <g transform="scale(.5)">
+                        <path stroke="none" fill="url(#blackToGreenNW)" d="M 0 0 L 1 0 L 0 1"/>
+                        <path stroke="none" fill="url(#transparentToBlueN)" d="M 0 0 L 1 0 L 0 1"/>
                     </g>
                 </g>
             </g>
