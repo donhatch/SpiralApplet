@@ -293,26 +293,12 @@ updateVertexColoredPaths = function(pathElements,
                     var y2      = dTokens[3*iVert+2];
 
 
-                    if (true)
-                    {
-                        currentSeqElement.attr("d", "M "+x1+" "+y1+" L "+x2+" "+y2);
+                    currentSeqElement.attr("d", "M "+x1+" "+y1+" L "+x2+" "+y2);
 
-                        currentGradientElement.attr("x1", x1);
-                        currentGradientElement.attr("y1", y1);
-                        currentGradientElement.attr("x2", x2);
-                        currentGradientElement.attr("y2", y2);
-                    }
-                    else
-                    {
-                        // some people say you can't use jQuery to modify svg element attrs:
-                        // http://stackoverflow.com/questions/10973339/modifying-svg-attributes-with-javascript-has-no-effect
-                        // so, use the raw javascript api...
-                        currentSeqElement[0].setAttribute("d", "M "+x1+" "+y1+" L "+x2+" "+y2);
-                        currentGradientElement[0].setAttribute("x1", x1);
-                        currentGradientElement[0].setAttribute("y1", y1);
-                        currentGradientElement[0].setAttribute("x2", x2);
-                        currentGradientElement[0].setAttribute("y2", y2);
-                    }
+                    currentGradientElement.attr("x1", x1);
+                    currentGradientElement.attr("y1", y1);
+                    currentGradientElement.attr("x2", x2);
+                    currentGradientElement.attr("y2", y2);
 
                     currentSeqElement = currentSeqElement.next();
                     currentGradientElement = currentGradientElement.next();
