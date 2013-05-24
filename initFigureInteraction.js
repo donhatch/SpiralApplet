@@ -101,6 +101,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 Z = temp;
                 dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
                 dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors);
+                //dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
             }
             z = d0;
             Z = d1;
@@ -111,6 +112,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 z = temp;
                 dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0"
                 dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors);
+                //dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
             }
         }
 
@@ -129,7 +131,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 Z = temp;
                 var q = analogy(p1,q0,z);
                 priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
-                priscillaNeighborsPathOpacities += " "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
+                priscillaNeighborsPathOpacities += " "+.5*(1.-(iNeighbor+1.)/nNeighbors)+" "+.5*(1.-iNeighbor/nNeighbors)+" 0";
             }
             z = p0;
             Z = p1;
@@ -140,9 +142,18 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
                 z = temp;
                 var q = analogy(p1,q0,Z);
                 priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
-                priscillaNeighborsPathOpacities += " "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
+                priscillaNeighborsPathOpacities += " 0 "+.5*(1.-iNeighbor/nNeighbors)+" "+.5*(1.-(iNeighbor+1.)/nNeighbors);
             }
         }
+        if (nNeighbors >= 1)
+        {
+            // add longer tail to the primary quill
+            var q0extension = plus(q0,times(.5,minus(q0,p1)));
+            priscillaNeighborsPath += " M "+q0[0]+" "+q0[1]+" L "+q0extension[0]+" "+q0extension[1];
+            priscillaNeighborsPathOpacities += " 1 0";
+        }
+
+
         if (priscillaNeighborsPath === "")
         {
             priscillaNeighborsPath = "M 0 0";
@@ -219,8 +230,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         m3arc.attr('d', m3arcPath);
         undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
 
-        // XXX change this from setup to update when update can handle nVerts changes
-        // XXX the false,false isn't really right if number of verts changed... but the code does the right thing by blowing away and regenerating the whole thing in that case anyway
+        // the false,false isn't really right if number of verts changed... but the code does the right thing by blowing away and regenerating the whole thing in that case anyway
         updateVertexColoredPaths(dudleyNeighborsPath,true,false,false);
         updateVertexColoredPaths(priscillaNeighborsPath,true,false,false);
 
@@ -379,13 +389,12 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
     {
         // really hacky way to deduce nNeighbors--
         // figure it out from the size of the neighborsPaths.
-        var pTemp = jQuery.trim(priscillaNeighborsPath.attr('d')).split(/ +/).length;
+        // (dudley's, since priscilla's got stuff added)
+
         var dTemp = jQuery.trim(dudleyNeighborsPath.attr('d')).split(/ +/).length;
         //console.log('length of d neighbors path = '+pTemp);
-        //console.log('length of p neighbors path = '+dTemp);
-        assert(pTemp === dTemp, "priscillaNeighborsPath and dudleyNeighborsPath have different numbers of tokens! "+pTemp+" vs "+dTemp+"");
-        assert(pTemp % 18 === 0, "neighbors path length "+pTemp+" is not a multiple of 18!");
-        nNeighbors = pTemp / 18;
+        assert(dTemp % 18 === 0, "neighbors path length "+dTemp+" is not a multiple of 18!");
+        nNeighbors = dTemp / 18;
     }
 
 
@@ -818,9 +827,9 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
                           function() {});
 
     initFigureInteraction(figure7div,
-                          [0,1.3], // p
-                          [.63, .69], // d0
-                          [.78, 1.3], // d1
+                          [0,1.195], // p
+                          [.8, .615], // d0
+                          [.965, 1.205], // d1
                           0, // nNeighbors
                           false, // don't show dotted lines
                           true, // show arcs
