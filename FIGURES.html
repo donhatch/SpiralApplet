@@ -99,10 +99,16 @@
             if (true)
             {
                 initFigures567Interaction(function() {
+                    var templateDivClone = templateDiv.clone();
+                    templateDivClone.find('.vertexColoredPathSegments').prev().show(0);
+                    templateDivClone.find('.vertexColoredPathSegments').remove();
+                    var innerHTML = "    "+jQuery.trim(templateDivClone.html());
+                    
                     // this gets called when the svg source changes
-                    theSource.text("    "+jQuery.trim(templateDiv[0].innerHTML));
+                    //theSource.text("    "+jQuery.trim(templateDiv[0].innerHTML));
+                    theSource.text(innerHTML);
                     console.log("setting text for copy-to-clipboard button");
-                    theButton.attr('data-clipboard-text', "    "+jQuery.trim(templateDiv[0].innerHTML));
+                    theButton.attr('data-clipboard-text', "    "+innerHTML);
                 });
             }
 
@@ -146,8 +152,8 @@ Figure 6
 Figure 7
 <hr>
 <div id="figureTemplateDiv" class="figure" width="450" height="330">
-    <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
-<?xml version="1.0" standalone="no"?>
+        <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
+<!--?xml version="1.0" standalone="no"?-->
         <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
            
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
@@ -159,27 +165,18 @@ Figure 7
                 <path class="m3arc" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0.10000000000000003 L 0.056920997883030844 0.1189736659610103 A0.06000000000000002,0.06000000000000002 0 0,1 0,0.16000000000000006 L 0 0.10000000000000003"></path>
             </g>
             <g class="dhatStuff"> <!-- note there's more than one dhatStuff -->
-                <path class="dhatDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0.6 0.2 L 0.6 0.45"></path>
+                <path class="dhatDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0.6000000000000001 0.2 L 0.6000000000000001 0.4500000000000001"></path>
             </g>
 
             <g class="orthoDottedPathStuff">
                 <path class="orthoDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2"></path>
             </g>
 
-            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke-width: 2; fill: none"
-                stroke="rgb(192,192,255)"
-                stroke-opacity="1"
-                d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0"></path>
+            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none;" stroke="rgb(128,128,255)" stroke-opacity="1" d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0" vertex-opacities=" 1 0 1 1 0 1"></path>
 
             <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6000000000000001 0.2 L 0.8 0.6000000000000001 L 0 0"></path>
-            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2; fill: none; stroke-opacity:1"
-                stroke="red"
-                stroke="rgb(255,192,192)"
-                d=" M -2.160000000000001 2.88 L -0.6000000000000003 1.8 L 0.3899494936611664 1.6585786437626908 M 0.3630852169962633 0.3035814496704034 L 0.1666666666666667 0.49999999999999994 L 0.16666666666666669 0.22222222222222215"></path>
-            <path class="priscillaMainPath" vector-effect="non-scaling-stroke"
-                stroke="red"
-                stroke-opacity="1"
-                style="stroke-width: 2; fill: none" d="M 0.1666666666666667 0.49999999999999994 L 0 1 L -0.6000000000000003 1.8 M 0 1 L 0.47140452079103173 0.7642977396044842"></path>
+            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1;" stroke="red" d=" M -2.160000000000001 2.88 L -0.6000000000000003 1.8 L 0.3899494936611664 1.6585786437626908 M 0.3630852169962633 0.3035814496704034 L 0.1666666666666667 0.49999999999999994 L 0.16666666666666669 0.22222222222222215 M 0.47140452079103173 0.7642977396044842 L 0.7071067811865476 0.6464466094067263" vertex-opacities=" 0 0.5 0 0 0.5 0 1 0"></path>
+            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" stroke="red" stroke-opacity="1" style="stroke-width: 2; fill: none" d="M 0.1666666666666667 0.49999999999999994 L 0 1 L -0.6000000000000003 1.8 M 0 1 L 0.47140452079103173 0.7642977396044842"> </path>
 
                 
             <g class="ptransform" transform="translate(0,1)">
@@ -200,7 +197,7 @@ Figure 7
             </g>
 
             <g class="dhatStuff"> <!-- note there's more than one dhatStuff -->
-                <g class="dhattransform" transform="translate(0.6000000000000001,0.45)">
+                <g class="dhattransform" transform="translate(0.6000000000000001,0.4500000000000001)">
                     <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                         <circle cx="0" cy="0" r="4" style="stroke:none;fill:blue"></circle>
                         <g transform="translate(-15,0)">
@@ -442,7 +439,7 @@ Test of vertex-colored paths.
 <button id="copy-button" data-clipboard-text="Copy Me!" title="Click to copy me.">Copy to Clipboard</button>
 
 <pre id="theSource">
-(this should get replaced by the svg source code)
+(this should get replaced by the svg source code the first time it changes)
 </pre>
 
 <!-- decoy, make sure this works -->
