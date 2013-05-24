@@ -56,7 +56,7 @@ var initFigureInteraction = function(theDiv,
         throw msg;
     }
 
-    var recomputeSVG = function(M,p,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
+    var recomputeSVG = function(M,p,p0,p1,d,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
         console.log("    recomputing svg");
 
         if (true)
@@ -441,7 +441,7 @@ var initFigureInteraction = function(theDiv,
     if (false)
     {
         // do it the first time
-        recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+        recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
     }
 
     var localToWindow = function(localXY) {
@@ -553,13 +553,13 @@ var initFigureInteraction = function(theDiv,
             //if (nNeighbors > 1)
             {
                 nNeighbors--;
-                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
         }
         else if (indexOfThingBeingDragged === 5)
         {
             nNeighbors++;
-            recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+            recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
         }
 
         prevXY = XY;
@@ -686,7 +686,7 @@ var initFigureInteraction = function(theDiv,
                     [undefined, yScale,    undefined],
                     [xTrans,    yTrans,    undefined],
                 ];
-                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 1) // d0
             {
@@ -700,7 +700,7 @@ var initFigureInteraction = function(theDiv,
                     d0 = localXY;
                 }
                 console.log("d0 changed to "+d0);
-                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 2) // d1
             {
@@ -715,14 +715,14 @@ var initFigureInteraction = function(theDiv,
                 }
                 //d1 = normalized(d1); // constrain to unit length
                 console.log("d1 changed to "+d1);
-                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 3) // p
             {
                 p = localXY;
                 p[0] = 0; // constrain to y axis
                 console.log("p changed to "+p);
-                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 4) // CW neighbor
             {
@@ -745,7 +745,7 @@ var initFigureInteraction = function(theDiv,
 
     if (someParamWasDefined)
     {
-        recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
+        recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
     }
 
 }; // initFigureInteraction
