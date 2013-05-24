@@ -168,8 +168,6 @@ var initFigureInteraction = function(theDiv,
         {
             z = p1;
             Z = p2;
-            console.log("p1 = ",p1);
-            console.log("p2 = ",p2);
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
                 var Q = analogy(p0,q0,z);
@@ -791,12 +789,15 @@ var initFigureInteraction = function(theDiv,
                 if (e.ctrlKey)
                 {
                     // constrain to same angle
-                    p0 = times(p0, length(localXY)/length(p0));
+                    var scale = length(localXY)/length(p0);
+                    p0 = times(p0, scale);
+                    p1 = times(p1, scale);
                 }
                 else
                 {
                     p0 = localXY;
                 }
+                p1[0] = p0[0] // constrain segment to be vertical XXX should we do this by moving to/from origin?
                 console.log("p0 changed to "+p0);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
@@ -805,13 +806,16 @@ var initFigureInteraction = function(theDiv,
                 if (e.ctrlKey)
                 {
                     // constrain to same angle
-                    p1 = times(p1, length(localXY)/length(p1));
+                    var scale = length(localXY)/length(p1);
+                    p1 = times(p1, scale);
+                    p0 = times(p0, scale);
                 }
                 else
                 {
                     p1 = localXY;
                 }
-                console.log("p0 changed to "+p1);
+                p0[0] = p1[0] // constrain segment to be vertical XXX should we do this by moving to/from origin?
+                console.log("p1 changed to "+p1);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 4) // d
