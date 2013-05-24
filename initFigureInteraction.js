@@ -264,7 +264,6 @@ var initFigureInteraction = function(theDiv,
                                        +" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]);
         var dhatDottedPath = "M "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]
 
-
         //
         // Now we've computed everything, put it into the appropriate attrs
         //
@@ -278,6 +277,14 @@ var initFigureInteraction = function(theDiv,
             orthoDottedPathElement.attr('d', orthoDottedPath);
         if (isDefined(dhatDottedPathElement))
             dhatDottedPathElement.attr('d', dhatDottedPath);
+        if (isDefined(p0p1DottedPathElement))
+        {
+            // root dash pattern at origin? no I don't think so
+            //p0p1DottedPathElement.attr('d', "M 0 0 L "+p0[0]+" "+p0[1]+" M 0 0 L "+p1[0]+" "+p1[1]);
+
+            // root dash pattern at p0 and p1? yes I think so, less distracting
+            p0p1DottedPathElement.attr('d', "M "+p0[0]+" "+p0[1]+" L 0 0 M "+p1[0]+" "+p1[1]+" L 0 0");
+        }
         if (isDefined(d))
         {
             dtransformElement.attr('transform', 'translate('+d[0]+','+d[1]+')');
@@ -409,6 +416,11 @@ var initFigureInteraction = function(theDiv,
         var dhatDottedPathElement = findExpectingOneThing(theSVG, '.dhatDottedPath');
         var dhattransformElement = findExpectingOneThing(theSVG, '.dhattransform');
     }
+    if (isDefined(d))
+    {
+        var p0p1DottedPathElement = findExpectingOneThing(theSVG, '.p0p1DottedPath');
+    }
+
 
     var ptransformElement = findExpectingNThings(theSVG, '.ptransform', 0,1);
     var p0transformElement = findExpectingNThings(theSVG, '.p0transform', 0,1);
