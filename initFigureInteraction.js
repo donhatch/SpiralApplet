@@ -521,8 +521,8 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
     // with respect to the upper-left corner of the SVG element.
     // In Chrome, e.offsetX,e.offsetY apparently works,
     // but in Firefox those are undefined so we have to do something more robust.
-    var figureOutOffsetXY = function(e) {
-        var clientP = theSVG[0].createSVGPoint();
+    var figureOutXYInSvgSpace = function(svgElement,e) {
+        var clientP = svgElement.createSVGPoint();
         clientP.x = e.clientX;
         clientP.y = e.clientY;
         var svgP = clientP.matrixTransform(theSVG[0].getScreenCTM().inverse());
@@ -541,24 +541,10 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         mousedownsElement.text(""+mousedownsCount+" mousedowns");
 
 
-        var XY = figureOutOffsetXY(e);
+        var XY = figureOutXYInSvgSpace(theSVG[0], e);
         //console.log("    XY = "+XY);
 
         dragging = true;
-
-        // XXX OH NO! offsetX,offsetY give the right thing in chrome, but they are undefined in firefox!!! how do we figure this out??
-        // on firefox, there are:
-        /*
-            offsetX/Y: undefined undefined (!?)
-            clientX/Y: 10 6
-            originalEvent.pageX/Y: 10 21
-            originalEvent.screenX/Y: 27 89
-        */
-        // I think this guy figured it out...
-        //     http://www.jacklmoore.com/notes/mouse-position/
-        // nope!
-        // more thorough here:
-        //     http://www.quirksmode.org/js/events_properties.html#position
 
         indexOfThingBeingDragged = pickClosestThingIndex(XY,10);
         console.log("dragging thing with index = "+indexOfThingBeingDragged);
@@ -596,7 +582,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         mouseupsCount++;
         mouseupsElement.text(""+mouseupsCount+" mouseups");
 
-        var XY = figureOutOffsetXY(e);
+        var XY = figureOutXYInSvgSpace(theSVG[0], e);
         dragging = false;
         prevXY = XY;
     });
@@ -672,7 +658,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         }
 
 
-        var XY = figureOutOffsetXY(e);
+        var XY = figureOutXYInSvgSpace(theSVG[0], e);
 
 
         // wtf? on chrome, this keeps firing every 1 second
