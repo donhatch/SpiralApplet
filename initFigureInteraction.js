@@ -229,8 +229,10 @@ var initFigureInteraction = function(theDiv,
         priscillaMainPathElement.attr('d', priscillaMainPath);
         priscillaNeighborsPathElement.attr('d', priscillaNeighborsPath);
         priscillaNeighborsPathElement.attr('vertex-opacities', priscillaNeighborsPathOpacities);
-        orthoDottedPathElement.attr('d', orthoDottedPath);
-        dhatDottedPathElement.attr('d', dhatDottedPath);
+        if (isDefined(orthoDottedPathElement))
+            orthoDottedPathElement.attr('d', orthoDottedPath);
+        if (isDefined(dhatDottedPathElement))
+            dhatDottedPathElement.attr('d', dhatDottedPath);
         ptransformElement.attr('transform', 'translate('+p[0]+','+p[1]+')');
         d0transformElement.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
         d1transformElement.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
@@ -252,7 +254,7 @@ var initFigureInteraction = function(theDiv,
     }; // recomputeSVG
 
     // http://net.tutsplus.com/tutorials/javascript-ajax/quick-tip-quick-and-easy-javascript-testing-with-assert/
-    var assert = function(condition, description) {
+    var assertInCaller = function(nCallersToSkip, condition, description) {
         if (!condition)
         {
             // throw to get a stack trace
@@ -262,7 +264,7 @@ var initFigureInteraction = function(theDiv,
             catch(e)
             {
                 var stackLines = e.stack.split('\n');
-                var theStackLine = jQuery.trim(stackLines[3]);
+                var theStackLine = jQuery.trim(stackLines[3+nCallersToSkip]);
                 theStackLine = theStackLine.replace(/at .* \(([^ ]*)\)$/, '$1');
                 console.log("theStackLine = "+theStackLine);
                 theStackLine = theStackLine.replace(/.*\//, ''); // get rid of all but trailing component of file name
@@ -290,20 +292,29 @@ var initFigureInteraction = function(theDiv,
                 }
             }
         }
+    }; // assertInCaller
+    var assert = function(condition, description) {
+        return assertInCaller(1, condition, description);
     }; // assert
 
     // jQuery(s), throwing an error if the result
     // has length other than nExpected.
     var findExpectingNThings = function(node,query,minExpected,maxExpected) {
+        // just trivially wrap _findExpectingNThings;
+        // the point is to make the number of stack frames to be skipped
+        // be the same in all calls to it
+        return _findExpectingNThings(node, query, minExpected,maxExpected);
+    };
+    var findExpectingOneThing = function(node,query) {
+        return _findExpectingNThings(node, query, 1,1);
+    };
+    var _findExpectingNThings = function(node,query,minExpected,maxExpected) {
         assert(typeof minExpected !== 'undefined'
             && typeof maxExpected !== 'undefined', "missing arg to findExpectingNThings");
         var answer = node.find(query);
-        assert((answer.length >= minExpected && answer.length <= maxExpected),
+        assertInCaller(2,(answer.length >= minExpected && answer.length <= maxExpected),
         "got "+answer.length+" results from node.find('"+query+"'), expected "+(minExpected==maxExpected ? minExpected : "between "+minExpected+" and "+maxExpected+""));
         return answer;
-    };
-    var findExpectingOneThing = function(node,query) {
-        return findExpectingNThings(node, query, 1,1);
     };
 
     // global constants (just a cache)
@@ -329,8 +340,11 @@ var initFigureInteraction = function(theDiv,
     var dudleyNeighborsPathElement = findExpectingOneThing(theSVG, '.dudleyNeighborsPath');
     var priscillaMainPathElement = findExpectingOneThing(theSVG, '.priscillaMainPath');
     var priscillaNeighborsPathElement = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
-    var orthoDottedPathElement = findExpectingOneThing(theSVG, '.orthoDottedPath');
-    var dhatDottedPathElement = findExpectingOneThing(theSVG, '.dhatDottedPath');
+
+    if (showOrthoDottedLines)
+        var orthoDottedPathElement = findExpectingOneThing(theSVG, '.orthoDottedPath');
+    if (showDhatStuff)
+        var dhatDottedPathElement = findExpectingOneThing(theSVG, '.dhatDottedPath');
 
     var ptransformElement = findExpectingNThings(theSVG, '.ptransform', 0,1);
     var p0transformElement = findExpectingNThings(theSVG, '.p0transform', 0,1);
@@ -759,7 +773,7 @@ var initFigureInteraction = function(theDiv,
     });
 
     if (!showOrthoDottedLines)
-        findExpectingNThings(theSVG,'.orthoDottedPathStuff',2,2).attr('display', 'none');
+        findExpectingNThings(theSVG,'.orthoDottedPathStuff',2,2).attr('display', 'none'); // the paths and the labels
     if (!showArcs)
         findExpectingOneThing(theSVG,'.arcsStuff').attr('display', 'none');
     if (!showDhatStuff)
@@ -808,6 +822,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
 
     var templateDiv = jQuery('#figureTemplateDiv');
     var templateSVG = templateDiv.children();
+    var figure4div = jQuery('#figure4div');
     var figure5div = jQuery('#figure5div');
     var figure6div = jQuery('#figure6div');
     var figure7div = jQuery('#figure7div');
@@ -821,16 +836,6 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
 
 
 
-
-    initFigureInteraction(
-        figure4div,
-        undefined, [.8,.6], [.8,1], // p0,p1
-        [1,0], undefined, undefined, // d
-        2, // nNeighbors
-        false, // don't show ortho dotted lines
-        false, // don't show arcs
-        false, // don't show dhat stuff
-        function() {});
 
     initFigureInteraction(
         figure5div,
@@ -871,6 +876,19 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
         true,
         true,
         callThisWhenSVGSourceChanges);
+
+
+    // XXX put this up above, when it finally works
+    initFigureInteraction(
+        figure4div,
+        undefined, [.8,.6], [.8,1], // p0,p1
+        [1,0], undefined, undefined, // d
+        2, // nNeighbors
+        false, // don't show ortho dotted lines
+        false, // don't show arcs
+        false, // don't show dhat stuff
+        function() {});
+
 
 
     if (false)
