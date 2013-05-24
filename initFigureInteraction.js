@@ -81,21 +81,14 @@ var initFigureInteraction = function(theDiv,
             //     
             var s = cross(p0,p1); // sin(theta) times product of lengths
             var c = dot(p0,p1); // cos(theta) times product of lengths
-            console.log("s = ",s);
-            console.log("c = ",c);
             var M = [q0Direction,
                      [s,c]];
             var b = [dot(q0Direction, d),0];
             // solve M x = b
             var detM = cross(M[0],M[1]);
-            console.log("detM = ",detM);
             var adjM = [[M[1][1], -M[0][1]],[-M[1][0],M[0][0]]];
-            console.log("adjM = ",adjM);
             var invM = [dividedby(adjM[0],detM),dividedby(adjM[1],detM)];
-            console.log("invM = ",invM);
-            console.log("b = ",b);
             var d0prev = [dot(invM[0],b),dot(invM[1],b)];
-            console.log("d0prev = ",d0prev);
 
             if (true)
             {
@@ -393,7 +386,6 @@ var initFigureInteraction = function(theDiv,
         throw null;
     }
 
-    console.log("theDiv[0].tagName = "+theDiv[0].tagName);
     assert(theDiv.length === 1 && theDiv[0].tagName === "DIV", "oh no! the SVG has to have a div as a parent! dragging won't work!");
     var theDivsChildren = theDiv.children();
     assert(theDivsChildren.length === 1 && theDiv[0].tagName === "DIV", "oh no! the SVG has siblings! dragging won't work!");
@@ -512,6 +504,9 @@ var initFigureInteraction = function(theDiv,
 
 
     console.log('p = '+p);
+    console.log('p0 = '+p0);
+    console.log('p1 = '+p1);
+    console.log('d = '+d);
     console.log('d0 = '+d0);
     console.log('d1 = '+d1);
     console.log('nNeighbors = '+nNeighbors);
@@ -834,9 +829,9 @@ var initFigureInteraction = function(theDiv,
                 }
                 else
                 {
+                    p1 = plus(p1, minus(localXY, p0)); // move p1 along with p0
                     p0 = localXY;
                 }
-                p1[0] = p0[0] // constrain segment to be vertical XXX should we do this by moving to/from origin?
                 console.log("p0 changed to "+p0);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
@@ -851,9 +846,10 @@ var initFigureInteraction = function(theDiv,
                 }
                 else
                 {
-                    p1 = localXY;
+                    // constrain to same x as p0, so only change y
+                    p1[0] = p0[0];
+                    p1[1] = localXY[1];
                 }
-                p0[0] = p1[0] // constrain segment to be vertical XXX should we do this by moving to/from origin?
                 console.log("p1 changed to "+p1);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
