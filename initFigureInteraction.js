@@ -280,7 +280,6 @@ var initFigureInteraction = function(theDiv,
                 if (assertOutputList !== null)
                 {
                     var li = document.createElement('li');
-                    li.className = 'assertFail';
                     text = "ASSERT FAIL: " + text; // TODO: color:red;font-weight:bold
                     li.appendChild(document.createTextNode(text));
                     assertOutputList.appendChild(li);
