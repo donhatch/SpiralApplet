@@ -48,14 +48,6 @@
 
             /* fill: green; */
         }
-
-
-        /* TODO: figure out how to hard code this */
-        .assertFail:before {  
-            color: red;  
-            font-weight: bold;  
-        }  
-
     </style>
 
     <!-- 1.9.1 provokes warnings in firefox:
@@ -87,6 +79,7 @@
 
             if (true)
             {
+                console.log("jQuery('.vertexColoredPath') = ",jQuery('.vertexColoredPath'));
                 setupVertexColoredPaths(jQuery('.vertexColoredPath'));
                 // do it twice to test
                 console.log("(setting up colored paths again)");
@@ -130,6 +123,75 @@
 <ul id="assertOutputList"></ul>  
 <p>
 <!-- ======================================================================== -->
+<hr>
+<div id="figure4div" class="figure" width="450" height="330">
+    <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
+        <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
+           
+            <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
+            <path class="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 1 L 0 0"></path>
+
+            <path class="dottedStuff" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; stroke-dasharray:5,5; fill:none"
+                d="M .8 .6 L 0 0 L .8 1.0"/>
+
+            <path class="dudleyNeighborsPath vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1"
+                stroke="rgb(128,128,255)"
+                d=" M 0 0 L 1.25 .2 L 1 0 M 0 0 L .75 -.125 L 1 0" vertex-opacities=".5 0 .5 .5 0 .5"></path>
+            <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 1 0"/>
+
+            <path class="priscillaNeighborsPath vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1; "
+                stroke="red"
+                d=" M .75 1.4 L .8 1.0 L .9 .8  M .75 .2 L .8 .6 L .9 .3"
+                vertex-opacities=" 0 0.5 0 0 0.5 0"/>
+            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" stroke="red" stroke-opacity="1" style="stroke-width: 4; fill: none"
+                d="M .8 .6 L .8 1.0"/>
+
+                
+            <g class="p0transform" transform="translate(.8,.6)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle class="priscillaPoint0" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
+                    <g transform="translate(10,-10)">
+                        <text class="p0text">
+                            <tspan x="0" y="0">p</tspan>
+                            <tspan x="0" y="3">_</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g class="p1transform" transform="translate(.8,1.0)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle class="priscillaPoint1" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
+                    <g transform="translate(10,-10)">
+                        <text class="p0text">
+                            <tspan x="0" y="0">p</tspan>
+                            <tspan x="0" y="-15">_</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g transform="translate(0,0)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <g transform="translate(-10,15)">
+                        <text>0</text>
+                    </g>
+                </g>
+            </g>
+
+            <g class="dtransform" transform="translate(1,0)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <g transform="translate(10,5)">
+                        <text class="d1text">d</text>
+                    </g>
+                </g>
+            </g>
+
+        </g>
+    </svg>
+</div>
+<br>
+Figure 4
 <hr>
 <div id="figure5div" class="figure" width="450" height="330">
     (placeholder -- this should get replaced by the figure 5 svg)

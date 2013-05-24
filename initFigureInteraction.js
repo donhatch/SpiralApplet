@@ -37,7 +37,7 @@ var initFigureInteraction = function(theDiv,
                                      p, p0, p1, // either p defined, or p0 and p1 defined
                                      d, d0, d1, // either d defined, or d0 and d1 defined
                                      nNeighbors,
-                                     showDottedLines,
+                                     showOrthoDottedLines,
                                      showArcs,
                                      showDhatStuff,
                                      callThisWhenSVGSourceChanges) {
@@ -758,7 +758,7 @@ var initFigureInteraction = function(theDiv,
         prevXY = XY;
     });
 
-    if (!showDottedLines)
+    if (!showOrthoDottedLines)
         findExpectingNThings(theSVG,'.orthoDottedPathStuff',2,2).attr('display', 'none');
     if (!showArcs)
         findExpectingOneThing(theSVG,'.arcsStuff').attr('display', 'none');
@@ -823,11 +823,21 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
 
 
     initFigureInteraction(
+        figure4div,
+        undefined, [.8,.6], [.8,1], // p0,p1
+        [1,0], undefined, undefined, // d
+        2, // nNeighbors
+        false, // don't show ortho dotted lines
+        false, // don't show arcs
+        false, // don't show dhat stuff
+        function() {});
+
+    initFigureInteraction(
         figure5div,
         [0,1], undefined, undefined, // p
         undefined, [.745, .415], [.8, .6], // d0,d1
         2, // nNeighbors
-        false, // don't show dotted lines
+        false, // don't show ortho dotted lines
         false, // don't show arcs
         false, // don't show dhat stuff
         function() {});
@@ -837,7 +847,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
         [0,1], undefined, undefined, // p
         undefined, [.6, .2], [.8, .6], // d0,d1
         0, // nNeighbors
-        true, // show dotted lines
+        true, // show ortho dotted lines
         false, // don't show arcs
         false, // don't show dhat stuff
         function() {});
@@ -847,7 +857,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
         [0,1.195], undefined, undefined, // p
         undefined, [.8, .615], [.965, 1.205], // d0,d1
         0, // nNeighbors
-        false, // don't show dotted lines
+        false, // don't show ortho dotted lines
         true, // show arcs
         true, // show dhat stuff
         function() {});

@@ -353,6 +353,22 @@
                 }
             }
 
+
+            if (true)
+            {
+                var figure4div = jQuery('#figure4div');
+                if (figure4div.length != 1) throw "oh no! can't find figure4div!"
+                var figure4svg = figure4div.children();
+                var dudleyNeighborsPath = figure4svg.find('.dudleyNeighborsPath');
+                var priscillaNeighborsPath = figure4svg.find('.priscillaNeighborsPath');
+                if (dudleyNeighborsPath.length != 1) throw "oh no! can't find dudleyNeighborsPath in figure 4!"
+                if (priscillaNeighborsPath.length != 1) throw "oh no! can't find priscillaNeighborsPath in figure 4!"
+                setupVertexColoredPaths(dudleyNeighborsPath);
+                setupVertexColoredPaths(priscillaNeighborsPath);
+            }
+
+
+
             var interactParam = getParameterByName('interact');
             //console.log("interact param = ",interactParam);
             if (interactParam != "no")
@@ -392,7 +408,6 @@
     <hr> <!--============================================================-->
 
     <div class="doMyThing">
-    <span id="youarehere" style="color:green">YOU ARE HERE<br></span>
     first thing: $xp$
     </div>
     <div class="doMyThing">
@@ -1247,6 +1262,7 @@ $0$).
             .....
             .....
             *....
+    <span id="youarehere" style="color:green">YOU ARE HERE<br></span>
                     * <span class="ol">p</span>=&lt;<span class="uol">x<sub>p</sub></span>,<span class="ol">y<sub>p</sub></span>&gt;
                     |
                   . |
@@ -1262,10 +1278,76 @@ $0$).
              .  .
               .          Dudley
           0 *----------------* <span class="uol">d</span>
-                              
-
-        Figure 4: Inductive step, Case 1: Priscilla has moved
 </pre>
+<div id="figure4div" class="figure">
+    <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
+        <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
+           
+            <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
+            <path class="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 1 L 0 0"></path>
+
+            <path class="dottedStuff" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; stroke-dasharray:5,5; fill:none"
+                d="M .8 .6 L 0 0 L .8 1.0"/>
+
+            <path class="dudleyNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1"
+                stroke="rgb(128,128,255)"
+                d=" M 0 0 L 1.25 .2 L 1 0 M 0 0 L .75 -.125 L 1 0" vertex-opacities=".5 0 .5 .5 0 .5"></path>
+            <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 1 0"/>
+
+            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1; "
+                stroke="red"
+                d=" M .75 1.4 L .8 1.0 L .9 .8  M .75 .2 L .8 .6 L .9 .3"
+                vertex-opacities=" 0 0.5 0 0 0.5 0"/>
+            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" stroke="red" stroke-opacity="1" style="stroke-width: 4; fill: none"
+                d="M .8 .6 L .8 1.0"/>
+
+                
+            <g class="p0transform" transform="translate(.8,.6)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle class="priscillaPoint0" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
+                    <g transform="translate(10,-10)">
+                        <text class="p0text">
+                            <tspan x="0" y="0">p</tspan>
+                            <tspan x="0" y="3">_</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g class="p1transform" transform="translate(.8,1.0)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle class="priscillaPoint1" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
+                    <g transform="translate(10,-10)">
+                        <text class="p0text">
+                            <tspan x="0" y="0">p</tspan>
+                            <tspan x="0" y="-15">_</tspan>
+                        </text>
+                    </g>
+                </g>
+            </g>
+            <g transform="translate(0,0)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <g transform="translate(-10,15)">
+                        <text>0</text>
+                    </g>
+                </g>
+            </g>
+
+            <g class="dtransform" transform="translate(1,0)">
+                <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
+                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <g transform="translate(10,5)">
+                        <text class="d1text">d</text>
+                    </g>
+                </g>
+            </g>
+
+        </g>
+    </svg>
+</div>
+<br>
+Figure 4: Inductive step, Case 1: Priscilla has moved
+<p>
 XXX rearrange and use underoverline for all of the following, like in case 2
 <br>
 In this case we have the following relationships between the previous event's values
@@ -1576,9 +1658,9 @@ and the proof of the Spiral Moment Lemma.
                 <path class="orthoDottedPath" vector-effect="non-scaling-stroke" style="stroke:#808080; stroke-width:2; stroke-dasharray:5,5; fill: none; stroke-opacity:1" d="M 0 0 L 0.8 0 L 0.8 0.6000000000000001 M 0 0 L 0.6000000000000001 0 L 0.6000000000000001 0.2"></path>
             </g>
 
-            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; display: none;" stroke="rgb(128,128,255)" stroke-opacity="1" d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0" vertex-opacities=" 1 0 1 1 0 1"></path>
+            <path class="dudleyNeighborsPath" stroke-miterlimit="100000" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none;" stroke="rgb(128,128,255)" stroke-opacity="1" d=" M 0.8 0.6000000000000001 L 0.9000000000000001 1.3000000000000003 L 0 0 M 0.6000000000000001 0.2 L 0.4000000000000001 -5.551115123125783e-17 L 0 0" vertex-opacities=" 1 0 1 1 0 1"></path>
             <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.6000000000000001 0.2 L 0.8 0.6000000000000001 L 0 0"></path>
-            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1; display: none;" stroke="red" d=" M -2.160000000000001 2.88 L -0.6000000000000003 1.8 L 0.3899494936611664 1.6585786437626908 M 0.3630852169962633 0.3035814496704034 L 0.1666666666666667 0.49999999999999994 L 0.16666666666666669 0.22222222222222215 M 0.47140452079103173 0.7642977396044842 L 0.7071067811865476 0.6464466094067263" vertex-opacities=" 0 0.5 0 0 0.5 0 1 0"></path>
+            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1" stroke="red" d=" M -2.160000000000001 2.88 L -0.6000000000000003 1.8 L 0.3899494936611664 1.6585786437626908 M 0.3630852169962633 0.3035814496704034 L 0.1666666666666667 0.49999999999999994 L 0.16666666666666669 0.22222222222222215 M 0.47140452079103173 0.7642977396044842 L 0.7071067811865476 0.6464466094067263" vertex-opacities=" 0 0.5 0 0 0.5 0 1 0"></path>
             <path class="priscillaMainPath" vector-effect="non-scaling-stroke" stroke="red" stroke-opacity="1" style="stroke-width: 2; fill: none" d="M 0.1666666666666667 0.49999999999999994 L 0 1 L -0.6000000000000003 1.8 M 0 1 L 0.47140452079103173 0.7642977396044842"> </path>
 
                 
