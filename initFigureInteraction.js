@@ -94,6 +94,14 @@ var initFigureInteraction = function(theDiv,
             {
                 //assert(d0prev[0] > 0.); // not true if they've dragged to strange places
                 //assert(d0prev[1] < 0.); // not true if they've dragged to strange places
+                if (false)
+                {
+                    console.log("         q0Direction = ",q0Direction);
+                    console.log("         first cross = ",cross(d0prev,[1,0])/length(d0prev));
+                    console.log("        second cross = ",cross(p0,p1)/(length(p0)*length(p1)));
+                }
+                // NOTE, these fail if p0 goes below the x axis...
+                // I'm not sure there's anything to be done about it
                 assert(Math.abs(cross(d0prev,[1,0])/length(d0prev) - cross(p0,p1)/(length(p0)*length(p1))) < 1e-6);
                 assert(Math.abs(dot(minus(d,d0prev),q0Direction)) < 1e-6);
             }
