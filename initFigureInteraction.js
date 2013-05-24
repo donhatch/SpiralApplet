@@ -213,23 +213,44 @@ var initFigureInteraction = function(theDiv,
         var paths = makeThePaths(p,d0,d1, nNeighbors);
 
 
-        dudleyMainPath.attr('d', paths[0]);
-        dudleyNeighborsPath.attr('d', paths[1]);
-        dudleyNeighborsPath.attr('vertex-opacities', paths[2]);
-        priscillaMainPath.attr('d', paths[3]);
-        priscillaNeighborsPath.attr('d', paths[4]);
-        priscillaNeighborsPath.attr('vertex-opacities', paths[5]);
-        orthoDottedPath.attr('d', paths[6]);
-        dhatDottedPath.attr('d', paths[7]);
+
+        var dudleyMainPath = paths[0];
+        var dudleyNeighborsPath = paths[1];
+        var dudleyNeighborsPathOpacities = paths[2];
+        var priscillaMainPath = paths[3];
+        var priscillaNeighborsPath = paths[4];
+        var priscillaNeighborsPathOpacities = paths[5];
+        var orthoDottedPath = paths[6];
+        var dhatDottedPath = paths[7];
         var d0 = paths[8];
         var d1 = paths[9];
         var dhat = paths[10];
-        ptransform.attr('transform', 'translate('+p[0]+','+p[1]+')');
-        d0transform.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
-        d1transform.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
-        dhattransform.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
-        xd0transform.attr('transform', 'translate('+d0[0]+',0)');
-        xd1transform.attr('transform', 'translate('+d1[0]+',0)');
+        var m1arcPath = paths[11];
+        var m2arcPath = paths[12];
+        var m3arcPath = paths[13];
+
+
+
+
+
+
+        dudleyMainPathElement.attr('d', paths[0]);
+        dudleyNeighborsPathElement.attr('d', paths[1]);
+        dudleyNeighborsPathElement.attr('vertex-opacities', paths[2]);
+        priscillaMainPathElement.attr('d', paths[3]);
+        priscillaNeighborsPathElement.attr('d', paths[4]);
+        priscillaNeighborsPathElement.attr('vertex-opacities', paths[5]);
+        orthoDottedPathElement.attr('d', paths[6]);
+        dhatDottedPathElement.attr('d', paths[7]);
+        var d0 = paths[8];
+        var d1 = paths[9];
+        var dhat = paths[10];
+        ptransformElement.attr('transform', 'translate('+p[0]+','+p[1]+')');
+        d0transformElement.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
+        d1transformElement.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
+        dhattransformElement.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
+        xd0transformElement.attr('transform', 'translate('+d0[0]+',0)');
+        xd1transformElement.attr('transform', 'translate('+d1[0]+',0)');
         var m1arcPath = paths[11];
         var m2arcPath = paths[12];
         var m3arcPath = paths[13];
@@ -239,8 +260,8 @@ var initFigureInteraction = function(theDiv,
         undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
 
         // the false,false isn't really right if number of verts changed... but the code does the right thing by blowing away and regenerating the whole thing in that case anyway
-        updateVertexColoredPaths(dudleyNeighborsPath,true,false,false);
-        updateVertexColoredPaths(priscillaNeighborsPath,true,false,false);
+        updateVertexColoredPaths(dudleyNeighborsPathElement,true,false,false);
+        updateVertexColoredPaths(priscillaNeighborsPathElement,true,false,false);
 
         callThisWhenSVGSourceChanges();
 
@@ -321,25 +342,25 @@ var initFigureInteraction = function(theDiv,
     var theDivsChildren = theDiv.children();
     assert(theDivsChildren.length === 1 && theDiv[0].tagName === "DIV", "oh no! the SVG has siblings! dragging won't work!");
 
-    var theGraphic = findExpectingOneThing(theSVG, '.theGraphic');
-    var dudleyMainPath = findExpectingOneThing(theSVG, '.dudleyMainPath');
-    var dudleyNeighborsPath = findExpectingOneThing(theSVG, '.dudleyNeighborsPath');
-    var priscillaMainPath = findExpectingOneThing(theSVG, '.priscillaMainPath');
-    var priscillaNeighborsPath = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
-    var orthoDottedPath = findExpectingOneThing(theSVG, '.orthoDottedPath');
-    var dhatDottedPath = findExpectingOneThing(theSVG, '.dhatDottedPath');
+    var theGraphicElement = findExpectingOneThing(theSVG, '.theGraphic');
+    var dudleyMainPathElement = findExpectingOneThing(theSVG, '.dudleyMainPath');
+    var dudleyNeighborsPathElement = findExpectingOneThing(theSVG, '.dudleyNeighborsPath');
+    var priscillaMainPathElement = findExpectingOneThing(theSVG, '.priscillaMainPath');
+    var priscillaNeighborsPathElement = findExpectingOneThing(theSVG, '.priscillaNeighborsPath');
+    var orthoDottedPathElement = findExpectingOneThing(theSVG, '.orthoDottedPath');
+    var dhatDottedPathElement = findExpectingOneThing(theSVG, '.dhatDottedPath');
 
-    var ptransform = findExpectingNThings(theSVG, '.ptransform', 0,1);
-    var p0transform = findExpectingNThings(theSVG, '.p0transform', 0,1);
-    var p1transform = findExpectingNThings(theSVG, '.p1transform', 0,1);
+    var ptransformElement = findExpectingNThings(theSVG, '.ptransform', 0,1);
+    var p0transformElement = findExpectingNThings(theSVG, '.p0transform', 0,1);
+    var p1transformElement = findExpectingNThings(theSVG, '.p1transform', 0,1);
 
-    var dtransform = findExpectingNThings(theSVG, '.dtransform', 0,1);
-    var d0transform = findExpectingNThings(theSVG, '.d0transform', 0,1);
-    var d1transform = findExpectingNThings(theSVG, '.d1transform', 0,1);
+    var dtransformElement = findExpectingNThings(theSVG, '.dtransform', 0,1);
+    var d0transformElement = findExpectingNThings(theSVG, '.d0transform', 0,1);
+    var d1transformElement = findExpectingNThings(theSVG, '.d1transform', 0,1);
 
-    var dhattransform = findExpectingOneThing(theSVG, '.dhattransform');
-    var xd0transform = findExpectingOneThing(theSVG, '.xd0transform');
-    var xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
+    var dhattransformElement = findExpectingOneThing(theSVG, '.dhattransform');
+    var xd0transformElement = findExpectingOneThing(theSVG, '.xd0transform');
+    var xd1transformElement = findExpectingOneThing(theSVG, '.xd1transform');
     var m1arc = findExpectingOneThing(theSVG, '.m1arc');
     var m2arc = findExpectingOneThing(theSVG, '.m2arc');
     var m3arc = findExpectingOneThing(theSVG, '.m3arc');
@@ -348,10 +369,10 @@ var initFigureInteraction = function(theDiv,
 
     // Either there's ptransform or p0transform,p1transform, but not both
     // Either there's dtransform or d0transform,d1transform, but not both
-    assert((ptransform.length==1 && p0transform.length==0 && p1transform.length==0)
-        || (ptransform.length==0 && p0transform.length==1 && p1transform.length==1));
-    assert((dtransform.length==1 && d0transform.length==0 && d1transform.length==0)
-        || (dtransform.length==0 && d0transform.length==1 && d1transform.length==1));
+    assert((ptransformElement.length==1 && p0transformElement.length==0 && p1transformElement.length==0)
+        || (ptransformElement.length==0 && p0transformElement.length==1 && p1transformElement.length==1));
+    assert((dtransformElement.length==1 && d0transformElement.length==0 && d1transformElement.length==0)
+        || (dtransformElement.length==0 && d0transformElement.length==1 && d1transformElement.length==1));
 
     // these may or may not exist on the page... if they don't, we'll have no-ops
     var mouseins_subelementsElement = jQuery("#mouseins_subelements");
@@ -390,20 +411,20 @@ var initFigureInteraction = function(theDiv,
     // are extracted from the svg
     if (typeof p === 'undefined')
     {
-        var scratch = ptransform.attr('transform');
+        var scratch = ptransformElement.attr('transform');
         p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
              Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
     }
     if (typeof d0 === 'undefined')
     {
         // 'translate(0,0)'
-        var scratch = d0transform.attr('transform');
+        var scratch = d0transformElement.attr('transform');
         d0 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
               Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
     }
     if (typeof d1 === 'undefined')
     {
-        var scratch = d1transform.attr('transform');
+        var scratch = d1transformElement.attr('transform');
         d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
               Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
     }
@@ -413,7 +434,7 @@ var initFigureInteraction = function(theDiv,
         // figure it out from the size of the neighborsPaths.
         // (dudley's, since priscilla's got stuff added)
 
-        var dTemp = jQuery.trim(dudleyNeighborsPath.attr('d')).split(/ +/).length;
+        var dTemp = jQuery.trim(dudleyNeighborsPathElement.attr('d')).split(/ +/).length;
         //console.log('length of d neighbors path = '+pTemp);
         assert(dTemp % 18 === 0, "neighbors path length "+dTemp+" is not a multiple of 18!");
         nNeighbors = dTemp / 18;
@@ -444,7 +465,7 @@ var initFigureInteraction = function(theDiv,
         // extract the top-level graphic's translation and scale.
         // the attr looks like:
         //     transform="translate(250,320) scale(200,-200)"
-        var scratch = theGraphic.attr('transform');
+        var scratch = theGraphicElement.attr('transform');
         var match = scratch.match(/^translate\((.*),(.*)\) scale\((.*),(.*)\)$/);
         xTrans = Number(match[1]);
         yTrans = Number(match[2]);
@@ -704,7 +725,7 @@ var initFigureInteraction = function(theDiv,
                 // Change overall translation of the main graphic of the svg
                 xTrans = XY[0];
                 yTrans = XY[1];
-                theGraphic.attr("transform", "translate("+xTrans+","+yTrans+") scale("+xScale+","+yScale+")");
+                theGraphicElement.attr("transform", "translate("+xTrans+","+yTrans+") scale("+xScale+","+yScale+")");
                 localToWindowMatrix = [
                     [xScale,    undefined, undefined],
                     [undefined, yScale,    undefined],
