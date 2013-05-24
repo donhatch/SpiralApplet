@@ -972,7 +972,12 @@ var initFigureInteraction = function(theDiv,
             }
             else if (indexOfThingBeingDragged === 4) // d
             {
-                d = localXY;
+                if (constrainToRegionsFlag && localXY[0] <= 0)
+                {
+                    // nothing-- leave it where it was
+                }
+                else
+                    d = localXY;
                 d[1] = 0; // constrain to x axis
                 console.log("d changed to "+d);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
