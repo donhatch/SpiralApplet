@@ -99,8 +99,8 @@ var initFigureInteraction = function(theDiv,
             throw "ERROR: unexpected combination of p,p0,p1,d,d0,d1";
         }
 
-        var qLength = length(minus(p1,p0prev)); // make quill same length as primal edge, seems to look fairly decent
-        var q0 = plus(p1,times(normalized(perpDot(minus(d0,d1))),qLength));
+        var qLength = length(minus(p0,p0prev)); // make quill same length as primal edge, seems to look fairly decent
+        var q0 = plus(p0,times(normalized(perpDot(minus(d0,d1))),qLength));
 
 
         var dudleyMainPath = "M 0 0 L "+d0[0]+" "+d0[1]+" L "+d1[0]+" "+d1[1]+" L 0 0";
@@ -159,7 +159,7 @@ var initFigureInteraction = function(theDiv,
                 temp = nextInLogSpiral(z,Z);
                 z = Z;
                 Z = temp;
-                var q = analogy(p1,q0,z);
+                var q = analogy(p0,q0,z);
                 priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
                 priscillaNeighborsPathOpacities += " "+.5*(1.-(iNeighbor+1.)/nNeighbors)+" "+.5*(1.-iNeighbor/nNeighbors)+" 0";
             }
@@ -170,7 +170,7 @@ var initFigureInteraction = function(theDiv,
                 temp = nextInLogSpiral(Z,z);
                 Z = z;
                 z = temp;
-                var q = analogy(p1,q0,Z);
+                var q = analogy(p0,q0,Z);
                 priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
                 priscillaNeighborsPathOpacities += " 0 "+.5*(1.-iNeighbor/nNeighbors)+" "+.5*(1.-(iNeighbor+1.)/nNeighbors);
             }
@@ -178,7 +178,7 @@ var initFigureInteraction = function(theDiv,
         if (nNeighbors >= 1)
         {
             // add longer tail to the primary quill
-            var q0extension = plus(q0,times(.5,minus(q0,p1)));
+            var q0extension = plus(q0,times(.5,minus(q0,p0)));
             priscillaNeighborsPath += " M "+q0[0]+" "+q0[1]+" L "+q0extension[0]+" "+q0extension[1];
             priscillaNeighborsPathOpacities += " 1 0";
         }
