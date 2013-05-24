@@ -66,13 +66,6 @@ setupVertexColoredPaths = function(pathElements)
         {
             console.log("        setupVertexColoredPaths: deleting previous vertexColoredPathSegments");
             previousContainerMaybe.remove();
-
-            // previous setup called pathElement.hide()
-            // so pathElement is (most likely) hidden.
-            // we need to show it again so when cloned, the clones don't end up hidden
-            // (we'll hide it again at the end).
-            // need the 0 argument to make this happen immediately!
-            pathElement.show(0);
         }
 
         var dAttr = pathElement.attr('d');
@@ -180,6 +173,12 @@ setupVertexColoredPaths = function(pathElements)
                     subPath.removeAttr('stroke-opacity');
 
                     subPath.attr('d', "M 0 0 1 1");
+
+
+                    // Assume we're supposed to be shown, so don't inherit
+                    // that hiddenness.
+                    subPath.removeAttr("display");
+                    subPath.css("display", "");
                 }
                 subPaths.push(subPath);
             }
