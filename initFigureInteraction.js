@@ -362,37 +362,40 @@ var initFigureInteraction = function(theDiv,
                             || typeof d1 !== 'undefined'
                             || typeof nNeighbors !== 'undefined');
 
-    // any values not given as params
-    // are extracted from the svg
-    if (typeof p === 'undefined')
+    if (!someParamWasDefined)
     {
-        var scratch = ptransformElement.attr('transform');
-        p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
-             Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-    }
-    if (typeof d0 === 'undefined')
-    {
-        // 'translate(0,0)'
-        var scratch = d0transformElement.attr('transform');
-        d0 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
-              Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-    }
-    if (typeof d1 === 'undefined')
-    {
-        var scratch = d1transformElement.attr('transform');
-        d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
-              Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
-    }
-    if (typeof nNeighbors === 'undefined')
-    {
-        // really hacky way to deduce nNeighbors--
-        // figure it out from the size of the neighborsPaths.
-        // (dudley's, since priscilla's got stuff added)
+        // it's the template. extract the values from the svg.
+        // if any of the elements used here didn't exist, we'll get an inscrutable error.
 
-        var dTemp = jQuery.trim(dudleyNeighborsPathElement.attr('d')).split(/ +/).length;
-        //console.log('length of d neighbors path = '+pTemp);
-        assert(dTemp % 18 === 0, "neighbors path length "+dTemp+" is not a multiple of 18!");
-        nNeighbors = dTemp / 18;
+        {
+            var scratch = ptransformElement.attr('transform');
+            p = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+                 Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+        }
+
+        {
+            // 'translate(0,0)'
+            var scratch = d0transformElement.attr('transform');
+            d0 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+                  Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+        }
+
+        {
+            var scratch = d1transformElement.attr('transform');
+            d1 = [Number(scratch.replace(/^.*\(/, '').replace(/,.*$/, '')),
+                  Number(scratch.replace(/^.*\,/, '').replace(/\).*$/, ''))]
+        }
+
+        {
+            // really hacky way to deduce nNeighbors--
+            // figure it out from the size of the neighborsPaths.
+            // (dudley's, since priscilla's got stuff added)
+
+            var dTemp = jQuery.trim(dudleyNeighborsPathElement.attr('d')).split(/ +/).length;
+            //console.log('length of d neighbors path = '+pTemp);
+            assert(dTemp % 18 === 0, "neighbors path length "+dTemp+" is not a multiple of 18!");
+            nNeighbors = dTemp / 18;
+        }
     }
 
 
