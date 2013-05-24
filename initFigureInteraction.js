@@ -822,6 +822,79 @@ var initFigureInteraction = function(theDiv,
         // This seems to be working well, so I have it hard-coded to true.
         var constrainToRegions = true;
 
+        // Given a point that was inside the interior of a polygonal region
+        // and is trying to move, constrain the new position
+        // to the region.  If a bound is violated,
+        // correct it by adjusting orthogonal to the bound
+        // so that the distance from that bound is the same as before.
+        var constrainToRegion = function(newMaybe,old,constraints) {
+            var debug = false;
+            if (debug)
+            {
+                console.log("    in constrainToRegion");
+                console.log("        newMaybe = ",newMaybe);
+                console.log("        old = ",old);
+                console.log("        constraints = ",constraints);
+            }
+
+            var clampIndex = -1;
+            var newMaybeClamped = undefined;
+
+            // make two passes-- first to clamp,
+            // then, if indeed we clamped,
+            // do a second pass to make sure the clamped value
+            // doesn't violate any other constraints.
+            for (var iPass = 0; iPass < 2; ++iPass)
+            {
+                if (debug) console.log("            iPass=",iPass);
+                for (var iConstraint in constraints)
+                {
+                    if (debug) console.log("                iConstraint = ",iConstraint);
+                    if (iPass == 1 && iConstraint == clampIndex)
+                    {
+                        // we're back around to the one that clamped,
+                        // so none of the others were violated.
+                        if (debug) console.log("    out constrainToRegion (clamped to constraint "+clampIndex+")");
+                        return newMaybeClamped;
+                    }
+                    var constraint = constraints[iConstraint];
+                    var normal = constraint[0]; // need not be unit length;
+                    var offset = constraint[1];
+                    var newDot = dot(newMaybe, normal);
+                    if (debug)
+                    {
+                        console.log("                    normal = ",normal);
+                        console.log("                    offset = ",offset);
+                        console.log("                    newDot = ",newDot);
+                    }
+                    if (newDot >= offset)
+                    {
+                        if (clampIndex !== -1)
+                        {
+                            // more than one constraint violated,
+                            // or correcting one constraint violated another.
+                            // we're in a corner of the constraint region--
+                            // return the old point.
+                            if (debug) console.log("    out constrainToRegion (corner)");
+                            return old;
+                        }
+                        // retain old (less than offset) dot product with normal,
+                        // by subtracting a multiple of normal.
+                        var oldDot = dot(old, normal);
+                        newMaybeClamped = minus(newMaybe, times(normal, (newDot-oldDot)/length2(normal)));
+                        clampIndex = iConstraint;
+                    }
+                }
+                assert(iPass == 0);
+                if (clampIndex == -1) // didn't clamp
+                {
+                    if (debug) console.log("    out constrainToRegion (didn't clamp)");
+                    return newMaybe;
+                }
+            }
+            assert(false);
+        }; // constrainToRegion
+
         //console.log("    dragging = "+dragging);
         if (dragging)
         {
@@ -867,24 +940,8 @@ var initFigureInteraction = function(theDiv,
                 {
                     var p0new = localXY; // if it doesn't get clamped
                     if (constrainToRegions)
-                    {
-                        var p0newClamped = null;
-                        if (p0new[0] <= 0)
-                            p0newClamped = [p0[0],p0new[1]];
-                        else if (p0new[1] <= 0)
-                            p0newClamped = [p0new[0],p0[1]];
-                        if (p0newClamped != null)
-                        {
-                            if (p0newClamped[0] <= 0
-                             || p0newClamped[1] <= 0)
-                            {
-                                // in corner-- clamp all the way
-                                // back to original value, i.e. do nothing.
-                                p0newClamped = p0;
-                            }
-                            p0new = p0newClamped;
-                        }
-                    }
+                        p0new = constrainToRegion(p0new,p0, [[[-1,0],0],
+                                                             [[0,-1],0]]);
                     p1 = plus(p1, minus(p0new, p0)); // move p1 along with p0
                     p0 = p0new;
                 }
