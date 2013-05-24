@@ -515,6 +515,8 @@ var initFigureInteraction = function(theDiv,
     }
 
     var localToWindow = function(localXY) {
+        if (typeof localXY === 'undefined')
+            return undefined;
         var x = localXY[0];
         var y = localXY[1];
         var M = localToWindowMatrix;
@@ -543,10 +545,13 @@ var initFigureInteraction = function(theDiv,
         var thisDist2;
         for (var i = 0; i < things.length; ++i)
         {
+            var thing = things[i];
+            if (typeof thing == 'undefined')
+                continue;
             thisDist2 = dist2(pickXY, things[i]);
             if (debug)
             {
-                console.log("        things["+i+"] = "+things[i]);
+                console.log("        things["+i+"] = "+thing);
                 console.log("            thisDist = "+Math.sqrt(thisDist2));
             }
             if (thisDist2 <= tooFar2
@@ -606,31 +611,35 @@ var initFigureInteraction = function(theDiv,
 
         dragging = true;
 
-        if (typeof p === 'undefined')
+        if (isDefined(p))
         {
-            var things = [
-                localToWindow([0,0]),
-                localToWindow(p0),
-                localToWindow(p1),
-                localToWindow(d),
-            ];
+            var spotToPressToIncreaseNeighbors = localToWindow(nextInLogSpiral(d1,d0));
+            var spotToPressToDecreaseNeighbors = localToWindow(nextInLogSpiral(d0,d1));
         }
         else
         {
-            var things = [
-                localToWindow([0,0]),
-                localToWindow(p),
-                localToWindow(d0),
-                localToWindow(d1),
-                localToWindow(nextInLogSpiral(d1,d0)), // first CW neighbor
-                localToWindow(nextInLogSpiral(d0,d1)), // first CCW neighbor
-            ];
+            // XXX GET SOMETHING BETTER THAN THIS
+            var spotToPressToIncreaseNeighbors = [30,0];
+            var spotToPressToDecreaseNeighbors = [0,0];
         }
+
+        var things = [
+            localToWindow([0,0]), // 0
+            localToWindow(p), // 1
+            localToWindow(p0), // 2
+            localToWindow(p1), // 3
+            localToWindow(d), // 4
+            localToWindow(d0), // 5
+            localToWindow(d1), // 6
+            spotToPressToIncreaseNeighbors, // 7
+            spotToPressToDecreaseNeighbors, // 8
+        ];
+
         indexOfThingBeingDragged = pickClosestThingIndex(XY,things,10);
         console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
         // XXX HACKY obscure way to change nNeighbors!
-        if (indexOfThingBeingDragged === 4)
+        if (indexOfThingBeingDragged === 7)
         {
             //if (nNeighbors > 1)
             {
@@ -638,7 +647,7 @@ var initFigureInteraction = function(theDiv,
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
         }
-        else if (indexOfThingBeingDragged === 5)
+        else if (indexOfThingBeingDragged === 8)
         {
             nNeighbors++;
             recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
@@ -777,7 +786,42 @@ var initFigureInteraction = function(theDiv,
                 console.log("p changed to "+p);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
-            else if (indexOfThingBeingDragged === 2) // d0
+            else if (indexOfThingBeingDragged === 2) // p0
+            {
+                if (e.ctrlKey)
+                {
+                    // constrain to same angle
+                    p0 = times(p0, length(localXY)/length(p0));
+                }
+                else
+                {
+                    p0 = localXY;
+                }
+                console.log("p0 changed to "+p0);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
+            }
+            else if (indexOfThingBeingDragged === 3) // p1
+            {
+                if (e.ctrlKey)
+                {
+                    // constrain to same angle
+                    p1 = times(p1, length(localXY)/length(p1));
+                }
+                else
+                {
+                    p1 = localXY;
+                }
+                console.log("p0 changed to "+p1);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
+            }
+            else if (indexOfThingBeingDragged === 4) // d
+            {
+                d = localXY;
+                d[1] = 0; // constrain to x axis
+                console.log("d changed to "+d);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
+            }
+            else if (indexOfThingBeingDragged === 5) // d0
             {
                 if (e.ctrlKey)
                 {
@@ -791,7 +835,7 @@ var initFigureInteraction = function(theDiv,
                 console.log("d0 changed to "+d0);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
-            else if (indexOfThingBeingDragged === 3) // d1
+            else if (indexOfThingBeingDragged === 6) // d1
             {
                 if (e.ctrlKey)
                 {
@@ -806,11 +850,11 @@ var initFigureInteraction = function(theDiv,
                 console.log("d1 changed to "+d1);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
-            else if (indexOfThingBeingDragged === 4) // CW neighbor
+            else if (indexOfThingBeingDragged === 7) // CW neighbor
             {
                 // nothing-- already did it on mouse down
             }
-            else if (indexOfThingBeingDragged === 5) // CCW neighbor
+            else if (indexOfThingBeingDragged === 8) // CCW neighbor
             {
                 // nothing-- already did it on mouse down
             }
