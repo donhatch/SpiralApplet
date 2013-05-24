@@ -201,15 +201,13 @@ setupVertexColoredPaths = function(pathElements)
         pathElement.after(container); // insert container after pathElement
 
         pathElement.hide();
-
-        //console.log("    gradients = ",gradients);
-        //console.log("    subPaths = ",subPaths);
     }); // each pathElement
 
     updateVertexColoredPaths(pathElements,
                              true,
                              true,
-                             true);
+                             true,
+                             false); // don't allowStructuralChanges
 
     console.log("    out setupVertexColoredPaths");
     return undefined;
@@ -218,8 +216,12 @@ setupVertexColoredPaths = function(pathElements)
 updateVertexColoredPaths = function(pathElements,
                                     updatePositionsFlag,
                                     updateColorsFlag,
-                                    updateAlphasFlag)
+                                    updateAlphasFlag,
+                                    allowStructuralChangesFlag)
 {
+    if (typeof allowStructuralChangesFlag === 'undefined')
+        allowStructuralChangesFlag = true;
+
     pathElements.each(function(index,pathElement) {
 
         pathElement = jQuery(pathElement);
@@ -227,6 +229,29 @@ updateVertexColoredPaths = function(pathElements,
         var dTokens = jQuery.trim(dAttr).split(/(?:,|\s)+/);
         if (dTokens.length % 3 !== 0) throw "ERROR: number of tokens in d attr is "+dTokens.length+" which is not a multiple of 3: "+dAttr;
         var nVerts = dTokens.length / 3;
+
+        // nSegs is number of "L" commands
+        var nSegs = 0;
+        for (var iVert = 0; iVert < nVerts; iVert++)
+            if (dTokens[3*iVert] === 'L')
+                nSegs++;
+
+        var container = pathElement.next();
+        if (typeof container === 'undefined'
+         || container.attr("class") !== "vertexColoredPathSegments"
+         || container.children().length != nSegs+1)
+        {
+            if (allowStructuralChangesFlag)
+            {
+                console.log("        updateVertexColoredPaths: number of path elements changed! calling setupVertexColoredPaths instead (slower)");
+                setupVertexColoredPaths(pathElement);
+            }
+            else
+            {
+                window.alert("        updateVertexColoredPaths probably internal error: number of path elements changed! and no structural changes allowed, so bailing");
+            }
+            return; // for this pathElement only-- go on to the next
+        }
 
         var colors = null;
         if (updateColorsFlag)
@@ -261,8 +286,8 @@ updateVertexColoredPaths = function(pathElements,
             }
         }
 
-        var currentGradientElement = jQuery(pathElement.next()[0].firstChild.firstChild);
-        var currentSegElement = jQuery(pathElement.next()[0].firstChild.nextSibling);
+        var currentGradientElement = jQuery(container[0].firstChild.firstChild);
+        var currentSegElement = jQuery(container[0].firstChild.nextSibling);
         for (var iVert = 1; iVert < nVerts; ++iVert) // skip 0
         {
             var command = dTokens[3*iVert];

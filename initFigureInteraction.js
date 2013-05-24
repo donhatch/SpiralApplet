@@ -220,8 +220,9 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
 
         // XXX change this from setup to update when update can handle nVerts changes
-        setupVertexColoredPaths(dudleyNeighborsPath);
-        setupVertexColoredPaths(priscillaNeighborsPath);
+        // XXX the false,false isn't really right if number of verts changed... but the code does the right thing by blowing away and regenerating the whole thing in that case anyway
+        updateVertexColoredPaths(dudleyNeighborsPath,true,false,false);
+        updateVertexColoredPaths(priscillaNeighborsPath,true,false,false);
 
         callThisWhenSVGSourceChanges();
 
