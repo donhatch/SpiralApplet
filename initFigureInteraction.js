@@ -861,11 +861,32 @@ var initFigureInteraction = function(theDiv,
                     var scale = length(localXY)/length(p0);
                     p0 = times(p0, scale);
                     p1 = times(p1, scale);
+                    // XXX TODO: constrain to local?
                 }
                 else
                 {
-                    p1 = plus(p1, minus(localXY, p0)); // move p1 along with p0
-                    p0 = localXY;
+                    var p0new = localXY; // if it doesn't get clamped
+                    if (constrainToRegions)
+                    {
+                        var p0newClamped = null;
+                        if (p0new[0] <= 0)
+                            p0newClamped = [p0[0],p0new[1]];
+                        else if (p0new[1] <= 0)
+                            p0newClamped = [p0new[0],p0[1]];
+                        if (p0newClamped != null)
+                        {
+                            if (p0newClamped[0] <= 0
+                             || p0newClamped[1] <= 0)
+                            {
+                                // in corner-- clamp all the way
+                                // back to original value, i.e. do nothing.
+                                p0newClamped = p0;
+                            }
+                            p0new = p0newClamped;
+                        }
+                    }
+                    p1 = plus(p1, minus(p0new, p0)); // move p1 along with p0
+                    p0 = p0new;
                 }
                 console.log("p0 changed to "+p0);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
@@ -878,12 +899,15 @@ var initFigureInteraction = function(theDiv,
                     var scale = length(localXY)/length(p1);
                     p1 = times(p1, scale);
                     p0 = times(p0, scale);
+                    // XXX TODO: constrain to local?
                 }
                 else
                 {
                     // constrain to same x as p0, so only change y
-                    p1[0] = p0[0];
-                    p1[1] = localXY[1];
+                    if (!constrainToRegions
+                     || localXY[1] > p0[1])
+                        p1[1] = localXY[1];
+                    p1[0] = p0[0]; // should already be the case
                 }
                 console.log("p1 changed to "+p1);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
@@ -905,43 +929,41 @@ var initFigureInteraction = function(theDiv,
                 }
                 else
                 {
+                    var d0new = localXY; // if it doesn't get clamped
                     if (constrainToRegions)
                     {
+                        var d0newClamped = null;
                         var newCross = cross(localXY, d1);
-                        var d0Maybe = null;
                         if (newCross <= 0)
                         {
                             // retain old (positive) cross product with d1,
                             // but slide along that line
                             var oldCross = cross(d0,d1); // positive
-                            d0Maybe = minus(localXY, times(perpDot(d1), (oldCross-newCross)/length2(d1)));
+                            d0newClamped = minus(localXY, times(perpDot(d1), (oldCross-newCross)/length2(d1)));
                         }
                         else if (localXY[0] >= d1[0])
                         {
-                            d0Maybe = [d0[0],localXY[1]];
+                            d0newClamped = [d0[0],localXY[1]];
                         }
                         else if (localXY[1] <= 0)
                         {
-                            d0Maybe = [localXY[0],d0[1]];
+                            d0newClamped = [localXY[0],d0[1]];
                         }
-                        if (d0Maybe !== null)
+                        if (d0newClamped !== null)
                         {
-                            if (cross(d0Maybe,d1) <= 0
-                             || d0Maybe[0] >= d1[0]
-                             || d0Maybe[1] <= 0)
+                            if (cross(d0newClamped,d1) <= 0
+                             || d0newClamped[0] >= d1[0]
+                             || d0newClamped[1] <= 0)
                             {
                                 // two constraints violated,
                                 // or correcting one constraint violated another.
                                 // we're in a corner of the constraint region-- do nothing.
+                                d0newClamped = d0;
                             }
-                            else
-                                d0 = d0Maybe;
+                            d0new = d0newClamped;
                         }
-                        else
-                            d0 = localXY;
                     }
-                    else
-                        d0 = localXY;
+                    d0 = d0new;
                 }
                 console.log("d0 changed to "+d0);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
@@ -956,38 +978,36 @@ var initFigureInteraction = function(theDiv,
                 }
                 else
                 {
+                    var d1new = localXY; // if it doesn't get clamped
                     if (constrainToRegions)
                     {
                         var newCross = cross(d0,localXY);
-                        var d1Maybe = null;
+                        var d1newClamped = null;
                         if (newCross <= 0)
                         {
                             // retain old (positive) cross product with d0,
                             // but slide along that line
                             var oldCross = cross(d0,d1); // positive
-                            d1Maybe = plus(localXY, times(perpDot(d0), (oldCross-newCross)/length2(d0)));
+                            d1newClamped = plus(localXY, times(perpDot(d0), (oldCross-newCross)/length2(d0)));
                         }
                         else if (localXY[0] <= d0[0])
                         {
-                            d1Maybe = [d1[0],localXY[1]];
+                            d1newClamped = [d1[0],localXY[1]];
                         }
-                        if (d1Maybe != null)
+                        if (d1newClamped != null)
                         {
-                            if (cross(d0, d1Maybe) <= 0
-                             || d1Maybe[0] <= d0[0])
+                            if (cross(d0, d1newClamped) <= 0
+                             || d1newClamped[0] <= d0[0])
                             {
                                 // two constraints violated,
                                 // or correcting one constraint violated another.
                                 // we're in a corner of the constraint region-- do nothing.
+                                d1newClamped = d1;
                             }
-                            else
-                                d1 = d1Maybe;
+                            d1new = d1newClamped;
                         }
-                        else
-                            d1 = localXY;
                     }
-                    else
-                        d1 = localXY;
+                    d1 = d1new;
                 }
                 console.log("d1 changed to "+d1);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
