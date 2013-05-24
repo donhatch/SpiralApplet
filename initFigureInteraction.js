@@ -679,7 +679,16 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
             //console.log("localXY = ",localXY);
             if (indexOfThingBeingDragged === 0) // origin
             {
-                // XXX doesn't work yet
+                // Change overall translation of the main graphic of the svg
+                xTrans = XY[0];
+                yTrans = XY[1];
+                theGraphic.attr("transform", "translate("+xTrans+","+yTrans+") scale("+xScale+","+yScale+")");
+                localToWindowMatrix = [
+                    [xScale,    undefined, undefined],
+                    [undefined, yScale,    undefined],
+                    [xTrans,    yTrans,    undefined],
+                ];
+                recomputeSVG(localToWindowMatrix, p, d0, d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 1) // d0
             {
