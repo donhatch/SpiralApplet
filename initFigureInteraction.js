@@ -404,14 +404,6 @@ var initFigureInteraction = function(theDiv,
     console.log('d1 = '+d1);
     console.log('nNeighbors = '+nNeighbors);
 
-    if (false) // change to true to debug a simple case
-    {
-        p = [0,1];
-        d0 = [Math.sqrt(.5),Math.sqrt(.5)/2];
-        d1 = [Math.sqrt(.5),Math.sqrt(.5)];
-        nNeighbors = 1;
-    }
-
     // this was the old bootstrapping way...
     // these days, these get clobbered by values extracted from the svg.
     var xTrans = 250;
@@ -462,17 +454,9 @@ var initFigureInteraction = function(theDiv,
                 (y-M[2][1])/M[1][1]];
     };
 
-    var pickClosestThingIndex = function(pickXY,threshold) {
+    var pickClosestThingIndex = function(pickXY, things, threshold) {
         var debug = false; // manually set this to true to debug
         var threshold1 = threshold*threshold;
-        var things = [
-            localToWindow([0,0]),
-            localToWindow(d0),
-            localToWindow(d1),
-            localToWindow(p),
-            localToWindow(nextInLogSpiral(d1,d0)), // first CW neighbor
-            localToWindow(nextInLogSpiral(d0,d1)), // first CCW neighbor
-        ];
         if (debug)
         {
             console.log("    in pickClosestThing");
@@ -547,7 +531,15 @@ var initFigureInteraction = function(theDiv,
 
         dragging = true;
 
-        indexOfThingBeingDragged = pickClosestThingIndex(XY,10);
+        var things = [
+            localToWindow([0,0]),
+            localToWindow(d0),
+            localToWindow(d1),
+            localToWindow(p),
+            localToWindow(nextInLogSpiral(d1,d0)), // first CW neighbor
+            localToWindow(nextInLogSpiral(d0,d1)), // first CCW neighbor
+        ];
+        indexOfThingBeingDragged = pickClosestThingIndex(XY,things,10);
         console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
         // XXX HACKY obscure way to change nNeighbors!
@@ -797,6 +789,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
 
     // replace the contents of each figure div
     // with a cloned copy of the template svg.
+    // XXX should this be in the caller?  not sure, I think this function does too much
     figureDivs.empty().append(templateSVG.clone());
 
 
