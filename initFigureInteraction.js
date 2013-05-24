@@ -525,7 +525,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         var clientP = svgElement.createSVGPoint();
         clientP.x = e.clientX;
         clientP.y = e.clientY;
-        var svgP = clientP.matrixTransform(theSVG[0].getScreenCTM().inverse());
+        var svgP = clientP.matrixTransform(svgElement.getScreenCTM().inverse());
         return [svgP.x,svgP.y];
     };
 
