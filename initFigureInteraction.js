@@ -1,8 +1,47 @@
-initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
-                                 showDottedLines,
-                                 showArcs,
-                                 showDhatStuff,
-                                 callThisWhenSVGSourceChanges) {
+//
+// complex arithmetic, with a complex number represented as z=[x,y]
+//
+var times = function(z0,z1) {
+    if (typeof z0 === "number") return [z0*z1[0], z0*z1[1]];
+    if (typeof z1 === "number") return [z0[0]*z1, z0[1]*z1];
+    return [z0[0]*z1[0] - z0[1]*z1[1], z0[0]*z1[1] + z0[1]*z1[0]];
+};
+var inverse = function(z) {
+    if (typeof z === "number") return 1./z;
+    return scaled(conj(z),1/length2(z));
+};
+var plus = function(z0,z1) { return [z0[0]+z1[0], z0[1]+z1[1]]; };
+var minus = function(z0,z1) { return [z0[0]-z1[0], z0[1]-z1[1]]; };
+var dividedby = function(z0,z1) { return times(z0,inverse(z1)); };
+var conj = function(z) { return [z[0], -z[1]]; };
+var cross = function(a,b) { return a[0]*b[1] - a[1]*b[0]; };
+var dot = function(a,b) { return a[0]*b[0] + a[1]*b[1]; };
+var length2 = function(z) { return dot(z, z); };
+var length = function(z) { return Math.sqrt(length2(z)); };
+var dist2 = function(z0,z1) { return length2(minus(z1,z0)); };
+var dist = function(z0,z1) { return Math.sqrt(dist2(z0,z1)); };
+var normalized = function(z) { var l = length(z); return [z[0]/l, z[1]/l]; };
+var perpDot = function(z) { return [-z[1], z[0]]; };
+var scaled = function(z,s) { return [z[0]*s, z[1]*s]; };
+
+// Very useful function for creating log spirals and things...
+// a:b :: A:?
+// answer is b/a*A.
+var analogy = function(a,b,A) { return times(dividedby(b,a),A); };
+var nextInLogSpiral = function(a,b) { return analogy(a,b,b); }
+
+
+
+
+
+
+
+
+var initOneOfFigures567Interaction = function(theDiv, p, d0, d1, nNeighbors,
+                                              showDottedLines,
+                                              showArcs,
+                                              showDhatStuff,
+                                              callThisWhenSVGSourceChanges) {
 
     if (typeof jQuery === "undefined")
     {
@@ -16,38 +55,6 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
         return;
     }
 
-
-    //
-    // complex arithmetic, with a complex number represented as z=[x,y]
-    //
-    var times = function(z0,z1) {
-        if (typeof z0 === "number") return [z0*z1[0], z0*z1[1]];
-        if (typeof z1 === "number") return [z0[0]*z1, z0[1]*z1];
-        return [z0[0]*z1[0] - z0[1]*z1[1], z0[0]*z1[1] + z0[1]*z1[0]];
-    };
-    var inverse = function(z) {
-        if (typeof z === "number") return 1./z;
-        return scaled(conj(z),1/length2(z));
-    };
-    var plus = function(z0,z1) { return [z0[0]+z1[0], z0[1]+z1[1]]; };
-    var minus = function(z0,z1) { return [z0[0]-z1[0], z0[1]-z1[1]]; };
-    var dividedby = function(z0,z1) { return times(z0,inverse(z1)); };
-    var conj = function(z) { return [z[0], -z[1]]; };
-    var cross = function(a,b) { return a[0]*b[1] - a[1]*b[0]; };
-    var dot = function(a,b) { return a[0]*b[0] + a[1]*b[1]; };
-    var length2 = function(z) { return dot(z, z); };
-    var length = function(z) { return Math.sqrt(length2(z)); };
-    var dist2 = function(z0,z1) { return length2(minus(z1,z0)); };
-    var dist = function(z0,z1) { return Math.sqrt(dist2(z0,z1)); };
-    var normalized = function(z) { var l = length(z); return [z[0]/l, z[1]/l]; };
-    var perpDot = function(z) { return [-z[1], z[0]]; };
-    var scaled = function(z,s) { return [z[0]*s, z[1]*s]; };
-
-    // Very useful function for creating log spirals and things...
-    // a:b :: A:?
-    // answer is b/a*A.
-    var analogy = function(a,b,A) { return times(dividedby(b,a),A); };
-    var nextInLogSpiral = function(a,b) { return analogy(a,b,b); }
 
 
 
@@ -68,7 +75,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
             p0 = times(p0, length(p));
 
             var p1 = p;
-            var p2 = analogy(p0,p1,p1)
+            var p2 = nextInLogSpiral(p0,p1);
         }
         if (true)
         {
@@ -96,7 +103,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
             Z = d1;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                temp = analogy(z,Z,Z);
+                temp = nextInLogSpiral(z,Z);
                 z = Z;
                 Z = temp;
                 dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
@@ -107,7 +114,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
             Z = d1;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                temp = analogy(Z,z,z);
+                temp = nextInLogSpiral(Z,z);
                 Z = z;
                 z = temp;
                 dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0"
@@ -126,7 +133,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
             Z = p2;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                temp = analogy(z,Z,Z);
+                temp = nextInLogSpiral(z,Z);
                 z = Z;
                 Z = temp;
                 var q = analogy(p1,q0,z);
@@ -137,7 +144,7 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
             Z = p1;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                temp = analogy(Z,z,z);
+                temp = nextInLogSpiral(Z,z);
                 Z = z;
                 z = temp;
                 var q = analogy(p1,q0,Z);
@@ -469,8 +476,8 @@ initFigureInteraction = function(theDiv, p, d0, d1, nNeighbors,
             localToWindow(d0),
             localToWindow(d1),
             localToWindow(p),
-            localToWindow(analogy(d1,d0,d0)), // first CW neighbor
-            localToWindow(analogy(d0,d1,d1)), // first CCW neighbor
+            localToWindow(nextInLogSpiral(d1,d0)), // first CW neighbor
+            localToWindow(nextInLogSpiral(d0,d1)), // first CCW neighbor
         ];
         if (debug)
         {
@@ -801,45 +808,45 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
 
 
 
-    initFigureInteraction(figure5div,
-                          [0,1], // p
-                          [.745, .415], // d0
-                          [.8, .6], // d1
-                          2, // nNeighbors
-                          false, // don't show dotted lines
-                          false, // don't show arcs
-                          false, // don't show dhat stuff
-                          function() {});
+    initOneOfFigures567Interaction(figure5div,
+                                   [0,1], // p
+                                   [.745, .415], // d0
+                                   [.8, .6], // d1
+                                   2, // nNeighbors
+                                   false, // don't show dotted lines
+                                   false, // don't show arcs
+                                   false, // don't show dhat stuff
+                                   function() {});
 
-    initFigureInteraction(figure6div,
-                          [0,1], // p
-                          [.6, .2], // d0
-                          [.8, .6], // d1
-                          0, // nNeighbors
-                          true, // show dotted lines
-                          false, // don't show arcs
-                          false, // don't show dhat stuff
-                          function() {});
+    initOneOfFigures567Interaction(figure6div,
+                                   [0,1], // p
+                                   [.6, .2], // d0
+                                   [.8, .6], // d1
+                                   0, // nNeighbors
+                                   true, // show dotted lines
+                                   false, // don't show arcs
+                                   false, // don't show dhat stuff
+                                   function() {});
 
-    initFigureInteraction(figure7div,
-                          [0,1.195], // p
-                          [.8, .615], // d0
-                          [.965, 1.205], // d1
-                          0, // nNeighbors
-                          false, // don't show dotted lines
-                          true, // show arcs
-                          true, // show dhat stuff
-                          function() {});
+    initOneOfFigures567Interaction(figure7div,
+                                   [0,1.195], // p
+                                   [.8, .615], // d0
+                                   [.965, 1.205], // d1
+                                   0, // nNeighbors
+                                   false, // don't show dotted lines
+                                   true, // show arcs
+                                   true, // show dhat stuff
+                                   function() {});
 
-    initFigureInteraction(templateDiv,
-                          undefined,
-                          undefined,
-                          undefined,
-                          undefined,
-                          true,
-                          true,
-                          true,
-                          callThisWhenSVGSourceChanges);
+    initOneOfFigures567Interaction(templateDiv,
+                                   undefined,
+                                   undefined,
+                                   undefined,
+                                   undefined,
+                                   true,
+                                   true,
+                                   true,
+                                   callThisWhenSVGSourceChanges);
 
 
     if (false)
