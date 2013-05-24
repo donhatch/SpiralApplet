@@ -56,35 +56,49 @@ var initFigureInteraction = function(theDiv,
         throw msg;
     }
 
+    var isDefined = function(x) { return typeof x !== 'undefined'; }
+
     var recomputeSVG = function(M,p,p0,p1,d,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
         console.log("    recomputing svg");
 
-        if (true)
+        if ( isDefined(p) && !isDefined(p0) && !isDefined(p1)
+         && !isDefined(d) &&  isDefined(d0) &&  isDefined(d1))
         {
-            // solve:
-            //     analogy(d1,d0,[1,0]) dot <x,y> = 0
-            //     (<0,1>-<x,y>) dot d0 = 0
-            //         => <x,y> dot d0 = <0,1> dot d0
-            // it's a straightforward system of linear equations,
-            // but it simplifies (worked this out on paper):
-            var temp = analogy(d1,d0,[0,1])
-            var p0 = times(temp,d0[1]/dot(temp,d0));
-            // woops, but that was assuming p=<0,1>.
-            // now do it for general p=<0,yp>.
-            p0 = times(p0, length(p));
+            if (true)
+            {
+                // solve:
+                //     analogy(d1,d0,[1,0]) dot <x,y> = 0
+                //     (<0,1>-<x,y>) dot d0 = 0
+                //         => <x,y> dot d0 = <0,1> dot d0
+                // it's a straightforward system of linear equations,
+                // but it simplifies (worked this out on paper):
+                var temp = analogy(d1,d0,[0,1])
+                var p0prev = times(temp,d0[1]/dot(temp,d0));
+                // woops, but that was assuming p=<0,1>.
+                // now do it for general p=<0,yp>.
+                p0prev = times(p0prev, length(p));
 
-            var p1 = p;
-            var p2 = nextInLogSpiral(p0,p1);
+                var p1 = p;
+                var p2 = nextInLogSpiral(p0prev,p1);
+            }
+            if (true)
+            {
+                //console.log("dot(p0prev,analogy(d1,d0,[1,0])) = ", dot(p0prev,analogy(d1,d0,[1,0])));
+                //console.log("dot(minus(p,p0prev),d0) = ", dot(minus([0,1],p0prev),d0));
+                assert(Math.abs(dot(minus(p0prev,p0prev),d0)) < 1e-6);
+                assert(Math.abs(dot(p0prev,analogy(d1,d0,[1,0]))) < 1e-6);
+            }
         }
-        if (true)
+        else if (!isDefined(p) &&  isDefined(p0) &&  isDefined(p1)
+               && isDefined(d) && !isDefined(d0) && !isDefined(d1))
         {
-            //console.log("dot(p0,analogy(d1,d0,[1,0])) = ", dot(p0,analogy(d1,d0,[1,0])));
-            //console.log("dot(minus(p,p0),d0) = ", dot(minus([0,1],p0),d0));
-            assert(Math.abs(dot(minus(p0,p0),d0)) < 1e-6);
-            assert(Math.abs(dot(p0,analogy(d1,d0,[1,0]))) < 1e-6);
+        }
+        else
+        {
+            throw "ERROR: unexpected combination of p,p0,p1,d,d0,d1";
         }
 
-        var qLength = length(minus(p1,p0)); // make quill same length as primal edge, seems to look fairly decent
+        var qLength = length(minus(p1,p0prev)); // make quill same length as primal edge, seems to look fairly decent
         var q0 = plus(p1,times(normalized(perpDot(minus(d0,d1))),qLength));
 
 
@@ -123,7 +137,7 @@ var initFigureInteraction = function(theDiv,
         }
 
 
-        var priscillaMainPath = "M "+p0[0]+" "+p0[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
+        var priscillaMainPath = "M "+p0prev[0]+" "+p0prev[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
         var priscillaNeighborsPath = "";
         var priscillaNeighborsPathOpacities = "";
         if (1)
@@ -139,7 +153,7 @@ var initFigureInteraction = function(theDiv,
                 priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
                 priscillaNeighborsPathOpacities += " "+.5*(1.-(iNeighbor+1.)/nNeighbors)+" "+.5*(1.-iNeighbor/nNeighbors)+" 0";
             }
-            z = p0;
+            z = p0prev;
             Z = p1;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
