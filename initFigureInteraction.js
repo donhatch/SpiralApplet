@@ -72,7 +72,7 @@ var initFigureInteraction = function(theDiv,
                 //         => <x,y> dot d0 = <0,1> dot d0
                 // it's a straightforward system of linear equations,
                 // but it simplifies (worked this out on paper):
-                var temp = analogy(d1,d0,[0,1])
+                var temp = analogy(d1,d0,[0,1]);
                 var p0prev = times(temp,d0[1]/dot(temp,d0));
                 // woops, but that was assuming p=<0,1>.
                 // now do it for general p=<0,yp>.
@@ -124,7 +124,7 @@ var initFigureInteraction = function(theDiv,
                 temp = nextInLogSpiral(z,Z);
                 z = Z;
                 Z = temp;
-                dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0"
+                dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0";
                 dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors);
                 //dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
             }
@@ -135,7 +135,7 @@ var initFigureInteraction = function(theDiv,
                 temp = nextInLogSpiral(Z,z);
                 Z = z;
                 z = temp;
-                dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0"
+                dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0";
                 dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors);
                 //dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
             }
@@ -164,7 +164,7 @@ var initFigureInteraction = function(theDiv,
                 z = Z;
                 Z = temp;
                 var q = analogy(p0,q0,z);
-                priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1]
+                priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1];
                 priscillaNeighborsPathOpacities += " "+.5*(1.-(iNeighbor+1.)/nNeighbors)+" "+.5*(1.-iNeighbor/nNeighbors)+" 0";
             }
             z = p0prev;
@@ -175,7 +175,7 @@ var initFigureInteraction = function(theDiv,
                 Z = z;
                 z = temp;
                 var q = analogy(p0,q0,Z);
-                priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]
+                priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1];
                 priscillaNeighborsPathOpacities += " 0 "+.5*(1.-iNeighbor/nNeighbors)+" "+.5*(1.-(iNeighbor+1.)/nNeighbors);
             }
         }
@@ -208,7 +208,7 @@ var initFigureInteraction = function(theDiv,
         var m2arcStart = times(d1, m2maxRadius/length(d1));
         var m2arcPath = "M 0 0 L "+m2arcStart[0]+" "+m2arcStart[1]+" A"+m2maxRadius+","+m2maxRadius+" 0 0,1 0,"+m2maxRadius+" L 0 0";
 
-        var deltam = times(p,cross(d0,d1)*.5)
+        var deltam = times(p,cross(d0,d1)*.5);
         var m3arcPath = "M "+deltam[0]+" "+deltam[1]+" L "+(m1arcStart[0]+deltam[0])+" "+(m1arcStart[1]+deltam[1])+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 "+(0+deltam[0])+","+(m1maxRadius+deltam[1])+" L "+deltam[0]+" "+deltam[1]+"";
 
 
@@ -279,11 +279,11 @@ var initFigureInteraction = function(theDiv,
                 var assertOutputList = document.getElementById('assertOutputList');
                 if (assertOutputList !== null)
                 {
-                    var li = document.createElement('li');  
-                    li.className = 'assertFail';  
-                    text = "ASSERT FAIL: " + text; // TODO: color:red;font-weight:bold  
+                    var li = document.createElement('li');
+                    li.className = 'assertFail';
+                    text = "ASSERT FAIL: " + text; // TODO: color:red;font-weight:bold
                     li.appendChild(document.createTextNode(text));
-                    assertOutputList.appendChild(li);  
+                    assertOutputList.appendChild(li);
                 }
                 else
                 {
@@ -449,7 +449,7 @@ var initFigureInteraction = function(theDiv,
         yTrans = Number(match[2]);
         xScale = Number(match[3]);
         yScale = Number(match[4]);
-        
+
         scratch = undefined;
         match = undefined;
     }
