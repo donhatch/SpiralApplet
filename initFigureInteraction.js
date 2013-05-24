@@ -98,7 +98,6 @@ var initFigureInteraction = function(theDiv,
                 assert(Math.abs(dot(minus(d,d0prev),q0Direction)) < 1e-6);
             }
 
-            console.log("q0Direction = ",q0Direction);
 
             var d0 = d;
             var d1 = d;
