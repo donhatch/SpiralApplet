@@ -56,11 +56,9 @@ var initFigureInteraction = function(theDiv,
         throw msg;
     }
 
+    var recomputeSVG = function(M,p,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
+        console.log("    recomputing svg");
 
-
-
-    var makeThePaths = function(p,d0,d1, nNeighbors)
-    {
         if (true)
         {
             // solve:
@@ -193,67 +191,24 @@ var initFigureInteraction = function(theDiv,
                                        +" M 0 0 L "+d0[0]+" 0 L "+d0[0]+" "+d0[1]);
         var dhatDottedPath = "M "+d0[0]+" "+d0[1]+" L "+dhat[0]+" "+dhat[1]
 
-        return [dudleyMainPath,
-                dudleyNeighborsPath,
-                dudleyNeighborsPathOpacities,
-                priscillaMainPath,
-                priscillaNeighborsPath,
-                priscillaNeighborsPathOpacities,
-                orthoDottedPath,
-                dhatDottedPath,
-                d0,d1,dhat,
-                m1arcPath,
-                m2arcPath,
-                m3arcPath];
-    } // makeThePaths
 
-    var recomputeSVG = function(M,p,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
-        console.log("    recomputing svg");
-
-        var paths = makeThePaths(p,d0,d1, nNeighbors);
-
-
-
-        var dudleyMainPath = paths[0];
-        var dudleyNeighborsPath = paths[1];
-        var dudleyNeighborsPathOpacities = paths[2];
-        var priscillaMainPath = paths[3];
-        var priscillaNeighborsPath = paths[4];
-        var priscillaNeighborsPathOpacities = paths[5];
-        var orthoDottedPath = paths[6];
-        var dhatDottedPath = paths[7];
-        var d0 = paths[8];
-        var d1 = paths[9];
-        var dhat = paths[10];
-        var m1arcPath = paths[11];
-        var m2arcPath = paths[12];
-        var m3arcPath = paths[13];
-
-
-
-
-
-
-        dudleyMainPathElement.attr('d', paths[0]);
-        dudleyNeighborsPathElement.attr('d', paths[1]);
-        dudleyNeighborsPathElement.attr('vertex-opacities', paths[2]);
-        priscillaMainPathElement.attr('d', paths[3]);
-        priscillaNeighborsPathElement.attr('d', paths[4]);
-        priscillaNeighborsPathElement.attr('vertex-opacities', paths[5]);
-        orthoDottedPathElement.attr('d', paths[6]);
-        dhatDottedPathElement.attr('d', paths[7]);
-        var d0 = paths[8];
-        var d1 = paths[9];
-        var dhat = paths[10];
+        //
+        // Now we've computed everything, put it into the appropriate attrs
+        //
+        dudleyMainPathElement.attr('d', dudleyMainPath);
+        dudleyNeighborsPathElement.attr('d', dudleyNeighborsPath);
+        dudleyNeighborsPathElement.attr('vertex-opacities', dudleyNeighborsPathOpacities);
+        priscillaMainPathElement.attr('d', priscillaMainPath);
+        priscillaNeighborsPathElement.attr('d', priscillaNeighborsPath);
+        priscillaNeighborsPathElement.attr('vertex-opacities', priscillaNeighborsPathOpacities);
+        orthoDottedPathElement.attr('d', orthoDottedPath);
+        dhatDottedPathElement.attr('d', dhatDottedPath);
         ptransformElement.attr('transform', 'translate('+p[0]+','+p[1]+')');
         d0transformElement.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
         d1transformElement.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
         dhattransformElement.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
         xd0transformElement.attr('transform', 'translate('+d0[0]+',0)');
         xd1transformElement.attr('transform', 'translate('+d1[0]+',0)');
-        var m1arcPath = paths[11];
-        var m2arcPath = paths[12];
-        var m3arcPath = paths[13];
         m1arc.attr('d', m1arcPath);
         m2arc.attr('d', m2arcPath);
         m3arc.attr('d', m3arcPath);
@@ -266,7 +221,7 @@ var initFigureInteraction = function(theDiv,
         callThisWhenSVGSourceChanges();
 
         //console.log("    done recomputing svg");
-    };
+    }; // recomputeSVG
 
     // http://net.tutsplus.com/tutorials/javascript-ajax/quick-tip-quick-and-easy-javascript-testing-with-assert/
     var assert = function(condition, description) {
