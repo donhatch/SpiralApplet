@@ -1253,15 +1253,7 @@ and
 $^td$
 are now both
 $0$).
-<pre>
-            (The following scale looked nice on paper:)
-            ....*
-            ....|
-            ....|
-            ....*
-            .....
-            .....
-            *....
+<pre class="asciiprevis">
     <span id="youarehere" style="color:green">YOU ARE HERE<br></span>
                     * <span class="ol">p</span>=&lt;<span class="uol">x<sub>p</sub></span>,<span class="ol">y<sub>p</sub></span>&gt;
                     |
@@ -1280,32 +1272,25 @@ $0$).
           0 *----------------* <span class="uol">d</span>
 </pre>
 <div id="figure4div" class="figure">
-    <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
+        <svg class="figure" xmlns="http://www.w3.org/2000/svg" version="1.1" width="450" height="330">
         <g class="theGraphic" transform="translate(150,300) scale(200,-200)">
            
             <!-- note, the super-light gray here might not be appropriate for printing or most displays; my display maybe isn't like most -->
             <path class="yAxis" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 1 L 0 0"></path>
 
-            <path class="dottedStuff" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; stroke-dasharray:5,5; fill:none"
-                d="M .8 .6 L 0 0 L .8 1.0"/>
+            <path class="p0p1DottedPath" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; stroke-dasharray:5,5; fill:none" d="M 0.395 0.675 L 0 0 M 0.395 0.97 L 0 0"></path>
 
-            <path class="dudleyNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1"
-                stroke="rgb(128,128,255)"
-                d=" M 0 0 L 1.25 .2 L 1 0 M 0 0 L .75 -.125 L 1 0" vertex-opacities=".5 0 .5 .5 0 .5"></path>
-            <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 1 0"/>
+            <path class="dudleyNeighborsPath vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1;" stroke="rgb(128,128,255)" d=" M 0.65 0 L 0.7964538239835902 0.11446675321721539 L 0 0 M 0.7964538239835902 0.11446675321721539 L 0.9557477786861427 0.2805153332887296 L 0 0 M 0.9557477786861427 0.2805153332887296 L 1.12169122102953 0.5120290076993976 L 0 0 M 0.65 0 L 0.5197409006028711 -0.07469742954919617 L 0 0 M 0.5197409006028711 -0.07469742954919617 L 0.4070013811972714 -0.11945633632805765 L 0 0 M 0.4070013811972714 -0.11945633632805765 L 0.3117110509892494 -0.1422896935758044 L 0 0" vertex-opacities=" 1 0.6666666666666667 1 0.6666666666666667 0.33333333333333337 0.6666666666666667 0.33333333333333337 0 0.33333333333333337 1 0.6666666666666667 1 0.6666666666666667 0.33333333333333337 0.6666666666666667 0.33333333333333337 0 0.33333333333333337"></path>
+            <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.65 0 L 0.65 0 L 0 0"></path>
 
-            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1; "
-                stroke="red"
-                d=" M .75 1.4 L .8 1.0 L .9 .8  M .75 .2 L .8 .6 L .9 .3"
-                vertex-opacities=" 0 0.5 0 0 0.5 0"/>
-            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" stroke="red" stroke-opacity="1" style="stroke-width: 4; fill: none"
-                d="M .8 .6 L .8 1.0"/>
+            <path class="priscillaNeighborsPath vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1;" stroke="red" d=" M 0.33879976293631986 1.3610383797923649 L 0.395 0.97 L 0.6011691954550926 0.7062180177791795 M 0.18980688398494144 1.8686741351300733 L 0.33879976293631986 1.3610383797923649 L 0.6623410445898534 1.0506583076356069 M -0.1044005186514198 2.513188128940457 L 0.18980688398494144 1.8686741351300733 L 0.6778085524893311 1.5188862578175295 M 0.5193655071830998 0.4581285619933082 L 0.395 0.675 L 0.36366251111060466 0.45695535246256586 M 0.4325473480617617 0.2834470170026336 L 0.36366251111060466 0.45695535246256586 L 0.31733727911334053 0.2991199961580543 M 0.3498208535506136 0.1635564650978084 L 0.31733727911334053 0.2991199961580543 L 0.2663300499354431 0.18737952771280122" vertex-opacities=" 0.33333333333333337 0.5 0 0.16666666666666669 0.33333333333333337 0 0 0.16666666666666669 0 0 0.5 0.33333333333333337 0 0.33333333333333337 0.16666666666666669 0 0.16666666666666669 0"></path>
+            <path class="priscillaMainPath" vector-effect="non-scaling-stroke" stroke="red" stroke-opacity="1" style="stroke-width: 4; fill: none" d="M 0.395 0.675 L 0.395 0.97"></path>
 
                 
-            <g class="p0transform" transform="translate(.8,.6)">
+            <g class="p0transform" transform="translate(0.395,0.675)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle class="priscillaPoint0" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
-                    <g transform="translate(10,-10)">
+                    <g transform="translate(8,-6)">
                         <text class="p0text">
                             <tspan x="0" y="0">p</tspan>
                             <tspan x="0" y="3">_</tspan>
@@ -1313,10 +1298,10 @@ $0$).
                     </g>
                 </g>
             </g>
-            <g class="p1transform" transform="translate(.8,1.0)">
+            <g class="p1transform" transform="translate(0.395,0.97)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle class="priscillaPoint1" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
-                    <g transform="translate(10,-10)">
+                    <g transform="translate(6,-6)">
                         <text class="p0text">
                             <tspan x="0" y="0">p</tspan>
                             <tspan x="0" y="-15">_</tspan>
@@ -1333,11 +1318,11 @@ $0$).
                 </g>
             </g>
 
-            <g class="dtransform" transform="translate(1,0)">
+            <g class="dtransform" transform="translate(0.65,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
                     <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
-                    <g transform="translate(10,5)">
-                        <text class="d1text">d</text>
+                    <g transform="translate(4,12)">
+                        <text class="dtext">d</text>
                     </g>
                 </g>
             </g>
@@ -1346,7 +1331,7 @@ $0$).
     </svg>
 </div>
 <br>
-Figure 4: Inductive step, Case 1: Priscilla has moved
+Figure 4: Inductive step, Case 1: Priscilla walks from $_p$ to $^p$ while Dudley stays stationary at $d$.
 <p>
 XXX rearrange and use underoverline for all of the following, like in case 2
 <br>
@@ -1438,7 +1423,7 @@ as shown in Figure 5.
     (placeholder -- this should get replaced by the figure 5 svg)
 </div>
 <br>
-Figure 5: Inductive step, Case 2: Dudley walks from $_d$ to $^d$.
+Figure 5: Inductive step, Case 2: Dudley walks from $_d$ to $^d$ while Priscilla stays stationary at $p$.
 <p>
 We denote quantities that are stationary at this step
 by giving them both an underbar and overbar.
