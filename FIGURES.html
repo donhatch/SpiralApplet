@@ -5,6 +5,7 @@
         TODO: things reverse badly when dragged to unusual orientations
               (with assertion failure in figure 4)
 
+        TODO: discoverable nNeighbors control
         TODO: text highlights when dragging, make it not do that
         TODO: make it not change into a text cursor when dragging? (when on text too)
         TODO: make it draggable even when in other document!
@@ -74,10 +75,12 @@
         jQuery(document).ready(function() {
             console.log("in jquery document-ready function!");
 
+            var figure4div = jQuery('#figure4div');
             var templateDiv = jQuery('#figureTemplateDiv');
             var templateSVG = templateDiv.children();
             var theSource = jQuery('#theSource');
             var theButton = jQuery('#copy-button');
+            var theButtonFigure4 = jQuery('#figure4-copy-button');
 
 
             if (true)
@@ -92,31 +95,51 @@
 
             if (true)
             {
-                initFigures567Interaction(function() {
-                    var templateDivClone = templateDiv.clone();
-                    templateDivClone.find('.vertexColoredPathSegments').prev().show(0);
-                    templateDivClone.find('.vertexColoredPathSegments').remove();
-                    var innerHTML = "    "+jQuery.trim(templateDivClone.html());
+                var callThisWhenFigure4SourceChanges = function() {
+                    var figureDivClone = figure4div.clone();
+                    figureDivClone.find('.vertexColoredPathSegments').prev().show(0);
+                    figureDivClone.find('.vertexColoredPathSegments').remove();
+                    var innerHTML = "    "+jQuery.trim(figureDivClone.html());
                     
                     // this gets called when the svg source changes
-                    //theSource.text("    "+jQuery.trim(templateDiv[0].innerHTML));
+                    theButtonFigure4.attr('data-clipboard-text', "    "+innerHTML);
+                };
+                var callThisWhenTemplateSourceChanges = function() {
+                    var figureDivClone = templateDiv.clone();
+                    figureDivClone.find('.vertexColoredPathSegments').prev().show(0);
+                    figureDivClone.find('.vertexColoredPathSegments').remove();
+                    var innerHTML = "    "+jQuery.trim(figureDivClone.html());
+                    
+                    // this gets called when the svg source changes
+                    //theSource.text("    "+jQuery.trim(figureDivClone[0].innerHTML));
                     theSource.text(innerHTML);
                     console.log("setting text for copy-to-clipboard button");
                     theButton.attr('data-clipboard-text', "    "+innerHTML);
-                });
+                };
+                initFigures567Interaction(callThisWhenFigure4SourceChanges,
+                                          callThisWhenTemplateSourceChanges);
+
+                // and do it once on start
+                callThisWhenFigure4SourceChanges();
+                callThisWhenTemplateSourceChanges();
             }
 
+            // https://github.com/zeroclipboard/ZeroClipboard/issues/52
+            // have to use just a single ZeroClipboard.
             if (true)
             {
                 // NOTE ZeroClipboard only works over a web server
                 // (not via file://).
                 // To start a web server:
                 //     python -m SimpleHTTPServer
-                var clip = new ZeroClipboard( document.getElementById("copy-button"), { moviePath: "ZeroClipboard.swf" } );
+                var clip = new ZeroClipboard([theButton[0],theButtonFigure4[0]], { moviePath: "ZeroClipboard.swf" } );
                 clip.on('complete', function(client,args) {
-                    console.log("Copied "+theButton.attr('data-clipboard-text').length+" bytes of text to clipboard");
+                    var button = this;
+                    console.log("Copied "+jQuery(button).attr('data-clipboard-text').length+" bytes of text to clipboard "+(button==theButton[0]?"(figures 5,6,7 template)":button==theButtonFigure4[0]?"(figure 4)":"(???)"));
                 });
             }
+
+
             console.log("out jquery document-ready function!");
         }); // jquery document ready function
     </script>
@@ -195,6 +218,7 @@
 </div>
 <br>
 Figure 4
+<button id="figure4-copy-button" data-clipboard-text="(should get replaced by figure 4 source)" title="Click to copy me.">Copy html source to Clipboard</button>
 <hr>
 <div id="figure5div" class="figure" width="450" height="330">
     (placeholder -- this should get replaced by the figure 5 svg)
@@ -499,7 +523,7 @@ Test of vertex-colored paths.
     </li>
 </ul>
 
-<button id="copy-button" data-clipboard-text="Copy Me!" title="Click to copy me.">Copy to Clipboard</button>
+<button id="copy-button" data-clipboard-text="(should get replaced by figures 5,6,7 template source" title="Click to copy me.">Copy to Clipboard</button>
 
 <pre id="theSource">
 (this should get replaced by the svg source code the first time it changes)

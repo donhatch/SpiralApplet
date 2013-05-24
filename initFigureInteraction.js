@@ -939,7 +939,7 @@ var initFigureInteraction = function(theDiv,
 
 
 
-var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
+var initFigures567Interaction = function(callThisWhenFigure4SourceChanges,callThisWhenTemplateSourceChanges)
 {
     // Make sure I'm not modifying any global vars...
     var globals = function() {
@@ -1025,7 +1025,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
         true,
         true,
         true,
-        callThisWhenSVGSourceChanges);
+        callThisWhenTemplateSourceChanges);
 
 
     // XXX put this up above, when it finally works
@@ -1037,7 +1037,7 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
         false, // don't show ortho dotted lines
         false, // don't show arcs
         false, // don't show dhat stuff
-        function() {});
+        callThisWhenFigure4SourceChanges);
 
 
 
