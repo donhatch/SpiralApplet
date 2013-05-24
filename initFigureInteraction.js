@@ -341,11 +341,8 @@ var initFigureInteraction = function(theDiv,
                 var stackLines = e.stack.split('\n');
                 var theStackLine = jQuery.trim(stackLines[3+nCallersToSkip]);
                 theStackLine = theStackLine.replace(/at .* \(([^ ]*)\)$/, '$1');
-                console.log("theStackLine = "+theStackLine);
                 theStackLine = theStackLine.replace(/.*\//, ''); // get rid of all but trailing component of file name
-                console.log("theStackLine = "+theStackLine);
                 theStackLine = theStackLine.replace(/:\d+$/, ''); // don't need the char position
-                console.log("theStackLine = "+theStackLine);
                 var text = theStackLine;
                 if (description !== undefined)
                 {
@@ -820,7 +817,7 @@ var initFigureInteraction = function(theDiv,
         // Whether or not to constrain the various positions
         // to be within the bounds discussed.
         // This seems to be working well, so I have it hard-coded to true.
-        var constrainToRegions = true;
+        var constrainToRegionsFlag = true;
 
         // Given a point that was inside the interior of a polygonal region
         // and is trying to move, constrain the new position
@@ -838,7 +835,7 @@ var initFigureInteraction = function(theDiv,
             }
 
             var clampIndex = -1;
-            var newMaybeClamped = undefined;
+            var newMaybeClamped = newMaybe;
 
             // make two passes-- first to clamp,
             // then, if indeed we clamped,
@@ -854,13 +851,13 @@ var initFigureInteraction = function(theDiv,
                     {
                         // we're back around to the one that clamped,
                         // so none of the others were violated.
-                        if (debug) console.log("    out constrainToRegion (clamped to constraint "+clampIndex+")");
+                        if (debug) console.log("    out constrainToRegion (clamped to constraint "+clampIndex+" -> "+newMaybeClamped+")");
                         return newMaybeClamped;
                     }
                     var constraint = constraints[iConstraint];
                     var normal = constraint[0]; // need not be unit length;
                     var offset = constraint[1];
-                    var newDot = dot(newMaybe, normal);
+                    var newDot = dot(newMaybeClamped, normal); // newMaybe on first pass, clamped value on second pass
                     if (debug)
                     {
                         console.log("                    normal = ",normal);
@@ -875,13 +872,17 @@ var initFigureInteraction = function(theDiv,
                             // or correcting one constraint violated another.
                             // we're in a corner of the constraint region--
                             // return the old point.
-                            if (debug) console.log("    out constrainToRegion (corner)");
+                            if (debug) console.log("    out constrainToRegion (corner, returning old)");
                             return old;
                         }
                         // retain old (less than offset) dot product with normal,
                         // by subtracting a multiple of normal.
                         var oldDot = dot(old, normal);
+                        assert(oldDot < offset);
                         newMaybeClamped = minus(newMaybe, times(normal, (newDot-oldDot)/length2(normal)));
+                        newDotClamped = dot(newMaybeClamped, normal);
+                        assert(newDotClamped < offset);
+                        assert(Math.abs(newDotClamped-oldDot) <= 1e-6);
                         clampIndex = iConstraint;
                     }
                 }
@@ -916,7 +917,7 @@ var initFigureInteraction = function(theDiv,
             }
             else if (indexOfThingBeingDragged === 1) // p
             {
-                if (constrainToRegions && localXY[1] <= 0)
+                if (constrainToRegionsFlag && localXY[1] <= 0)
                 {
                     // nothing-- leave it where it was
                 }
@@ -939,7 +940,7 @@ var initFigureInteraction = function(theDiv,
                 else
                 {
                     var p0new = localXY; // if it doesn't get clamped
-                    if (constrainToRegions)
+                    if (constrainToRegionsFlag)
                         p0new = constrainToRegion(p0new,p0, [[[-1,0],0],
                                                              [[0,-1],0]]);
                     p1 = plus(p1, minus(p0new, p0)); // move p1 along with p0
@@ -961,7 +962,7 @@ var initFigureInteraction = function(theDiv,
                 else
                 {
                     // constrain to same x as p0, so only change y
-                    if (!constrainToRegions
+                    if (!constrainToRegionsFlag
                      || localXY[1] > p0[1])
                         p1[1] = localXY[1];
                     p1[0] = p0[0]; // should already be the case
@@ -987,39 +988,10 @@ var initFigureInteraction = function(theDiv,
                 else
                 {
                     var d0new = localXY; // if it doesn't get clamped
-                    if (constrainToRegions)
-                    {
-                        var d0newClamped = null;
-                        var newCross = cross(localXY, d1);
-                        if (newCross <= 0)
-                        {
-                            // retain old (positive) cross product with d1,
-                            // but slide along that line
-                            var oldCross = cross(d0,d1); // positive
-                            d0newClamped = minus(localXY, times(perpDot(d1), (oldCross-newCross)/length2(d1)));
-                        }
-                        else if (localXY[0] >= d1[0])
-                        {
-                            d0newClamped = [d0[0],localXY[1]];
-                        }
-                        else if (localXY[1] <= 0)
-                        {
-                            d0newClamped = [localXY[0],d0[1]];
-                        }
-                        if (d0newClamped !== null)
-                        {
-                            if (cross(d0newClamped,d1) <= 0
-                             || d0newClamped[0] >= d1[0]
-                             || d0newClamped[1] <= 0)
-                            {
-                                // two constraints violated,
-                                // or correcting one constraint violated another.
-                                // we're in a corner of the constraint region-- do nothing.
-                                d0newClamped = d0;
-                            }
-                            d0new = d0newClamped;
-                        }
-                    }
+                    if (constrainToRegionsFlag)
+                        d0new = constrainToRegion(d0new,d0, [[[0,-1],0],
+                                                             [[1,0],d1[0]],
+                                                             [perpDot(d1),0]]);
                     d0 = d0new;
                 }
                 console.log("d0 changed to "+d0);
@@ -1036,34 +1008,9 @@ var initFigureInteraction = function(theDiv,
                 else
                 {
                     var d1new = localXY; // if it doesn't get clamped
-                    if (constrainToRegions)
-                    {
-                        var newCross = cross(d0,localXY);
-                        var d1newClamped = null;
-                        if (newCross <= 0)
-                        {
-                            // retain old (positive) cross product with d0,
-                            // but slide along that line
-                            var oldCross = cross(d0,d1); // positive
-                            d1newClamped = plus(localXY, times(perpDot(d0), (oldCross-newCross)/length2(d0)));
-                        }
-                        else if (localXY[0] <= d0[0])
-                        {
-                            d1newClamped = [d1[0],localXY[1]];
-                        }
-                        if (d1newClamped != null)
-                        {
-                            if (cross(d0, d1newClamped) <= 0
-                             || d1newClamped[0] <= d0[0])
-                            {
-                                // two constraints violated,
-                                // or correcting one constraint violated another.
-                                // we're in a corner of the constraint region-- do nothing.
-                                d1newClamped = d1;
-                            }
-                            d1new = d1newClamped;
-                        }
-                    }
+                    if (constrainToRegionsFlag)
+                        d1new = constrainToRegion(d1new,d1, [[[-1,0],-d0[0]],
+                                                             [neg(perpDot(d0)),0]]);
                     d1 = d1new;
                 }
                 console.log("d1 changed to "+d1);
