@@ -10,6 +10,7 @@ var inverse = function(z) {
     if (typeof z === "number") return 1./z;
     return scaled(conj(z),1/length2(z));
 };
+var neg = function (z) { return [-z[0], -z[1]]; }
 var plus = function(z0,z1) { return [z0[0]+z1[0], z0[1]+z1[1]]; };
 var minus = function(z0,z1) { return [z0[0]-z1[0], z0[1]-z1[1]]; };
 var dividedby = function(z0,z1) { return times(z0,inverse(z1)); };
@@ -56,24 +57,62 @@ var initFigureInteraction = function(theDiv,
         throw msg;
     }
 
+    // easier to type and less error prone-- but don't use it in critical sections I don't think
     var isDefined = function(x) { return typeof x !== 'undefined'; }
 
-    var recomputeSVG = function(M,p,p0,p1,d,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
+    var recomputeSVG = function(localToWindowMatrix,p,p0,p1,d,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
         console.log("    recomputing svg");
 
         if (!isDefined(p) &&  isDefined(p0) &&  isDefined(p1)
           && isDefined(d) && !isDefined(d0) && !isDefined(d1))
         {
             // Figure 4
+
+            // Actually this is underconstrained.
+            // We choose the quill direction,
+            // somewhat arbitrarily,
+            // as the bisector of where it can legally be.
+            var q0Direction = normalized(plus(normalized(neg(perpDot(p0))),[0,-1]));
+            var q0 = plus(p0, times(.25, q0Direction));
+
+            // solve for d0 (CW from d, below the x axis):
+            //     x,y = d + t * perpDot(q0Direction)   i.e. (x,y - d) dot q0Direction == 0
+            //     y/x = -tan(angle(p0,p1))    i.e. (x,y) dot (sin,cos) = 0
+            //     
+            var s = cross(p0,p1); // sin(theta) times product of lengths
+            var c = dot(p0,p1); // cos(theta) times product of lengths
+            console.log("s = ",s);
+            console.log("c = ",c);
+            var M = [q0Direction,
+                     [s,c]];
+            var b = [dot(q0Direction, d),0];
+            // solve M x = b
+            var detM = cross(M[0],M[1]);
+            console.log("detM = ",detM);
+            var adjM = [[M[1][1], -M[0][1]],[-M[1][0],M[0][0]]];
+            console.log("adjM = ",adjM);
+            var invM = [dividedby(adjM[0],detM),dividedby(adjM[1],detM)];
+            console.log("invM = ",invM);
+            console.log("b = ",b);
+            var d0prev = [dot(invM[0],b),dot(invM[1],b)];
+            console.log("d0prev = ",d0prev);
+
+            if (true)
+            {
+                //assert(d0prev[0] > 0.); // not true if they've dragged to strange places
+                //assert(d0prev[1] < 0.); // not true if they've dragged to strange places
+                assert(Math.abs(cross(d0prev,[1,0])/length(d0prev) - cross(p0,p1)/(length(p0)*length(p1))) < 1e-6);
+                assert(Math.abs(dot(minus(d,d0prev),q0Direction)) < 1e-6);
+            }
+
+            console.log("q0Direction = ",q0Direction);
+
             var d0 = d;
             var d1 = d;
-            var d2 = times(d,[1.1,.1]); // XXX fudge for now-- get it right later
-            var d0prev = analogy(d2,d1,d0);
+            var d2 = analogy(d0prev,d0,d1);
 
             var p2 = nextInLogSpiral(p0,p1);
             var p0prev = nextInLogSpiral(p1,p0);
-
-            var q0 = plus(p0,[.1,-.1]); // XXX fudge for now-- get it right later
         }
         else if ( isDefined(p) && !isDefined(p0) && !isDefined(p1)
               && !isDefined(d) &&  isDefined(d0) &&  isDefined(d1))
@@ -265,7 +304,7 @@ var initFigureInteraction = function(theDiv,
             m2arc.attr('d', m2arcPath);
             m3arc.attr('d', m3arcPath);
         }
-        undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
+        undoScales.attr('transform', 'scale('+1./localToWindowMatrix[0][0]+','+1./localToWindowMatrix[1][1]+')');
 
         // the false,false isn't really right if number of verts changed... but the code does the right thing by blowing away and regenerating the whole thing in that case anyway
         updateVertexColoredPaths(dudleyNeighborsPathElement,true,false,false);
