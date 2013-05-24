@@ -69,6 +69,10 @@ var initFigureInteraction = function(theDiv,
             var d1 = d;
             var d2 = times(d,[1.1,.1]); // XXX fudge for now-- get it right later
             var d0prev = analogy(d2,d1,d0);
+
+            var p2 = nextInLogSpiral(p0,p1);
+            var p0prev = nextInLogSpiral(p1,p0);
+
             var q0 = plus(p0,[.1,-.1]); // XXX fudge for now-- get it right later
         }
         else if ( isDefined(p) && !isDefined(p0) && !isDefined(p1)
@@ -91,7 +95,7 @@ var initFigureInteraction = function(theDiv,
 
                 var p1 = nextInLogSpiral(p0,p);
                 var p2 = nextInLogSpiral(p,p1);
-                var p0prev = nextInLogSpiral(p1,p0);
+                var p0prev = nextInLogSpiral(p,p0);
                 var d2 = nextInLogSpiral(d0,d1);
                 var d0prev = nextInLogSpiral(d1,d0);
             }
@@ -101,7 +105,8 @@ var initFigureInteraction = function(theDiv,
                 assert(Math.abs(dot(p0,analogy(d1,d0,[1,0]))) < 1e-6);
             }
             var qLength = length(minus(p,p0)); // make quill same length as primal edge, seems to look fairly decent
-            var q0 = plus(p,times(normalized(perpDot(minus(d0,d1))),qLength));
+            var q = plus(p,times(normalized(perpDot(minus(d0,d1))),qLength));
+            var q0 = analogy(p,q,p0);
         }
         else
         {
@@ -149,7 +154,7 @@ var initFigureInteraction = function(theDiv,
         if (isDefined(p))
         {
             // figures 5,6,7
-            priscillaMainPath = "M "+p0[0]+" "+p0[1]+" L "+p[0]+" "+p[1]+" L "+p1[0]+" "+p1[1]+" M "+p[0]+" "+p[1]+" L "+q0[0]+" "+q0[1];
+            priscillaMainPath = "M "+p0[0]+" "+p0[1]+" L "+p[0]+" "+p[1]+" L "+p1[0]+" "+p1[1]+" M "+p[0]+" "+p[1]+" L "+q[0]+" "+q[1];
         }
         else
         {
@@ -167,8 +172,8 @@ var initFigureInteraction = function(theDiv,
             console.log("p2 = ",p2);
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                var q = analogy(p0,q0,z);
-                priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+q[0]+" "+q[1];
+                var Q = analogy(p0,q0,z);
+                priscillaNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L "+Q[0]+" "+Q[1];
                 priscillaNeighborsPathOpacities += " "+.5*(1.-(iNeighbor+1.)/nNeighbors)+" "+.5*(1.-iNeighbor/nNeighbors)+" 0";
                 temp = nextInLogSpiral(z,Z);
                 z = Z;
@@ -178,19 +183,19 @@ var initFigureInteraction = function(theDiv,
             Z = p0;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                var q = analogy(p0,q0,Z);
-                priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1];
+                var Q = analogy(p0,q0,Z);
+                priscillaNeighborsPath += " M "+Q[0]+" "+Q[1]+" L "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1];
                 priscillaNeighborsPathOpacities += " 0 "+.5*(1.-iNeighbor/nNeighbors)+" "+.5*(1.-(iNeighbor+1.)/nNeighbors);
                 temp = nextInLogSpiral(Z,z);
                 Z = z;
                 z = temp;
             }
         }
-        if (nNeighbors >= 1)
+        if (isDefined(p) && nNeighbors >= 1)
         {
             // add longer tail to the primary quill
-            var q0extension = plus(q0,times(.5,minus(q0,p)));
-            priscillaNeighborsPath += " M "+q0[0]+" "+q0[1]+" L "+q0extension[0]+" "+q0extension[1];
+            var qExtension = plus(q,times(.5,minus(q,p)));
+            priscillaNeighborsPath += " M "+q[0]+" "+q[1]+" L "+qExtension[0]+" "+qExtension[1];
             priscillaNeighborsPathOpacities += " 1 0";
         }
 
