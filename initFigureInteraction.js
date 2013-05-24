@@ -32,27 +32,28 @@ var nextInLogSpiral = function(a,b) { return analogy(a,b,b); }
 
 
 
-
-
-
-
-
-var initOneOfFigures567Interaction = function(theDiv, p, d0, d1, nNeighbors,
-                                              showDottedLines,
-                                              showArcs,
-                                              showDhatStuff,
-                                              callThisWhenSVGSourceChanges) {
+// common code used to init each of the figures
+var initFigureInteraction = function(theDiv,
+                                     p, p0, p1, // either p defined, or p0 and p1 defined
+                                     d, d0, d1, // either d defined, or d0 and d1 defined
+                                     nNeighbors,
+                                     showDottedLines,
+                                     showArcs,
+                                     showDhatStuff,
+                                     callThisWhenSVGSourceChanges) {
 
     if (typeof jQuery === "undefined")
     {
-        window.alert("Oh no! initFigureInteraction() called but jQuery hasn't been loaded or something! bailing!");
-        return;
+        var msg = "Oh no! initFigureInteraction() called but jQuery hasn't been loaded or something! bailing!";
+        window.alert(msg);
+        throw msg;
     }
     if (!jQuery.isReady)
     {
         // XXX TODO: this may be too strict, maybe call live()?
-        window.alert("Hey! initFigureInteraction() called when document not ready! You need to call this through jQuery.ready()");
-        return;
+        var msg = "Hey! initFigureInteraction() called when document not ready! You need to call this through jQuery.ready()";
+        window.alert(msg);
+        throw msg;
     }
 
 
@@ -290,13 +291,16 @@ var initOneOfFigures567Interaction = function(theDiv, p, d0, d1, nNeighbors,
 
     // jQuery(s), throwing an error if the result
     // has length other than nExpected.
-    var findExpectingNThings = function(node,query,nExpected) {
+    var findExpectingNThings = function(node,query,minExpected,maxExpected) {
+        assert(typeof minExpected !== 'undefined'
+            && typeof maxExpected !== 'undefined', "missing arg to findExpectingNThings");
         var answer = node.find(query);
-        assert(answer.length === nExpected, "got "+answer.length+" results from node.find('"+query+"'), expected "+nExpected);
+        assert((answer.length >= minExpected && answer.length <= maxExpected),
+        "got "+answer.length+" results from node.find('"+query+"'), expected "+(minExpected==maxExpected ? minExpected : "between "+minExpected+" and "+maxExpected+""));
         return answer;
     };
     var findExpectingOneThing = function(node,query) {
-        return findExpectingNThings(node, query, 1);
+        return findExpectingNThings(node, query, 1,1);
     };
 
     // global constants (just a cache)
@@ -312,7 +316,6 @@ var initOneOfFigures567Interaction = function(theDiv, p, d0, d1, nNeighbors,
         throw null;
     }
 
-
     console.log("theDiv[0].tagName = "+theDiv[0].tagName);
     assert(theDiv.length === 1 && theDiv[0].tagName === "DIV", "oh no! the SVG has to have a div as a parent! dragging won't work!");
     var theDivsChildren = theDiv.children();
@@ -326,9 +329,14 @@ var initOneOfFigures567Interaction = function(theDiv, p, d0, d1, nNeighbors,
     var orthoDottedPath = findExpectingOneThing(theSVG, '.orthoDottedPath');
     var dhatDottedPath = findExpectingOneThing(theSVG, '.dhatDottedPath');
 
-    var ptransform = findExpectingOneThing(theSVG, '.ptransform');
-    var d0transform = findExpectingOneThing(theSVG, '.d0transform');
-    var d1transform = findExpectingOneThing(theSVG, '.d1transform');
+    var ptransform = findExpectingNThings(theSVG, '.ptransform', 0,1);
+    var p0transform = findExpectingNThings(theSVG, '.p0transform', 0,1);
+    var p1transform = findExpectingNThings(theSVG, '.p1transform', 0,1);
+
+    var dtransform = findExpectingNThings(theSVG, '.dtransform', 0,1);
+    var d0transform = findExpectingNThings(theSVG, '.d0transform', 0,1);
+    var d1transform = findExpectingNThings(theSVG, '.d1transform', 0,1);
+
     var dhattransform = findExpectingOneThing(theSVG, '.dhattransform');
     var xd0transform = findExpectingOneThing(theSVG, '.xd0transform');
     var xd1transform = findExpectingOneThing(theSVG, '.xd1transform');
@@ -338,8 +346,12 @@ var initOneOfFigures567Interaction = function(theDiv, p, d0, d1, nNeighbors,
     var undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
 
 
-
-
+    // Either there's ptransform or p0transform,p1transform, but not both
+    // Either there's dtransform or d0transform,d1transform, but not both
+    assert((ptransform.length==1 && p0transform.length==0 && p1transform.length==0)
+        || (ptransform.length==0 && p0transform.length==1 && p1transform.length==1));
+    assert((dtransform.length==1 && d0transform.length==0 && d1transform.length==0)
+        || (dtransform.length==0 && d0transform.length==1 && d1transform.length==1));
 
     // these may or may not exist on the page... if they don't, we'll have no-ops
     var mouseins_subelementsElement = jQuery("#mouseins_subelements");
@@ -367,6 +379,9 @@ var initOneOfFigures567Interaction = function(theDiv, p, d0, d1, nNeighbors,
     //console.log('scales = ',undoScales);
 
     var someParamWasDefined = (typeof p !== 'undefined'
+                            || typeof p0 !== 'undefined'
+                            || typeof p1 !== 'undefined'
+                            || typeof d !== 'undefined'
                             || typeof d0 !== 'undefined'
                             || typeof d1 !== 'undefined'
                             || typeof nNeighbors !== 'undefined');
@@ -746,11 +761,11 @@ var initOneOfFigures567Interaction = function(theDiv, p, d0, d1, nNeighbors,
     });
 
     if (!showDottedLines)
-        findExpectingNThings(theSVG,'.orthoDottedPathStuff',2).attr('display', 'none');
+        findExpectingNThings(theSVG,'.orthoDottedPathStuff',2,2).attr('display', 'none');
     if (!showArcs)
         findExpectingOneThing(theSVG,'.arcsStuff').attr('display', 'none');
     if (!showDhatStuff)
-        findExpectingNThings(theSVG,'.dhatStuff',2).attr('display', 'none');
+        findExpectingNThings(theSVG,'.dhatStuff',2,2).attr('display', 'none');
 
     if (someParamWasDefined)
     {
@@ -803,50 +818,50 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
 
     // replace the contents of each figure div
     // with a cloned copy of the template svg.
-    figureDivs.empty().append(templateSVG.clone()); // XXX why doesn't this work? shouldn't it be same as the other?
+    figureDivs.empty().append(templateSVG.clone());
 
 
 
 
-    initOneOfFigures567Interaction(figure5div,
-                                   [0,1], // p
-                                   [.745, .415], // d0
-                                   [.8, .6], // d1
-                                   2, // nNeighbors
-                                   false, // don't show dotted lines
-                                   false, // don't show arcs
-                                   false, // don't show dhat stuff
-                                   function() {});
+    initFigureInteraction(
+        figure5div,
+        [0,1], undefined, undefined, // p
+        undefined, [.745, .415], [.8, .6], // d0,d1
+        2, // nNeighbors
+        false, // don't show dotted lines
+        false, // don't show arcs
+        false, // don't show dhat stuff
+        function() {});
 
-    initOneOfFigures567Interaction(figure6div,
-                                   [0,1], // p
-                                   [.6, .2], // d0
-                                   [.8, .6], // d1
-                                   0, // nNeighbors
-                                   true, // show dotted lines
-                                   false, // don't show arcs
-                                   false, // don't show dhat stuff
-                                   function() {});
+    initFigureInteraction(
+        figure6div,
+        [0,1], undefined, undefined, // p
+        undefined, [.6, .2], [.8, .6], // d0,d1
+        0, // nNeighbors
+        true, // show dotted lines
+        false, // don't show arcs
+        false, // don't show dhat stuff
+        function() {});
 
-    initOneOfFigures567Interaction(figure7div,
-                                   [0,1.195], // p
-                                   [.8, .615], // d0
-                                   [.965, 1.205], // d1
-                                   0, // nNeighbors
-                                   false, // don't show dotted lines
-                                   true, // show arcs
-                                   true, // show dhat stuff
-                                   function() {});
+    initFigureInteraction(
+        figure7div,
+        [0,1.195], undefined, undefined, // p
+        undefined, [.8, .615], [.965, 1.205], // d0,d1
+        0, // nNeighbors
+        false, // don't show dotted lines
+        true, // show arcs
+        true, // show dhat stuff
+        function() {});
 
-    initOneOfFigures567Interaction(templateDiv,
-                                   undefined,
-                                   undefined,
-                                   undefined,
-                                   undefined,
-                                   true,
-                                   true,
-                                   true,
-                                   callThisWhenSVGSourceChanges);
+    initFigureInteraction(
+        templateDiv,
+        undefined, undefined, undefined, // p,p0,p1
+        undefined, undefined, undefined, // d,d0,d1
+        undefined, // nNeighbors
+        true,
+        true,
+        true,
+        callThisWhenSVGSourceChanges);
 
 
     if (false)
@@ -866,4 +881,4 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
     }
 
 
-} // initFigures567Interaction
+}; // initFigures567Interaction
