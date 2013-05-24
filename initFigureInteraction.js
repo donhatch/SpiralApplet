@@ -81,6 +81,9 @@ var initFigureInteraction = function(theDiv,
                 var p0 = p; // so don't test for isDefined(p0) any more
                 var p1 = p; // so don't test for isDefined(p1) any more
                 var p2 = analogy(p0prev,p0,p1);
+
+                var d2 = nextInLogSpiral(d0,d1);
+                var d0prev = nextInLogSpiral(d1,d0);
             }
             if (true)
             {
@@ -98,6 +101,7 @@ var initFigureInteraction = function(theDiv,
             var d0 = d;
             var d1 = d;
             var d2 = times(d,[1.1,.1]); // XXX fudge for now-- get it right later
+            var d0prev = analogy(d2,d1,d0);
             var q0 = plus(p0,[.1,-.1]); // XXX fudge for now-- get it right later
 
             var p2 = nextInLogSpiral(p0,p1);
@@ -120,27 +124,27 @@ var initFigureInteraction = function(theDiv,
         var dudleyNeighborsPath = "";
         var dudleyNeighborsPathOpacities = "";
         {
-            z = d0;
-            Z = d1;
+            z = d1;
+            Z = d2;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                temp = nextInLogSpiral(z,Z);
-                z = Z;
-                Z = temp;
                 dudleyNeighborsPath += " M "+z[0]+" "+z[1]+" L "+Z[0]+" "+Z[1]+" L 0 0";
                 dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors);
                 //dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
+                temp = nextInLogSpiral(z,Z);
+                z = Z;
+                Z = temp;
             }
-            z = d0;
-            Z = d1;
+            z = d0prev;
+            Z = d0;
             for (var iNeighbor = 0; iNeighbor < nNeighbors; ++iNeighbor)
             {
-                temp = nextInLogSpiral(Z,z);
-                Z = z;
-                z = temp;
                 dudleyNeighborsPath += " M "+Z[0]+" "+Z[1]+" L "+z[0]+" "+z[1]+" L 0 0";
                 dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-iNeighbor/nNeighbors);
                 //dudleyNeighborsPathOpacities += " "+(1.-iNeighbor/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors)+" "+(1.-(iNeighbor+1.)/nNeighbors);
+                temp = nextInLogSpiral(Z,z);
+                Z = z;
+                z = temp;
             }
         }
 
