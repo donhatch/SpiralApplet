@@ -901,41 +901,38 @@ var initFigureInteraction = function(theDiv,
                 {
                     // constrain to same angle
                     d0 = times(d0, length(localXY)/length(d0));
-                    // XXX TODO: constrain to local
+                    // XXX TODO: constrain to local?
                 }
                 else
                 {
                     if (constrainToRegions)
                     {
                         var newCross = cross(localXY, d1);
+                        var d0Maybe = null;
                         if (newCross <= 0)
                         {
+                            // retain old (positive) cross product with d1,
+                            // but slide along that line
                             var oldCross = cross(d0,d1); // positive
-                            var d0Maybe = minus(localXY, times(perpDot(d1), (oldCross-newCross)/length2(d1)));
-                            if (d0Maybe[1] <= 0 || d0Maybe[0] >= d1[0])
-                            {
-                                // we're in the corner-- do nothing
-                            }
-                            else
-                                d0 = d0Maybe;
+                            d0Maybe = minus(localXY, times(perpDot(d1), (oldCross-newCross)/length2(d1)));
                         }
                         else if (localXY[0] >= d1[0])
                         {
-                            var d0Maybe = [d0[0],localXY[1]];
-                            if (cross(d0Maybe,d1) <= 0
-                             || d0Maybe[1] <= 0)
-                            {
-                                // we're in the corner-- do nothing
-                            }
-                            else
-                                d0 = d0Maybe;
+                            d0Maybe = [d0[0],localXY[1]];
                         }
                         else if (localXY[1] <= 0)
                         {
-                            var d0Maybe = [localXY[0],d0[1]];
-                            if (cross(d0Maybe,d1) <= 0)
+                            d0Maybe = [localXY[0],d0[1]];
+                        }
+                        if (d0Maybe !== null)
+                        {
+                            if (cross(d0Maybe,d1) <= 0
+                             || d0Maybe[0] >= d1[0]
+                             || d0Maybe[1] <= 0)
                             {
-                                // we're in the corner-- do nothing
+                                // two constraints violated,
+                                // or correcting one constraint violated another.
+                                // we're in a corner of the constraint region-- do nothing.
                             }
                             else
                                 d0 = d0Maybe;
@@ -955,40 +952,39 @@ var initFigureInteraction = function(theDiv,
                 {
                     // constrain to same angle
                     d1 = times(d1, length(localXY)/length(d1));
-                    // XXX TODO: constrain to local
+                    // XXX TODO: constrain to local?
                 }
                 else
                 {
                     if (constrainToRegions)
                     {
                         var newCross = cross(d0,localXY);
+                        var d1Maybe = null;
                         if (newCross <= 0)
                         {
                             // retain old (positive) cross product with d0,
                             // but slide along that line
                             var oldCross = cross(d0,d1); // positive
-                            var d1Maybe = plus(localXY, times(perpDot(d0), (oldCross-newCross)/length2(d0)));
-                            if (d1Maybe[0] <= d0[0])
-                            {
-                                // we're in the corner-- do nothing
-                            }
-                            else
-                                d1 = d1Maybe;
+                            d1Maybe = plus(localXY, times(perpDot(d0), (oldCross-newCross)/length2(d0)));
                         }
                         else if (localXY[0] <= d0[0])
                         {
-                            var d1Maybe = [d1[0],localXY[1]];
-                            if (cross(d0,d1Maybe) <= 0)
+                            d1Maybe = [d1[0],localXY[1]];
+                        }
+                        if (d1Maybe != null)
+                        {
+                            if (cross(d0, d1Maybe) <= 0
+                             || d1Maybe[0] <= d0[0])
                             {
-                                // we're in the corner-- do nothing
+                                // two constraints violated,
+                                // or correcting one constraint violated another.
+                                // we're in a corner of the constraint region-- do nothing.
                             }
                             else
                                 d1 = d1Maybe;
                         }
                         else
-                        {
                             d1 = localXY;
-                        }
                     }
                     else
                         d1 = localXY;
