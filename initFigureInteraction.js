@@ -454,9 +454,9 @@ var initFigureInteraction = function(theDiv,
                 (y-M[2][1])/M[1][1]];
     };
 
-    var pickClosestThingIndex = function(pickXY, things, threshold) {
+    var pickClosestThingIndex = function(pickXY, things, tooFar) {
         var debug = false; // manually set this to true to debug
-        var threshold1 = threshold*threshold;
+        var tooFar2 = tooFar*tooFar;
         if (debug)
         {
             console.log("    in pickClosestThing");
@@ -474,7 +474,7 @@ var initFigureInteraction = function(theDiv,
                 console.log("        things["+i+"] = "+things[i]);
                 console.log("            thisDist = "+Math.sqrt(thisDist2));
             }
-            if (thisDist2 <= threshold1
+            if (thisDist2 <= tooFar2
              && (bestIndex==-1 || thisDist2 < bestDist2))
             {
                 bestDist2 = thisDist2;
@@ -514,7 +514,7 @@ var initFigureInteraction = function(theDiv,
         return [svgP.x,svgP.y];
     };
 
-    var threshold = 10;
+    var tooFar = 10; // pixels
     var dragging = false;
     var indexOfThingBeingDragged = -1;
     var prevXY = [NaN,NaN]
