@@ -78,8 +78,9 @@ var initFigureInteraction = function(theDiv,
                 // now do it for general p=<0,yp>.
                 p0prev = times(p0prev, length(p));
 
-                var p1 = p;
-                var p2 = nextInLogSpiral(p0prev,p1);
+                var p0 = p; // so don't test for isDefined(p0) any more
+                var p1 = p; // so don't test for isDefined(p1) any more
+                var p2 = analogy(p0prev,p0,p1);
             }
             if (true)
             {
@@ -137,7 +138,16 @@ var initFigureInteraction = function(theDiv,
         }
 
 
-        var priscillaMainPath = "M "+p0prev[0]+" "+p0prev[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
+        var priscillaMainPath;
+        if (isDefined(p))
+        {
+            priscillaMainPath = "M "+p0prev[0]+" "+p0prev[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
+        }
+        else
+        {
+            assert(false, "XXX implement me!");
+        }
+
         var priscillaNeighborsPath = "";
         var priscillaNeighborsPathOpacities = "";
         if (1)
