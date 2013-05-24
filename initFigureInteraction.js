@@ -278,6 +278,12 @@ var initFigureInteraction = function(theDiv,
             orthoDottedPathElement.attr('d', orthoDottedPath);
         if (isDefined(dhatDottedPathElement))
             dhatDottedPathElement.attr('d', dhatDottedPath);
+        if (isDefined(d))
+        {
+            dtransformElement.attr('transform', 'translate('+d[0]+','+d[1]+')');
+            p0transformElement.attr('transform', 'translate('+p0[0]+','+p0[1]+')');
+            p1transformElement.attr('transform', 'translate('+p1[0]+','+p1[1]+')');
+        }
         if (isDefined(p))
         {
             ptransformElement.attr('transform', 'translate('+p[0]+','+p[1]+')');
