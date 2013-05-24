@@ -1031,9 +1031,9 @@ var initFigures567Interaction = function(callThisWhenSVGSourceChanges)
     // XXX put this up above, when it finally works
     initFigureInteraction(
         figure4div,
-        undefined, [.8,.6], [.8,1], // p0,p1
-        [1,0], undefined, undefined, // d
-        2, // nNeighbors
+        undefined, [.395,.675], [.395,.97], // p0,p1
+        [.65,0], undefined, undefined, // d
+        3, // nNeighbors
         false, // don't show ortho dotted lines
         false, // don't show arcs
         false, // don't show dhat stuff
