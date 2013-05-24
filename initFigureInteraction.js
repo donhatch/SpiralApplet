@@ -99,6 +99,9 @@ var initFigureInteraction = function(theDiv,
             var d1 = d;
             var d2 = times(d,[1.1,.1]); // XXX fudge for now-- get it right later
             var q0 = plus(p0,[.1,-.1]); // XXX fudge for now-- get it right later
+
+            var p2 = nextInLogSpiral(p0,p1);
+            var p0prev = nextInLogSpiral(p1,p0);
         }
         else
         {
@@ -145,11 +148,13 @@ var initFigureInteraction = function(theDiv,
         var priscillaMainPath;
         if (isDefined(p))
         {
+            // figures 5,6,7
             priscillaMainPath = "M "+p0prev[0]+" "+p0prev[1]+" L "+p1[0]+" "+p1[1]+" L "+p2[0]+" "+p2[1]+" M "+p1[0]+" "+p1[1]+" L "+q0[0]+" "+q0[1];
         }
         else
         {
-            assert(false, "XXX implement me!");
+            // figure 4
+            priscillaMainPath = "M "+p0[0]+" "+p0[1]+" L "+p1[0]+" "+p1[1];
         }
 
         var priscillaNeighborsPath = "";
@@ -197,19 +202,22 @@ var initFigureInteraction = function(theDiv,
             dudleyNeighborsPath = "M 0 0";
         }
 
-        var theta1 = Math.atan2(d0[1],d0[0]);
-        var m1maxRadius = length(p)*length2(d0)*Math.sin(2*theta1)/4.;
-        var theta2 = Math.atan2(d1[1],d1[0]);
-        var m2maxRadius = length(p)*length2(d1)*Math.sin(2*theta2)/4.;
+        if (showArcs)
+        {
+            var theta1 = Math.atan2(d0[1],d0[0]);
+            var m1maxRadius = length(p)*length2(d0)*Math.sin(2*theta1)/4.;
+            var theta2 = Math.atan2(d1[1],d1[0]);
+            var m2maxRadius = length(p)*length2(d1)*Math.sin(2*theta2)/4.;
 
-        // <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 1.414 1.414  A1,1 0 0,1 0,1 L 0 0"></path>
-        var m1arcStart = times(d0, m1maxRadius/length(d0));
-        var m1arcPath = "M 0 0 L "+m1arcStart[0]+" "+m1arcStart[1]+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 0,"+m1maxRadius+" L 0 0";
-        var m2arcStart = times(d1, m2maxRadius/length(d1));
-        var m2arcPath = "M 0 0 L "+m2arcStart[0]+" "+m2arcStart[1]+" A"+m2maxRadius+","+m2maxRadius+" 0 0,1 0,"+m2maxRadius+" L 0 0";
+            // <path class="m1arc" vector-effect="non-scaling-stroke" style="stroke:#f0f0f0; stroke-width:2; fill: none; stroke-opacity:1" d="M 0 0 L 1.414 1.414  A1,1 0 0,1 0,1 L 0 0"></path>
+            var m1arcStart = times(d0, m1maxRadius/length(d0));
+            var m1arcPath = "M 0 0 L "+m1arcStart[0]+" "+m1arcStart[1]+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 0,"+m1maxRadius+" L 0 0";
+            var m2arcStart = times(d1, m2maxRadius/length(d1));
+            var m2arcPath = "M 0 0 L "+m2arcStart[0]+" "+m2arcStart[1]+" A"+m2maxRadius+","+m2maxRadius+" 0 0,1 0,"+m2maxRadius+" L 0 0";
 
-        var deltam = times(p,cross(d0,d1)*.5);
-        var m3arcPath = "M "+deltam[0]+" "+deltam[1]+" L "+(m1arcStart[0]+deltam[0])+" "+(m1arcStart[1]+deltam[1])+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 "+(0+deltam[0])+","+(m1maxRadius+deltam[1])+" L "+deltam[0]+" "+deltam[1]+"";
+            var deltam = times(p,cross(d0,d1)*.5);
+            var m3arcPath = "M "+deltam[0]+" "+deltam[1]+" L "+(m1arcStart[0]+deltam[0])+" "+(m1arcStart[1]+deltam[1])+" A"+m1maxRadius+","+m1maxRadius+" 0 0,1 "+(0+deltam[0])+","+(m1maxRadius+deltam[1])+" L "+deltam[0]+" "+deltam[1]+"";
+        }
 
 
         var dhat = [d0[0], d0[0]/d1[0]*d1[1]];
@@ -233,15 +241,25 @@ var initFigureInteraction = function(theDiv,
             orthoDottedPathElement.attr('d', orthoDottedPath);
         if (isDefined(dhatDottedPathElement))
             dhatDottedPathElement.attr('d', dhatDottedPath);
-        ptransformElement.attr('transform', 'translate('+p[0]+','+p[1]+')');
-        d0transformElement.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
-        d1transformElement.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
-        dhattransformElement.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
-        xd0transformElement.attr('transform', 'translate('+d0[0]+',0)');
-        xd1transformElement.attr('transform', 'translate('+d1[0]+',0)');
-        m1arc.attr('d', m1arcPath);
-        m2arc.attr('d', m2arcPath);
-        m3arc.attr('d', m3arcPath);
+        if (isDefined(p))
+        {
+            ptransformElement.attr('transform', 'translate('+p[0]+','+p[1]+')');
+            d0transformElement.attr('transform', 'translate('+d0[0]+','+d0[1]+')');
+            d1transformElement.attr('transform', 'translate('+d1[0]+','+d1[1]+')');
+        }
+        if (isDefined(dhattransformElement))
+            dhattransformElement.attr('transform', 'translate('+dhat[0]+','+dhat[1]+')');
+        if (isDefined(xd0transformElement))
+        {
+            xd0transformElement.attr('transform', 'translate('+d0[0]+',0)');
+            xd1transformElement.attr('transform', 'translate('+d1[0]+',0)');
+        }
+        if (isDefined(m1arc))
+        {
+            m1arc.attr('d', m1arcPath);
+            m2arc.attr('d', m2arcPath);
+            m3arc.attr('d', m3arcPath);
+        }
         undoScales.attr('transform', 'scale('+1./M[0][0]+','+1./M[1][1]+')');
 
         // the false,false isn't really right if number of verts changed... but the code does the right thing by blowing away and regenerating the whole thing in that case anyway
@@ -290,6 +308,7 @@ var initFigureInteraction = function(theDiv,
                 {
                     window.alert("Oh no! Assertion failed! "+text);
                 }
+                throw text;
             }
         }
     }; // assertInCaller
@@ -344,7 +363,10 @@ var initFigureInteraction = function(theDiv,
     if (showOrthoDottedLines)
         var orthoDottedPathElement = findExpectingOneThing(theSVG, '.orthoDottedPath');
     if (showDhatStuff)
+    {
         var dhatDottedPathElement = findExpectingOneThing(theSVG, '.dhatDottedPath');
+        var dhattransformElement = findExpectingOneThing(theSVG, '.dhattransform');
+    }
 
     var ptransformElement = findExpectingNThings(theSVG, '.ptransform', 0,1);
     var p0transformElement = findExpectingNThings(theSVG, '.p0transform', 0,1);
@@ -354,12 +376,17 @@ var initFigureInteraction = function(theDiv,
     var d0transformElement = findExpectingNThings(theSVG, '.d0transform', 0,1);
     var d1transformElement = findExpectingNThings(theSVG, '.d1transform', 0,1);
 
-    var dhattransformElement = findExpectingOneThing(theSVG, '.dhattransform');
-    var xd0transformElement = findExpectingOneThing(theSVG, '.xd0transform');
-    var xd1transformElement = findExpectingOneThing(theSVG, '.xd1transform');
-    var m1arc = findExpectingOneThing(theSVG, '.m1arc');
-    var m2arc = findExpectingOneThing(theSVG, '.m2arc');
-    var m3arc = findExpectingOneThing(theSVG, '.m3arc');
+    if (showOrthoDottedLines)
+    {
+        var xd0transformElement = findExpectingOneThing(theSVG, '.xd0transform');
+        var xd1transformElement = findExpectingOneThing(theSVG, '.xd1transform');
+    }
+    if (showArcs)
+    {
+        var m1arc = findExpectingOneThing(theSVG, '.m1arc');
+        var m2arc = findExpectingOneThing(theSVG, '.m2arc');
+        var m3arc = findExpectingOneThing(theSVG, '.m3arc');
+    }
     var undoScales = theSVG.find('.undoScaleForSvgText'); // lots of these!
 
 
@@ -572,14 +599,26 @@ var initFigureInteraction = function(theDiv,
 
         dragging = true;
 
-        var things = [
-            localToWindow([0,0]),
-            localToWindow(d0),
-            localToWindow(d1),
-            localToWindow(p),
-            localToWindow(nextInLogSpiral(d1,d0)), // first CW neighbor
-            localToWindow(nextInLogSpiral(d0,d1)), // first CCW neighbor
-        ];
+        if (typeof p === 'undefined')
+        {
+            var things = [
+                localToWindow([0,0]),
+                localToWindow(p0),
+                localToWindow(p1),
+                localToWindow(d),
+            ];
+        }
+        else
+        {
+            var things = [
+                localToWindow([0,0]),
+                localToWindow(d0),
+                localToWindow(d1),
+                localToWindow(p),
+                localToWindow(nextInLogSpiral(d1,d0)), // first CW neighbor
+                localToWindow(nextInLogSpiral(d0,d1)), // first CCW neighbor
+            ];
+        }
         indexOfThingBeingDragged = pickClosestThingIndex(XY,things,10);
         console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
@@ -772,12 +811,15 @@ var initFigureInteraction = function(theDiv,
         prevXY = XY;
     });
 
-    if (!showOrthoDottedLines)
-        findExpectingNThings(theSVG,'.orthoDottedPathStuff',2,2).attr('display', 'none'); // the paths and the labels
-    if (!showArcs)
-        findExpectingOneThing(theSVG,'.arcsStuff').attr('display', 'none');
-    if (!showDhatStuff)
-        findExpectingNThings(theSVG,'.dhatStuff',2,2).attr('display', 'none');
+    if (isDefined(p))
+    {
+        if (!showOrthoDottedLines)
+            findExpectingNThings(theSVG,'.orthoDottedPathStuff',2,2).attr('display', 'none'); // the paths and the labels
+        if (!showArcs)
+            findExpectingOneThing(theSVG,'.arcsStuff').attr('display', 'none');
+        if (!showDhatStuff)
+            findExpectingNThings(theSVG,'.dhatStuff',2,2).attr('display', 'none');
+    }
 
     if (someParamWasDefined)
     {
