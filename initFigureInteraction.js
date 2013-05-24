@@ -817,8 +817,12 @@ var initFigureInteraction = function(theDiv,
         }
 
 
-        //console.log("    dragging = "+dragging);
+        // Whether or not to constrain the various positions
+        // to be within the bounds discussed.
+        // This seems to be working well, so I have it hard-coded to true.
         var constrainToRegions = true;
+
+        //console.log("    dragging = "+dragging);
         if (dragging)
         {
             //console.log("XY = ",XY);
@@ -901,14 +905,43 @@ var initFigureInteraction = function(theDiv,
                 }
                 else
                 {
-                    if (constrainToRegions
-                     && (localXY[1] <= 0
-                      || cross(localXY, d1) <= 0
-                      || localXY[0] >= d1[0]))
+                    if (constrainToRegions)
                     {
-                        // nothing-- leave it where it was
-
-                        // XXX can do better-- slide along boundary, otherwise seems clunky
+                        var newCross = cross(localXY, d1);
+                        if (newCross <= 0)
+                        {
+                            var oldCross = cross(d0,d1); // positive
+                            var d0Maybe = minus(localXY, times(perpDot(d1), (oldCross-newCross)/length2(d1)));
+                            if (d0Maybe[1] <= 0 || d0Maybe[0] >= d1[0])
+                            {
+                                // we're in the corner-- do nothing
+                            }
+                            else
+                                d0 = d0Maybe;
+                        }
+                        else if (localXY[0] >= d1[0])
+                        {
+                            var d0Maybe = [d0[0],localXY[1]];
+                            if (cross(d0Maybe,d1) <= 0
+                             || d0Maybe[1] <= 0)
+                            {
+                                // we're in the corner-- do nothing
+                            }
+                            else
+                                d0 = d0Maybe;
+                        }
+                        else if (localXY[1] <= 0)
+                        {
+                            var d0Maybe = [localXY[0],d0[1]];
+                            if (cross(d0Maybe,d1) <= 0)
+                            {
+                                // we're in the corner-- do nothing
+                            }
+                            else
+                                d0 = d0Maybe;
+                        }
+                        else
+                            d0 = localXY;
                     }
                     else
                         d0 = localXY;
