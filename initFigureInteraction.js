@@ -89,18 +89,22 @@ var initFigureInteraction = function(theDiv,
                 assert(Math.abs(dot(minus(p0prev,p0prev),d0)) < 1e-6);
                 assert(Math.abs(dot(p0prev,analogy(d1,d0,[1,0]))) < 1e-6);
             }
+            var qLength = length(minus(p0,p0prev)); // make quill same length as primal edge, seems to look fairly decent
+            var q0 = plus(p0,times(normalized(perpDot(minus(d0,d1))),qLength));
         }
         else if (!isDefined(p) &&  isDefined(p0) &&  isDefined(p1)
                && isDefined(d) && !isDefined(d0) && !isDefined(d1))
         {
+            var d0 = d;
+            var d1 = d;
+            var d2 = times(d,[1.1,.1]); // XXX fudge for now-- get it right later
+            var q0 = plus(p0,[.1,-.1]); // XXX fudge for now-- get it right later
         }
         else
         {
             throw "ERROR: unexpected combination of p,p0,p1,d,d0,d1";
         }
 
-        var qLength = length(minus(p0,p0prev)); // make quill same length as primal edge, seems to look fairly decent
-        var q0 = plus(p0,times(normalized(perpDot(minus(d0,d1))),qLength));
 
 
         var dudleyMainPath = "M 0 0 L "+d0[0]+" "+d0[1]+" L "+d1[0]+" "+d1[1]+" L 0 0";
