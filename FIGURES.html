@@ -6,14 +6,12 @@
               (with assertion failure in figure 4)
 
         TODO: discoverable nNeighbors control
-        TODO: text highlights when dragging, make it not do that
-        TODO: make it not change into a text cursor when dragging? (when on text too)
-        TODO: make it draggable even when in other document!
+        TODO: on hover, maybe make the points bigger? (already changing the cursor)
 
         TODO: more descriptive than "dragging thing with"
         TODO: constraints, so _d can't be to right of ^d, etc.
         TODO: show values somewhere on screen instead of console log
-        TODO: make drag handle bigger on hover
+
 
         TODO: doesn't detect mouse clicks in firefox?
 
@@ -35,6 +33,14 @@
         }
         svg.figure {
             outline: 1px dashed black;
+
+            /* this makes it an arrow cursor throughout the svg
+               (if we don't do this, it turns into the text cursor
+               when hovering over text elements */
+            cursor: default;
+        }
+        circle.movable {
+            cursor: pointer;
         }
 
         text {
@@ -175,7 +181,7 @@
                 
             <g class="p0transform" transform="translate(.8,.6)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle class="priscillaPoint0" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
+                    <circle class="priscillaPoint0 movable" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
                     <g transform="translate(8,-6)">
                         <text class="p0text">
                             <tspan x="0" y="0">p</tspan>
@@ -186,7 +192,7 @@
             </g>
             <g class="p1transform" transform="translate(.8,1.0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle class="priscillaPoint1" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
+                    <circle class="priscillaPoint1 movable" cx="0" cy="0" r="3" style="stroke: red; fill: white;"></circle>
                     <g transform="translate(6,-6)">
                         <text class="p0text">
                             <tspan x="0" y="0">p</tspan>
@@ -197,7 +203,7 @@
             </g>
             <g transform="translate(0,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <circle class="origin movable" cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(-10,15)">
                         <text>0</text>
                     </g>
@@ -206,7 +212,7 @@
 
             <g class="dtransform" transform="translate(1,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <circle class="dudleyPoint movable" cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(4,12)">
                         <text class="dtext">d</text>
                     </g>
@@ -268,7 +274,7 @@ Figure 7
                 
             <g class="ptransform" transform="translate(0,1)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle class="priscillaPoint" cx="0" cy="0" r="4" style="stroke-width:2; stroke: red; fill: white;"></circle>
+                    <circle class="priscillaPoint movable" cx="0" cy="0" r="4" style="stroke-width:2; stroke: red; fill: white;"></circle>
                     <g transform="translate(10,-10)">
                         <text>p</text>
                     </g>
@@ -276,7 +282,7 @@ Figure 7
             </g>
             <g transform="translate(0,0)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <circle "origin movable" cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(-10,15)">
                         <text>0</text>
                     </g>
@@ -299,7 +305,7 @@ Figure 7
 
             <g class="d0transform" transform="translate(0.6000000000000001,0.2)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <circle "dudleyPoint0 movable" cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(5,10)">
                         <text class="d0text">
                             <tspan x="0" y="0">d</tspan>
@@ -310,7 +316,7 @@ Figure 7
             </g>
             <g class="d1transform" transform="translate(0.8,0.6000000000000001)">
                 <g class="undoScaleForSvgText" transform="scale(0.005,-0.005)">
-                    <circle cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
+                    <circle "dudleyPoint1 movable" cx="0" cy="0" r="3" style="stroke:blue;fill:white"></circle>
                     <g transform="translate(10,5)">
                         <text class="d1text">
                             <tspan x="0" y="0">d</tspan>
