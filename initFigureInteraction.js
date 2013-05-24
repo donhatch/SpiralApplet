@@ -818,6 +818,7 @@ var initFigureInteraction = function(theDiv,
 
 
         //console.log("    dragging = "+dragging);
+        var constrainToRegions = true;
         if (dragging)
         {
             //console.log("XY = ",XY);
@@ -838,7 +839,12 @@ var initFigureInteraction = function(theDiv,
             }
             else if (indexOfThingBeingDragged === 1) // p
             {
-                p = localXY;
+                if (constrainToRegions && localXY[1] <= 0)
+                {
+                    // nothing-- leave it where it was
+                }
+                else
+                    p = localXY;
                 p[0] = 0; // constrain to y axis
                 console.log("p changed to "+p);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
@@ -891,10 +897,21 @@ var initFigureInteraction = function(theDiv,
                 {
                     // constrain to same angle
                     d0 = times(d0, length(localXY)/length(d0));
+                    // XXX TODO: constrain to local
                 }
                 else
                 {
-                    d0 = localXY;
+                    if (constrainToRegions
+                     && (localXY[1] <= 0
+                      || cross(localXY, d1) <= 0
+                      || localXY[0] >= d1[0]))
+                    {
+                        // nothing-- leave it where it was
+
+                        // XXX can do better-- slide along boundary, otherwise seems clunky
+                    }
+                    else
+                        d0 = localXY;
                 }
                 console.log("d0 changed to "+d0);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
@@ -905,12 +922,44 @@ var initFigureInteraction = function(theDiv,
                 {
                     // constrain to same angle
                     d1 = times(d1, length(localXY)/length(d1));
+                    // XXX TODO: constrain to local
                 }
                 else
                 {
-                    d1 = localXY;
+                    if (constrainToRegions)
+                    {
+                        var newCross = cross(d0,localXY);
+                        if (newCross <= 0)
+                        {
+                            // retain old (positive) cross product with d0,
+                            // but slide along that line
+                            var oldCross = cross(d0,d1); // positive
+                            var d1Maybe = plus(localXY, times(perpDot(d0), (oldCross-newCross)/length2(d0)));
+                            if (d1Maybe[0] <= d0[0])
+                            {
+                                // we're in the corner-- do nothing
+                            }
+                            else
+                                d1 = d1Maybe;
+                        }
+                        else if (localXY[0] <= d0[0])
+                        {
+                            var d1Maybe = [d1[0],localXY[1]];
+                            if (cross(d0,d1Maybe) <= 0)
+                            {
+                                // we're in the corner-- do nothing
+                            }
+                            else
+                                d1 = d1Maybe;
+                        }
+                        else
+                        {
+                            d1 = localXY;
+                        }
+                    }
+                    else
+                        d1 = localXY;
                 }
-                //d1 = normalized(d1); // constrain to unit length
                 console.log("d1 changed to "+d1);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
