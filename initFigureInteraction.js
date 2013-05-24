@@ -619,9 +619,9 @@ var initFigureInteraction = function(theDiv,
         {
             var things = [
                 localToWindow([0,0]),
+                localToWindow(p),
                 localToWindow(d0),
                 localToWindow(d1),
-                localToWindow(p),
                 localToWindow(nextInLogSpiral(d1,d0)), // first CW neighbor
                 localToWindow(nextInLogSpiral(d0,d1)), // first CCW neighbor
             ];
@@ -770,7 +770,14 @@ var initFigureInteraction = function(theDiv,
                 ];
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
-            else if (indexOfThingBeingDragged === 1) // d0
+            else if (indexOfThingBeingDragged === 1) // p
+            {
+                p = localXY;
+                p[0] = 0; // constrain to y axis
+                console.log("p changed to "+p);
+                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
+            }
+            else if (indexOfThingBeingDragged === 2) // d0
             {
                 if (e.ctrlKey)
                 {
@@ -784,7 +791,7 @@ var initFigureInteraction = function(theDiv,
                 console.log("d0 changed to "+d0);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
-            else if (indexOfThingBeingDragged === 2) // d1
+            else if (indexOfThingBeingDragged === 3) // d1
             {
                 if (e.ctrlKey)
                 {
@@ -797,13 +804,6 @@ var initFigureInteraction = function(theDiv,
                 }
                 //d1 = normalized(d1); // constrain to unit length
                 console.log("d1 changed to "+d1);
-                recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
-            }
-            else if (indexOfThingBeingDragged === 3) // p
-            {
-                p = localXY;
-                p[0] = 0; // constrain to y axis
-                console.log("p changed to "+p);
                 recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
             }
             else if (indexOfThingBeingDragged === 4) // CW neighbor
