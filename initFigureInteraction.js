@@ -43,6 +43,7 @@ var initFigureInteraction = function(theDiv,
                                      showDhatStuff,
                                      callThisWhenSVGSourceChanges) {
 
+    console.log("        in initFigureInteraction");
     if (typeof jQuery === "undefined")
     {
         var msg = "Oh no! initFigureInteraction() called but jQuery hasn't been loaded or something! bailing!";
@@ -61,7 +62,7 @@ var initFigureInteraction = function(theDiv,
     var isDefined = function(x) { return typeof x !== 'undefined'; }
 
     var recomputeSVG = function(localToWindowMatrix,p,p0,p1,d,d0,d1,nNeighbors,callThisWhenSVGSourceChanges) {
-        console.log("    recomputing svg");
+        console.log("            recomputing svg");
 
         if (!isDefined(p) &&  isDefined(p0) &&  isDefined(p1)
           && isDefined(d) && !isDefined(d0) && !isDefined(d1))
@@ -535,13 +536,13 @@ var initFigureInteraction = function(theDiv,
     }
 
 
-    console.log('p = '+p);
-    console.log('p0 = '+p0);
-    console.log('p1 = '+p1);
-    console.log('d = '+d);
-    console.log('d0 = '+d0);
-    console.log('d1 = '+d1);
-    console.log('nNeighbors = '+nNeighbors);
+    console.log('            p = '+p);
+    console.log('            p0 = '+p0);
+    console.log('            p1 = '+p1);
+    console.log('            d = '+d);
+    console.log('            d0 = '+d0);
+    console.log('            d1 = '+d1);
+    console.log('            nNeighbors = '+nNeighbors);
 
     // this was the old bootstrapping way...
     // these days, these get clobbered by values extracted from the svg.
@@ -724,7 +725,7 @@ var initFigureInteraction = function(theDiv,
         ];
 
         indexOfThingBeingDragged = pickClosestThingIndex(XY,things,10);
-        elementBeingDragged = (indexOfThingBeingDragged===-1 ? null : elements[indexOfThingBeingDragged]);
+        elementBeingDragged = (indexOfThingBeingDragged===-1 ? undefined : elements[indexOfThingBeingDragged]);
         if (isDefined(elementBeingDragged))
         {
             highlight(elementBeingDragged[0]);
@@ -1165,6 +1166,8 @@ var initFigureInteraction = function(theDiv,
             }
         );
     });
+
+    console.log("        out initFigureInteraction");
 
 }; // initFigureInteraction
 
