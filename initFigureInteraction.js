@@ -423,7 +423,17 @@ var initFigureInteraction = function(theDiv,
     if (isDefined(d))
     {
         var p0p1DottedPathElement = findExpectingOneThing(theSVG, '.p0p1DottedPath');
+        var dPointElement = findExpectingOneThing(theSVG, '.dPoint');
+        var p0PointElement = findExpectingOneThing(theSVG, '.p0Point');
+        var p1PointElement = findExpectingOneThing(theSVG, '.p1Point');
     }
+    if (isDefined(p))
+    {
+        var pPointElement = findExpectingOneThing(theSVG, '.pPoint');
+        var d0PointElement = findExpectingOneThing(theSVG, '.d0Point');
+        var d1PointElement = findExpectingOneThing(theSVG, '.d1Point');
+    }
+    var originPointElement = findExpectingOneThing(theSVG, '.originPoint');
 
 
     var ptransformElement = findExpectingNThings(theSVG, '.ptransform', 0,1);
@@ -651,7 +661,20 @@ var initFigureInteraction = function(theDiv,
     var tooFar = 10; // pixels
     var dragging = false;
     var indexOfThingBeingDragged = -1;
+    var elementBeingDragged = undefined;
     var prevXY = [NaN,NaN]
+
+    var stopDragging = function()
+    {
+        if (dragging && isDefined(elementBeingDragged))
+        {
+            unhighlight(elementBeingDragged[0]);
+        }
+
+        dragging = false;
+        indexOfThingBeingDragged = -1;
+        elementBeingDragged = null;
+    }
 
     theSVG.mousedown(function(e) {
         //console.log("mouse down: ",e);
@@ -688,8 +711,25 @@ var initFigureInteraction = function(theDiv,
             spotToPressToIncreaseNeighbors, // 7
             spotToPressToDecreaseNeighbors, // 8
         ];
+        var elements = [
+            originPointElement,
+            pPointElement,
+            p0PointElement,
+            p1PointElement,
+            dPointElement,
+            d0PointElement,
+            d1PointElement,
+            undefined,
+            undefined,
+        ];
 
         indexOfThingBeingDragged = pickClosestThingIndex(XY,things,10);
+        elementBeingDragged = (indexOfThingBeingDragged===-1 ? null : elements[indexOfThingBeingDragged]);
+        if (isDefined(elementBeingDragged))
+        {
+            highlight(elementBeingDragged[0]);
+        }
+
         console.log("dragging thing with index = "+indexOfThingBeingDragged);
 
         // XXX HACKY obscure way to change nNeighbors!
@@ -726,7 +766,7 @@ var initFigureInteraction = function(theDiv,
         mouseupsElement.text(""+mouseupsCount+" mouseups");
 
         var XY = figureOutXYInSvgSpace(theSVG[0], e);
-        dragging = false;
+        stopDragging();
         prevXY = XY;
     });
 
@@ -751,7 +791,7 @@ var initFigureInteraction = function(theDiv,
             mouseleavesCount++;
             mouseleavesElement.text(""+mouseleavesCount+" mouseleaves");
 
-            dragging = false;
+            stopDragging();
         });
         theSVG.mouseout(function(e) {
             //console.log("mouse out: ",e);
@@ -1049,26 +1089,79 @@ var initFigureInteraction = function(theDiv,
     }
 
 
+    // we have two different mechanisms (hover, drag)
+    // each of which want to highlight things.
+    // so, the thing thing maintains a ref count--
+    // it gets highlighted whenever the ref count is nonzero.
+    var debugRefCounts = false;
+    var highlight = function(circleElement) {
+        var refCount = circleElement.getAttribute('highlightRefCount');
+        if (refCount === null) refCount = 0;
+        refCount = Number(refCount);
+        if (debugRefCounts) console.log("highlight "+circleElement.getAttribute("class")+": refCount "+refCount+" -> "+(refCount+1));
+
+        // experimenting with different schemes...
+        if (refCount == 0)
+        {
+            var oldR = Number(circleElement.getAttribute("r"));
+            circleElement.setAttribute("r", oldR+1);
+        }
+        if (refCount == 0)
+        {
+            var oldStrokeWidth = Number(circleElement.getAttribute("stroke-width"));
+            circleElement.setAttribute("stroke-width", oldStrokeWidth+1);
+        }
+
+        refCount++;
+        circleElement.setAttribute('highlightRefCount', refCount);
+    };
+    var unhighlight = function(circleElement) {
+        var refCount = circleElement.getAttribute('highlightRefCount');
+        if (debugRefCounts) console.log("unhighlight "+circleElement.getAttribute("class")+": refCount "+refCount+" -> "+(Number(refCount)-1));
+        assert(refCount !== null);
+        assert(refCount > 0);
+        refCount = Number(refCount);
+        --refCount;
+
+        // experimenting with different schemes...
+        if (refCount == 0)
+        {
+            var oldR = Number(circleElement.getAttribute("r"));
+            circleElement.setAttribute("r", oldR-1);
+        }
+        if (refCount == 0)
+        {
+            var oldStrokeWidth = Number(circleElement.getAttribute("stroke-width"));
+            circleElement.setAttribute("stroke-width", oldStrokeWidth-1);
+        }
+
+        circleElement.setAttribute('highlightRefCount', refCount);
+    };
+
     // Make movable circles bigger on hover.
-    // NOTE: this isn't quite ideal with clamped dragging... the highlighting goes away when clamped because the cursor is no longer over the thing
     theSVG.find('circle.movable').each(function(index,target) {
-        var origR = Number(target.getAttribute("r"));
-        var origStrokeWidth = Number(target.getAttribute("stroke-width"));
+        var highlighted = null;
         jQuery(target).hover(
             function() {
-                // XXX should only do this when not dragging someone else!
+                if (debugRefCounts) console.log("hover "+this.getAttribute("class"));
+                assert(highlighted == null);
+                if (dragging)
                 {
-                    this.setAttribute("r", origR+1);
-                    this.setAttribute("stroke-width", origStrokeWidth+1);
+                    // already dragging-- don't do it, in case it's someone else
+                    highlighted = false;
+                }
+                else
+                {
+                    highlighted = true;
+                    highlight(this);
                 }
             },
             function() {
-                // XXX should not do this when dragging self!
-                {
-                    this.setAttribute("r", origR);
-                    this.setAttribute("stroke-width", origStrokeWidth);
-                }
-
+                if (debugRefCounts) console.log("unhover "+this.getAttribute("class"));
+                assert(highlighted !== null);
+                if (highlighted) // only decrement ref count if we incremented it!
+                    unhighlight(this);
+                highlighted = null;
             }
         );
     });
@@ -1103,8 +1196,15 @@ var initFigures567Interaction = function(callThisWhenFigure4SourceChanges,callTh
                     answer.push(key+":"+a[key]+"->"+b[key]);
         return answer;
     }
+    var nKeys = function(a) {
+        var answer = 0;
+        for (var key in a)
+            answer++;
+        return answer;
+    }
+
     var globals0 = globals();
-    console.log("before: number of globals 0: = ",globals0.length);
+    console.log("    in initFigures567Interaction ("+nKeys(globals0)+" globals defined)");
 
 
 
@@ -1180,13 +1280,15 @@ var initFigures567Interaction = function(callThisWhenFigure4SourceChanges,callTh
 
 
 
+    var globals1 = globals();
+    console.log("    out initFigures567Interaction ("+nKeys(globals1)+" globals defined)");
     if (false)
     {
         // XXX currently can't do this,
         // since scrollMaxX and scrollMaxY change, in firefox.
         // and even if we make an exception for that,
         // I guess it's still not safe.
-        var globals1 = globals();
+        // also, we do change global_numberOfGradientsEver
         if (difference(globals0,globals1).length !== 0
          || difference(globals1,globals0).length !== 0
          || whatChanged(globals0,globals1).length !== 0)
