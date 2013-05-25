@@ -6,16 +6,10 @@
               (with assertion failure in figure 4)
 
         TODO: discoverable nNeighbors control
-        TODO: on hover, maybe make the points bigger? (already changing the cursor)
+        TODO: on hover, maybe make the points bigger? (already changing the cursor). shouldn't be hard
 
         TODO: more descriptive than "dragging thing with"
         TODO: show values somewhere on screen instead of console log
-
-
-        TODO: doesn't detect mouse clicks in firefox?
-
-        TODO: parametrize the figure, going to use it 3 times
-
 
     -->
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -39,6 +33,7 @@
             cursor: default;
         }
         circle.movable {
+            /* change to pointer (finger) when over a movable */
             cursor: pointer;
         }
 
@@ -47,6 +42,7 @@
                if the mouse is over it during dragging,
                since that got pretty distracting.
                the user-select one is commented out because it provokes a warning in firefox.
+               XXX actually this doesn't happen any more even without this, I don't think... ?? figure out why or why not
                */
             -webkit-touch-callout: none;
             -webkit-user-select: none;
