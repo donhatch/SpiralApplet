@@ -49,7 +49,7 @@ gets transformed into:
     <path id="thePath_part2" d="M 1 0 L 1 1" stroke="url(#vertexColors000001)"></path>
 */
 
-global_numberOfGradientIdsEver = 0;
+global_numberOfVertexColoredPathGradientIdsEver = 0;
 
 
 setupVertexColoredPaths = function(pathElements)
@@ -143,7 +143,7 @@ setupVertexColoredPaths = function(pathElements)
                     while (answer.length < width) answer = "0" + answer;
                     return answer;
                 };
-                var gradientId = "vertexColors"+zeropad(global_numberOfGradientIdsEver++, 6);
+                var gradientId = "vertexColors"+zeropad(global_numberOfVertexColoredPathGradientIdsEver++, 6);
                 var gradient;
                 {
                     gradient = document.createElementNS(NS, "linearGradient");
