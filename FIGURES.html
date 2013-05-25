@@ -85,10 +85,11 @@
 
             if (true)
             {
-                console.log("jQuery('.testVertexColoredPath') = ",jQuery('.testVertexColoredPath'));
+                //console.log("jQuery('.testVertexColoredPath') = ",jQuery('.testVertexColoredPath'));
+                console.log("(setting up colored paths)");
                 setupVertexColoredPaths(jQuery('.testVertexColoredPath'));
                 // do it twice to test
-                console.log("(setting up colored paths again)");
+                console.log("(setting up colored paths again to make sure that works)");
                 setupVertexColoredPaths(jQuery('.testVertexColoredPath'));
             }
 
@@ -113,13 +114,13 @@
                     // this gets called when the svg source changes
                     //theSource.text("    "+jQuery.trim(figureDivClone[0].innerHTML));
                     theSource.text(innerHTML);
-                    console.log("    setting text for copy-to-clipboard button");
+                    console.log("    setting template text to display and to copy-to-clipboard button");
                     theButton.attr('data-clipboard-text', "    "+innerHTML);
                 };
                 initFigures567Interaction(callThisWhenFigure4SourceChanges,
                                           callThisWhenTemplateSourceChanges);
 
-                // and do it once on start
+                // and do them once on start
                 callThisWhenFigure4SourceChanges();
                 callThisWhenTemplateSourceChanges();
             }

@@ -43,7 +43,7 @@ var initFigureInteraction = function(theDiv,
                                      showDhatStuff,
                                      callThisWhenSVGSourceChanges) {
 
-    console.log("        in initFigureInteraction");
+    console.log("        in initFigureInteraction (theDiv id="+theDiv.attr("id")+")");
     if (typeof jQuery === "undefined")
     {
         var msg = "Oh no! initFigureInteraction() called but jQuery hasn't been loaded or something! bailing!";
@@ -1167,7 +1167,7 @@ var initFigureInteraction = function(theDiv,
         );
     });
 
-    console.log("        out initFigureInteraction");
+    console.log("        out initFigureInteraction (theDiv id="+theDiv.attr("id")+")");
 
 }; // initFigureInteraction
 
