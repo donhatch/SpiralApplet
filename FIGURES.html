@@ -85,11 +85,11 @@
 
             if (true)
             {
-                console.log("jQuery('.vertexColoredPath') = ",jQuery('.vertexColoredPath'));
-                setupVertexColoredPaths(jQuery('.vertexColoredPath'));
+                console.log("jQuery('.testVertexColoredPath') = ",jQuery('.testVertexColoredPath'));
+                setupVertexColoredPaths(jQuery('.testVertexColoredPath'));
                 // do it twice to test
                 console.log("(setting up colored paths again)");
-                setupVertexColoredPaths(jQuery('.vertexColoredPath'));
+                setupVertexColoredPaths(jQuery('.testVertexColoredPath'));
             }
 
 
@@ -113,7 +113,7 @@
                     // this gets called when the svg source changes
                     //theSource.text("    "+jQuery.trim(figureDivClone[0].innerHTML));
                     theSource.text(innerHTML);
-                    console.log("setting text for copy-to-clipboard button");
+                    console.log("    setting text for copy-to-clipboard button");
                     theButton.attr('data-clipboard-text', "    "+innerHTML);
                 };
                 initFigures567Interaction(callThisWhenFigure4SourceChanges,
@@ -158,10 +158,10 @@
 
             <path class="p0p1DottedPath" vector-effect="non-scaling-stroke" style="stroke:#e0e0e0; stroke-width:2; stroke-dasharray:5,5; fill:none" d="M 0.395 0.675 L 0 0 M 0.395 0.97 L 0 0"></path>
 
-            <path class="dudleyNeighborsPath vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1;" stroke="rgb(128,128,255)" d=" M 0.65 0 L 0.7964538239835902 0.11446675321721539 L 0 0 M 0.7964538239835902 0.11446675321721539 L 0.9557477786861427 0.2805153332887296 L 0 0 M 0.9557477786861427 0.2805153332887296 L 1.12169122102953 0.5120290076993976 L 0 0 M 0.65 0 L 0.5197409006028711 -0.07469742954919617 L 0 0 M 0.5197409006028711 -0.07469742954919617 L 0.4070013811972714 -0.11945633632805765 L 0 0 M 0.4070013811972714 -0.11945633632805765 L 0.3117110509892494 -0.1422896935758044 L 0 0" vertex-opacities=" 1 0.6666666666666667 1 0.6666666666666667 0.33333333333333337 0.6666666666666667 0.33333333333333337 0 0.33333333333333337 1 0.6666666666666667 1 0.6666666666666667 0.33333333333333337 0.6666666666666667 0.33333333333333337 0 0.33333333333333337"></path>
+            <path class="dudleyNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1;" stroke="rgb(128,128,255)" d=" M 0.65 0 L 0.7964538239835902 0.11446675321721539 L 0 0 M 0.7964538239835902 0.11446675321721539 L 0.9557477786861427 0.2805153332887296 L 0 0 M 0.9557477786861427 0.2805153332887296 L 1.12169122102953 0.5120290076993976 L 0 0 M 0.65 0 L 0.5197409006028711 -0.07469742954919617 L 0 0 M 0.5197409006028711 -0.07469742954919617 L 0.4070013811972714 -0.11945633632805765 L 0 0 M 0.4070013811972714 -0.11945633632805765 L 0.3117110509892494 -0.1422896935758044 L 0 0" vertex-opacities=" 1 0.6666666666666667 1 0.6666666666666667 0.33333333333333337 0.6666666666666667 0.33333333333333337 0 0.33333333333333337 1 0.6666666666666667 1 0.6666666666666667 0.33333333333333337 0.6666666666666667 0.33333333333333337 0 0.33333333333333337"></path>
             <path class="dudleyMainPath" vector-effect="non-scaling-stroke" style="stroke: blue; stroke-width: 4; fill: none; stroke-miterlimit:1.414" d="M 0 0 L 0.65 0 L 0.65 0 L 0 0"></path>
 
-            <path class="priscillaNeighborsPath vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1;" stroke="red" d=" M 0.33879976293631986 1.3610383797923649 L 0.395 0.97 L 0.6011691954550926 0.7062180177791795 M 0.18980688398494144 1.8686741351300733 L 0.33879976293631986 1.3610383797923649 L 0.6623410445898534 1.0506583076356069 M -0.1044005186514198 2.513188128940457 L 0.18980688398494144 1.8686741351300733 L 0.6778085524893311 1.5188862578175295 M 0.5193655071830998 0.4581285619933082 L 0.395 0.675 L 0.36366251111060466 0.45695535246256586 M 0.4325473480617617 0.2834470170026336 L 0.36366251111060466 0.45695535246256586 L 0.31733727911334053 0.2991199961580543 M 0.3498208535506136 0.1635564650978084 L 0.31733727911334053 0.2991199961580543 L 0.2663300499354431 0.18737952771280122" vertex-opacities=" 0.33333333333333337 0.5 0 0.16666666666666669 0.33333333333333337 0 0 0.16666666666666669 0 0 0.5 0.33333333333333337 0 0.33333333333333337 0.16666666666666669 0 0.16666666666666669 0"></path>
+            <path class="priscillaNeighborsPath" vector-effect="non-scaling-stroke" style="stroke-width: 2px; fill: none; stroke-opacity: 1;" stroke="red" d=" M 0.33879976293631986 1.3610383797923649 L 0.395 0.97 L 0.6011691954550926 0.7062180177791795 M 0.18980688398494144 1.8686741351300733 L 0.33879976293631986 1.3610383797923649 L 0.6623410445898534 1.0506583076356069 M -0.1044005186514198 2.513188128940457 L 0.18980688398494144 1.8686741351300733 L 0.6778085524893311 1.5188862578175295 M 0.5193655071830998 0.4581285619933082 L 0.395 0.675 L 0.36366251111060466 0.45695535246256586 M 0.4325473480617617 0.2834470170026336 L 0.36366251111060466 0.45695535246256586 L 0.31733727911334053 0.2991199961580543 M 0.3498208535506136 0.1635564650978084 L 0.31733727911334053 0.2991199961580543 L 0.2663300499354431 0.18737952771280122" vertex-opacities=" 0.33333333333333337 0.5 0 0.16666666666666669 0.33333333333333337 0 0 0.16666666666666669 0 0 0.5 0.33333333333333337 0 0.33333333333333337 0.16666666666666669 0 0.16666666666666669 0"></path>
             <path class="priscillaMainPath" vector-effect="non-scaling-stroke" stroke="red" stroke-opacity="1" style="stroke-width: 4; fill: none" d="M 0.395 0.675 L 0.395 0.97"></path>
 
                 
@@ -365,7 +365,7 @@ Figures 5,6,7 template (all elements that appear in any of them).
                 ></path>
                 <g transform="translate(-.5,0)">
                     <g transform="scale(.25)">
-                        <path class="vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                        <path class="testVertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
                             stroke="url(#testGradient)"
                             stroke-opacity="1"
                             vertex-colors="red yellow green cyan blue magenta red"
@@ -379,7 +379,7 @@ Figures 5,6,7 template (all elements that appear in any of them).
                 </g>
                 <g transform="translate(0,0)">
                     <g transform="scale(.25)">
-                        <path class="vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                        <path class="testVertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
                             stroke="url(#testGradient)"
                             stroke-opacity=".25"
                             vertex-colors="red yellow green cyan blue magenta red"
@@ -392,7 +392,7 @@ Figures 5,6,7 template (all elements that appear in any of them).
                 </g>
                 <g transform="translate(.5,0)">
                     <g transform="scale(.25)">
-                        <path class="vertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
+                        <path class="testVertexColoredPath" vector-effect="non-scaling-stroke" style="stroke-width:2; fill:none"
                             stroke="red"
                             stroke-opacity="url(#testGradient)"
                             vertex-opacities="1 0 1 0 1 0 1"
