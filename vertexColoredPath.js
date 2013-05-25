@@ -54,7 +54,7 @@ global_numberOfVertexColoredPathGradientIdsEver = 0;
 
 setupVertexColoredPaths = function(pathElements)
 {
-    console.log("    in setupVertexColoredPaths");
+    console.log("            in setupVertexColoredPaths");
     pathElements.each(function(index,pathElement) {
 
         pathElement = jQuery(pathElement);
@@ -208,7 +208,7 @@ setupVertexColoredPaths = function(pathElements)
                              true,
                              false); // don't allowStructuralChanges
 
-    console.log("    out setupVertexColoredPaths");
+    console.log("            out setupVertexColoredPaths");
     return undefined;
 } // setupVertexColoredPaths
 
