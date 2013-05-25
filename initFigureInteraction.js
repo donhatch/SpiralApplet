@@ -1048,6 +1048,24 @@ var initFigureInteraction = function(theDiv,
         recomputeSVG(localToWindowMatrix, p,p0,p1, d,d0,d1, nNeighbors,callThisWhenSVGSourceChanges);
     }
 
+
+    // Make movable circles bigger on hover.
+    // NOTE: this isn't quite ideal with clamped dragging... the highlighting goes away when clamped because the cursor is no longer over the thing
+    theSVG.find('circle.movable').each(function(index,target) {
+        var origR = Number(target.getAttribute("r"));
+        var origStrokeWidth = Number(target.getAttribute("stroke-width"));
+        jQuery(target).hover(
+            function() {
+                this.setAttribute("r", origR+1);
+                this.setAttribute("stroke-width", origStrokeWidth+1);
+            },
+            function() {
+                this.setAttribute("r", origR);
+                this.setAttribute("stroke-width", origStrokeWidth);
+            }
+        );
+    });
+
 }; // initFigureInteraction
 
 
