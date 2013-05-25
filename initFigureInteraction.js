@@ -1056,8 +1056,11 @@ var initFigureInteraction = function(theDiv,
         var origStrokeWidth = Number(target.getAttribute("stroke-width"));
         jQuery(target).hover(
             function() {
-                this.setAttribute("r", origR+1);
-                this.setAttribute("stroke-width", origStrokeWidth+1);
+                if (!dragging) // only do this when not dragging someone else
+                {
+                    this.setAttribute("r", origR+1);
+                    this.setAttribute("stroke-width", origStrokeWidth+1);
+                }
             },
             function() {
                 this.setAttribute("r", origR);
