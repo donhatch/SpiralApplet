@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Created-By: (Don Hatch, Wed May  4 01:42:16 PDT 2016)
+Main-Class: SpiralApplet
