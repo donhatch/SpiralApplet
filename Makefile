@@ -65,10 +65,24 @@ CLASSES = \
         Rational.class \
         SpiralApplet.class
         ${NULL}
-JAR_DEPENDS_ON = ${CLASSES}      macros.h Makefile javacpp javarenumber README
-JAR_CONTAINS = *.class *.prejava macros.h Makefile javacpp javarenumber README
+HTMLFILES = \
+        FIGURES.html \
+        README.html \
+        ${NULL}
+JSFILES = \
+        initFigureInteraction.js \
+        myPreprocessingConfig.js \
+        vertexColoredPath.js \
+        ZeroClipboard.js \
+        ZeroClipboard.min.js \
+        ${NULL}
+SWFFILES = \
+        ZeroClipboard.swf \
+        ${NULL}
+JAR_DEPENDS_ON = ${CLASSES}      macros.h Makefile javacpp javarenumber RUNME README ${HTMLFILES} ${JSFILES} ${SWFFILES}
+JAR_CONTAINS = *.class *.prejava macros.h Makefile javacpp javarenumber RUNME README ${HTMLFILES} ${JSFILES} ${SWFFILES}
 
-# If we want to be able to run it as java -jar SpiralApplet.jar, then need to do this:
+# If we want to be able to run it as java -jar SpiralApplet.jar (without additional classpath), then need to do this:
 JAR_CONTAINS += com
 
 .PHONY: all default jar
@@ -77,8 +91,8 @@ jar: ${JARFILE}
 all: jar
 
 ${JARFILE}: Makefile META-INF/MANIFEST.MF ${JAR_DEPENDS_ON}
-        # XXX argh, exits with status 0 even if missing something
-	${JAVAROOT}/bin/jar -cfm ${JARFILE} META-INF/MANIFEST.MF ${JAR_CONTAINS}
+        # XXX argh, doesn't remove the jar file even if fails because missing something? wtf? so add explicit removal
+	${JAVAROOT}/bin/jar -cfm ${JARFILE} META-INF/MANIFEST.MF ${JAR_CONTAINS} || (rm ${JARFILE}; false)
 
 CPPFLAGS += -Wall -Werror
 # The following seems to work but clutters up output and may be less portable
