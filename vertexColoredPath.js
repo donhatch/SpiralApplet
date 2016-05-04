@@ -33,20 +33,24 @@ Limitations:
 For example:
     <path id="thePath"
         d="M 0 0 L 1 0 L 1 1"
-        stroke="red black #0000ff"
-        stroke-opacity="100% .5 1"
+        vertex-colors="red black #0000ff"
+        vertex-opacities="100% .5 1"
     ></path>
 gets transformed into:
-    <linearGradient id="vertexColors000000" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%"   stop-color="red"   stop-opacity="100%"/>
-        <stop offset="100%" stop-color="black" stop-opacity=".5"/>
-    </linearGradient>
-    <linearGradient id="vertexColors000001" gradientUnits="userSpaceOnUse" x1="1" y1="0" x2="1" y2="1">
-        <stop offset="0%"   stop-color="black"   stop-opacity=".5"/>
-        <stop offset="100%" stop-color="#0000ff" stop-opacity="1"/>
-    </linearGradient>
-    <path id="thePath_part1" d="M 0 0 L 1 0" stroke="url(#vertexColors000000)"></path>
-    <path id="thePath_part2" d="M 1 0 L 1 1" stroke="url(#vertexColors000001)"></path>
+    <g class="vertexColoredPathSegments">
+      <defs>
+        <linearGradient id="vertexColors000000" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="red"   stop-opacity="100%"/>
+            <stop offset="100%" stop-color="black" stop-opacity=".5"/>
+        </linearGradient>
+        <linearGradient id="vertexColors000001" gradientUnits="userSpaceOnUse" x1="1" y1="0" x2="1" y2="1">
+            <stop offset="0%"   stop-color="black"   stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#0000ff" stop-opacity="1"/>
+        </linearGradient>
+      </defs>
+      <path id="thePath_part1" d="M 0 0 L 1 0" stroke="url(#vertexColors000000)"></path>
+      <path id="thePath_part2" d="M 1 0 L 1 1" stroke="url(#vertexColors000001)"></path>
+    </g>
 */
 
 global_numberOfVertexColoredPathGradientIdsEver = 0;
