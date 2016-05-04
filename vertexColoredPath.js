@@ -1,8 +1,5 @@
 // vertexColoredPath.js
 
-
-
-
 /*
 A vertex-colored path is specified
 by giving a "vertex-colors" attr, containing a space-separated
@@ -14,7 +11,7 @@ must be the same as the number of
 vertices in the path, or an error is thrown.
 This is implemented by breaking up the path into line segments,
 each with its own gradient element.
-The gradients and segments are added immediately after the original path element,
+The gradients and segments are added as a <g> element immediately after the original path element,
 and the original path element gets hidden.
 Limitations:
     - Only M,L are supported currently
@@ -31,12 +28,16 @@ Limitations:
       when you don't give "vertex-colors" and "vertex-opacities").
 
 For example:
-    <path id="thePath"
-        d="M 0 0 L 1 0 L 1 1"
-        vertex-colors="red black #0000ff"
-        vertex-opacities="100% .5 1"
+    <path d="M 0 0 L 1 0 L 1 1"
+          vertex-colors="red black #0000ff"
+          vertex-opacities="100% .5 1"
     ></path>
 gets transformed into:
+    <path d="M 0 0 L 1 0 L 1 1"
+          vertex-colors="red black #0000ff"
+          vertex-opacities="100% .5 1"
+          style="display: none"
+    ></path>
     <g class="vertexColoredPathSegments">
       <defs>
         <linearGradient id="vertexColors000000" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="0">
@@ -48,8 +49,8 @@ gets transformed into:
             <stop offset="100%" stop-color="#0000ff" stop-opacity="1"/>
         </linearGradient>
       </defs>
-      <path id="thePath_part1" d="M 0 0 L 1 0" stroke="url(#vertexColors000000)"></path>
-      <path id="thePath_part2" d="M 1 0 L 1 1" stroke="url(#vertexColors000001)"></path>
+      <path d="M 0 0 L 1 0" stroke="url(#vertexColors000000)"></path>
+      <path d="M 1 0 L 1 1" stroke="url(#vertexColors000001)"></path>
     </g>
 */
 
@@ -203,7 +204,7 @@ setupVertexColoredPaths = function(pathElements)
             container.appendChild(subPaths[i][0]);
         pathElement.after(container); // insert container after pathElement
 
-        pathElement.hide();
+        pathElement.hide(); // adds display:none
     }); // each pathElement
 
     updateVertexColoredPaths(pathElements,
