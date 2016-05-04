@@ -422,6 +422,16 @@ public class MyGraphics
     public void drawLine(double x0, double y0, double x1, double y1,
                          boolean antiAlias)
     {
+        boolean jitterFlag = false; // hardcode to true to debug
+        if (jitterFlag)
+        {
+          double jitterRadius = .02; // hardcode as desired
+          x0 += (Math.random() * 2*jitterRadius) - jitterRadius;
+          x1 += (Math.random() * 2*jitterRadius) - jitterRadius;
+          y0 += (Math.random() * 2*jitterRadius) - jitterRadius;
+          y1 += (Math.random() * 2*jitterRadius) - jitterRadius;
+        }
+
         // clip; it sucks without clipping
         double clipX0 = (0-translateX)/scaleX;
         double clipX1 = (gsize.width-translateX)/scaleX;
