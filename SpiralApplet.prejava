@@ -1815,9 +1815,10 @@ public class SpiralApplet
 
                 nPaints++;
                 g.setColor(java.awt.Color.white);
-                g.drawString(""+nPaints+" paints",
-                              size.width - 75,
-                              20);
+                String nPaintsString = ""+nPaints+" paints";
+                g.drawString(nPaintsString,
+                             size.width - 5 - g.getFontMetrics().stringWidth(nPaintsString),
+                             20);
 
                 g.drawString("focus: "+theSpiralView.focus,
                              10,
@@ -3771,6 +3772,7 @@ public class SpiralApplet
 
                 double prevPrevVal = val;
                 double prevVal = val;
+                boolean isFirstInPass = true;
                 for (int i = scanDir==1?i1:i0; ; i = MOD(i+scanDir,n))
                 {
                     returnValue++;
@@ -3809,6 +3811,8 @@ public class SpiralApplet
                                 prevPrevVal != prevVal &&
                                 (thisVal<prevVal) != (prevVal<prevPrevVal))
                             {
+                                // There's a change here; draw a vertex (and quill).
+
                                 // draw point at larger-index endpoint of the line
                                 if (scanDir < 0)
                                 {
@@ -3880,6 +3884,39 @@ public class SpiralApplet
                             if (prevVal==prevPrevVal
                              || (thisVal<prevVal) != (prevVal<prevPrevVal))
                             {
+                                // Not really ideal to be drawing the quills with the dual,
+                                // since it means parts of quills will be obscured by parts of dual.
+                                // They are really part of the primal, so should draw them with primal instead.
+                                // But it's when drawing the dual that we have access to desired numbers, currently.
+                                boolean drawQuillsFlag = true;
+                                if (drawQuillsFlag)
+                                {
+                                    java.awt.Color savedColor = mg.getColor();
+                                    if (isFirstInPass)
+                                    {
+                                        isFirstInPass = false;
+                                        if (!pastelsFlag) mg.setColor(new java.awt.Color(128,192,192)); // halfway between the two
+                                    }
+                                    else if (scanDir < 0)
+                                    {
+                                        if (!pastelsFlag) mg.setColor(new java.awt.Color(128,255,128)); // light green (same as earlier)
+                                    }
+                                    else
+                                    {
+                                        if (!pastelsFlag) mg.setColor(new java.awt.Color(128,128,255)); // light blue (same as earlier)
+                                    }
+
+                                    double dualDir = Math.atan2(-scanDir*(nextDualY-dualY),
+                                                                -scanDir*(nextDualX-dualX));
+                                    double quillDir = dualDir - Math.PI*.5;
+                                    double quillLength = primalR * .5;
+                                    mg.drawLine(primalX, primalY,
+                                                primalX-quillLength*Math.cos(quillDir),
+                                                primalY-quillLength*Math.sin(quillDir),
+                                                antiAliasFlag);
+                                    mg.setColor(savedColor);
+                                }
+
                                 if (scanDir < 0)
                                 {
                                     mg.drawPoint(dualX, dualY, 5);
@@ -4220,11 +4257,13 @@ public class SpiralApplet
         // and, acquire a lock on the big things that don't change often but that are too expensive to snapshot
         // (the model).
         private javax.swing.Timer theTimer = null;
-        javafx.animation.AnimationTimer theAnimationTimer = null;
+        Object theAnimationTimer = null; // actually a javafx.animation.AnimationTimer
         private void startTheAnimation()
         {
             System.out.println("in startTheAnimation");
+#if USE_JAVAFX
             if (!useJavaFX)
+#endif  // JAVAFX
             {
                 if (theTimer == null)
                 {
@@ -4264,13 +4303,14 @@ public class SpiralApplet
                 System.out.println("    starting timer");
                 theTimer.start();
             }
+#if USE_JAVAFX
             if (useJavaFX)
             {
                 if (theAnimationTimer == null)
                 {
                     // interesting, see http://www.javamex.com/tutorials/threads/sleep.shtml for issues and bugs
                     System.out.println("    creating javafx animation timer");
-                    theAnimationTimer = new javafx.animation.AnimationTimer() {
+                    theAnimationTimer = (Object)new javafx.animation.AnimationTimer() {
                         public void handle(long nanos)
                         {
                             if (eventVerbose >= 1) System.out.println("in timer action");
@@ -4304,8 +4344,9 @@ public class SpiralApplet
                     };
                 }
                 System.out.println("    starting timer");
-                theAnimationTimer.start();
+                ((javafx.animation.AnimationTimer)theAnimationTimer).start();
             }
+#endif  // JAVAFX
             System.out.println("out startTheAnimation");
         }
 
@@ -4315,11 +4356,19 @@ public class SpiralApplet
     //
 
 
+#ifdef USE_JAVAFX
         public static boolean useJavaFX = true;
+#endif  // USE_JAVAFX
         public SpiralModel.Params spiralModelParams = new SpiralModel.Params(); // gui copy, flushed to model when Regenerate button pressed
         public SpiralModel theSpiralModel = new SpiralModel();
         public SpiralView theSpiralView = new SpiralView();
-        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so
+
+#ifdef USE_JAVAFX
+        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1);
+#else
+        public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 11); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so though (although maybe that was one platform a long time ago)
+#endif  // USE_JAVAFX
+
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
@@ -4329,7 +4378,7 @@ public class SpiralApplet
 
 
         private java.awt.Component theCanvas = null;
-        private javafx.scene.image.ImageView theImageView = null;
+        //private javafx.scene.image.ImageView theImageView = null;
         //private java.awt.Component theHelpWindow = null;
         private JFrame theMainAppletWindow = null;
         private JFrame theControlPanelWindow = null;
@@ -4839,6 +4888,17 @@ public class SpiralApplet
         System.out.println("in main");
         System.out.println("    java "+System.getProperty("java.version"));
 
+#if USE_JAVAFX
+        if (useJavaFX)
+        {
+            // creating a JFXPanel implicitly starts the JavaFX runtime.
+            // unless we do this, the AnimationTimer will be non-functional!
+            // also on ubuntu, the jre crashes when done near end of main, so do near beginning of main.
+            System.out.println("    initializing javafx...");
+            new javafx.embed.swing.JFXPanel();
+            System.out.println("    done.");
+        }
+#endif  // USE_JAVAFX
 
         final SpiralApplet applet = new SpiralApplet();
 
@@ -4889,16 +4949,6 @@ public class SpiralApplet
         applet.theControlPanelWindow.setName("control panel window");
         applet.theMainAppletWindow.setName("main applet window");
         applet.theHelpWindow.setName("help");
-
-        if (useJavaFX)
-        {
-            // creating a JFXPanel implicitly starts the JavaFX runtime.
-            // unless we do this, the AnimationTimer will be non-functional!
-            System.out.println("initializing javafx...");
-            new javafx.embed.swing.JFXPanel();
-            System.out.println("done.");
-        }
-
 
         // do the timing workaround suggested in http://www.javamex.com/tutorials/threads/sleep_issues.shtml
         if (true)
