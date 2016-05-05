@@ -39,10 +39,16 @@
 #JAVAC=javac1.7
 #JAVAROOT="c:/Program Files/Java/jdk1.7.0_21"
 
-# Currently works on ubuntu-- java 1.7 or 1.8 or so depending on what's installed
+# Currently works on ubuntu, after: apt install openjdk-8-jdk openjfx
 JAVAC=javac
 JAVAROOT="/usr"
-CPPFLAGS=-DUSE_JAVAFX=0
+ifeq ($(wildcard /usr/lib/jvm/java-8-openjdk-amd64/lib/javafx-mx.jar),)
+  # javafx isn't installed
+  CPPFLAGS=-DUSE_JAVAFX=0
+else
+  # javafx is installed
+  CPPFLAGS=-DUSE_JAVAFX=1
+endif
 
 uname := $(shell uname -o)
 #dummy := $(warning uname = $(uname))
