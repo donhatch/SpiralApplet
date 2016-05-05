@@ -566,7 +566,7 @@ of the entire primal polygon perimeter.
 So
 $v_m$
 is the only good exit,
-and distance-from=origin is strictly increasing
+and distance-from-origin is strictly increasing
 from
 $\langle 0,-1\rangle$
 around CCW to
@@ -1024,7 +1024,7 @@ The important property of u is that the directions of each of the four vectors:
     p^+ = & \text{position (minus origin) of first vertex $v_{m+2}$ after (i.e. CCW from) the good exit} \\
     n^+ = & \text{outward normal of last edge $e_{m+1}$ after (CCW from) the good exit} \\
 \end{align}
-is within
+is (XXXstrictly? say it if its true) within
 $90^{\circ}$
 of the direction of u,
 i.e. each of $n-,p-,p+,n+$ has positive dot product with u.
@@ -1075,7 +1075,8 @@ to the moment vector being accumulated.
 Spiral Moment Lemma:
 During Priscilla's and Dudley's simultaneous walk around
 the CCW-outward-spiraling part of the primal (starting with $e_0$)
-and dual as described above, at all times strictly after the first event:
+and dual as described above, at all times strictly after the first event,
+the polar coordinates $rm,tm$ of the moment satisfy:
 \begin{alignat*}{3}
     0 & \;\overset{(A)}\lt\;  &  rm & \;\overset{(B)}\lt\;  rp \, rd^2 \sin(tp-td) \cos(tp-td) / 2 \\
    td & \;\overset{(C)}\lt\;  &  tm & \;\overset{(D)}\leq\; tp \\
@@ -1095,6 +1096,7 @@ and so ($A$) doesn't hold
 (and ($C$),($D$) don't even make sense since
 $tm$
 isn't even defined).
+(XXX but if I do away with angles and talk only in terms of cross products / determinants / tri areas, does that problem go away?  then might be able to make a more straightforward base case)
 <p>
 Note also that
 in any of Priscilla and Dudley's walks,
