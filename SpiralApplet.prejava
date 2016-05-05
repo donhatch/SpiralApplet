@@ -4324,7 +4324,7 @@ public class SpiralApplet
                             if (focusAnimationMultiplierIsZero)
                             {
                                 System.out.println("    stopping javafx animation timer");
-                                theAnimationTimer.stop();
+                                ((javafx.animation.AnimationTimer)theAnimationTimer).stop();
                             }
 
 
