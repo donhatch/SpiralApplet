@@ -6,6 +6,11 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??
 
+    TODO: more friendly and usable control of speed
+    TODO: more friendly and usable control of shape. should be able to easily express:
+              - constant slope of user's choosing  (have this crudely with 0gradual, 0, 0steep)
+              - arbitrary slope center and std deviation
+              - random walk params? maybe need to review that.
     TODO: maybe just pass arraylists to the plotter, not functors... it's not like we get any streaming benefit
     TODO: make everything moment (not center) based
     TODO: non-rotating mode
@@ -438,6 +443,42 @@ public class SpiralApplet
                         {
                             add(new JLabel("Delta style:"));
                             add(new JLabel("  "));
+                            add(new JRadioButton("<html>0gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_GRADUAL) {{
+                                setMargin(nomargin);
+                                buttonGroup.add(this);
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    @Override
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_GRADUAL);
+                                        // no need to repaint
+                                    }
+                                });
+                            }});
+                            add(new JRadioButton("<html>0</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0) {{
+                                setMargin(nomargin);
+                                buttonGroup.add(this);
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    @Override
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0);
+                                        // no need to repaint
+                                    }
+                                });
+                            }});
+                            add(new JRadioButton("<html>0steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_STEEP) {{
+                                setMargin(nomargin);
+                                buttonGroup.add(this);
+                                addActionListener(new java.awt.event.ActionListener() {
+                                    @Override
+                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    {
+                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_STEEP);
+                                        // no need to repaint
+                                    }
+                                });
+                            }});
                             add(new JRadioButton("<html>&plusmn;1</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_1) {{
                                 setMargin(nomargin);
                                 buttonGroup.add(this);
@@ -2021,10 +2062,13 @@ public class SpiralApplet
         public static class SpiralModel
         {
             public static final int DELTASTYLE_MIN = 0;
-            public static final int DELTASTYLE_1 = 0;
-            public static final int DELTASTYLE_ANY = 1;
-            public static final int DELTASTYLE_1_WRAP = 2;
-            public static final int DELTASTYLE_MAX = 2;
+            public static final int DELTASTYLE_0_GRADUAL = 0;
+            public static final int DELTASTYLE_0 = 1;
+            public static final int DELTASTYLE_0_STEEP = 2;
+            public static final int DELTASTYLE_1 = 3;
+            public static final int DELTASTYLE_ANY = 4;
+            public static final int DELTASTYLE_1_WRAP = 5;
+            public static final int DELTASTYLE_MAX = 5;
 
 
             public static class Params
@@ -2054,7 +2098,7 @@ public class SpiralApplet
 
             public void init(int n,
                              int nParts,
-                             int deltaStyle, // DELTASTYLE_1 or DELTASTYLE_ANY or DELTASTYLE_1_WRAP
+                             int deltaStyle, // DELTASTYLE_0 or DELTASTYLE_1 or DELTASTYLE_ANY or DELTASTYLE_1_WRAP
                              int randomSeed)
             {
                 this.params.n.set(n);
@@ -2068,7 +2112,34 @@ public class SpiralApplet
                 assert(nParts >= 2); // doesn't work with only one part
 
                 this.theList = new int[n];
-                if (deltaStyle == DELTASTYLE_1)
+                if (deltaStyle == DELTASTYLE_0_GRADUAL)
+                {
+                    int val0 = nParts/8*2; // even starting point
+                    int val1 = val0 + 1;
+                    FORI (i, n)
+                    {
+                       this.theList[i] = i%2==0 ? val0 : val1;
+                    }
+                }
+                else if (deltaStyle == DELTASTYLE_0)
+                {
+                    int val0 = nParts/4*2; // even starting point
+                    int val1 = val0 + 1;
+                    FORI (i, n)
+                    {
+                       this.theList[i] = i%2==0 ? val0 : val1;
+                    }
+                }
+                else if (deltaStyle == DELTASTYLE_0_STEEP)
+                {
+                    int val0 = 3*nParts/8*2; // even starting point
+                    int val1 = val0 + 1;
+                    FORI (i, n)
+                    {
+                       this.theList[i] = i%2==0 ? val0 : val1;
+                    }
+                }
+                else if (deltaStyle == DELTASTYLE_1)
                 {
                     int maxPasses = 100;
                     int val = nParts/4*2; // somewhat arbitrary even starting point... will turn random (but still even, since n is even) on second pass.
