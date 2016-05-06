@@ -1225,7 +1225,13 @@ public class SpiralApplet
             //
             if (true)
             {
-                theControlPanelWindow = new JFrame(windowTitle + " Control Panel");
+                theControlPanelWindow = new JFrame(windowTitle.get() + " Control Panel");
+                windowTitle.addListener(new Listenable.Listener() {
+                    @Override
+                    public void valueChanged() {
+                        theControlPanelWindow.setTitle(windowTitle.get() + " Control Panel");
+                    }
+                });
                 // no need for setDefaultCloseOperation
                 // since the default is HIDE_ON_CLOSE which is what we want
 
@@ -4981,6 +4987,13 @@ public class SpiralApplet
         final SpiralApplet applet = new SpiralApplet();
 
         final JFrame frame = new JFrame(applet.windowTitle.get());
+
+        applet.windowTitle.addListener(new Listenable.Listener() {
+            @Override
+            public void valueChanged() {
+                frame.setTitle(applet.windowTitle.get());
+            }
+        });
 
         // TODO: what was I thinking?  can't use 1.2 any more?? need to use reflection to see whether I can do this
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // supposedly exists since java 1.4, but I can see starting in 1.3, weird
