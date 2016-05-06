@@ -4,7 +4,7 @@
 
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
-    BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??
+    BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
 
     TODO: more friendly and usable control of speed
     TODO: more friendly and usable control of shape. should be able to easily express:
@@ -397,124 +397,152 @@ public class SpiralApplet
                 add(new JRow() {{
                     add(new JLabel("        ")); // indent a bit
                     add(new JCol() {{
-                        add(new JTablePanel() {{
-                            {
-                                final String toolTipText = "period";
-                                add(new JLabel("Period:") {{
-                                    setToolTipText(toolTipText);
-                                }});
-                                add(makeIncrementableTextFieldForInt(applet.spiralModelParams.n, toolTipText, 2));
-                                add(new JLabel(" "));
-                                add(new JTextFieldForNumber(applet.theSpiralModel.params.n) {{
-                                    makeTextComponentLikeLabel(this);
-                                    setToolTipText(toolTipText);
-                                }});
-                            }
-                            advanceRow();
-                            {
-                                final String toolTipText = "number of parts into which to break 90 degrees";
-                                add(new JLabel("Number of parts:") {{
-                                    setToolTipText(toolTipText);
-                                }});
-                                add(makeIncrementableTextFieldForInt(applet.spiralModelParams.nParts, toolTipText, 1));
-                                add(new JLabel(" "));
-                                add(new JTextFieldForNumber(applet.theSpiralModel.params.nParts) {{
-                                    makeTextComponentLikeLabel(this);
-                                    setToolTipText(toolTipText);
-                                }});
-                            }
-                            advanceRow();
-                            {
-                                final String toolTipText = "seed";
-                                add(new JLabel("Random seed:") {{
-                                    setToolTipText(toolTipText);
-                                }});
+                        add(new JRow() {{
+                          add(new JRow() {
+                              private ButtonGroup buttonGroup = new ButtonGroup();
+                          {
+                              add(new JLabel("Delta style:"));
+                              add(new JLabel("  "));
+                              add(new JCol() {{
+                                  add(new JRadioButton("<html>0Gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYGRADUAL) {{
+                                      setMargin(nomargin);
+                                      buttonGroup.add(this);
+                                      addActionListener(new java.awt.event.ActionListener() {
+                                          @Override
+                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          {
+                                              applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_VERYGRADUAL);
+                                              // no need to repaint
+                                          }
+                                      });
+                                  }});
+                                  add(new JRadioButton("<html>0gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_GRADUAL) {{
+                                      setMargin(nomargin);
+                                      buttonGroup.add(this);
+                                      addActionListener(new java.awt.event.ActionListener() {
+                                          @Override
+                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          {
+                                              applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_GRADUAL);
+                                              // no need to repaint
+                                          }
+                                      });
+                                  }});
+                                  add(new JRadioButton("<html>0</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0) {{
+                                      setMargin(nomargin);
+                                      buttonGroup.add(this);
+                                      addActionListener(new java.awt.event.ActionListener() {
+                                          @Override
+                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          {
+                                              applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0);
+                                              // no need to repaint
+                                          }
+                                      });
+                                  }});
+                                  add(new JRadioButton("<html>0steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_STEEP) {{
+                                      setMargin(nomargin);
+                                      buttonGroup.add(this);
+                                      addActionListener(new java.awt.event.ActionListener() {
+                                          @Override
+                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          {
+                                              applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_STEEP);
+                                              // no need to repaint
+                                          }
+                                      });
+                                  }});
+                                  add(new JRadioButton("<html>0Steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYSTEEP) {{
+                                      setMargin(nomargin);
+                                      buttonGroup.add(this);
+                                      addActionListener(new java.awt.event.ActionListener() {
+                                          @Override
+                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          {
+                                              applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_VERYSTEEP);
+                                              // no need to repaint
+                                          }
+                                      });
+                                  }});
+                                  add(new JRadioButton("<html>&plusmn;1</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_1) {{
+                                      setMargin(nomargin);
+                                      buttonGroup.add(this);
+                                      addActionListener(new java.awt.event.ActionListener() {
+                                          @Override
+                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          {
+                                              applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1);
+                                              // no need to repaint
+                                          }
+                                      });
+                                  }});
+                                  add(new JRadioButton("Any", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_ANY) {{
+                                      setMargin(nomargin);
+                                      buttonGroup.add(this);
+                                      addActionListener(new java.awt.event.ActionListener() {
+                                          @Override
+                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          {
+                                              applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_ANY);
+                                              // no need to repaint
+                                          }
+                                      });
+                                  }});
+                                  add(new JRadioButton("<html>&plusmn;1 wrap</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_1_WRAP) {{
+                                      setMargin(nomargin);
+                                      buttonGroup.add(this);
+                                      addActionListener(new java.awt.event.ActionListener() {
+                                          @Override
+                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          {
+                                              applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1_WRAP);
+                                              // no need to repaint
+                                          }
+                                      });
+                                  }});
+                              }});
+                          }});
+                          add(new JTablePanel() {{
+                              {
+                                  final String toolTipText = "period";
+                                  add(new JLabel("Period:") {{
+                                      setToolTipText(toolTipText);
+                                  }});
+                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.n, toolTipText, 2));
+                                  add(new JLabel(" "));
+                                  add(new JTextFieldForNumber(applet.theSpiralModel.params.n) {{
+                                      makeTextComponentLikeLabel(this);
+                                      setToolTipText(toolTipText);
+                                  }});
+                              }
+                              advanceRow();
+                              {
+                                  final String toolTipText = "number of parts into which to break 90 degrees";
+                                  add(new JLabel("Number of parts:") {{
+                                      setToolTipText(toolTipText);
+                                  }});
+                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.nParts, toolTipText, 1));
+                                  add(new JLabel(" "));
+                                  add(new JTextFieldForNumber(applet.theSpiralModel.params.nParts) {{
+                                      makeTextComponentLikeLabel(this);
+                                      setToolTipText(toolTipText);
+                                  }});
+                              }
+                              advanceRow();
+                              {
+                                  final String toolTipText = "seed";
+                                  add(new JLabel("Random seed:") {{
+                                      setToolTipText(toolTipText);
+                                  }});
 
-                                add(makeIncrementableTextFieldForInt(applet.spiralModelParams.randomSeed, toolTipText, 1));
-                                add(new JLabel(" "));
-                                add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
-                                    makeTextComponentLikeLabel(this);
-                                    setToolTipText(toolTipText);
-                                }});
-                            }
-                        }});
-                        add(new JRow() {
-                            private ButtonGroup buttonGroup = new ButtonGroup();
-                        {
-                            add(new JLabel("Delta style:"));
-                            add(new JLabel("  "));
-                            add(new JRadioButton("<html>0gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_GRADUAL) {{
-                                setMargin(nomargin);
-                                buttonGroup.add(this);
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
-                                    {
-                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_GRADUAL);
-                                        // no need to repaint
-                                    }
-                                });
-                            }});
-                            add(new JRadioButton("<html>0</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0) {{
-                                setMargin(nomargin);
-                                buttonGroup.add(this);
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
-                                    {
-                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0);
-                                        // no need to repaint
-                                    }
-                                });
-                            }});
-                            add(new JRadioButton("<html>0steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_STEEP) {{
-                                setMargin(nomargin);
-                                buttonGroup.add(this);
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
-                                    {
-                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_STEEP);
-                                        // no need to repaint
-                                    }
-                                });
-                            }});
-                            add(new JRadioButton("<html>&plusmn;1</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_1) {{
-                                setMargin(nomargin);
-                                buttonGroup.add(this);
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
-                                    {
-                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1);
-                                        // no need to repaint
-                                    }
-                                });
-                            }});
-                            add(new JRadioButton("Any", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_ANY) {{
-                                setMargin(nomargin);
-                                buttonGroup.add(this);
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
-                                    {
-                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_ANY);
-                                        // no need to repaint
-                                    }
-                                });
-                            }});
-                            add(new JRadioButton("<html>&plusmn;1 wrap</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_1_WRAP) {{
-                                setMargin(nomargin);
-                                buttonGroup.add(this);
-                                addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
-                                    {
-                                        applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1_WRAP);
-                                        // no need to repaint
-                                    }
-                                });
-                            }});
+                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.randomSeed, toolTipText, 1));
+                                  add(new JLabel(" "));
+                                  add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
+                                      makeTextComponentLikeLabel(this);
+                                      setToolTipText(toolTipText);
+                                  }});
+                              }
+                          }});
                         }});
 
                         add(new JButton("Regenerate") {{
@@ -1200,37 +1228,14 @@ public class SpiralApplet
                 // no need for setDefaultCloseOperation
                 // since the default is HIDE_ON_CLOSE which is what we want
 
+                final boolean useScrollPane = true; // may already be big enough to warrant it on some displays
 
-                final boolean useScrollPane = false; // can set this to true if it gets big enough to warrant it
-
-                final int preferredWidth = 600; // XXX big enough so tooltip doesn't spill out, since that causes perf problems forevermore
-                final int preferredHeight = 400;
-
-
-                java.awt.Component controlPanel = new SpiralAppletControlPanel(this) {
-                    @Override
-                    public java.awt.Dimension getPreferredSize()
-                    {
-                        if (useScrollPane)
-                            return new java.awt.Dimension(preferredWidth, preferredHeight);
-                        else
-                            return super.getPreferredSize();
-                    }
-                    @Override
-                    public java.awt.Dimension getMinimumSize()
-                    {
-                        if (useScrollPane)
-                            return new java.awt.Dimension(preferredWidth, preferredHeight);
-                        else
-                            return super.getMinimumSize();
-                    }
-                };
+                java.awt.Component controlPanel = new SpiralAppletControlPanel(this);
                 if (useScrollPane)
                     controlPanel = new JScrollPane(controlPanel);
                 theControlPanelWindow.getContentPane().add(controlPanel);
-
                 theControlPanelWindow.setLocation(730, 10);
-                theControlPanelWindow.setSize(preferredWidth+34, preferredHeight); // empirical-- will be wrong on another machine, no doubt XXX TODO: can we compute a good preferred size? pack() or something? just want to pack width, not height, I think?
+                theControlPanelWindow.pack();
                 theControlPanelWindow.setVisible(true);
             }
 
@@ -2061,14 +2066,16 @@ public class SpiralApplet
 
         public static class SpiralModel
         {
-            public static final int DELTASTYLE_MIN = 0;
-            public static final int DELTASTYLE_0_GRADUAL = 0;
-            public static final int DELTASTYLE_0 = 1;
-            public static final int DELTASTYLE_0_STEEP = 2;
-            public static final int DELTASTYLE_1 = 3;
-            public static final int DELTASTYLE_ANY = 4;
-            public static final int DELTASTYLE_1_WRAP = 5;
-            public static final int DELTASTYLE_MAX = 5;
+            public static final int DELTASTYLE_MIN           = 0;
+            public static final int DELTASTYLE_0_VERYGRADUAL = 1;
+            public static final int DELTASTYLE_0_GRADUAL     = 2;
+            public static final int DELTASTYLE_0             = 3;
+            public static final int DELTASTYLE_0_STEEP       = 4;
+            public static final int DELTASTYLE_0_VERYSTEEP   = 5;
+            public static final int DELTASTYLE_1             = 6;
+            public static final int DELTASTYLE_ANY           = 7;
+            public static final int DELTASTYLE_1_WRAP        = 8;
+            public static final int DELTASTYLE_MAX           = 8;
 
 
             public static class Params
@@ -2109,35 +2116,33 @@ public class SpiralApplet
                 java.util.Random rng = new java.util.Random(randomSeed);
                 assert(n >= 2);
                 assert(n % 2 == 0); // doesn't work with odd n
+                assert(n % 4 == 0); // actually DELTASTYLE_0 only works with n a multiple of 4
                 assert(nParts >= 2); // doesn't work with only one part
 
                 this.theList = new int[n];
-                if (deltaStyle == DELTASTYLE_0_GRADUAL)
+                if (deltaStyle == DELTASTYLE_0_VERYGRADUAL
+                 || deltaStyle == DELTASTYLE_0_GRADUAL
+                 || deltaStyle == DELTASTYLE_0
+                 || deltaStyle == DELTASTYLE_0_STEEP
+                 || deltaStyle == DELTASTYLE_0_VERYSTEEP)
                 {
-                    int val0 = nParts/8*2; // even starting point
-                    int val1 = val0 + 1;
-                    FORI (i, n)
-                    {
-                       this.theList[i] = i%2==0 ? val0 : val1;
-                    }
-                }
-                else if (deltaStyle == DELTASTYLE_0)
-                {
-                    int val0 = nParts/4*2; // even starting point
-                    int val1 = val0 + 1;
-                    FORI (i, n)
-                    {
-                       this.theList[i] = i%2==0 ? val0 : val1;
-                    }
-                }
-                else if (deltaStyle == DELTASTYLE_0_STEEP)
-                {
-                    int val0 = 3*nParts/8*2; // even starting point
-                    int val1 = val0 + 1;
-                    FORI (i, n)
-                    {
-                       this.theList[i] = i%2==0 ? val0 : val1;
-                    }
+                   double avg = deltaStyle==DELTASTYLE_0_VERYGRADUAL ? 0. :
+                                deltaStyle==DELTASTYLE_0_GRADUAL ? nParts/3. :
+                                deltaStyle==DELTASTYLE_0_STEEP ? 2*nParts/3. :
+                                deltaStyle==DELTASTYLE_0_VERYSTEEP ? nParts :
+                                nParts/2.;
+                   int avgRounded = (int)Math.round(avg);
+                   avgRounded = CLAMP(avgRounded, 1, nParts-1);
+                   // alternate between avgRounded-1 and avgRounded
+                   int vals[] = avgRounded%2==0 ? new int[]{avgRounded, avgRounded-1}
+                                                : new int[]{avgRounded-1, avgRounded};
+                   FORI (i, n)
+                   {
+                       this.theList[i] = vals[i % vals.length];
+                   }
+                   PRINT(avgRounded);
+                   PRINTVEC(vals);
+                   PRINTARRAY(Arrays.subarray(this.theList, 0, 20));
                 }
                 else if (deltaStyle == DELTASTYLE_1)
                 {
@@ -2323,6 +2328,7 @@ public class SpiralApplet
                                   && this.areas[i] == thisArea)
                             {
                                 System.out.println("centers and areas stabilized at iPass="+iPass+" i="+i+"/n="+n);
+                                System.out.println("=========================");
                                 done = true;
                             }
                             else
