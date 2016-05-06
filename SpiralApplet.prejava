@@ -2,6 +2,10 @@
     Notes:
         Uses System.nanoTime which requires java >= 1.4
 
+    Q: is really exercising all cases... seems like it doesn't have enough degrees of freedom, does it?  I don't think its capable of making a non-convex dual. and does it assume dual has a circumsphere?  :-(
+    PA: I think my logic is: the quills are always at *exactly* right angles to the origin, is it ok to make that assumption?  because anything else is worse, I think... in some sense.  need to get clear on this.  perhaps have a paremeter "quillsafety" (think of a better name)?
+
+
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
@@ -23,7 +27,7 @@
     todo: check out LWJGL for consistent frame rate?
     TODO: maybe JavaFX? she says it works well for vsync: http://www.java-gaming.org/index.php?topic=27763.0.  ah good, it's included in jdk 7.
     TODO: use javax.swing.Timer instead of my own custom thread
-          WHOA! as soon as I switched to a timer, I'm getting consistent timings! nice 60fps. wtf?
+          WHOA! as soon as I switched to this kind of timer, I'm getting consistent timings! nice 60fps. wtf?
           well except every 5 seconds or so, it gives far faster for a few frames in a row. argh!
           sleeping for 11 ms seems to be a sweet spot.  screwy.
           and a few days later, it's not happening any more... it's going full speed again, even with the timer.  wtf??
@@ -2139,7 +2143,8 @@ public class SpiralApplet
                                 nParts/2.;
                    int avgRounded = (int)Math.round(avg);
                    avgRounded = CLAMP(avgRounded, 1, nParts-1);
-                   // alternate between avgRounded-1 and avgRounded
+                   // vals will alternate between avgRounded-1 and avgRounded.
+                   // since val really means val+.5, this will achieve the desired average of avgRounded.
                    int vals[] = avgRounded%2==0 ? new int[]{avgRounded, avgRounded-1}
                                                 : new int[]{avgRounded-1, avgRounded};
                    FORI (i, n)
@@ -2292,7 +2297,7 @@ public class SpiralApplet
                             // Compute new area and center
                             // from prev area and center
 
-                            // val is (proportional to) primalAng-dualAng.
+                            // val is (proportional to) primalAng-dualAng (i.e. it's primal-dualAng in units of 90degrees/nParts).
                             // when val increases, it means primalAng is increasing
                             // (i.e. Priscilla is moving, Dudley is turning)
                             // when val decreases, it means dualAng is increasing
