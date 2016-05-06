@@ -502,6 +502,7 @@ public class SpiralApplet
                                   }});
                               }});
                           }});
+                          add(new JLabel("        "), stretchx);
                           add(new JTablePanel() {{
                               {
                                   final String toolTipText = "period";
@@ -543,7 +544,7 @@ public class SpiralApplet
                                   }});
                               }
                           }});
-                        }});
+                        }}, stretchx);
 
                         add(new JButton("Regenerate") {{
                             setMargin(nomargin);
@@ -561,8 +562,8 @@ public class SpiralApplet
                                 }
                             });
                         }});
-                    }});
-                }});
+                    }}, stretchx);
+                }}, stretchx);
                 contentPane.add(new JSeparator(), stretchx);
                 contentPane.add(new JLabel("View"));
                 add(new JRow() {{
