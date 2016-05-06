@@ -12,7 +12,6 @@
               - arbitrary slope center and std deviation
               - random walk params? maybe need to review that.
     TODO: maybe just pass arraylists to the plotter, not functors... it's not like we get any streaming benefit
-    TODO: make everything moment (not center) based
     TODO: non-rotating mode
     TODO: delta mode approximating arbitrary slopes
     TODO: saturation slider
@@ -2099,7 +2098,7 @@ public class SpiralApplet
 
 
             public int theList[/*n*/];
-            public double centers[/*n*/][/*2*/]; // centers[i] is center of theList up through index i, rotated and scaled canonically
+            public double moments[/*n*/][/*2*/]; // moments[i] is moment (i.e. center times areas[i]) of theList up through index i, rotated and scaled canonically
             public double areas[/*n*/]; // areas[i] is area of dual diagram of theList up through index i, rotated and scaled so biggest dual edge is <1,0> and biggest primal edge has length 1
 
             SpiralModel()
@@ -2268,16 +2267,16 @@ public class SpiralApplet
                     assert((theList[i] + i)%2 == 0);
                 }
 
-                this.centers = new double[n][2];
+                this.moments = new double[n][2];
                 this.areas = new double[n];
                 if (true)
                 {
                     // compute all cumulative centers and areas
 
                     double prevArea = 0.;
-                    double prevCenter[] = {0.,0.};
+                    double prevMoment[] = {0.,0.};
                     double thisArea = 0.;
-                    double thisCenter[] = {0.,0.};
+                    double thisMoment[] = {0.,0.};
 
                     boolean done = false;
 
@@ -2304,34 +2303,34 @@ public class SpiralApplet
                             double primalAng = Math.PI/2 * ((val+.5)/nParts);
                             if (primalAng > prevPrimalAng)
                             {
-                                updateCenterAndAreaWhenPriscillaMoved(
-                                        prevCenter[0], prevCenter[1], prevArea,
+                                updateMomentAndAreaWhenPriscillaMoved(
+                                        prevMoment[0], prevMoment[1], prevArea,
                                         prevPrimalAng,
                                         primalAng,
                                         scratch);
-                                thisCenter[0] = scratch[0];
-                                thisCenter[1] = scratch[1];
+                                thisMoment[0] = scratch[0];
+                                thisMoment[1] = scratch[1];
                                 thisArea = scratch[2];
                             }
                             else
                             {
-                                updateCenterAndAreaWhenDudleyMoved(
-                                        prevCenter[0], prevCenter[1], prevArea,
+                                updateMomentAndAreaWhenDudleyMoved(
+                                        prevMoment[0], prevMoment[1], prevArea,
                                         prevPrimalAng,
                                         primalAng,
                                         scratch);
-                                thisCenter[0] = scratch[0];
-                                thisCenter[1] = scratch[1];
+                                thisMoment[0] = scratch[0];
+                                thisMoment[1] = scratch[1];
                                 thisArea = scratch[2];
                             }
 
                             if (done)
                             {
-                                assert(VecMath.equalsExactly(this.centers[i], thisCenter));
+                                assert(VecMath.equalsExactly(this.moments[i], thisMoment));
                                 assert(this.areas[i] == thisArea);
                             }
                             else if (iPass > 0
-                                  && VecMath.equalsExactly(this.centers[i], thisCenter)
+                                  && VecMath.equalsExactly(this.moments[i], thisMoment)
                                   && this.areas[i] == thisArea)
                             {
                                 System.out.println("centers and areas stabilized at iPass="+iPass+" i="+i+"/n="+n);
@@ -2340,12 +2339,12 @@ public class SpiralApplet
                             }
                             else
                             {
-                                VecMath.copyvec(this.centers[i], thisCenter);
+                                VecMath.copyvec(this.moments[i], thisMoment);
                                 this.areas[i] = thisArea;
                             }
 
-                            prevCenter[0] = thisCenter[0];
-                            prevCenter[1] = thisCenter[1];
+                            prevMoment[0] = thisMoment[0];
+                            prevMoment[1] = thisMoment[1];
                             prevArea = thisArea;
                             prevVal = val;
                         }
@@ -2353,21 +2352,26 @@ public class SpiralApplet
                     assert(done);
                 }
 
+
                 // sanity check-- all centers should have strictly positive y coord,
                 // and moment magnitudes should be within proven bounds.
                 FORI (i, n)
                 {
-                    // theorem says center has positive y coord
-                    if (!(centers[i][1] > 0.))
+                    if (!(areas[i] > 0.))
                     {
-                        System.out.println("Oh no! centers["+i+"] = "+centers[i][1]+" <= 0!");
+                        System.out.println("Oh no! areas["+i+"] = "+areas[i]+" <= 0!");
+                    }
+                    // theorem says center has positive y coord
+                    if (!(moments[i][1] > 0.))
+                    {
+                        System.out.println("Oh no! moments["+i+"] = "+moments[i][1]+" <= 0!");
                     }
                     double primalAng = (theList[i]+.5)/nParts*(Math.PI*.5);
 
                     // theorem says |moment| <= sin(2*primalAng)/4
-                    if (!(VecMath.norm(centers[i])*areas[i] < Math.sin(2*primalAng)/4))
+                    if (!(VecMath.norm(moments[i]) < Math.sin(2*primalAng)/4))
                     {
-                        System.out.println("Oh no! centers["+i+"] = "+centers[i][1]+" has length "+VecMath.norm(centers[i])*areas[i]+" >= "+Math.sin(2*primalAng)/4+"!");
+                        System.out.println("Oh no! moments["+i+"] = "+moments[i][1]+" has length "+VecMath.norm(moments[i])+" >= "+Math.sin(2*primalAng)/4+"!");
                     }
                 }
             } // init
@@ -2390,43 +2394,39 @@ public class SpiralApplet
         }; // public class SpiralView
 
 
-
-        public static void updateCenterAndAreaWhenPriscillaMoved(
-                double oldCenterX,
-                double oldCenterY,
+        public static void updateMomentAndAreaWhenPriscillaMoved(
+                double oldMomentX,
+                double oldMomentY,
                 double oldArea,
                 double oldPrimalMinusDualAng,
                 double newPrimalMinusDualAng,
-                double newCenterAndArea[])
+                double newMomentAndArea[])
         {
             assumpt(newPrimalMinusDualAng >= oldPrimalMinusDualAng);
             // primalAng is increasing. (assuming newPrimalMinusDual > oldPrimalMinusDual).
             // this shrinks the canonical representation of the primal,
             // thereby shrinking the center accordingly.
-            // nothing happens to the area,
+            // nothing happens to the area (so moment gets shrunk by same abount that center gets shrunk)
             // nor to the direction from origin to center.
             double shrink = Math.cos(newPrimalMinusDualAng)
                           / Math.cos(oldPrimalMinusDualAng);
             assert(shrink <= 1.);
-            double newCenterX = shrink * oldCenterX;
-            double newCenterY = shrink * oldCenterY;
+            double newMomentX = shrink * oldMomentX;
+            double newMomentY = shrink * oldMomentY;
             double newArea = oldArea;
-            newCenterAndArea[0] = newCenterX;
-            newCenterAndArea[1] = newCenterY;
-            newCenterAndArea[2] = newArea;
-        } // updateCenterAndAreaWhenPriscillaMoved
+            newMomentAndArea[0] = newMomentX;
+            newMomentAndArea[1] = newMomentY;
+            newMomentAndArea[2] = newArea;
+        } // updateMomentAndAreaWhenPriscillaMoved
 
-        public static void updateCenterAndAreaWhenDudleyMoved(
-                double oldCenterX,
-                double oldCenterY,
+        public static void updateMomentAndAreaWhenDudleyMoved(
+                double oldMomentX,
+                double oldMomentY,
                 double oldArea,
                 double oldPrimalMinusDualAng,
                 double newPrimalMinusDualAng,
-                double newCenterAndArea[])
+                double newMomentAndArea[])
         {
-            double oldMomentX = oldArea * oldCenterX;
-            double oldMomentY = oldArea * oldCenterY;
-
             assumpt(newPrimalMinusDualAng <= oldPrimalMinusDualAng);
             // dualAng is increasing... (assuming newPrimalMinusDual < oldPrimalMinusDual).
             // decrease primalAng to compensate,
@@ -2453,90 +2453,79 @@ public class SpiralApplet
             double newMomentX = oldMomentInNewSpaceX + areaIncrInNewSpace * Math.cos(newPrimalMinusDualAng);
             double newMomentY = oldMomentInNewSpaceY + areaIncrInNewSpace * Math.sin(newPrimalMinusDualAng);
             double newArea = SQR(shrink)*oldArea + areaIncrInNewSpace;
-            if (newArea == 0.)
-            {
-                // it's a bit unfortunate to lose the center but oh well
-                newCenterAndArea[0] = 0.;
-                newCenterAndArea[1] = 0.;
-                newCenterAndArea[2] = 0.;
-            }
-            else
-            {
-                newCenterAndArea[0] = newMomentX / newArea;
-                newCenterAndArea[1] = newMomentY / newArea;
-                newCenterAndArea[2] = newArea;
-                //PRINTVEC(newCenterAndArea);
-            }
-        } // updateCenterAndAreaWhenDudleyMoved
+            newMomentAndArea[0] = newMomentX;
+            newMomentAndArea[1] = newMomentY;
+            newMomentAndArea[2] = newArea;
+        } // updateMomentAndAreaWhenDudleyMoved
 
         // DEBUGGING-- sanity check that two dudleys is the same as the cumulative dudley.
         // yes, this does appear to be working correctly
         // (when I substitute this for the normal one, the prints
         // indicate that the two answers are the same)
-        public static void updateCenterAndAreaWhenDudleyMoved2(
-                double oldCenterX,
-                double oldCenterY,
+        public static void updateMomentAndAreaWhenDudleyMoved2(
+                double oldMomentX,
+                double oldMomentY,
                 double oldArea,
                 double oldPrimalMinusDualAng,
                 double newPrimalMinusDualAng,
-                double newCenterAndArea[])
+                double newMomentAndArea[])
         {
-            System.out.println("in dudley moved 2");
+            System.out.println("in updateMomentAndAreaWhenDudleyMoved 2");
             double midPrimalMinusDualAng = LERP(oldPrimalMinusDualAng, newPrimalMinusDualAng, .654321);
-            double midCenterAndArea[] = newCenterAndArea; // use it as scratch
-            updateCenterAndAreaWhenDudleyMoved(
-                oldCenterX,
-                oldCenterY,
+            double midMomentAndArea[] = newMomentAndArea; // use it as scratch
+            updateMomentAndAreaWhenDudleyMoved(
+                oldMomentX,
+                oldMomentY,
                 oldArea,
                 oldPrimalMinusDualAng,
                 midPrimalMinusDualAng,
-                midCenterAndArea);
-            PRINTVEC(midCenterAndArea);
-            updateCenterAndAreaWhenDudleyMoved(
-                midCenterAndArea[0],
-                midCenterAndArea[1],
-                midCenterAndArea[2],
+                midMomentAndArea);
+            PRINTVEC(midMomentAndArea);
+            updateMomentAndAreaWhenDudleyMoved(
+                midMomentAndArea[0],
+                midMomentAndArea[1],
+                midMomentAndArea[2],
                 midPrimalMinusDualAng,
                 newPrimalMinusDualAng,
-                newCenterAndArea);
-            PRINTVEC(newCenterAndArea);
-            updateCenterAndAreaWhenDudleyMoved(
-                oldCenterX,
-                oldCenterY,
+                newMomentAndArea);
+            PRINTVEC(newMomentAndArea);
+            updateMomentAndAreaWhenDudleyMoved(
+                oldMomentX,
+                oldMomentY,
                 oldArea,
                 oldPrimalMinusDualAng,
                 newPrimalMinusDualAng,
-                newCenterAndArea);
-            PRINTVEC(newCenterAndArea);
-            System.out.println("in dudley moved 2");
+                newMomentAndArea);
+            PRINTVEC(newMomentAndArea);
+            System.out.println("in updateMomentAndAreaWhenDudleyMoved 2");
         }
 
         // Actually we know which one moved (assuming spiraling outward).
-        public static void updateCenterAndAreaWhenSomeoneMoved(
-                double oldCenterX,
-                double oldCenterY,
+        public static void updateMomentAndAreaWhenSomeoneMoved(
+                double oldMomentX,
+                double oldMomentY,
                 double oldArea,
                 double oldPrimalMinusDualAng,
                 double newPrimalMinusDualAng,
-                double newCenterAndArea[])
+                double newMomentAndArea[])
         {
             if (newPrimalMinusDualAng >= oldPrimalMinusDualAng)
-                updateCenterAndAreaWhenPriscillaMoved(
-                    oldCenterX,
-                    oldCenterY,
+                updateMomentAndAreaWhenPriscillaMoved(
+                    oldMomentX,
+                    oldMomentY,
                     oldArea,
                     oldPrimalMinusDualAng,
                     newPrimalMinusDualAng,
-                    newCenterAndArea);
+                    newMomentAndArea);
             else
-                updateCenterAndAreaWhenDudleyMoved(
-                    oldCenterX,
-                    oldCenterY,
+                updateMomentAndAreaWhenDudleyMoved(
+                    oldMomentX,
+                    oldMomentY,
                     oldArea,
                     oldPrimalMinusDualAng,
                     newPrimalMinusDualAng,
-                    newCenterAndArea);
-        } // updateCenterAndAreaWhenSomeoneMoved
+                    newMomentAndArea);
+        } // updateMomentAndAreaWhenSomeoneMoved
 
 
 
@@ -2906,9 +2895,9 @@ public class SpiralApplet
                         public void getDatum(int i, double putDatumHere[/*2*/])
                         {
                             int val = spiralModel.theList[i];
-                            double center[] = spiralModel.centers[i];
+                            double moment[] = spiralModel.moments[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-                            double momentAng = Math.atan2(center[1],center[0]);
+                            double momentAng = Math.atan2(moment[1],moment[0]);
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = RTOD(momentAng);
                             putDatumHere[2] = primalAng / (Math.PI*.5);
@@ -2950,11 +2939,11 @@ public class SpiralApplet
                         public void getDatum(int i, double putDatumHere[/*2*/])
                         {
                             int val = spiralModel.theList[i];
-                            double center[] = spiralModel.centers[i];
+                            double moment[] = spiralModel.moments[i];
                             double area = spiralModel.areas[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-                            double areaBasedMomentMag = MyMath.hypot(center[1],center[0]) * area;
+                            double areaBasedMomentMag = MyMath.hypot(moment[1],moment[0]) * area;
 
                             double maxAreaBasedMomentMag = Math.sin(2*primalAng)/4; // i.e. tri area / 2
 
@@ -2973,10 +2962,10 @@ public class SpiralApplet
                         public void getDatum(int i, double putDatumHere[/*2*/])
                         {
                             int val = spiralModel.theList[i];
-                            double center[] = spiralModel.centers[i];
+                            double moment[] = spiralModel.moments[i];
                             double area = spiralModel.areas[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-                            double areaBasedMomentMag = MyMath.hypot(center[1],center[0]) * area;
+                            double areaBasedMomentMag = MyMath.hypot(moment[1],moment[0]) * area;
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = areaBasedMomentMag;
                             putDatumHere[2] = primalAng / (Math.PI*.5);
@@ -3058,15 +3047,10 @@ public class SpiralApplet
                         public void getDatum(int i, double putDatumHere[/*2*/])
                         {
                             int val = spiralModel.theList[i];
-                            double center[] = spiralModel.centers[i];
-                            double area = spiralModel.areas[i];
+                            double moment[] = spiralModel.moments[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-
-                            double areaBasedMomentX = center[0]*area;
-                            double areaBasedMomentY = center[1]*area;
-
-                            putDatumHere[0] = areaBasedMomentX;
-                            putDatumHere[1] = areaBasedMomentY;
+                            putDatumHere[0] = moment[0];
+                            putDatumHere[1] = moment[1];
                             putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
                     }
@@ -3157,18 +3141,16 @@ public class SpiralApplet
                                 double otherX = maxMagForOtherAngle * Math.cos(otherAngle);
                                 double otherY = maxMagForOtherAngle * Math.sin(otherAngle);
                                 double otherArea = 100.; // arbitrary, it doesn't matter I don't think
-                                updateCenterAndAreaWhenSomeoneMoved(
-                                    otherX / otherArea,
-                                    otherY / otherArea,
+                                updateMomentAndAreaWhenSomeoneMoved(
+                                    otherX,  // so otherX,otherY is already a moment? and was dividint to get center
+                                    otherY,
                                     otherArea,
                                     otherAngle,
                                     focusPrimalAngleMinusDualAngle,
                                     scratch);
-                                double xCenter = scratch[0];
-                                double yCenter = scratch[1];
-                                double area = scratch[2];
-                                double xMoment = xCenter * area;
-                                double yMoment = yCenter * area;
+                                double xMoment = scratch[0];
+                                double yMoment = scratch[1];
+                                double area = scratch[2]; // not used
 
                                 // oh no! it appears to be exactly equal to the circle! damn!
                                 // let's verify that...
@@ -3236,25 +3218,25 @@ public class SpiralApplet
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-                            double center[] = spiralModel.centers[i];
+                            double moment[] = spiralModel.moments[i];
                             double area = spiralModel.areas[i];
 
                             if (focusPrimalAngleMinusDualAngle > primalAng)
-                                updateCenterAndAreaWhenPriscillaMoved(
-                                    center[0], center[1], area, primalAng,
+                                updateMomentAndAreaWhenPriscillaMoved(
+                                    moment[0], moment[1], area, primalAng,
                                     focusPrimalAngleMinusDualAngle,
                                     scratch);
                             else
-                                updateCenterAndAreaWhenDudleyMoved(
-                                    center[0], center[1], area, primalAng,
+                                updateMomentAndAreaWhenDudleyMoved(
+                                    moment[0], moment[1], area, primalAng,
                                     focusPrimalAngleMinusDualAngle,
                                     scratch);
 
-                            double newCenterX = scratch[0];
-                            double newCenterY = scratch[1];
-                            double newArea = scratch[2];
-                            putDatumHere[0] = newCenterX * newArea;
-                            putDatumHere[1] = newCenterY * newArea;
+                            double newMomentX = scratch[0];
+                            double newMomentY = scratch[1];
+                            double newArea = scratch[2]; // not used
+                            putDatumHere[0] = newMomentX;
+                            putDatumHere[1] = newMomentY;
                             //putDatumHere[2] = focusPrimalAngleMinusDualAngle / (Math.PI*.5);
                             putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
@@ -3309,12 +3291,14 @@ public class SpiralApplet
                         public void getDatum(int i, double putDatumHere[/*2*/])
                         {
                             int val = spiralModel.theList[i];
-                            double center[] = spiralModel.centers[i];
+                            double moment[] = spiralModel.moments[i];
+                            double area = spiralModel.areas[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-                            putDatumHere[0] = center[0];
-                            putDatumHere[1] = center[1];
-                            putDatumHere[2] = 0.;
+                            double centerX = moment[0] / area;
+                            double centerY = moment[1] / area;
+                            putDatumHere[0] = centerX;
+                            putDatumHere[1] = centerY;
                             putDatumHere[2] = primalAng / (Math.PI*.5);
                         }
                     }
@@ -3388,23 +3372,25 @@ public class SpiralApplet
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-                            double center[] = spiralModel.centers[i];
+                            double moment[] = spiralModel.moments[i];
                             double area = spiralModel.areas[i];
 
                             if (focusPrimalAngleMinusDualAngle > primalAng)
-                                updateCenterAndAreaWhenPriscillaMoved(
-                                    center[0], center[1], area, primalAng,
+                                updateMomentAndAreaWhenPriscillaMoved(
+                                    moment[0], moment[1], area, primalAng,
                                     focusPrimalAngleMinusDualAngle,
                                     scratch);
                             else
-                                updateCenterAndAreaWhenDudleyMoved(
-                                    center[0], center[1], area, primalAng,
+                                updateMomentAndAreaWhenDudleyMoved(
+                                    moment[0], moment[1], area, primalAng,
                                     focusPrimalAngleMinusDualAngle,
                                     scratch);
 
-                            double newCenterX = scratch[0];
-                            double newCenterY = scratch[1];
+                            double newMomentX = scratch[0];
+                            double newMomentY = scratch[1];
                             double newArea = scratch[2];
+                            double newCenterX = newArea==0. ? 0. : newMomentX / newArea;
+                            double newCenterY = newArea==0. ? 0. : newMomentY / newArea;
 
                             putDatumHere[0] = newCenterX;
                             putDatumHere[1] = newCenterY;
@@ -3863,7 +3849,7 @@ public class SpiralApplet
                 {
                     returnValue++;
 
-                    // TODO: combine straight parts, the line will look better.  actually maybe not, it will ruin the pastel-ness, unless I tweak the line drawing
+                    // TODO: combine straight parts, the line will look better.  actually maybe not, it will ruin the pastel-ness, unless I tweak the line drawing to do gradients
 
                     int thisVal = spiralModel.theList[i];
                     if (scanDir==1 ? thisVal > prevVal : thisVal < prevVal)
@@ -4076,15 +4062,15 @@ public class SpiralApplet
                             {dualX,dualY},
                             {-dualY,dualX},
                         };
-                        double center[] = VecMath.vxm(spiralModel.centers[i], m);
-                        VecMath.vxs(center, center, primalR/dualR); // divide by dualR because we should never have multiplied by it
-                        //VecMath.vxs(center, center, 2.); // XXX I don't understand this
+                        double moment[] = VecMath.vxm(spiralModel.moments[i], m);
+                        double areaScratch = spiralModel.areas[i]; // var area already defined, maybe should rename it
+                        VecMath.vxs(moment, moment, primalR/dualR); // divide by dualR because we should never have multiplied by it
                         java.awt.Color savedColor = mg.getColor();
                         mg.setColor(java.awt.Color.yellow);
 
                         boolean big = (spiralModel.theList[i] > spiralModel.theList[(i+1)%n])
                                  && !(spiralModel.theList[MOD(i-1,n)] > spiralModel.theList[i]);
-                        mg.drawPoint(center[0], center[1], big?3:1);
+                        mg.drawPoint(moment[0] / areaScratch, moment[1] / areaScratch, big?3:1);
                         mg.setColor(savedColor);
                     }
 
@@ -4186,20 +4172,25 @@ public class SpiralApplet
                             double s = sinOrientationAngleFudge;
                             double centerXinCanonicalOrientation =  centerX*c + centerY*s;
                             double centerYinCanonicalOrientation = -centerX*s + centerY*c;
+                            double momentXinCanonicalOrientation = area * centerXinCanonicalOrientation;
+                            double momentYinCanonicalOrientation = area * centerYinCanonicalOrientation;
                             FORIDOWN (speculativeNextVal, nParts)
                             {
                                 double speculativeNextPrimalAng = (speculativeNextVal+.5)/nParts*(Math.PI*.5);
 
-                                updateCenterAndAreaWhenSomeoneMoved(
-                                    centerXinCanonicalOrientation,
-                                    centerYinCanonicalOrientation,
+                                updateMomentAndAreaWhenSomeoneMoved(
+                                    momentXinCanonicalOrientation,
+                                    momentYinCanonicalOrientation,
                                     area,
                                     initialPrimalAng,
                                     speculativeNextPrimalAng,
                                     scratch);
-                                double speculativeNextCenterXinCanonicalOrientation = scratch[0];
-                                double speculativeNextCenterYinCanonicalOrientation = scratch[1];
+
+                                double speculativeNextMomentXinCanonicalOrientation = scratch[0];
+                                double speculativeNextMomentYinCanonicalOrientation = scratch[1];
                                 double speculativeNextArea = scratch[2];
+                                double speculativeNextCenterXinCanonicalOrientation = speculativeNextMomentXinCanonicalOrientation / speculativeNextArea;
+                                double speculativeNextCenterYinCanonicalOrientation = speculativeNextMomentYinCanonicalOrientation / speculativeNextArea;
                                 double speculativeNextCenterX = speculativeNextCenterXinCanonicalOrientation*c - speculativeNextCenterYinCanonicalOrientation*s;
                                 double speculativeNextCenterY = speculativeNextCenterXinCanonicalOrientation*s + speculativeNextCenterYinCanonicalOrientation*c;
 
