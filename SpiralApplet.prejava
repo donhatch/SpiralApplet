@@ -561,7 +561,7 @@ public class SpiralApplet
                                     applet.theCanvas.repaint();
                                 }
                             });
-                        }});
+                        }}, centerjustify);
                     }}, stretchx);
                 }}, stretchx);
                 contentPane.add(new JSeparator(), stretchx);
