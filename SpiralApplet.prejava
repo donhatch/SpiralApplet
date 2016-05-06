@@ -404,7 +404,7 @@ public class SpiralApplet
                               add(new JLabel("Delta style:"));
                               add(new JLabel("  "));
                               add(new JCol() {{
-                                  add(new JRadioButton("<html>0Gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYGRADUAL) {{
+                                  add(new JRadioButton("<html>0 very gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYGRADUAL) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -416,7 +416,7 @@ public class SpiralApplet
                                           }
                                       });
                                   }});
-                                  add(new JRadioButton("<html>0gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_GRADUAL) {{
+                                  add(new JRadioButton("<html>0 gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_GRADUAL) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -440,7 +440,7 @@ public class SpiralApplet
                                           }
                                       });
                                   }});
-                                  add(new JRadioButton("<html>0steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_STEEP) {{
+                                  add(new JRadioButton("<html>0 steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_STEEP) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -452,7 +452,7 @@ public class SpiralApplet
                                           }
                                       });
                                   }});
-                                  add(new JRadioButton("<html>0Steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYSTEEP) {{
+                                  add(new JRadioButton("<html>0 very steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYSTEEP) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
