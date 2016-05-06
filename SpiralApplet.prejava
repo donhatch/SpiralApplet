@@ -3761,10 +3761,11 @@ public class SpiralApplet
             int returnValue = 0;
 
 
-            // fudge using orientationNumber-- orientationNumber=1 means don't rotate
-            double orientationAngleFudge = (orientationNumber-1)/12.*(2*Math.PI); // naive
+            // fudge using orientationNumber-- orientationNumber=1 means don't rotate.
+            double orientationAngleFudge;
             {
                 double primalAng = Math.PI/2 * ((val+.5)/nParts);
+                // first pretend quadrant is 0, and set the part within the quadrant
                 switch (orientationNumber % 3)
                 {
                     case 0:
@@ -3782,6 +3783,7 @@ public class SpiralApplet
                     default:
                         assert(false);
                 }
+                // then add the appropriate multiple of 90 degrees depending on the quadrant
                 orientationAngleFudge += (orientationNumber/3) * (Math.PI*.5);
             }
             double sinOrientationAngleFudge = Math.sin(orientationAngleFudge);
