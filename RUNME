@@ -1,6 +1,11 @@
 #!/bin/sh
 
-sep=:
+# Classpath separator.
+# Cygwin: ';' only  (I think)
+# Linux: ':' only (openjdk-8 at least)
+# Darwin: ':' only
+# Darwin and Linux both have uname, so that's a good differentior from Cygwin.
+uname && sep=':' || sep=';'
 
 # If everything including com is in SpiralApplet.jar,
 # then can run it standalone with no classpath
