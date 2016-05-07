@@ -2,10 +2,6 @@
     Notes:
         Uses System.nanoTime which requires java >= 1.4
 
-    Q: is really exercising all cases... seems like it doesn't have enough degrees of freedom, does it?  I don't think its capable of making a non-convex dual. and does it assume dual has a circumsphere?  :-(
-    PA: I think my logic is: the quills are always at *exactly* right angles to the origin, is it ok to make that assumption?  because anything else is worse, I think... in some sense.  need to get clear on this.  perhaps have a paremeter "quillsafety" (think of a better name)?
-
-
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
@@ -3899,6 +3895,33 @@ public class SpiralApplet
                                 {
                                     mg.drawPoint(primalX, primalY, 3);
                                 }
+
+
+                                boolean drawQuillsFlag = true;
+                                if (drawQuillsFlag)
+                                {
+                                    java.awt.Color savedColor = null;
+                                    if (isFirstInPass && scanDir<0)
+                                    {
+                                        savedColor = mg.getColor();
+                                        if (!pastelsFlag) mg.setColor(new java.awt.Color(128,192,192)); // halfway between the two
+                                    }
+
+                                    // quill vector is vertex position rotated 90 degrees CW,
+                                    // and make its length 1/2 of vertex position length.
+
+                                    double quillVectorX = primalY * .5;
+                                    double quillVectorY = -primalX * .5;
+                                    mg.drawLine(primalX, primalY,
+                                                primalX + quillVectorX,
+                                                primalY + quillVectorY,
+                                                antiAliasFlag);
+                                    if (isFirstInPass && scanDir<0)
+                                    {
+                                        mg.setColor(savedColor);
+                                        isFirstInPass = false;
+                                    }
+                                }
                             }
                             if (scanDir > 0)
                             {
@@ -3961,39 +3984,6 @@ public class SpiralApplet
                             if (prevVal==prevPrevVal
                              || (thisVal<prevVal) != (prevVal<prevPrevVal))
                             {
-                                // Not really ideal to be drawing the quills with the dual,
-                                // since it means parts of quills will be obscured by parts of dual.
-                                // They are really part of the primal, so should draw them with primal instead.
-                                // But it's when drawing the dual that we have access to desired numbers, currently.
-                                boolean drawQuillsFlag = true;
-                                if (drawQuillsFlag)
-                                {
-                                    java.awt.Color savedColor = mg.getColor();
-                                    if (isFirstInPass)
-                                    {
-                                        isFirstInPass = false;
-                                        if (!pastelsFlag) mg.setColor(new java.awt.Color(128,192,192)); // halfway between the two
-                                    }
-                                    else if (scanDir < 0)
-                                    {
-                                        if (!pastelsFlag) mg.setColor(new java.awt.Color(128,255,128)); // light green (same as earlier)
-                                    }
-                                    else
-                                    {
-                                        if (!pastelsFlag) mg.setColor(new java.awt.Color(128,128,255)); // light blue (same as earlier)
-                                    }
-
-                                    double dualDir = Math.atan2(-scanDir*(nextDualY-dualY),
-                                                                -scanDir*(nextDualX-dualX));
-                                    double quillDir = dualDir - Math.PI*.5;
-                                    double quillLength = primalR * .5;
-                                    mg.drawLine(primalX, primalY,
-                                                primalX-quillLength*Math.cos(quillDir),
-                                                primalY-quillLength*Math.sin(quillDir),
-                                                antiAliasFlag);
-                                    mg.setColor(savedColor);
-                                }
-
                                 if (scanDir < 0)
                                 {
                                     mg.drawPoint(dualX, dualY, 5);
