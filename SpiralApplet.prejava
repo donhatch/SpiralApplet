@@ -1151,6 +1151,7 @@ public class SpiralApplet
                 contentPane.add(new JSeparator(), stretchx);
 
                 //randomlyColorize(this);
+                //dumpComponentHierarchy(this, 0, 0, 1);
 
             } // SpiralAppletControlPanel ctor
         } // class SpiralAppletControlPanel
@@ -1566,9 +1567,9 @@ public class SpiralApplet
             public void mouseEntered(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseEntered: "+e);
-                // steal keyboard focus!
+                // steal keyboard focus!  canvases and applets don't get it by default
                 //System.out.println("Requesting focus!");
-                requestFocus(); // hey it works! (javac 1.3, runtime 1.6)  XXX what does "it works" mean?
+                requestFocus(); // hey it works! (javac 1.3, runtime 1.6) and overriding isFocusTraversable() no longer works in 1.7 and gives deprecation warning.
                 if (eventVerbose >= 1) System.out.println("out mouseEntered: "+e);
             }
             @Override
@@ -1693,38 +1694,6 @@ public class SpiralApplet
                 }
                 if (eventVerbose >= 1) System.out.println("out keyTyped: "+e);
             } // keyTyped
-
-
-
-
-
-
-#if 0 // no longer works in 1.7, and emits deprecation warning, so fuck it
-            //
-            // Make it so we get keyboard focus on startup,
-            // without having to click first.  Thanks, Melinda!
-            // The state of things seems to be:
-            //      - Buttons and TextFields are apparently "focus traversable"
-            //        by default.  Canvases and Applets aren't,
-            //        implying (not obvious) that you need to click to type
-            //        when the app starts,
-            //        which is almost never the desired behavior.
-            //        You can change this by overriding isFocusTraversable(),
-            //        which we do below.
-            //      - Other approaches using requestFocus():
-            //        A Canvas calling requestFocus() doesn't seem to do
-            //        anything.  An Applet calling requestFocus() doesn't
-            //        do anything during init(), but I think it works
-            //        if you put it in the mouseEntered handler or something,
-            //        though this can lead to various unpredictabilities.
-            //
-            @Override
-            public boolean isFocusTraversable()
-            {
-                return true;
-            }
-#endif
-
 
 
             double lastStartTimePrinted = 0.;
@@ -3787,8 +3756,7 @@ public class SpiralApplet
                 mg.drawLine(0.,0.,Math.cos(primalAng),Math.sin(primalAng),antiAliasFlag);
             }
 
-
-
+            boolean needToDrawCyanQuill = drawPrimalFlag && spiralModel.theList[i0] < spiralModel.theList[MOD(i0-1,n)];
 
             // scanDir=1: the part *after* (bigger than) the focus.
             // scanDir=-1: the part *before* (smaller than) the focus.
@@ -3845,7 +3813,6 @@ public class SpiralApplet
 
                 double prevPrevVal = val;
                 double prevVal = val;
-                boolean isFirstInPass = true;
                 for (int i = scanDir==1?i1:i0; ; i = MOD(i+scanDir,n))
                 {
                     returnValue++;
@@ -3901,8 +3868,12 @@ public class SpiralApplet
                                 if (drawQuillsFlag)
                                 {
                                     java.awt.Color savedColor = null;
-                                    if (isFirstInPass && scanDir<0)
+
+                                    assert(thisVal<prevVal || thisVal>prevVal);
+
+                                    if (needToDrawCyanQuill && scanDir < 0) // note, currently the vertex and quill probably gets drawn twice, so the last one (scanDir < 0) is the important one.
                                     {
+                                        needToDrawCyanQuill = false;
                                         savedColor = mg.getColor();
                                         if (!pastelsFlag) mg.setColor(new java.awt.Color(128,192,192)); // halfway between the two
                                     }
@@ -3916,10 +3887,9 @@ public class SpiralApplet
                                                 primalX + quillVectorX,
                                                 primalY + quillVectorY,
                                                 antiAliasFlag);
-                                    if (isFirstInPass && scanDir<0)
+                                    if (savedColor != null)
                                     {
                                         mg.setColor(savedColor);
-                                        isFirstInPass = false;
                                     }
                                 }
                             }
@@ -4983,8 +4953,7 @@ public class SpiralApplet
             }
         });
 
-        // TODO: what was I thinking?  can't use 1.2 any more?? need to use reflection to see whether I can do this
-        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // supposedly exists since java 1.4, but I can see starting in 1.3, weird
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // supposedly exists since java 1.4, but I can see starting in 1.3, weird
         frame.getContentPane().add(applet);
 
         //dumpComponentHierarchy(frame, 0, 0, 1);
