@@ -504,29 +504,38 @@ public class SpiralApplet
                           add(new JLabel("        "), stretchx);
                           add(new JTablePanel() {{
                               {
+                                  add(new JSeparator());
+                                  add(new JLabel("current"));
+                                  add(new JSeparator());
+                                  add(new JLabel("  on regen"));
+                              }
+                              advanceRow();
+                              {
                                   final String toolTipText = "period";
                                   add(new JLabel("Period:") {{
                                       setToolTipText(toolTipText);
                                   }});
-                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.n, toolTipText, 2));
-                                  add(new JLabel(" "));
+                                  // Note this will get chopped badly if user enters a number with more digits than
+                                  // the original, but that generally doesn't happen
                                   add(new JTextFieldForNumber(applet.theSpiralModel.params.n) {{
                                       makeTextComponentLikeLabel(this);
                                       setToolTipText(toolTipText);
                                   }});
+                                  add(new JLabel(" "));
+                                  add(makeIncrementableTextFieldForMultipleOf(applet.spiralModelParams.n, toolTipText, 4, 4, true)); // must be multiple of 4 and positive
                               }
                               advanceRow();
                               {
                                   final String toolTipText = "number of parts into which to break 90 degrees";
-                                  add(new JLabel("Number of parts:") {{
+                                  add(new JLabel("Number of parts per 90 degrees:") {{
                                       setToolTipText(toolTipText);
                                   }});
-                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.nParts, toolTipText, 1));
-                                  add(new JLabel(" "));
                                   add(new JTextFieldForNumber(applet.theSpiralModel.params.nParts) {{
                                       makeTextComponentLikeLabel(this);
                                       setToolTipText(toolTipText);
                                   }});
+                                  add(new JLabel(" "));
+                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.nParts, toolTipText, 1));
                               }
                               advanceRow();
                               {
@@ -535,12 +544,12 @@ public class SpiralApplet
                                       setToolTipText(toolTipText);
                                   }});
 
-                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.randomSeed, toolTipText, 1));
-                                  add(new JLabel(" "));
                                   add(new JTextFieldForNumber(applet.theSpiralModel.params.randomSeed) {{
                                       makeTextComponentLikeLabel(this);
                                       setToolTipText(toolTipText);
                                   }});
+                                  add(new JLabel(" "));
+                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.randomSeed, toolTipText, 1));
                               }
                           }});
                         }}, stretchx);
@@ -4485,8 +4494,6 @@ public class SpiralApplet
         }
     } // JTextFieldForString
 
-
-
     // Stolen from MC4DControlPanel.java
     public static class JTextFieldForNumber extends JValidatingTextField
     {
@@ -4604,7 +4611,6 @@ public class SpiralApplet
             return minimumSize;
         }
     } // JTextFieldForNumber
-
 
     public static class JCheckBoxForBoolean extends JCheckBox
     {
@@ -4751,8 +4757,15 @@ public class SpiralApplet
         textComponent.setEnabled(true); // otherwise not selectable
     }
 
-    static JRow makeIncrementableTextFieldForInt(final Listenable.Number f, final String name, final double increment)
+    static JRow makeIncrementableTextFieldForMultipleOf(final Listenable.Number f,
+                                                        final String name,
+                                                        final double increment,
+                                                        final double mustBeMultipleOf, // 0 if no constraint
+                                                        final boolean mustBePositive)
     {
+        if (mustBeMultipleOf != 0.) {
+            assert(increment % mustBeMultipleOf == 0.); // otherwise incrementing wouldn't be very useful
+        }
         final java.awt.Color asciiToColor[] = new java.awt.Color[128];
         asciiToColor[' '] = null;
         asciiToColor['b'] = java.awt.Color.black;
@@ -4781,9 +4794,24 @@ public class SpiralApplet
                 });
                 setToolTipText("<html>decrement "+name+"</html>");
             }});
-            add(new JTextFieldForNumber(f) {{
-                setToolTipText("<html>"+name+"</html>");
-            }} );
+            add(new JTextFieldForNumber(f) {
+                @Override
+                public boolean validate(String text)
+                {
+                    if (!super.validate(text)) return false;
+                    try {
+                        double d = Double.parseDouble(text);
+                        if (mustBePositive && !(d > 0.)) return false;
+                        if (mustBeMultipleOf != 0. && d % mustBeMultipleOf != 0.) return false;
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                }
+                {
+                    setToolTipText("<html>"+name+"</html>");
+                }
+            } );
             add(new JRepeatingButton("") {
                 @Override
                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
@@ -4811,6 +4839,14 @@ public class SpiralApplet
                 setToolTipText("<html>increment "+name+"</html>");
             }});
         }};
+    } // makeIncrementableTextFieldForMultipleOf
+
+    // TODO: shouldn't this be ForNumber?
+    static JRow makeIncrementableTextFieldForInt(final Listenable.Number f,
+                                                 final String name,
+                                                 final double increment)
+    {
+        return makeIncrementableTextFieldForMultipleOf(f, name, increment, 0., false);
     } // makeIncrementableTextFieldForNumber
 
 
