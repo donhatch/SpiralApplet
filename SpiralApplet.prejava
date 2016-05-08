@@ -522,7 +522,8 @@ public class SpiralApplet
                                       setToolTipText(toolTipText);
                                   }});
                                   add(new JLabel(" "));
-                                  add(makeIncrementableTextFieldForMultipleOf(applet.spiralModelParams.n, toolTipText, 4, 4, true)); // must be multiple of 4 and positive
+                                  // period must be multiple of 4 and positive to prevent assertion error
+                                  add(makeIncrementableTextFieldForMultipleOf(applet.spiralModelParams.n, toolTipText, 4, 4, true));
                               }
                               advanceRow();
                               {
@@ -535,7 +536,7 @@ public class SpiralApplet
                                       setToolTipText(toolTipText);
                                   }});
                                   add(new JLabel(" "));
-                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.nParts, toolTipText, 1));
+                                  add(makeIncrementableTextFieldForNumber(applet.spiralModelParams.nParts, toolTipText, 1));
                               }
                               advanceRow();
                               {
@@ -549,7 +550,7 @@ public class SpiralApplet
                                       setToolTipText(toolTipText);
                                   }});
                                   add(new JLabel(" "));
-                                  add(makeIncrementableTextFieldForInt(applet.spiralModelParams.randomSeed, toolTipText, 1));
+                                  add(makeIncrementableTextFieldForNumber(applet.spiralModelParams.randomSeed, toolTipText, 1));
                               }
                           }});
                         }}, stretchx);
@@ -816,7 +817,7 @@ public class SpiralApplet
                                     setToolTipText(toolTipText);
                                 }});
                                 add(new JRow() {{
-                                  add(makeIncrementableTextFieldForInt(applet.animSleepMS, toolTipText, 1));
+                                  add(makeIncrementableTextFieldForNumber(applet.animSleepMS, toolTipText, 1));
                                   add(new JLabel(" (javaFX "+(useJavaFX ? "enabled" : "disabled")+")"));
                                 }});
                             }
@@ -826,7 +827,7 @@ public class SpiralApplet
                                 add(new JLabel("Ticker/plot pixels per part:") {{
                                     setToolTipText(toolTipText);
                                 }});
-                                add(makeIncrementableTextFieldForInt(applet.theSpiralView.pixelsPerPart, toolTipText, 1));
+                                add(makeIncrementableTextFieldForNumber(applet.theSpiralView.pixelsPerPart, toolTipText, 1));
                             }
                             advanceRow();
                             {
@@ -835,9 +836,9 @@ public class SpiralApplet
                                     setToolTipText(toolTipText);
                                 }});
                                 add(new JRow() {{
-                                    add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedParts, "parts in parts/frame", 1));
+                                    add(makeIncrementableTextFieldForNumber(applet.theSpiralView.animSpeedParts, "parts in parts/frame", 1));
                                     add(new JLabel(" / "));
-                                    add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedFrames, "frames in parts/frame", 1));
+                                    add(makeIncrementableTextFieldForNumber(applet.theSpiralView.animSpeedFrames, "frames in parts/frame", 1));
                                     add(new JLabel("    "));
                                 }});
                             }
@@ -1119,7 +1120,7 @@ public class SpiralApplet
                             add(new JCheckBoxForBoolean("show plots of model stats", applet.showPlotsFlag) {{
                                 setMargin(nomargin);
                             }});
-                            add(makeIncrementableTextFieldForInt(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
+                            add(makeIncrementableTextFieldForNumber(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
                         }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
                             setMargin(nomargin);
@@ -4841,10 +4842,9 @@ public class SpiralApplet
         }};
     } // makeIncrementableTextFieldForMultipleOf
 
-    // TODO: shouldn't this be ForNumber?
-    static JRow makeIncrementableTextFieldForInt(final Listenable.Number f,
-                                                 final String name,
-                                                 final double increment)
+    static JRow makeIncrementableTextFieldForNumber(final Listenable.Number f,
+                                                    final String name,
+                                                    final double increment)
     {
         return makeIncrementableTextFieldForMultipleOf(f, name, increment, 0., false);
     } // makeIncrementableTextFieldForNumber
