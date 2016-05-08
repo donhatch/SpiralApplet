@@ -3756,7 +3756,7 @@ public class SpiralApplet
                 mg.drawLine(0.,0.,Math.cos(primalAng),Math.sin(primalAng),antiAliasFlag);
             }
 
-            boolean needToDrawCyanQuill = drawPrimalFlag && spiralModel.theList[i0] < spiralModel.theList[MOD(i0-1,n)];
+            boolean needToDrawCyanVertexAndQuill = drawPrimalFlag && spiralModel.theList[i0] < spiralModel.theList[MOD(i0-1,n)];
 
             // scanDir=1: the part *after* (bigger than) the focus.
             // scanDir=-1: the part *before* (smaller than) the focus.
@@ -3853,6 +3853,16 @@ public class SpiralApplet
                             {
                                 // There's a change here; draw a vertex (and quill).
 
+                                java.awt.Color savedColor = null;
+                                // note, currently the vertex and quill probably gets drawn twice,
+                                // in which case the last one (scanDir < 0) is the important one.
+                                if (needToDrawCyanVertexAndQuill && scanDir < 0)
+                                {
+                                    needToDrawCyanVertexAndQuill = false;
+                                    savedColor = mg.getColor();
+                                    if (!pastelsFlag) mg.setColor(new java.awt.Color(128,192,192)); // halfway between the two
+                                }
+
                                 // draw point at larger-index endpoint of the line
                                 if (scanDir < 0)
                                 {
@@ -3867,17 +3877,6 @@ public class SpiralApplet
                                 boolean drawQuillsFlag = true;
                                 if (drawQuillsFlag)
                                 {
-                                    java.awt.Color savedColor = null;
-
-                                    assert(thisVal<prevVal || thisVal>prevVal);
-
-                                    if (needToDrawCyanQuill && scanDir < 0) // note, currently the vertex and quill probably gets drawn twice, so the last one (scanDir < 0) is the important one.
-                                    {
-                                        needToDrawCyanQuill = false;
-                                        savedColor = mg.getColor();
-                                        if (!pastelsFlag) mg.setColor(new java.awt.Color(128,192,192)); // halfway between the two
-                                    }
-
                                     // quill vector is vertex position rotated 90 degrees CW,
                                     // and make its length 1/2 of vertex position length.
 
@@ -3887,10 +3886,10 @@ public class SpiralApplet
                                                 primalX + quillVectorX,
                                                 primalY + quillVectorY,
                                                 antiAliasFlag);
-                                    if (savedColor != null)
-                                    {
-                                        mg.setColor(savedColor);
-                                    }
+                                }
+                                if (savedColor != null)
+                                {
+                                    mg.setColor(savedColor);
                                 }
                             }
                             if (scanDir > 0)
