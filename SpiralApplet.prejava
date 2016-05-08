@@ -799,11 +799,17 @@ public class SpiralApplet
                     add(new JCol() {{
                         add(new JTablePanel() {{
                             {
-                                final String toolTipText = "number of milliseconds to sleep after each vsync pulse before calling repaint()";
+                                final String toolTipText = "<html>number of milliseconds to sleep after each vsync pulse before calling repaint()."
+                                        + (useJavaFX ? "<br>Probably not needed since javaFX stabilizes the frame rate."
+                                                     : "<br>Probably needed since not using javaFX.")
+                                        + "</html>";
                                 add(new JLabel("Anim sleep ms:") {{
                                     setToolTipText(toolTipText);
                                 }});
-                                add(makeIncrementableTextFieldForInt(applet.animSleepMS, toolTipText, 1));
+                                add(new JRow() {{
+                                  add(makeIncrementableTextFieldForInt(applet.animSleepMS, toolTipText, 1));
+                                  add(new JLabel(" (javaFX "+(useJavaFX ? "enabled" : "disabled")+")"));
+                                }});
                             }
                             advanceRow();
                             {
@@ -823,6 +829,7 @@ public class SpiralApplet
                                     add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedParts, "parts in parts/frame", 1));
                                     add(new JLabel(" / "));
                                     add(makeIncrementableTextFieldForInt(applet.theSpiralView.animSpeedFrames, "frames in parts/frame", 1));
+                                    add(new JLabel("    "));
                                 }});
                             }
                         }});
@@ -835,7 +842,6 @@ public class SpiralApplet
                             }});
                         }});
                     }});
-                    add(new JLabel("    "));
                     add(new JRepeatingButton("") {
                         @Override
                         public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45,45); }
@@ -4397,14 +4403,16 @@ public class SpiralApplet
     //
 
 
-#ifdef USE_JAVAFX
+#if USE_JAVAFX
         public static boolean useJavaFX = true;
-#endif  // USE_JAVAFX
+#else
+        public static boolean useJavaFX = false;
+#endif  // !USE_JAVAFX
         public SpiralModel.Params spiralModelParams = new SpiralModel.Params(); // gui copy, flushed to model when Regenerate button pressed
         public SpiralModel theSpiralModel = new SpiralModel();
         public SpiralView theSpiralView = new SpiralView();
 
-#ifdef USE_JAVAFX
+#if USE_JAVAFX
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, -1);
 #else
         public Listenable.Int animSleepMS = new Listenable.Int(0, 1000*1000, 11); // 11 seems to be empirical sweet spot when using javax.swing.Timer... still speeds up for a few frames every 5 seconds or so though (although maybe that was one platform a long time ago)
@@ -4952,7 +4960,9 @@ public class SpiralApplet
             }
         });
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // supposedly exists since java 1.4, but I can see starting in 1.3, weird
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // supposedly exists since java 1.4, but I can see starting in 1.3, weird
+        com.donhatchsw.awt.MainWindowCount.setExitOnLastClose(frame);
+
         frame.getContentPane().add(applet);
 
         //dumpComponentHierarchy(frame, 0, 0, 1);
@@ -4991,7 +5001,6 @@ public class SpiralApplet
 
         applet.theMainAppletWindow = frame;
 
-
         // for benefit of any debugging function that wants to loop over frames...
         applet.theControlPanelWindow.setName("control panel window");
         applet.theMainAppletWindow.setName("main applet window");
@@ -5015,7 +5024,9 @@ public class SpiralApplet
             thread.start();
         }
 
-        // why can't we get here in any toolkit ever?
+        // release main's token
+        com.donhatchsw.awt.MainWindowCount.decrementAndExitIfImTheLastOne();
+
         System.out.println("out main");
     } // main
 
