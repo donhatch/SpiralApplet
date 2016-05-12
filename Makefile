@@ -88,8 +88,8 @@ JSFILES = \
 SWFFILES = \
         ZeroClipboard.swf \
         ${NULL}
-JAR_DEPENDS_ON = ${CLASSES}      macros.h Makefile javacpp javarenumber RUNME README ${HTMLFILES} ${JSFILES} ${SWFFILES}
-JAR_CONTAINS = *.class *.prejava macros.h Makefile javacpp javarenumber RUNME README ${HTMLFILES} ${JSFILES} ${SWFFILES}
+JAR_DEPENDS_ON = ${CLASSES}      macros.h Makefile javacpp javarenumber RUNME README.md ${HTMLFILES} ${JSFILES} ${SWFFILES}
+JAR_CONTAINS = *.class *.prejava macros.h Makefile javacpp javarenumber RUNME README.md ${HTMLFILES} ${JSFILES} ${SWFFILES}
 
 # If we want to be able to run it as java -jar SpiralApplet.jar (without additional classpath), then need to do this:
 JAR_CONTAINS += com
@@ -111,13 +111,13 @@ CPPFLAGS += -Wall -Werror
 
 .SUFFIXES: .prejava .java .class
 .prejava.class:
-	javacpp ${CPPFLAGS} ${JAVAC} -deprecation -classpath ".$(CLASSPATHSEP)$(JAVAROOT)/jre/lib/jfxrt.jar$(CLASSPATHSEP)./donhatchsw.jar" $*.prejava
+	./javacpp ${CPPFLAGS} ${JAVAC} -deprecation -classpath ".$(CLASSPATHSEP)$(JAVAROOT)/jre/lib/jfxrt.jar$(CLASSPATHSEP)./donhatchsw.jar" $*.prejava
 ifneq ($(uname),Cygwin)
-	javarenumber -v 0 $*.class
+	./javarenumber -v 0 $*.class
         # too slow... only do this in the production version
         # on second thought, try it, for now...
         # on third hand, it bombs with Couldn't open GraphicsAntiAliasingSetter$*.class because that one has no subclasses... argh.
-        #@javarenumber -v -1 $*'$$'*.class
+        #@./javarenumber -v -1 $*'$$'*.class
 endif
 
 # Separate renumber target since renumbering all the subclass files
@@ -127,7 +127,7 @@ endif
 # the .java files.
 
 ${JARFILE}.is_renumbered: $(JAR_DEPENDS_ON)
-	javarenumber -v -1 *.class
+	./javarenumber -v -1 *.class
 	${JAVAROOT}/bin/jar -cfm $(JARFILE).is_renumbered META-INF/MANIFEST.MF ${JAR_CONTAINS}
 	touch $@
 .PHONY: renumber
