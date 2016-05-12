@@ -1143,24 +1143,8 @@ public class SpiralApplet
                             }});
                         }});
                         add(new JRow() {{
-
-
                             add(new JLabel("Window title:"));
-                            add(new JTextFieldForString(applet.windowTitle) {
-                                @Override
-                                public java.awt.Dimension getPreferredSize()
-                                {
-                                    java.awt.Dimension superSize = super.getPreferredSize();
-                                    // TODO: who owns it? can I tweak it and return it?
-                                    return new java.awt.Dimension(200, superSize.height);
-                                }
-                                // weird, getPreferredSize seems adequate when returning 100... but when returning 200, it turns to zero!? unless we also provide getMinimumSize
-                                @Override
-                                public java.awt.Dimension getMinimumSize()
-                                {
-                                    return getPreferredSize();
-                                }
-                            }, stretchx);
+                            add(new JTextFieldForString(applet.windowTitle), stretchx);
                         }}, stretchx);
                     }}, stretchx);
                 }}, stretchx);
@@ -4716,10 +4700,12 @@ public class SpiralApplet
             g.fillRect(0,0, size.width,size.height);
         }
 
-        if (hidpimag != 1) {
+        if (hidpimag != 1)
+        {
             int mag = hidpimag;
             String[] newRows = new String[rows.length*mag];
-            FORI (iRow, rows.length) {
+            FORI (iRow, rows.length)
+            {
                 String row = rows[iRow];
                 int nCols = row.length();
                 char chars[] = new char[nCols*mag];
@@ -4727,9 +4713,8 @@ public class SpiralApplet
                     FORI (j, mag)
                       chars[i*mag+j] = row.charAt(i);
                 String newRow = new String(chars);
-                FORI (iMag, mag) {
+                FORI (iMag, mag)
                     newRows[iRow*mag + iMag] = newRow;
-                }
             }
             rows = newRows;
         }
