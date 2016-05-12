@@ -595,9 +595,9 @@ public class SpiralApplet
                         add(new JRow() {{
                             add(new JRepeatingButton("") {
                                 @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
                                 {
@@ -625,9 +625,9 @@ public class SpiralApplet
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
                                 {
@@ -655,9 +655,9 @@ public class SpiralApplet
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
                                 {
@@ -685,9 +685,9 @@ public class SpiralApplet
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
                                 {
@@ -715,9 +715,9 @@ public class SpiralApplet
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
                                 {
@@ -745,9 +745,9 @@ public class SpiralApplet
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
                                 {
@@ -775,9 +775,9 @@ public class SpiralApplet
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
                                 @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20,20); }
+                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
                                 @Override
                                 public void paint(java.awt.Graphics g)
                                 {
@@ -854,7 +854,7 @@ public class SpiralApplet
                     }});
                     add(new JRepeatingButton("") {
                         @Override
-                        public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45,45); }
+                        public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45*hidpimag,45*hidpimag); }
                         @Override
                         public java.awt.Dimension getMinimumSize()   { return getPreferredSize(); }
                         @Override
@@ -4412,7 +4412,7 @@ public class SpiralApplet
     // App-specific variables...
     //
 
-
+        public static int hidpimag = 1;  // XXXTODO: get this through command line!
 #if USE_JAVAFX
         public static boolean useJavaFX = true;
 #else
@@ -4723,6 +4723,24 @@ public class SpiralApplet
             g.fillRect(0,0, size.width,size.height);
         }
 
+        if (hidpimag != 1) {
+            int mag = hidpimag;
+            String[] newRows = new String[rows.length*mag];
+            FORI (iRow, rows.length) {
+                String row = rows[iRow];
+                int nCols = row.length();
+                char chars[] = new char[nCols*mag];
+                FORI (i, nCols)
+                    FORI (j, mag)
+                      chars[i*mag+j] = row.charAt(i);
+                String newRow = new String(chars);
+                FORI (iMag, mag) {
+                    newRows[iRow*mag + iMag] = newRow;
+                }
+            }
+            rows = newRows;
+        }
+
         int x0 = (size.width - rows[0].length())/2;
         int y0 = (size.height - rows.length)/2;
         java.awt.Color prevColor = null;
@@ -4773,9 +4791,9 @@ public class SpiralApplet
         return new JRow() {{
             add(new JRepeatingButton("") {
                 @Override
-                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
+                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
                 @Override
-                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
+                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
                 @Override
                 public void paint(java.awt.Graphics g)
                 {
@@ -4815,7 +4833,7 @@ public class SpiralApplet
             } );
             add(new JRepeatingButton("") {
                 @Override
-                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11,11); }
+                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
                 @Override
                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
                 @Override
