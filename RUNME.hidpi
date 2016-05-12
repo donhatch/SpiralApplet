@@ -1,6 +1,11 @@
 #!/bin/bash
 
-java_arg="-Dswing.plaf.metal.controlFont=Dialog-20"
+# From printing getFont() of various components at runtime, I see that the defaults are:
+#     controlled by controlFont:
+#         JLabel,JButton: font is javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=bold,size=12]
+#     controlled by userFont:
+#         JTextField: font is javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12]
+java_args="-Dswing.plaf.metal.controlFont=Dialog-bold-20 -Dswing.plaf.metal.userFont=Dialog-20 -Dswing.plaf.metal.systemFont=Dialog-20 -Dswing.plaf.metal.smallFont=Dialog-100"
 
 # Classpath separator.
 # Cygwin: ';' only  (I think)
@@ -12,13 +17,13 @@ uname && sep=':' || sep=';'
 
 # If everything including com is in SpiralApplet.jar,
 # then can run it standalone with no classpath
-#exec java $java_arg -jar SpiralApplet.jar "$@"
+#exec java $java_args -jar SpiralApplet.jar "$@"
 
 # Have to do it this way if com is not in SpiralApplet.jar
-#exec java -classpath "SpiralApplet.jar${sep}donhatchsw.jar" $java_arg SpiralApplet "$@"
+#exec java -classpath "SpiralApplet.jar${sep}donhatchsw.jar" $java_args SpiralApplet "$@"
 
 # This way doesn't require jar to be made at all, just the class files
-#exec java -classpath ".${sep}donhatchsw.jar" $java_arg SpiralApplet "$@"
+#exec java -classpath ".${sep}donhatchsw.jar" $java_args SpiralApplet "$@"
 
 # Requires neither jar nor donhatchsw to be made (note that we still *compile* out of donhatchsw.jar in current directory though... this is just useful for non-interface fixes or debugging in donhatchsw)
-exec java -classpath ".${sep}../donhatchsw" $java_arg SpiralApplet "$@"
+exec java -classpath ".${sep}../donhatchsw" $java_args SpiralApplet "$@"

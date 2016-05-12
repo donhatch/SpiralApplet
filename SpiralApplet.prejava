@@ -1160,10 +1160,10 @@ public class SpiralApplet
                                 {
                                     return getPreferredSize();
                                 }
-                            });
-                        }});
-                    }});
-                }});
+                            }, stretchx);
+                        }}, stretchx);
+                    }}, stretchx);
+                }}, stretchx);
                 contentPane.add(new JSeparator(), stretchx);
 
                 //randomlyColorize(this);
@@ -4412,7 +4412,7 @@ public class SpiralApplet
     // App-specific variables...
     //
 
-        public static int hidpimag = 1;  // XXXTODO: get this through command line!
+        public static int hidpimag = 2;  // XXXTODO: get this through command line!
 #if USE_JAVAFX
         public static boolean useJavaFX = true;
 #else
@@ -4566,22 +4566,31 @@ public class SpiralApplet
             // (changed from 29 to 31).
             // Fudge it a bit...
             // XXX not sure this will look good on all systems... if it doesn't, we can just remove it
+            // XXX not right when I change default font size from 12 to 20, apparently
             // XXX hmm, actually makes things mess up when growing and shrinking, that's weird
             java.awt.Dimension preferredSize = super.getPreferredSize();
             //System.out.println("textfield.super.preferredSize() = "+preferredSize);
-            if (true)
+            if (hidpimag == 1) // hack
+            {
                 preferredSize.height -= 2;
+            }
 
             // XXX another hack, wtf?
             if (true)
             {
+                String widestExpectedText;
                 if (f instanceof Listenable.Int)
-                    preferredSize.width = 55; // big enough to hold 1,000,000 comfortably-- bleah
+                {
+                    widestExpectedText = "1000000";
+                }
                 else
                 {
-                    //preferredSize.width = 100;
-                    preferredSize.width = 50; // for this app, this is plenty, although it's bogus in general
+                    // for this app, the following is plenty, although it's bogus in general
+                    widestExpectedText = "-180.0";
                 }
+                // XXX which of the following?  book "more java gems" uses the getGraphics one
+                //preferredSize.width = getFontMetrics(getFont()).stringWidth(widestExpectedText);
+                preferredSize.width = getGraphics().getFontMetrics().stringWidth(widestExpectedText);
             }
 
             //System.out.println("out JTextFieldForNumber.getPreferredSize(), returning "+preferredSize);
@@ -4593,23 +4602,7 @@ public class SpiralApplet
         @Override
         public java.awt.Dimension getMinimumSize()
         {
-            //System.out.println("in JTextFieldForNumber.getMinimumSize()");
-            java.awt.Dimension minimumSize = super.getMinimumSize();
-            //System.out.println("textfield.super.minimumSize() = "+minimumSize);
-            if (true)
-                minimumSize.height -= 2;
-
-            // XXX another hack, wtf?
-            if (true)
-            {
-                if (f instanceof Listenable.Int)
-                    minimumSize.width = 55;
-                else
-                    minimumSize.width = 100;
-            }
-
-            //System.out.println("out JTextFieldForNumber.getMinimumSize(), returning "+minimumSize);
-            return minimumSize;
+            return getPreferredSize();
         }
     } // JTextFieldForNumber
 
@@ -4835,7 +4828,7 @@ public class SpiralApplet
                 @Override
                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
                 @Override
-                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11,11); }
+                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
                 @Override
                 public void paint(java.awt.Graphics g)
                 {
