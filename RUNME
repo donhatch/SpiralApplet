@@ -5,6 +5,7 @@
 # Linux: ':' only (openjdk-8 at least)
 # Darwin: ':' only
 # Darwin and Linux both have uname, so that's a good differentior from Cygwin.
+# XXX hmm according to Makefile, cygwin does have uname, and it outputs "Cygwin"?  so I'm not sure this will work.  should use logic in Makefile probably.
 uname && sep=':' || sep=';'
 
 # If everything including com is in SpiralApplet.jar,

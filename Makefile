@@ -50,13 +50,16 @@ else
   CPPFLAGS=-DUSE_JAVAFX=1
 endif
 
-uname := $(shell uname -o)
+
+# On linux and cygwin, use uname -o; on darwin, use uname
+uname := $(shell uname -o > /dev/null 2>&1 && uname -o || uname)
 #dummy := $(warning uname = $(uname))
 ifeq ($(uname),Cygwin)
     # on cygwin, apparently it's this
     CLASSPATHSEP = ;
 else
-    # on linux, it's this
+    # on linux and darwin, it's this
+    # (some javas on linux allow both, but not all)
     CLASSPATHSEP = :
 endif
 
