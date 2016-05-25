@@ -1161,6 +1161,31 @@ public class SpiralApplet
     //
         public SpiralApplet()
         {
+            if (true) {
+              // Note, there's a MetalLookAndFeel.setCurrentTheme,
+              // not sure how to get it, or even how to get the look and feel.
+              // Anyway, the following seems to be a good heuristic.
+              javax.swing.plaf.metal.DefaultMetalTheme defaultMetalTheme = new javax.swing.plaf.metal.DefaultMetalTheme();
+              javax.swing.plaf.FontUIResource controlTextFont = defaultMetalTheme.getControlTextFont();
+              int size = controlTextFont.getSize();
+              //PRINT(controlTextFont);
+              //PRINT(size);
+              // Expected: size=12 is the default.
+              // Anything bigger means it was probably messed with on the command line.
+              if (true)
+              {
+                if (size > 12)
+                {
+                  hidpimag = 2;
+                  System.out.println("Default controlFont size is "+size+">12, assuming my pixels are the tiny pixels of a hidpi display, setting hidpimag to "+hidpimag);
+                }
+                else
+                {
+                  System.out.println("Default controlFont size is "+size+"<=12, not messing with hidpimag");
+                }
+              }
+            }
+
             java.awt.Container contentPane = getContentPane();
 
             contentPane.setLayout(new ColLayout());
@@ -1385,31 +1410,6 @@ public class SpiralApplet
             eventVerbose = getParameterInt("EventVerbose", eventVerbose);
             if (eventVerbose >= 1) System.out.println("in init");
 
-
-            if (true) {
-              // Note, there's a MetalLookAndFeel.setCurrentTheme,
-              // not sure how to get it, or even how to get the look and feel.
-              // Anyway, the following seems to be a good heuristic.
-              javax.swing.plaf.metal.DefaultMetalTheme defaultMetalTheme = new javax.swing.plaf.metal.DefaultMetalTheme();
-              javax.swing.plaf.FontUIResource controlTextFont = defaultMetalTheme.getControlTextFont();
-              int size = controlTextFont.getSize();
-              PRINT(controlTextFont);
-              PRINT(size);
-              // Expected: size=12 is the default.
-              // Anything bigger means it was probably messed with on the command line.
-              if (false)
-              {
-                if (size > 12)
-                {
-                  hidpimag = 2;
-                  System.out.println("Default controlFont size is "+size+">12, assuming my pixels are the tiny pixels of a hidpi display, setting hidpimag to "+hidpimag);
-                }
-                else
-                {
-                  System.out.println("Default controlFont size is "+size+"<=12, not messing with hidpimag");
-                }
-              }
-            }
 
             graphicsAntiAliasingSetter = new GraphicsAntiAliasingSetter();
 
@@ -4428,7 +4428,7 @@ public class SpiralApplet
     // App-specific variables...
     //
 
-        public static int hidpimag = 1;  // follows setting of controlFont from java command line
+        public static int hidpimag = 1; // follows setting of controlFont from java command line
 #if USE_JAVAFX
         public static boolean useJavaFX = true;
 #else
