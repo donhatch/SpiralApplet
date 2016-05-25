@@ -16,7 +16,9 @@ uname && sep=':' || sep=';'
 #exec java -classpath "SpiralApplet.jar${sep}donhatchsw.jar" SpiralApplet "$@"
 
 # This way doesn't require jar to be made at all, just the class files
+echo java -classpath ".${sep}donhatchsw.jar" SpiralApplet "$@"
 exec java -classpath ".${sep}donhatchsw.jar" SpiralApplet "$@"
 
 # Requires neither jar nor donhatchsw to be made (note that we still *compile* out of donhatchsw.jar in current directory though... this is just useful for non-interface fixes or debugging in donhatchsw)
+#echo java -classpath ".${sep}../donhatchsw" SpiralApplet "$@"
 #exec java -classpath ".${sep}../donhatchsw" SpiralApplet "$@"

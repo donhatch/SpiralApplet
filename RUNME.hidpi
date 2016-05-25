@@ -23,7 +23,9 @@ uname && sep=':' || sep=';'
 #exec java -classpath "SpiralApplet.jar${sep}donhatchsw.jar" $java_args SpiralApplet "$@"
 
 # This way doesn't require jar to be made at all, just the class files
-#exec java -classpath ".${sep}donhatchsw.jar" $java_args SpiralApplet "$@"
+echo java -classpath ".${sep}donhatchsw.jar" $java_args SpiralApplet "$@"
+exec java -classpath ".${sep}donhatchsw.jar" $java_args SpiralApplet "$@"
 
 # Requires neither jar nor donhatchsw to be made (note that we still *compile* out of donhatchsw.jar in current directory though... this is just useful for non-interface fixes or debugging in donhatchsw)
-exec java -classpath ".${sep}../donhatchsw" $java_args SpiralApplet "$@"
+#echo java -classpath ".${sep}../donhatchsw" $java_args SpiralApplet "$@"
+#exec java -classpath ".${sep}../donhatchsw" $java_args SpiralApplet "$@"
