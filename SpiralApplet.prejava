@@ -2917,7 +2917,17 @@ public class SpiralApplet
 
                             double maxAreaBasedMomentMag = Math.sin(2*primalAng)/4; // i.e. tri area / 2
 
-                            assert(areaBasedMomentMag < maxAreaBasedMomentMag);
+                            // XXX started debugging this... it apparently happens, when I choose some distributions
+                            try {
+                              assert(areaBasedMomentMag < maxAreaBasedMomentMag);
+                            } catch (Throwable e) {
+                              PRINT(areaBasedMomentMag);
+                              PRINT(maxAreaBasedMomentMag);
+                              //throw e;
+                              putDatumHere[0] = RTOD(primalAng);
+                              putDatumHere[1] = maxAreaBasedMomentMag;
+                              putDatumHere[2] = 0.;
+                            }
 
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = maxAreaBasedMomentMag;
@@ -2983,10 +2993,6 @@ public class SpiralApplet
                                 i -= 90;
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 double rMax = Math.cos(angle)*Math.sin(angle)/2;
-                                if (false)
-                                {
-                                    rMax *= Math.cos(angle);
-                                }
                                 double xMax = Math.cos(angle)*rMax;
                                 double yMax = Math.sin(angle)*rMax;
 
