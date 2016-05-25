@@ -2,6 +2,7 @@
     Notes:
         Uses System.nanoTime which requires java >= 1.4
 
+    BUG: assert(areaBasedMomentMag < maxAreaBasedMomentMag) fails on one of the data plots, when using +-1.  Investigate.
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
