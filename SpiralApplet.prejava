@@ -1161,7 +1161,8 @@ public class SpiralApplet
     //
         public SpiralApplet()
         {
-            if (true) {
+            if (true)
+            {
               // Note, there's a MetalLookAndFeel.setCurrentTheme,
               // not sure how to get it, or even how to get the look and feel.
               // Anyway, the following seems to be a good heuristic.
@@ -4428,7 +4429,7 @@ public class SpiralApplet
     // App-specific variables...
     //
 
-        public static int hidpimag = 1; // follows setting of controlFont from java command line
+        public static int hidpimag = 1; // automagically follows setting of controlFont from java command line
 #if USE_JAVAFX
         public static boolean useJavaFX = true;
 #else
