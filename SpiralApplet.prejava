@@ -1,6 +1,7 @@
 /*
     Notes:
         Uses System.nanoTime which requires java >= 1.4
+        (probably need even later, haven't been keeping track)
 
     BUG: assert(areaBasedMomentMag < maxAreaBasedMomentMag) fails on one of the data plots, when using +-1.  Investigate.
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
@@ -428,7 +429,7 @@ public class SpiralApplet
                                           }
                                       });
                                   }});
-                                  add(new JRadioButton("<html>0</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0) {{
+                                  add(new JRadioButton("<html>0 medium</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -463,6 +464,21 @@ public class SpiralApplet
                                               // no need to repaint
                                           }
                                       });
+                                  }});
+                                  add(new JRow() {{
+                                      add(new JRadioButton("<html>0</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_USER_SPECIFIED) {{
+                                          setMargin(nomargin);
+                                          buttonGroup.add(this);
+                                          addActionListener(new java.awt.event.ActionListener() {
+                                              @Override
+                                              public void actionPerformed(java.awt.event.ActionEvent e)
+                                              {
+                                                  applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_USER_SPECIFIED);
+                                                  // no need to repaint
+                                              }
+                                          });
+                                      }});
+                                      add(makeIncrementableTextFieldForNumber(applet.spiralModelParams.deltaStyle_0_degrees, "steepness of deltastyle 0 (0 = very gradual, 90 = very steep)", 1));
                                   }});
                                   add(new JRadioButton("<html>&plusmn;1</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_1) {{
                                       setMargin(nomargin);
@@ -563,7 +579,7 @@ public class SpiralApplet
                                 @Override
                                 public void actionPerformed(java.awt.event.ActionEvent e)
                                 {
-                                    applet.theSpiralModel.init(applet.spiralModelParams.n.get(), applet.spiralModelParams.nParts.get(), applet.spiralModelParams.deltaStyle.get(), applet.spiralModelParams.randomSeed.get());
+                                    applet.theSpiralModel.init(applet.spiralModelParams.n.get(), applet.spiralModelParams.nParts.get(), applet.spiralModelParams.deltaStyle.get(), applet.spiralModelParams.deltaStyle_0_degrees.get(), applet.spiralModelParams.randomSeed.get());
 
                                     applet.theSpiralView.focus.modEquals(
                                         applet.theSpiralModel.params.n.get(), 1);
@@ -2069,16 +2085,17 @@ public class SpiralApplet
 
         public static class SpiralModel
         {
-            public static final int DELTASTYLE_MIN           = 0;
-            public static final int DELTASTYLE_0_VERYGRADUAL = 1;
-            public static final int DELTASTYLE_0_GRADUAL     = 2;
-            public static final int DELTASTYLE_0             = 3;
-            public static final int DELTASTYLE_0_STEEP       = 4;
-            public static final int DELTASTYLE_0_VERYSTEEP   = 5;
-            public static final int DELTASTYLE_1             = 6;
-            public static final int DELTASTYLE_ANY           = 7;
-            public static final int DELTASTYLE_1_WRAP        = 8;
-            public static final int DELTASTYLE_MAX           = 8;
+            public static final int DELTASTYLE_MIN              = 0;
+            public static final int DELTASTYLE_0_USER_SPECIFIED = 0;
+            public static final int DELTASTYLE_0_VERYGRADUAL    = 1;
+            public static final int DELTASTYLE_0_GRADUAL        = 2;
+            public static final int DELTASTYLE_0                = 3;
+            public static final int DELTASTYLE_0_STEEP          = 4;
+            public static final int DELTASTYLE_0_VERYSTEEP      = 5;
+            public static final int DELTASTYLE_1                = 6;
+            public static final int DELTASTYLE_ANY              = 7;
+            public static final int DELTASTYLE_1_WRAP           = 8;
+            public static final int DELTASTYLE_MAX              = 8;
 
 
             public static class Params
@@ -2087,6 +2104,7 @@ public class SpiralApplet
                 public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 100*1000); // must be positive multiple of 2
                 public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be >= 2
                 public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
+                public Listenable.Double deltaStyle_0_degrees = new Listenable.Double(0., 90., 45.);
                 public Listenable.Int randomSeed = new Listenable.Int(0, (1<<31)-1, 1);
             }
 
@@ -2103,12 +2121,14 @@ public class SpiralApplet
                 init(params.n.get(),
                      params.nParts.get(),
                      params.deltaStyle.get(),
+                     params.deltaStyle_0_degrees.get(),
                      params.randomSeed.get());
             }
 
             public void init(int n,
                              int nParts,
                              int deltaStyle, // DELTASTYLE_0 or DELTASTYLE_1 or DELTASTYLE_ANY or DELTASTYLE_1_WRAP
+                             double deltaStyle_0_degrees,
                              int randomSeed)
             {
                 this.params.n.set(n);
@@ -2127,13 +2147,15 @@ public class SpiralApplet
                  || deltaStyle == DELTASTYLE_0_GRADUAL
                  || deltaStyle == DELTASTYLE_0
                  || deltaStyle == DELTASTYLE_0_STEEP
-                 || deltaStyle == DELTASTYLE_0_VERYSTEEP)
+                 || deltaStyle == DELTASTYLE_0_VERYSTEEP
+                 || deltaStyle == DELTASTYLE_0_USER_SPECIFIED)
                 {
                    double avg = deltaStyle==DELTASTYLE_0_VERYGRADUAL ? 0. :
                                 deltaStyle==DELTASTYLE_0_GRADUAL ? nParts/3. :
                                 deltaStyle==DELTASTYLE_0_STEEP ? 2*nParts/3. :
                                 deltaStyle==DELTASTYLE_0_VERYSTEEP ? nParts :
-                                nParts/2.;
+                                deltaStyle==DELTASTYLE_0 ? nParts/2. :
+                                nParts * deltaStyle_0_degrees / 90.;
                    int avgRounded = (int)Math.round(avg);
                    avgRounded = CLAMP(avgRounded, 1, nParts-1);
                    // vals will alternate between avgRounded-1 and avgRounded.
@@ -4927,6 +4949,8 @@ public class SpiralApplet
     //
     public static void main(final String args[])
     {
+        PRINT(System.getProperty("swing.defaultlaf"));
+
         if (true)
         {
             Rational.confidenceTest();
