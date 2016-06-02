@@ -3027,7 +3027,17 @@ public class SpiralApplet
                             if (i >= 90)
                             {
                                 i -= 90;
-                                // more refined inner arc  (correct when >= 45 degrees, not right when < 45 degrees)
+                                // more refined inner arc
+                                //(correct when >= 45 degrees, not right when < 45 degrees... but kind of close!
+                                // TODO: try to figure out more about this.
+                                //      - track when it's violated-- what is primalAng-dualAng?
+                                //      - can I get a case where it's maximally violated?
+                                //      - get a precise bound if possible
+                                // observations:
+                                //      - for moment ang > 45, max moment mag appears when primal ang
+                                //        is equal to moment ang
+                                //      - for moment ang < 45, max moment mag bound is when primal ang = 45,
+                                //        but the picture indicates we can get tighter
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 double rMax = Math.cos(angle)*Math.sin(angle)/2;
                                 double xMax = Math.cos(angle)*rMax;
@@ -3087,7 +3097,7 @@ public class SpiralApplet
                     0., .5, // values to put at x bounds
                     0., .5, // values to put at y bounds
 
-                    5,5, // nMajor x,y
+                    10,10, // nMajor x,y
 
                     java.awt.Color.blue, // outerFrameColor
                     java.awt.Color.white, // innerFrameColor
@@ -3121,6 +3131,7 @@ public class SpiralApplet
                             else if (iPicture == 1)
                             {
                                 // more refined inner arc
+                                // (seems to be mostly true, but violated most visibly at focus ang <= 30)
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 double cosAngle = Math.cos(angle);
                                 double sinAngle = Math.sin(angle);
@@ -3188,6 +3199,8 @@ public class SpiralApplet
                             }
                             else if (iPicture == 4)
                             {
+                                // XXX revisit the following; at the moment it's greek to me
+
                                 // attempted transcription of desired xm < 1/2 xd^2 in p=+y space:
                                 //     rm sin(tp-tm) < 1/2 (rd sin(tp-td))^2
                                 // in dudley space where rd=1 and td=0:
