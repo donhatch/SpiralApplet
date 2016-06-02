@@ -3,7 +3,6 @@
         Uses System.nanoTime which requires java >= 1.4
         (probably need even later, haven't been keeping track)
 
-    BUG: assert(areaBasedMomentMag < maxAreaBasedMomentMag) fails on one of the data plots, when using +-1.  Investigate.
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
@@ -1284,6 +1283,7 @@ public class SpiralApplet
                     controlPanel = new JScrollPane(controlPanel);
                 theControlPanelWindow.getContentPane().add(controlPanel);
                 theControlPanelWindow.setLocation(730, 10);
+                theControlPanelWindow.setLocation(1076,62);
                 theControlPanelWindow.pack();
                 theControlPanelWindow.setVisible(true);
             }
@@ -2620,7 +2620,6 @@ public class SpiralApplet
             public void getDatum(int i, double putDatumHere[/*3*/]);
         } // abstract class DataFetcher
 
-        // more general drawStats, takes an arbitrary iteration and bounds
         public static void drawOnePlot(java.awt.Graphics g,
                                        java.awt.Dimension gsize,
 
@@ -2806,7 +2805,8 @@ public class SpiralApplet
                 double datum[] = new double[3];
 
                 java.awt.Color color = dataColor;
-                g.setColor(color.darker().darker().darker());
+                //g.setColor(color.darker().darker().darker());
+                g.setColor(color.darker().darker()); // good for ubuntu in vbox in macbook, not sure about others
 
                 double gXprev = Double.NaN;
                 double gYprev = Double.NaN;
@@ -2816,7 +2816,8 @@ public class SpiralApplet
                     if (pastelsFlag)
                     {
                         color = getHSBColor((float)datum[2], .5f, 1.f);
-                        g.setColor(color.darker().darker().darker());
+                        //g.setColor(color.darker().darker().darker());
+                        g.setColor(color.darker().darker()); // good for ubuntu in vbox in macbook, not sure about others
                     }
                     double x = datum[0];
                     double y = datum[1];
@@ -2891,15 +2892,13 @@ public class SpiralApplet
                     java.awt.Color.red, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        // XXX this is actually pretty screwy--- we end up drawing a bounds point for every data point, even if there are a zillion data points and not that many pixels
                         public int nData()
                         {
-                            return spiralModel.params.n.get();
+                            return spiralModel.params.nParts.get();
                         }
                         public void getDatum(int i, double putDatumHere[/*3*/])
                         {
-                            int val = spiralModel.theList[i];
-                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+                            double primalAng = (i+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
                             double maybeTopMomentAng = primalAng;
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = RTOD(maybeTopMomentAng);
@@ -2962,24 +2961,13 @@ public class SpiralApplet
                             double area = spiralModel.areas[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-                            double areaBasedMomentMag = MyMath.hypot(moment[1],moment[0]) * area;
+                            double momentMag = MyMath.hypot(moment[1],moment[0]);
 
-                            double maxAreaBasedMomentMag = Math.sin(2*primalAng)/4; // i.e. tri area / 2
-
-                            // XXX started debugging this... it apparently happens, when I choose some distributions
-                            try {
-                              assert(areaBasedMomentMag < maxAreaBasedMomentMag);
-                            } catch (Throwable e) {
-                              PRINT(areaBasedMomentMag);
-                              PRINT(maxAreaBasedMomentMag);
-                              //throw e;
-                              putDatumHere[0] = RTOD(primalAng);
-                              putDatumHere[1] = maxAreaBasedMomentMag;
-                              putDatumHere[2] = 0.; // hue
-                            }
+                            double maxMomentMag = Math.sin(2*primalAng)/4; // i.e. tri area / 2, i.e. sin(primalAng)*cos(primalAng)/2
+                            assert(momentMag < maxMomentMag);
 
                             putDatumHere[0] = RTOD(primalAng);
-                            putDatumHere[1] = maxAreaBasedMomentMag;
+                            putDatumHere[1] = maxMomentMag;
                             putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     },
@@ -2994,9 +2982,9 @@ public class SpiralApplet
                             double moment[] = spiralModel.moments[i];
                             double area = spiralModel.areas[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-                            double areaBasedMomentMag = MyMath.hypot(moment[1],moment[0]) * area;
+                            double momentMag = MyMath.hypot(moment[1],moment[0]);
                             putDatumHere[0] = RTOD(primalAng);
-                            putDatumHere[1] = areaBasedMomentMag;
+                            putDatumHere[1] = momentMag;
                             putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     }
@@ -3009,7 +2997,7 @@ public class SpiralApplet
             y0 -= yDelta;
             y1 -= yDelta;
 
-            // all moments x vs. y, scatter plot
+            // moment x vs. moment y
             {
                 drawOnePlot(
                     g,
@@ -3053,10 +3041,10 @@ public class SpiralApplet
                             {
                                 // outer circular arc
                                 double worstFocusPrimalAngleMinusDualAngle = Math.PI/4;
-                                double maxAreaBasedMomentMag = Math.sin(2*worstFocusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                double maxMomentMag = Math.sin(2*worstFocusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
                                 double angle = (i+.5)/90*(Math.PI/2);
-                                double xMax = maxAreaBasedMomentMag * Math.cos(angle);
-                                double yMax = maxAreaBasedMomentMag * Math.sin(angle);
+                                double xMax = maxMomentMag * Math.cos(angle);
+                                double yMax = maxMomentMag * Math.sin(angle);
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
@@ -3087,7 +3075,7 @@ public class SpiralApplet
             y0 += yDelta;
             y1 += yDelta;
 
-            // moments x vs. y, scatter plot,
+            // moment x vs. moment y scatter plot,
             // only at the given focus angle
             {
                 drawOnePlot(
@@ -3121,10 +3109,10 @@ public class SpiralApplet
                             if (iPicture == 0)
                             {
                                 // outer circular arc
-                                double maxAreaBasedMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
                                 double angle = (i+.5)/90*(Math.PI/2);
-                                double xMax = maxAreaBasedMomentMag * Math.cos(angle);
-                                double yMax = maxAreaBasedMomentMag * Math.sin(angle);
+                                double xMax = maxMomentMag * Math.cos(angle);
+                                double yMax = maxMomentMag * Math.sin(angle);
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
@@ -3148,8 +3136,8 @@ public class SpiralApplet
                                 // tangent the x axis at the origin,
                                 // that seems to meet the original circle at the right place.
                                 // still not right though.
-                                double maxAreaBasedMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
-                                double R = maxAreaBasedMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
+                                double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                double R = maxMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
                                 double t = LERP(-Math.PI*.5, Math.PI*.5, (i+.5)/90);
                                 double xMax = Math.cos(t)*R;
                                 double yMax = Math.sin(t)*R + R;
@@ -3180,8 +3168,8 @@ public class SpiralApplet
                                 // oh no! it appears to be exactly equal to the circle! damn!
                                 // let's verify that...
                                 {
-                                    double maxAreaBasedMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
-                                    double Rexpected = maxAreaBasedMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
+                                    double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                    double Rexpected = maxMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
                                     double Rgotttttt = MyMath.hypot(xMoment,yMoment-Rexpected);
                                     assert(EQ(Rexpected, Rgotttttt, 1e-6));
                                     //PRINT(Rexpected);
@@ -3246,6 +3234,8 @@ public class SpiralApplet
                             double moment[] = spiralModel.moments[i];
                             double area = spiralModel.areas[i];
 
+                            // Pretend following primalAng-dualAng is focusPrimalAngleMinusDualAngle
+                            // and update moment accordingly.
                             if (focusPrimalAngleMinusDualAngle > primalAng)
                                 updateMomentAndAreaWhenPriscillaMoved(
                                     moment[0], moment[1], area, primalAng,
@@ -3267,7 +3257,6 @@ public class SpiralApplet
                         }
                     }
                 );
-
             }
             // advance upward and to right
             x0 += xDelta;
@@ -3275,7 +3264,7 @@ public class SpiralApplet
             y0 -= yDelta;
             y1 -= yDelta;
 
-            // all centers x vs. y, scatter plot
+            // center x vs. center y
             {
                 drawOnePlot(
                     g,
@@ -3335,7 +3324,7 @@ public class SpiralApplet
             y0 += yDelta;
             y1 += yDelta;
 
-            // centers x vs. y, scatter plot,
+            // centers x vs. center y, scatter plot,
             // only at the given focus angle
             {
                 drawOnePlot(
@@ -3425,6 +3414,113 @@ public class SpiralApplet
                 );
 
             }
+
+            // advance upward and to right
+            x0 += xDelta;
+            x1 += xDelta;
+            y0 -= yDelta;
+            y1 -= yDelta;
+
+            // moment x vs. moment y  but measured from primal angle instead of dual
+            {
+                drawOnePlot(
+                    g,
+                    gsize,
+                    1,40,2, x0,x1, 2,5,1, "moment y", null, // left to right
+                    1,45,2, y0,y1, 2,15,1, "moment x", null, // bottom to top
+
+                    0., .25, // values to put at x bounds
+                    0., .25, // values to put at y bounds
+
+                    5,5, // nMajor x,y
+
+                    java.awt.Color.blue, // outerFrameColor
+                    java.awt.Color.white, // innerFrameColor
+                    gray64, // majorGridColor
+                    gray128, // labelColor
+                    java.awt.Color.green, // boundsColor
+                    java.awt.Color.red, // dataColor
+                    pastelsFlag,
+                    new DataFetcher() { // possibleBoundsFetcher
+                        private int n = 90;
+                        public int nData()
+                        {
+                            return 2*n;
+                        }
+                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        {
+                            if (i >= n)
+                            {
+                                // some inner arc, not sure yet
+                                i -= n;
+                                double y = (i+.5)/n;
+                                double centerY = .5;
+                                double radiusY = .5;
+                                //double x = Math.sqrt(SQR(radiusY) - SQR(y-centerY))*.5;
+                                //double x = Math.sqrt(SQR(radiusY) - SQR(y-centerY))*.6;
+                                //double x = Math.sqrt(SQR(radiusY) - SQR(y-centerY))*.55;
+                                double x = Math.sqrt(SQR(radiusY) - SQR(y-centerY))*.54;
+                                putDatumHere[0] = x * .25;
+                                putDatumHere[1] = y * .25;
+                                putDatumHere[2] = 0.; // hue
+
+                                /*
+                                // more refined inner arc
+                                i -= 90;
+                                double angle = (i+.5)/90*(Math.PI/2);
+                                double rMax = Math.cos(angle)*Math.sin(angle)/2;
+                                double xMax = Math.cos(angle)*rMax;
+                                double yMax = Math.sin(angle)*rMax;
+
+                                putDatumHere[0] = xMax;
+                                putDatumHere[1] = yMax;
+                                putDatumHere[2] = 0.; // hue
+                                */
+                            }
+                            else
+                            {
+                                // outer circular arc
+                                double worstFocusPrimalAngleMinusDualAngle = Math.PI/4;
+                                double maxMomentMag = Math.sin(2*worstFocusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
+                                double angle = (i+.5)/n*(Math.PI/2);
+                                double xMax = maxMomentMag * Math.cos(angle);
+                                double yMax = maxMomentMag * Math.sin(angle);
+
+                                putDatumHere[0] = xMax;
+                                putDatumHere[1] = yMax;
+                                putDatumHere[2] = 0.; // hue
+                            }
+                        }
+                    },
+                    new DataFetcher() { // dataFetcher
+                        public int nData()
+                        {
+                            return spiralModel.params.n.get();
+                        }
+                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        {
+                            int val = spiralModel.theList[i];
+                            double moment[] = spiralModel.moments[i];
+                            double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
+
+                            double angleTweak = Math.PI/2 - primalAng;
+                            double cosAngleTweak = Math.cos(angleTweak);
+                            double sinAngleTweak = Math.sin(angleTweak);
+
+                            putDatumHere[0] = moment[0]*cosAngleTweak - moment[1]*sinAngleTweak;
+                            putDatumHere[1] = moment[1]*cosAngleTweak + moment[0]*sinAngleTweak;
+                            putDatumHere[2] = primalAng / (Math.PI*.5); // hue
+                        }
+                    }
+                );
+
+            }
+
+
+            // advance downward
+            y0 += yDelta;
+            y1 += yDelta;
+
         } // drawStats
 
         public static void drawTicker(java.awt.Graphics g,
@@ -5085,6 +5181,7 @@ public class SpiralApplet
         frame.setSize(718,583);
         frame.setSize(648,600);
         frame.setSize(622,558);
+        frame.setSize(980,562);
 
         frame.setVisible(true);
 
