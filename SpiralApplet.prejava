@@ -3075,7 +3075,7 @@ public class SpiralApplet
             y0 += yDelta;
             y1 += yDelta;
 
-            // moment x vs. moment y scatter plot,
+            // moment x vs. moment y,
             // only at the given focus angle
             {
                 drawOnePlot(
@@ -3100,7 +3100,7 @@ public class SpiralApplet
                         private double scratch[] = new double[3];
                         public int nData()
                         {
-                            return 5*90;
+                            return 6*90;
                         }
                         public void getDatum(int ii, double putDatumHere[/*3*/])
                         {
@@ -3152,13 +3152,15 @@ public class SpiralApplet
                             else if (iPicture == 3)
                             {
                                 // trying yet another thing...
+                                // (turns out to be exactly equal to the circle)
+
                                 double otherAngle = (i+.5)/90*(Math.PI/2);
                                 double maxMagForOtherAngle = Math.sin(2*otherAngle)/4;
                                 double otherX = maxMagForOtherAngle * Math.cos(otherAngle);
                                 double otherY = maxMagForOtherAngle * Math.sin(otherAngle);
                                 double otherArea = 100.; // arbitrary, it doesn't matter I don't think
                                 updateMomentAndAreaWhenSomeoneMoved(
-                                    otherX,  // so otherX,otherY is already a moment? and was dividint to get center
+                                    otherX,  // so otherX,otherY is already a moment? and was dividing to get center
                                     otherY,
                                     otherArea,
                                     otherAngle,
@@ -3206,6 +3208,18 @@ public class SpiralApplet
                                 }
                                 putDatumHere[0] = xm;
                                 putDatumHere[1] = ym;
+                                putDatumHere[2] = 0.; // hue
+                            }
+                            else if (iPicture == 5)
+                            {
+                                double frac = (i+.5)/90;
+                                double c = Math.cos(focusPrimalAngleMinusDualAngle);
+                                double s = Math.sin(focusPrimalAngleMinusDualAngle);
+                                double maxMomentMag = c*s/2;
+                                double x = c * (frac * maxMomentMag);
+                                double y = s * (frac * maxMomentMag);
+                                putDatumHere[0] = x;
+                                putDatumHere[1] = y;
                                 putDatumHere[2] = 0.; // hue
                             }
                             else
