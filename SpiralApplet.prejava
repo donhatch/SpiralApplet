@@ -10,12 +10,11 @@
 
     TODO: more friendly and usable control of speed
     TODO: more friendly and usable control of shape. should be able to easily express:
-              - constant slope of user's choosing  (have this crudely with 0gradual, 0, 0steep)
-              - arbitrary slope center and std deviation
+              - constant slope of user's choosing  (have this crudely with 0gradual, 0, 0steep) (DONE)
+              - arbitrary slope center and std deviation? need to think about it
               - random walk params? maybe need to review that.
     TODO: maybe just pass arraylists to the plotter, not functors... it's not like we get any streaming benefit
     TODO: non-rotating mode
-    TODO: delta mode approximating arbitrary slopes
     TODO: saturation slider
     TODO: keystrokes to change orientation
     TODO: smooth out animation when going very slowly
@@ -2897,14 +2896,14 @@ public class SpiralApplet
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
                             double maybeTopMomentAng = primalAng;
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = RTOD(maybeTopMomentAng);
-                            putDatumHere[2] = 0.;
+                            putDatumHere[2] = 0.; // hue
                         }
                     },
                     new DataFetcher() { // dataFetcher
@@ -2912,7 +2911,7 @@ public class SpiralApplet
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double moment[] = spiralModel.moments[i];
@@ -2920,7 +2919,7 @@ public class SpiralApplet
                             double momentAng = Math.atan2(moment[1],moment[0]);
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = RTOD(momentAng);
-                            putDatumHere[2] = primalAng / (Math.PI*.5);
+                            putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     }
                 );
@@ -2956,7 +2955,7 @@ public class SpiralApplet
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double moment[] = spiralModel.moments[i];
@@ -2976,12 +2975,12 @@ public class SpiralApplet
                               //throw e;
                               putDatumHere[0] = RTOD(primalAng);
                               putDatumHere[1] = maxAreaBasedMomentMag;
-                              putDatumHere[2] = 0.;
+                              putDatumHere[2] = 0.; // hue
                             }
 
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = maxAreaBasedMomentMag;
-                            putDatumHere[2] = primalAng / (Math.PI*.5);
+                            putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     },
                     new DataFetcher() { // dataFetcher
@@ -2989,7 +2988,7 @@ public class SpiralApplet
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double moment[] = spiralModel.moments[i];
@@ -2998,7 +2997,7 @@ public class SpiralApplet
                             double areaBasedMomentMag = MyMath.hypot(moment[1],moment[0]) * area;
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = areaBasedMomentMag;
-                            putDatumHere[2] = primalAng / (Math.PI*.5);
+                            putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     }
                 );
@@ -3035,7 +3034,7 @@ public class SpiralApplet
                         {
                             return 2*90;
                         }
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             if (i >= 90)
                             {
@@ -3048,7 +3047,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                             else
                             {
@@ -3061,7 +3060,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                         }
                     },
@@ -3070,14 +3069,14 @@ public class SpiralApplet
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double moment[] = spiralModel.moments[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
                             putDatumHere[0] = moment[0];
                             putDatumHere[1] = moment[1];
-                            putDatumHere[2] = primalAng / (Math.PI*.5);
+                            putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     }
                 );
@@ -3115,7 +3114,7 @@ public class SpiralApplet
                         {
                             return 5*90;
                         }
-                        public void getDatum(int ii, double putDatumHere[/*2*/])
+                        public void getDatum(int ii, double putDatumHere[/*3*/])
                         {
                             int iPicture = ii / 90;
                             int i = ii % 90;
@@ -3129,7 +3128,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                             else if (iPicture == 1)
                             {
@@ -3141,7 +3140,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                             else if (iPicture == 2)
                             {
@@ -3157,7 +3156,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                             else if (iPicture == 3)
                             {
@@ -3192,7 +3191,7 @@ public class SpiralApplet
 
                                 putDatumHere[0] = xMoment;
                                 putDatumHere[1] = yMoment;
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                             else if (iPicture == 4)
                             {
@@ -3216,7 +3215,7 @@ public class SpiralApplet
                                 }
                                 putDatumHere[0] = xm;
                                 putDatumHere[1] = ym;
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                             else
                                 assert(false);
@@ -3239,7 +3238,7 @@ public class SpiralApplet
                             return spiralModel.params.n.get();
                         }
                         double scratch[] = new double[3];
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3264,7 +3263,7 @@ public class SpiralApplet
                             putDatumHere[0] = newMomentX;
                             putDatumHere[1] = newMomentY;
                             //putDatumHere[2] = focusPrimalAngleMinusDualAngle / (Math.PI*.5);
-                            putDatumHere[2] = primalAng / (Math.PI*.5);
+                            putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     }
                 );
@@ -3301,12 +3300,12 @@ public class SpiralApplet
                         {
                             return 90;
                         }
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             double angle = (i+.5)/90*(Math.PI/2);
                             putDatumHere[0] = Math.cos(angle);
                             putDatumHere[1] = Math.sin(angle);
-                            putDatumHere[2] = 0.;
+                            putDatumHere[2] = 0.; // hue
                         }
                     },
                     new DataFetcher() { // dataFetcher
@@ -3314,7 +3313,7 @@ public class SpiralApplet
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double moment[] = spiralModel.moments[i];
@@ -3325,7 +3324,7 @@ public class SpiralApplet
                             double centerY = moment[1] / area;
                             putDatumHere[0] = centerX;
                             putDatumHere[1] = centerY;
-                            putDatumHere[2] = primalAng / (Math.PI*.5);
+                            putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     }
                 );
@@ -3362,7 +3361,7 @@ public class SpiralApplet
                         {
                             return 2*90;
                         }
-                        public void getDatum(int ii, double putDatumHere[/*2*/])
+                        public void getDatum(int ii, double putDatumHere[/*3*/])
                         {
                             int iPicture = ii / 90;
                             int i = ii % 90;
@@ -3371,7 +3370,7 @@ public class SpiralApplet
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 putDatumHere[0] = Math.cos(angle);
                                 putDatumHere[1] = Math.sin(angle);
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                             else
                             {
@@ -3383,7 +3382,7 @@ public class SpiralApplet
                                     x = c;
                                 putDatumHere[0] = x;
                                 putDatumHere[1] = y;
-                                putDatumHere[2] = 0.;
+                                putDatumHere[2] = 0.; // hue
                             }
                         }
                     },
@@ -3393,7 +3392,7 @@ public class SpiralApplet
                             return spiralModel.params.n.get();
                         }
                         double scratch[] = new double[3];
-                        public void getDatum(int i, double putDatumHere[/*2*/])
+                        public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3420,7 +3419,7 @@ public class SpiralApplet
 
                             putDatumHere[0] = newCenterX;
                             putDatumHere[1] = newCenterY;
-                            putDatumHere[2] = focusPrimalAngleMinusDualAngle / (Math.PI*.5);
+                            putDatumHere[2] = focusPrimalAngleMinusDualAngle / (Math.PI*.5); // hue
                         }
                     }
                 );
