@@ -3026,8 +3026,8 @@ public class SpiralApplet
                         {
                             if (i >= 90)
                             {
-                                // more refined inner arc
                                 i -= 90;
+                                // more refined inner arc  (correct when >= 45 degrees, not right when < 45 degrees)
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 double rMax = Math.cos(angle)*Math.sin(angle)/2;
                                 double xMax = Math.cos(angle)*rMax;
@@ -3122,9 +3122,12 @@ public class SpiralApplet
                             {
                                 // more refined inner arc
                                 double angle = (i+.5)/90*(Math.PI/2);
-                                double rMax = Math.cos(angle)*Math.sin(angle)/2;
-                                double xMax = Math.cos(angle)*rMax;
-                                double yMax = Math.sin(angle)*rMax;
+                                double cosAngle = Math.cos(angle);
+                                double sinAngle = Math.sin(angle);
+                                //double rMax = Math.sin(2*angle)/4; // same thing
+                                double rMax = cosAngle*sinAngle/2;
+                                double xMax = cosAngle*rMax;
+                                double yMax = sinAngle*rMax;
 
                                 putDatumHere[0] = xMax;
                                 putDatumHere[1] = yMax;
@@ -4566,7 +4569,7 @@ public class SpiralApplet
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
