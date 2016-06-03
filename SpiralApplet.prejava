@@ -3503,8 +3503,11 @@ public class SpiralApplet
                                         }
                                     }
                                 }
-                                data = (double[][])dataArrayList.toArray(new double[0][]);
-                                System.out.println("data.length = "+data.length);
+                                System.out.print("data.length = "+dataArrayList.size());
+                                System.out.flush();
+                                data = new double[dataArrayList.size()][];
+                                dataArrayList.toArray(data);
+                                System.out.println();
                             }
 
                             public int nData()
