@@ -7,7 +7,8 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
 
-    TODO: maybe combine moment and area into momentAndArea?  it is a homogeneous thing, after all
+    TODO: disable Regenerate button unless out of date?  or turn it red when out of date?
+    TODO: combine moment and area into momentAndArea?  it is a homogeneous thing, after all
     TODO: more friendly and usable control of speed
     TODO: more friendly and usable control of shape. should be able to easily express:
               - constant slope of user's choosing  (have this crudely with 0gradual, 0, 0steep) (DONE)
@@ -1139,6 +1140,7 @@ public class SpiralApplet
                             add(makeIncrementableTextFieldForNumber(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
                             add(new JCheckBoxForBoolean("including the expensive one", applet.showTheExpensivePlotTooFlag) {{
                                 setMargin(nomargin);
+                                setToolTipText("<html>You might want to set Period very low and regenerate before turning this on.</html>");
                             }});
                         }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
