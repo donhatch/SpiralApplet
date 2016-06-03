@@ -1,4 +1,3 @@
-#define HOMO // XXX get rid
 /*
     Notes:
         Uses System.nanoTime which requires java >= 1.4
@@ -2135,12 +2134,7 @@ public class SpiralApplet
             // We combine them into one homogeneous array, so that, conceptually,
             // momentsAndAreas[i] is {moments[i][0], moments[i][1], areas[i]}.
             //
-#ifdef HOMO
             public double momentsAndAreas[/*n*/][/*3*/];
-#else
-            public double moments[/*n*/][/*2*/];
-            public double areas[/*n*/];
-#endif
 
 
             SpiralModel()
@@ -2314,34 +2308,19 @@ public class SpiralApplet
                     assert((theList[i] + i)%2 == 0);
                 }
 
-#ifdef HOMO
                 this.momentsAndAreas = new double[n][3];
-#else
-                this.moments = new double[n][2];
-                this.areas = new double[n];
-#endif
                 if (true)
                 {
                     // compute all cumulative centers and areas
 
-#ifdef HOMO
                     double prevMomentAndArea[] = {0.,0.,0.};
                     double thisMomentAndArea[] = {0.,0.,0.};
-#else
-                    double prevArea = 0.;
-                    double prevMoment[] = {0.,0.};
-                    double thisArea = 0.;
-                    double thisMoment[] = {0.,0.};
-#endif
 
                     boolean done = false;
 
                     double prevVal = theList[n-1];
 
                     int maxPasses = 2 + 10000/n; // really should be, roughly, one complete pass plus some fixed number of iterations
-#ifndef HOMO
-                    double scratch[] = new double[3];
-#endif
                     PRINT(maxPasses);
                     FORI (iPass, maxPasses)
                     {
@@ -2360,40 +2339,18 @@ public class SpiralApplet
                             double prevPrimalAng = Math.PI/2 * ((prevVal+.5)/nParts);
                             double primalAng = Math.PI/2 * ((val+.5)/nParts);
 
-#ifdef HOMO
                             updateMomentAndAreaWhenSomeoneMoved(
                                     prevMomentAndArea[0], prevMomentAndArea[1], prevMomentAndArea[2],
                                     prevPrimalAng,
                                     primalAng,
                                     thisMomentAndArea);
-#else
-                            updateMomentAndAreaWhenSomeoneMoved(
-                                    prevMoment[0], prevMoment[1], prevArea,
-                                    prevPrimalAng,
-                                    primalAng,
-                                    scratch);
-                            thisMoment[0] = scratch[0];
-                            thisMoment[1] = scratch[1];
-                            thisArea = scratch[2];
-#endif
 
                             if (done)
                             {
-#ifdef HOMO
                                 assert(VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea));
-#else
-                                assert(VecMath.equalsExactly(this.moments[i], thisMoment));
-                                assert(this.areas[i] == thisArea);
-#endif
                             }
-#ifdef HOMO
                             else if (iPass > 0
                                   && VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea))
-#else
-                            else if (iPass > 0
-                                  && VecMath.equalsExactly(this.moments[i], thisMoment)
-                                  && this.areas[i] == thisArea)
-#endif
                             {
                                 System.out.println("centers and areas stabilized at iPass="+iPass+" i="+i+"/n="+n);
                                 System.out.println("=========================");
@@ -2401,21 +2358,10 @@ public class SpiralApplet
                             }
                             else
                             {
-#ifdef HOMO
                                 VecMath.copyvec(this.momentsAndAreas[i], thisMomentAndArea);
-#else
-                                VecMath.copyvec(this.moments[i], thisMoment);
-                                this.areas[i] = thisArea;
-#endif
                             }
 
-#ifdef HOMO
                             VecMath.copyvec(prevMomentAndArea, thisMomentAndArea);
-#else
-                            prevMoment[0] = thisMoment[0];
-                            prevMoment[1] = thisMoment[1];
-                            prevArea = thisArea;
-#endif
 
                             prevVal = val;
                         }
@@ -2428,44 +2374,23 @@ public class SpiralApplet
                 // and moment magnitudes should be within proven bounds.
                 FORI (i, n)
                 {
-#ifdef HOMO
                     if (!(momentsAndAreas[i][2] > 0.)) // if non-positive area
                     {
                         System.out.println("Oh no! areas["+i+"] = "+momentsAndAreas[i][2]+" <= 0!");
                     }
-#else
-                    if (!(areas[i] > 0.))
-                    {
-                        System.out.println("Oh no! areas["+i+"] = "+areas[i]+" <= 0!");
-                    }
-#endif
                     // theorem says center has positive y coord
-#ifdef HOMO
                     if (!(momentsAndAreas[i][1] > 0.))
                     {
                         System.out.println("Oh no! moments["+i+"][1] = "+momentsAndAreas[i][1]+" <= 0!");
                     }
-#else
-                    if (!(moments[i][1] > 0.))
-                    {
-                        System.out.println("Oh no! moments["+i+"][1] = "+moments[i][1]+" <= 0!");
-                    }
-#endif
                     double primalAng = (theList[i]+.5)/nParts*(Math.PI*.5);
 
                     // theorem says |moment| <= sin(2*primalAng)/4
-#ifdef HOMO
                     if (!(VecMath.norm(2, momentsAndAreas[i]) < Math.sin(2*primalAng)/4))
                     {
                         // XXX TODO: should be VecMath.toString(2, momentsAndAreas[i]) but such a thing doesn't exist
                         System.out.println("Oh no! moments["+i+"] = "+VecMath.toString(momentsAndAreas[i])+" has length "+VecMath.norm(2, momentsAndAreas[i])+" >= "+Math.sin(2*primalAng)/4+"!");
                     }
-#else
-                    if (!(VecMath.norm(moments[i]) < Math.sin(2*primalAng)/4))
-                    {
-                        System.out.println("Oh no! moments["+i+"] = "+moments[i][1]+" has length "+VecMath.norm(moments[i])+" >= "+Math.sin(2*primalAng)/4+"!");
-                    }
-#endif
                 }
             } // init
         }; // public class SpiralModel
@@ -2989,13 +2914,8 @@ public class SpiralApplet
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-#ifdef HOMO
                             double momentAndArea[] = spiralModel.momentsAndAreas[i];
                             double momentAng = Math.atan2(momentAndArea[1],momentAndArea[0]);
-#else
-                            double moment[] = spiralModel.moments[i];
-                            double momentAng = Math.atan2(moment[1],moment[0]);
-#endif
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = RTOD(momentAng);
                             putDatumHere[2] = primalAng / (Math.PI*.5); // hue
@@ -3039,13 +2959,8 @@ public class SpiralApplet
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-#ifdef HOMO
                             double momentAndArea[] = spiralModel.momentsAndAreas[i];
                             double momentMag = VecMath.norm(2, momentAndArea);
-#else
-                            double moment[] = spiralModel.moments[i];
-                            double momentMag = MyMath.hypot(moment[1],moment[0]);
-#endif
 
                             double maxMomentMag = Math.sin(2*primalAng)/4; // i.e. tri area / 2, i.e. sin(primalAng)*cos(primalAng)/2
                             assert(momentMag < maxMomentMag);
@@ -3064,14 +2979,8 @@ public class SpiralApplet
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-#ifdef HOMO
                             double momentAndArea[] = spiralModel.momentsAndAreas[i];
                             double momentMag = VecMath.norm(2, momentAndArea);
-#else
-                            double moment[] = spiralModel.moments[i];
-                            double area = spiralModel.areas[i];
-                            double momentMag = MyMath.hypot(moment[1],moment[0]);
-#endif
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = momentMag;
                             putDatumHere[2] = primalAng / (Math.PI*.5); // hue
@@ -3160,15 +3069,9 @@ public class SpiralApplet
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-#ifdef HOMO
                             double momentAndArea[] = spiralModel.momentsAndAreas[i];
                             putDatumHere[0] = momentAndArea[0];
                             putDatumHere[1] = momentAndArea[1];
-#else
-                            double moment[] = spiralModel.moments[i];
-                            putDatumHere[0] = moment[0];
-                            putDatumHere[1] = moment[1];
-#endif
                             putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     }
@@ -3356,7 +3259,6 @@ public class SpiralApplet
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-#ifdef HOMO
                             double momentAndArea[] = spiralModel.momentsAndAreas[i];
 
                             // Pretend following primalAng-dualAng is focusPrimalAngleMinusDualAngle
@@ -3365,17 +3267,6 @@ public class SpiralApplet
                                 momentAndArea[0], momentAndArea[1], momentAndArea[2],
                                 primalAng, focusPrimalAngleMinusDualAngle,
                                 scratch);
-#else
-                            double moment[] = spiralModel.moments[i];
-                            double area = spiralModel.areas[i];
-
-                            // Pretend following primalAng-dualAng is focusPrimalAngleMinusDualAngle
-                            // and update moment accordingly.
-                            updateMomentAndAreaWhenSomeoneMoved(
-                                moment[0], moment[1], area,
-                                primalAng, focusPrimalAngleMinusDualAngle,
-                                scratch);
-#endif
 
                             double newMomentX = scratch[0];
                             double newMomentY = scratch[1];
@@ -3574,23 +3465,14 @@ public class SpiralApplet
                                     int val = spiralModel.theList[i];
                                     double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-#ifdef HOMO
                                     double momentAndArea[] = spiralModel.momentsAndAreas[i];
-#else
-                                    double moment[] = spiralModel.moments[i];
-                                    double area = spiralModel.areas[i];
-#endif
 
                                     if (false)
                                     {
                                       // Pretend following primalAng-dualAng is focusPrimalAngleMinusDualAngle
                                       // and update moment accordingly.
                                       updateMomentAndAreaWhenSomeoneMoved(
-#ifdef HOMO
                                           momentAndArea[0], momentAndArea[1], momentAndArea[2],
-#else
-                                          moment[0], moment[1], area,
-#endif
                                           primalAng, focusPrimalAngleMinusDualAngle,
                                           newMomentAndAreaScratch);
                                       dataArrayList.add(new double[]{newMomentAndAreaScratch[0],
@@ -3607,11 +3489,7 @@ public class SpiralApplet
                                             {
                                                 // dudley then priscilla, or priscilla then dudley
                                                 updateMomentAndAreaWhenSomeoneMoved(
-#ifdef HOMO
                                                     momentAndArea[0], momentAndArea[1], momentAndArea[2],
-#else
-                                                    moment[0], moment[1], area,
-#endif
                                                     primalAng, steppingStoneAng,
                                                     newMomentAndAreaScratch);
                                                 updateMomentAndAreaWhenSomeoneMoved(
@@ -3699,16 +3577,9 @@ public class SpiralApplet
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
 
-#ifdef HOMO
                             double momentAndArea[] = spiralModel.momentsAndAreas[i];
                             double centerX = momentAndArea[0] / momentAndArea[2];
                             double centerY = momentAndArea[1] / momentAndArea[2];
-#else
-                            double moment[] = spiralModel.moments[i];
-                            double area = spiralModel.areas[i];
-                            double centerX = moment[0] / area;
-                            double centerY = moment[1] / area;
-#endif
                             putDatumHere[0] = centerX;
                             putDatumHere[1] = centerY;
                             putDatumHere[2] = primalAng / (Math.PI*.5); // hue
@@ -3783,20 +3654,10 @@ public class SpiralApplet
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-
-#ifdef HOMO
                             double momentAndArea[] = spiralModel.momentsAndAreas[i];
-#else
-                            double moment[] = spiralModel.moments[i];
-                            double area = spiralModel.areas[i];
-#endif
 
                             updateMomentAndAreaWhenSomeoneMoved(
-#ifdef HOMO
                                 momentAndArea[0], momentAndArea[1], momentAndArea[2],
-#else
-                                moment[0], moment[1], area,
-#endif
                                 primalAng, focusPrimalAngleMinusDualAngle,
                                 scratch);
 
@@ -3901,24 +3762,14 @@ public class SpiralApplet
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-
-#ifdef HOMO
                             double momentAndArea[] = spiralModel.momentsAndAreas[i];
-#else
-                            double moment[] = spiralModel.moments[i];
-#endif
 
                             double angleTweak = Math.PI/2 - primalAng;
                             double cosAngleTweak = Math.cos(angleTweak);
                             double sinAngleTweak = Math.sin(angleTweak);
 
-#ifdef HOMO
                             putDatumHere[0] = momentAndArea[0]*cosAngleTweak - momentAndArea[1]*sinAngleTweak;
                             putDatumHere[1] = momentAndArea[1]*cosAngleTweak + momentAndArea[0]*sinAngleTweak;
-#else
-                            putDatumHere[0] = moment[0]*cosAngleTweak - moment[1]*sinAngleTweak;
-                            putDatumHere[1] = moment[1]*cosAngleTweak + moment[0]*sinAngleTweak;
-#endif
                             putDatumHere[2] = primalAng / (Math.PI*.5); // hue
                         }
                     }
@@ -4587,15 +4438,10 @@ public class SpiralApplet
                             {dualX,dualY},
                             {-dualY,dualX},
                         };
-#ifdef HOMO
                         double moment[] = VecMath.vxm(new double[]{spiralModel.momentsAndAreas[i][0],
                                                                    spiralModel.momentsAndAreas[i][1]},
                                                       m);
                         double areaScratch = spiralModel.momentsAndAreas[i][2]; // var area already defined, maybe should rename it
-#else
-                        double moment[] = VecMath.vxm(spiralModel.moments[i], m);
-                        double areaScratch = spiralModel.areas[i]; // var area already defined, maybe should rename it
-#endif
                         VecMath.vxs(moment, moment, primalR/dualR); // divide by dualR because we should never have multiplied by it
                         java.awt.Color savedColor = mg.getColor();
                         mg.setColor(java.awt.Color.yellow);
