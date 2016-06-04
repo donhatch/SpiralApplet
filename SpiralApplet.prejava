@@ -3505,8 +3505,12 @@ public class SpiralApplet
                                 }
                                 System.out.print("data.length = "+dataArrayList.size());
                                 System.out.flush();
-                                data = new double[dataArrayList.size()][];
-                                dataArrayList.toArray(data);
+
+                                // gag!
+                                //data = new double[dataArrayList.size()][];
+                                //dataArrayList.toArray(data);
+                                data = MyToArray(dataArrayList, double[].class);
+
                                 System.out.println();
                             }
 
@@ -5477,5 +5481,18 @@ public class SpiralApplet
 
         System.out.println("out main");
     } // main
+
+    // Least horrible way I know of to convert an ArrayList to array.
+    // Example usage:
+    //    java.util.ArrayList<double[]> arrayList = new java.util.ArrayList<double[]>();
+    //    double[][] array = MyToArray(arrayList, double[].class);
+    // See http://stackoverflow.com/questions/37625877/could-java-util-arraylistt-toarray-be-made-friendlier
+    public static <T> T[] MyToArray(java.util.ArrayList<T> arrayList, Class type)
+    {
+        // Note, it's surprisingly more efficient to allocate it with size 0
+        // rather than arraryList.size().
+        T[] array = (T[])java.lang.reflect.Array.newInstance(type, 0); // = new T[0]
+        return arrayList.toArray(array);
+    }
 
 } // class SpiralApplet
