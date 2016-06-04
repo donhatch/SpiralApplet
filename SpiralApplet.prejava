@@ -20,10 +20,9 @@
     TODO: keystrokes to change orientation
     TODO: smooth out animation when going very slowly
     TODO: gui for scale
-    TODO: allow dragging ticker
     TODO: allow dragging points on spiral? hmm
-    todo: check out LWJGL for consistent frame rate?
-    TODO: maybe JavaFX? she says it works well for vsync: http://www.java-gaming.org/index.php?topic=27763.0.  ah good, it's included in jdk 7.
+    todo: check out LWJGL for consistent frame rate?  nah too much effort.
+    TODO: maybe JavaFX? she says it works well for vsync: http://www.java-gaming.org/index.php?topic=27763.0.  ah good, it's included in jdk 7.  using it.
     TODO: use javax.swing.Timer instead of my own custom thread
           WHOA! as soon as I switched to this kind of timer, I'm getting consistent timings! nice 60fps. wtf?
           well except every 5 seconds or so, it gives far faster for a few frames in a row. argh!
@@ -405,7 +404,7 @@ public class SpiralApplet
                               add(new JLabel("Delta style:"));
                               add(new JLabel("  "));
                               add(new JCol() {{
-                                  add(new JRadioButton("<html>0 very gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYGRADUAL) {{
+                                  add(new JRadioButton("<html>0 very gradual (1)</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYGRADUAL) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -417,7 +416,7 @@ public class SpiralApplet
                                           }
                                       });
                                   }});
-                                  add(new JRadioButton("<html>0 gradual</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_GRADUAL) {{
+                                  add(new JRadioButton("<html>0 gradual (30)</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_GRADUAL) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -429,7 +428,7 @@ public class SpiralApplet
                                           }
                                       });
                                   }});
-                                  add(new JRadioButton("<html>0 medium</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0) {{
+                                  add(new JRadioButton("<html>0 medium (45)</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -441,7 +440,7 @@ public class SpiralApplet
                                           }
                                       });
                                   }});
-                                  add(new JRadioButton("<html>0 steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_STEEP) {{
+                                  add(new JRadioButton("<html>0 steep (60)</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_STEEP) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -453,7 +452,7 @@ public class SpiralApplet
                                           }
                                       });
                                   }});
-                                  add(new JRadioButton("<html>0 very steep</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYSTEEP) {{
+                                  add(new JRadioButton("<html>0 very steep (89)</html>", applet.spiralModelParams.deltaStyle.get()==SpiralModel.DELTASTYLE_0_VERYSTEEP) {{
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
@@ -1037,6 +1036,7 @@ public class SpiralApplet
                         int spiralOrientationNumber = -1; // gets set during paint
 
                     {
+                        // Listeners for spiral orientation number control
                         addMouseMotionListener(new java.awt.event.MouseAdapter() {
                             @Override
                             public void mouseMoved(java.awt.event.MouseEvent mouseEvent)
@@ -1353,7 +1353,14 @@ public class SpiralApplet
         static final String helpMessage[] = {
             "===================================================================",
             "Mouse:",
+            "    - drag the ticker",
             "Keys:",
+            "    space - pause animation",
+            "    enter - repaint",
+            "    right/left arrow - step forward/backward",
+            "    shift-right/left arrow - play forward/backward",
+            "    up/down arrow - pause animation",
+            "    ctrl-q - quit",
             "===================================================================",
         }; // helpMessage
 
@@ -1607,6 +1614,9 @@ public class SpiralApplet
                     if (getButton(e) == java_awt_event_MouseEvent_BUTTON3)
                         System.out.println("    (right mouse)");
                 }
+                prevMouseX = e.getX();
+                prevMouseY = e.getY();
+                pause(); // maybe should resume later? not sure
 
                 theCanvas.repaint();
 
@@ -1646,6 +1656,18 @@ public class SpiralApplet
             public void mouseDragged(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 2) System.out.println("  in mouseDragged: "+e);
+
+                int currMouseX = e.getX();
+                int currMouseY = e.getY();
+                int dx = currMouseX - prevMouseX;
+                int dy = currMouseY - prevMouseY;
+                prevMouseX = currMouseX;
+                prevMouseY = currMouseY;
+
+                if (eventVerbose >= 1)
+                  System.out.println("    dx="+dx+" dy="+dy);
+                theSpiralView.focus.minusEquals(dx-dy,2);
+                theSpiralView.focus.modEquals(theSpiralModel.params.n.get(), 1);
 
                 theCanvas.repaint();
 
@@ -3035,7 +3057,9 @@ public class SpiralApplet
                                 //      - for moment ang > 45, max moment mag appears when primal ang
                                 //        is equal to moment ang
                                 //      - for moment ang < 45, max moment mag bound is when primal ang = 45,
-                                //        but the picture indicates we can get tighter
+                                //        yielding the circular arc,
+                                //        but the picture indicates we can get tighter--
+                                //        it's closer to the petal but not quite within it
                                 double angle = (i+.5)/90*(Math.PI/2);
                                 double rMax = Math.cos(angle)*Math.sin(angle)/2;
                                 double xMax = Math.cos(angle)*rMax;
@@ -4836,7 +4860,7 @@ public class SpiralApplet
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showTheExpensivePlotTooFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
@@ -4870,6 +4894,9 @@ public class SpiralApplet
         private java.awt.Image backBufferImage = null;
         private MyGraphics3D mostRecentGraphics = null;
         private int nPaints = 0;
+
+        private int prevMouseX = 0;
+        private int prevMouseY = 0;
 
 
     public static class JTextFieldForString extends JValidatingTextField
@@ -5490,7 +5517,7 @@ public class SpiralApplet
     public static <T> T[] MyToArray(java.util.ArrayList<T> arrayList, Class type)
     {
         // Note, it's surprisingly more efficient to allocate it with size 0
-        // rather than arraryList.size().
+        // rather than arraryList.size(), supposedly something about the zeroing.
         T[] array = (T[])java.lang.reflect.Array.newInstance(type, 0); // = new T[0]
         return arrayList.toArray(array);
     }
