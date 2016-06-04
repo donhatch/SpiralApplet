@@ -1922,9 +1922,19 @@ public class SpiralApplet
                              size.width - 5 - g.getFontMetrics().stringWidth(nPaintsString),
                              20);
 
-                g.drawString("focus: "+theSpiralView.focus,
+                g.drawString("focus: "+theSpiralView.focus
+                                      +" / "
+                                      +theSpiralModel.params.n.get()
+                                      ,
                              10,
                              20);
+                g.drawString("value: "+theSpiralModel.theList[MOD(theSpiralView.focus.round(),
+                                                                  theSpiralModel.params.n.get())]
+                                      +" / "
+                                      +theSpiralModel.params.nParts.get()
+                                      ,
+                             10,
+                             40);
 
 
 
@@ -4109,7 +4119,7 @@ public class SpiralApplet
 
             // have to be drawing something
             assert(drawPrimalFlag || drawDualFlag || drawRungsFlag);
-            // don't draw primal and dual at same time
+            // don't allow drawing primal and dual at same time
             assert(!drawPrimalFlag || !drawDualFlag);
 
             if (debugLevel >= 1) System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal":"")+(drawDualFlag?"dual":"")+(drawRungsFlag?",rungs":""));
@@ -4221,7 +4231,10 @@ public class SpiralApplet
                     if (scanDir < 0)
                         mg.setColor(java.awt.Color.white);
                     else
-                        mg.setColor(gray64);
+                    {
+                        //mg.setColor(gray64);
+                        mg.setColor(gray128); // looks good on ubuntu, don't know about elsewhere
+                    }
                 }
 
 
@@ -4396,6 +4409,7 @@ public class SpiralApplet
                             if (prevVal==prevPrevVal
                              || (thisVal<prevVal) != (prevVal<prevPrevVal))
                             {
+                                // dual vertex
                                 if (scanDir < 0)
                                 {
                                     mg.drawPoint(dualX, dualY, 5);
@@ -4404,7 +4418,10 @@ public class SpiralApplet
                                                 antiAliasFlag);
                                 }
                                 else
-                                    mg.drawPoint(dualX, dualY, 3);
+                                {
+                                    //mg.drawPoint(dualX, dualY, 3);
+                                    mg.drawPoint(dualX, dualY, 5);
+                                }
                             }
 
                             if (scanDir > 0)
