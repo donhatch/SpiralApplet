@@ -59,7 +59,7 @@ public class Complex
         this.y = (y0*x1 - x0*y1) / denominator;
         return this;
     }
-    public Complex pow(double x0, double y0, double x1, double y1)
+    public Complex equalsPow(double x0, double y0, double x1, double y1)
     {
         // z0^z1 = exp(z1*log(z0))
         return log(x0,y0).timesEquals(x1,y1).expEquals();
@@ -73,7 +73,7 @@ public class Complex
     }
     public Complex equalsInverse(double x, double y)
     {
-        double denominator = x1*x1 + y1*y1;
+        double denominator = x*x + y*y;
         this.x =  x / denominator;
         this.y = -y / denominator;
         return this;

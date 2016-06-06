@@ -46,6 +46,7 @@
 #define java_awt_event_MouseEvent_BUTTON3 3
 
 import com.donhatchsw.util.Arrays;
+import com.donhatchsw.util.Complex;
 import com.donhatchsw.util.MyMath;
 import com.donhatchsw.util.VecMath;
 //import com.donhatchsw.util.SortStuff;
@@ -58,6 +59,7 @@ import com.donhatchsw.awt.ColLayout;
 import com.donhatchsw.awt.JRow;
 import com.donhatchsw.awt.JCol;
 import com.donhatchsw.awt.JTablePanel;
+import com.donhatchsw.awt.MainWindowCount;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
@@ -2213,11 +2215,12 @@ public class SpiralApplet
                         // close to limit
                         double eps = 1e-6;
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
-                        Complex d1 = p01.times(-eps,0.).plusEquals(1.,0.);
+                        Complex d1 = p01.times(-eps).plusEquals(1.); // d1 = 1 - eps*p01
 
                         double predictedArea = eps*Math.sin(t)/2/(1-d1.abs2());
-                        Complex predictedMoment = p01.times(-d1.y/2.,0.).divEquals(
-                                                  d1.times(d1.abs2(),0.).minusEquals(1.,0.).timesEquals(-1.,0.));
+                        Complex predictedMoment = p01.times(-d1.y/2.).divEquals(
+                                                  d1.times(d1.abs2()).minusEquals(1.)
+                                                                     .timesEquals(-1.));
 
                         OUT("close to limit:");
                         PRINT(predictedMoment);
@@ -2228,16 +2231,17 @@ public class SpiralApplet
                         double eps = 1e-2;
                         double nIters = 1e3;
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
-                        Complex d1 = p01.times(-eps,0.).plusEquals(1.,0.);
-                        Complex m01 = p01.times(d1.cross(1.,0.)/2.,0.);
+                        Complex d1 = p01.times(-eps).plusEquals(1.);
+                        Complex m01 = p01.times(d1.cross(1.)/2.);
 
                         Complex predictedMoment = new Complex(0., 0.);
                         //Complex d1_pow_i = new Complex(d1);  // d1^1
-                        Complex d1_pow_i = new Complex(1.,0.);  // d1^0
+                        Complex d1_pow_i = new Complex(1.);  // d1^0
                         for (int i = 1; i <= nIters; ++i) // yes, start at 1
                         {
                             d1_pow_i.timesEquals(d1);
-                            predictedMoment.plusEquals(m01.times(d1_pow_i).timesEquals(d1_pow_i.abs2(),0.));
+                            predictedMoment.plusEquals(m01.times(d1_pow_i)
+                                                          .timesEquals(d1_pow_i.abs2()));
                         }
                         OUT("close to limit iterative:");
                         PRINT(predictedMoment);
@@ -2247,18 +2251,18 @@ public class SpiralApplet
                         double eps = 1e-2;
                         double nIters = 1e3;
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
-                        Complex d1 = p01.times(-eps,0.).plusEquals(1.,0.);
-                        Complex m01 = p01.times(d1.cross(1.,0.)/2.,0.);
+                        Complex d1 = p01.times(-eps).plusEquals(1.);
+                        Complex m01 = p01.times(d1.cross(1.)/2.);
 
                         Complex predictedMoment = new Complex(0., 0.);
                         for (int i = 1; i <= nIters; ++i) // yes, start at 1
                         {
-                            predictedMoment.timesEquals(d1).timesEquals(d1.abs2(),0.);
+                            predictedMoment.timesEquals(d1)
+                                           .timesEquals(d1.abs2());
                             predictedMoment.plusEquals(m01);
                         }
                         OUT("close to limit iterative, different way:");
                         PRINT(predictedMoment);
-
                     }
                 }
                 this.params.n.set(n);
@@ -5546,7 +5550,7 @@ public class SpiralApplet
         });
 
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // supposedly exists since java 1.4, but I can see starting in 1.3, weird
-        com.donhatchsw.awt.MainWindowCount.setExitOnLastClose(frame);
+        MainWindowCount.setExitOnLastClose(frame);
 
         frame.getContentPane().add(applet);
 
@@ -5612,7 +5616,7 @@ public class SpiralApplet
         }
 
         // release main's token
-        com.donhatchsw.awt.MainWindowCount.decrementAndExitIfImTheLastOne();
+        MainWindowCount.decrementAndExitIfImTheLastOne();
 
         System.out.println("out main");
     } // main

@@ -72,7 +72,6 @@ CLASSES = \
         GraphicsAntiAliasingSetter.class \
         TimingGraph.class \
         Rational.class \
-        Complex.class \
         SpiralApplet.class \
         ${NULL}
 HTMLFILES = \
