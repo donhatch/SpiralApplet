@@ -3,6 +3,9 @@
         Uses System.nanoTime which requires java >= 1.4
         (probably need even later, haven't been keeping track)
 
+    BUG: moment prediction isn't correct yet. why?
+
+    BUG: tooltip is weird on the "Anim sleep ms" textfield
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
@@ -75,7 +78,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 //import javax.swing.JComboBox;
 import javax.swing.JCheckBox;
-
 
 public class SpiralApplet
     extends JApplet
@@ -580,6 +582,7 @@ public class SpiralApplet
                                 {
                                     applet.theSpiralModel.init(applet.spiralModelParams.n.get(), applet.spiralModelParams.nParts.get(), applet.spiralModelParams.deltaStyle.get(), applet.spiralModelParams.deltaStyle_0_degrees.get(), applet.spiralModelParams.randomSeed.get());
 
+                                    // XXX hmm, not sure about this, seems intrusive... maybe should just do it when about to use it?
                                     applet.theSpiralView.focus.modEquals(
                                         applet.theSpiralModel.params.n.get(), 1);
 
@@ -825,8 +828,9 @@ public class SpiralApplet
                     add(new JCol() {{
                         add(new JTablePanel() {{
                             {
+                                // XXX TODO: comes out weird on the textfield
                                 final String toolTipText = "<html>number of milliseconds to sleep after each vsync pulse before calling repaint()."
-                                        + (useJavaFX ? "<br>Probably not needed since javaFX stabilizes the frame rate."
+                                        + (useJavaFX ? "<br>Probably not needed since using javaFX which stabilizes the frame rate."
                                                      : "<br>Probably needed since not using javaFX.")
                                         + "</html>";
                                 add(new JLabel("Anim sleep ms:") {{
@@ -1913,8 +1917,6 @@ public class SpiralApplet
                 }
 
 
-
-
                 nPaints++;
                 g.setColor(java.awt.Color.white);
                 String nPaintsString = ""+nPaints+" paints";
@@ -2184,6 +2186,81 @@ public class SpiralApplet
                              double deltaStyle_0_degrees,
                              int randomSeed)
             {
+                {
+                    // ARGH! not right yet
+                    //double t_degrees = applet.theSpiralModel.params.deltaStyle_0_degrees.get();
+                    double t_degrees = Double.NaN;
+                    if (deltaStyle == DELTASTYLE_0_VERYGRADUAL) t_degrees = 1;
+                    if (deltaStyle == DELTASTYLE_0_GRADUAL) t_degrees = 30;
+                    if (deltaStyle == DELTASTYLE_0) t_degrees = 45;
+                    if (deltaStyle == DELTASTYLE_0_STEEP) t_degrees = 60;
+                    if (deltaStyle == DELTASTYLE_0_VERYSTEEP) t_degrees = 89;
+                    if (deltaStyle == DELTASTYLE_0_USER_SPECIFIED) t_degrees = deltaStyle_0_degrees;
+                    PRINT(t_degrees);
+                    double t = DTOR(t_degrees);
+                    {
+                        // the limit, as computed by wolfram alpha
+                        double predictedArea = Math.tan(t)/4;
+                        double denominator = 9*SQR(Math.cos(t))+SQR(Math.sin(t));
+                        double predictedMomentX = (3*SQR(Math.cos(t))*Math.sin(t)+CUB(Math.sin(t)))/2/denominator;
+                        double predictedMomentY = (Math.cos(t)*SQR(Math.sin(t)))/denominator;
+                        OUT("limit:");
+                        PRINT(predictedMomentX);
+                        PRINT(predictedMomentY);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        // close to limit
+                        double eps = 1e-6;
+                        Complex p01 = new Complex(Math.cos(t), Math.sin(t));
+                        Complex d1 = p01.times(-eps,0.).plusEquals(1.,0.);
+
+                        double predictedArea = eps*Math.sin(t)/2/(1-d1.abs2());
+                        Complex predictedMoment = p01.times(-d1.y/2.,0.).divEquals(
+                                                  d1.times(d1.abs2(),0.).minusEquals(1.,0.).timesEquals(-1.,0.));
+
+                        OUT("close to limit:");
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        // close to limit iterative
+                        double eps = 1e-2;
+                        double nIters = 1e3;
+                        Complex p01 = new Complex(Math.cos(t), Math.sin(t));
+                        Complex d1 = p01.times(-eps,0.).plusEquals(1.,0.);
+                        Complex m01 = p01.times(d1.cross(1.,0.)/2.,0.);
+
+                        Complex predictedMoment = new Complex(0., 0.);
+                        //Complex d1_pow_i = new Complex(d1);  // d1^1
+                        Complex d1_pow_i = new Complex(1.,0.);  // d1^0
+                        for (int i = 1; i <= nIters; ++i) // yes, start at 1
+                        {
+                            d1_pow_i.timesEquals(d1);
+                            predictedMoment.plusEquals(m01.times(d1_pow_i).timesEquals(d1_pow_i.abs2(),0.));
+                        }
+                        OUT("close to limit iterative:");
+                        PRINT(predictedMoment);
+                    }
+                    {
+                        // close to limit iterative, different way
+                        double eps = 1e-2;
+                        double nIters = 1e3;
+                        Complex p01 = new Complex(Math.cos(t), Math.sin(t));
+                        Complex d1 = p01.times(-eps,0.).plusEquals(1.,0.);
+                        Complex m01 = p01.times(d1.cross(1.,0.)/2.,0.);
+
+                        Complex predictedMoment = new Complex(0., 0.);
+                        for (int i = 1; i <= nIters; ++i) // yes, start at 1
+                        {
+                            predictedMoment.timesEquals(d1).timesEquals(d1.abs2(),0.);
+                            predictedMoment.plusEquals(m01);
+                        }
+                        OUT("close to limit iterative, different way:");
+                        PRINT(predictedMoment);
+
+                    }
+                }
                 this.params.n.set(n);
                 this.params.nParts.set(nParts);
                 this.params.deltaStyle.set(deltaStyle);
@@ -2398,6 +2475,14 @@ public class SpiralApplet
                             prevVal = val;
                         }
                     }
+                    OUT("===========");
+                    PRINTVEC(this.momentsAndAreas[0]);
+                    PRINTVEC(this.momentsAndAreas[1]);
+                    PRINTVEC(this.momentsAndAreas[2]);
+                    PRINTVEC(VecMath.vxs(this.momentsAndAreas[0], 1./this.momentsAndAreas[0][2]));
+                    PRINTVEC(VecMath.vxs(this.momentsAndAreas[1], 1./this.momentsAndAreas[1][2]));
+                    PRINTVEC(VecMath.vxs(this.momentsAndAreas[2], 1./this.momentsAndAreas[2][2]));
+                    OUT("===========");
                     assert(done);
                 }
 
@@ -2456,7 +2541,7 @@ public class SpiralApplet
             // primalAng is increasing. (assuming newPrimalMinusDual > oldPrimalMinusDual).
             // this shrinks the canonical representation of the primal,
             // thereby shrinking the center accordingly.
-            // nothing happens to the area (so moment gets shrunk by same abount that center gets shrunk)
+            // nothing happens to the area (so moment gets shrunk by same amount that center gets shrunk)
             // nor to the direction from origin to center.
             double shrink = Math.cos(newPrimalMinusDualAng)
                           / Math.cos(oldPrimalMinusDualAng);
@@ -2477,6 +2562,8 @@ public class SpiralApplet
                 double newPrimalMinusDualAng,
                 double newMomentAndArea[])
         {
+            // TODO: redo this in terms of complex multiplication, maybe (it would be simpler but the current implementation has the advantage that it does no memory allocations)
+
             assumpt(newPrimalMinusDualAng <= oldPrimalMinusDualAng);
             // dualAng is increasing... (assuming newPrimalMinusDual < oldPrimalMinusDual).
             // decrease primalAng to compensate,
@@ -2492,7 +2579,11 @@ public class SpiralApplet
             double ct = Math.cos(t);
             double st = Math.sin(t);
 
-            // old moment in new space is old moment shrunk by shrink^2 and rotated
+            // old moment in new space is old moment shrunk by shrink^2 and rotated.
+            // (only shrink^2 rather than shrink^3 because it's composed of pieces
+            // position*area; the areas got shrunk by shrink^2 but the positions
+            // didn't shrink, they only got rotated.  it's the priscilla moves that shrink
+            // the positions.)
             double oldMomentInNewSpaceX = SQR(shrink) * (oldMomentX * ct - oldMomentY * st);
             double oldMomentInNewSpaceY = SQR(shrink) * (oldMomentX * st + oldMomentY * ct);
 
