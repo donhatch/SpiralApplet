@@ -1,5 +1,5 @@
-//import org.apache.commons.math3.complex.Complex;
-// Nah, just write my own. similar but:
+// I looked at org.apache.commons.math3.complex.Complex
+// but didn't like it enough.  Just writing my own instead.
 //   - calls things plus,times,etc. rather than add,multiply,etc.
 //   - exposes x,y as public fields
 //   - has abs2(),dot,cross,perpDot
@@ -58,13 +58,49 @@ public class Complex
         this.y = (y0*x1 - x0*y1) / denominator;
         return this;
     }
+    public Complex equalsNeg(double x, double y)
+    {
+        this.x = -x;
+        this.y = -y;
+        return this;
+    }
+    public Complex equalsConj(double x, double y)
+    {
+        this.x = x;
+        this.y = -y;
+        return this;
+    }
+    public Complex equalsPerpDot(double x, double y)
+    {
+        this.x = -y;
+        this.y = x;
+        return this;
+    }
+    public Complex equalsExp(double x, double y)
+    {
+        double magnitude = Math.exp(abs(x, y));
+        this.x = magnitude * Math.cos(y);
+        this.y = magnitude * Math.sin(y);
+        return this;
+    }
+    public Complex equalsLog(double x, double y)
+    {
+        this.x = Math.log(abs2(x, y))*.5; // = log(abs(x,y)) but without the hypot
+        this.y = arg(x, y);
+        return this;
+    }
 
-    // Accumulation functions with RHS in x,y form.
+    // Accumulation functions with RHS (if any) in x,y form.
     // Answer goes back into this, with no memory allocations.
     public Complex plusEquals (double x, double y) { return this.equalsPlus (this.x, this.y, x, y); }
     public Complex minusEquals(double x, double y) { return this.equalsMinus(this.x, this.y, x, y); }
     public Complex timesEquals(double x, double y) { return this.equalsTimes(this.x, this.y, x, y); }
     public Complex divEquals  (double x, double y) { return this.equalsDiv  (this.x, this.y, x, y); }
+    public Complex negEquals()     { return this.equalsNeg    (this.x, this.y); }
+    public Complex conjEquals()    { return this.equalsConj   (this.x, this.y); }
+    public Complex perpDotEquals() { return this.equalsPerpDot(this.x, this.y); }
+    public Complex expEquals()     { return this.equalsExp    (this.x, this.y); }
+    public Complex logEquals()     { return this.equalsLog    (this.x, this.y); }
 
     // Accumulation functions with RHS in Complex form.
     // Answer goes back into this, with no memory allocations.
@@ -73,28 +109,27 @@ public class Complex
     public Complex timesEquals(Complex that) { return this.timesEquals(that.x, that.y); }
     public Complex divEquals  (Complex that) { return this.divEquals  (that.x, that.y); }
 
-    // Static functions allocating answer, with LHS in x,y form and no RHS.
-    public static Complex neg    (double x, double y) { return new Complex(-x, -y); }
-    public static Complex conj   (double x, double y) { return new Complex(x, -y); }
-    public static Complex perpDot(double x, double y) { return new Complex(-y, x); }
-
-    // Static functions allocating answer, with LHS and RHS in x,y form.
+    // Static functions allocating answer, with LHS and RHS (if any) in x,y form.
     public static Complex plus (double x0, double y0, double x1, double y1) { return new Complex(x0, y0).plusEquals (x1, y1); }
     public static Complex minus(double x0, double y0, double x1, double y1) { return new Complex(x0, y0).minusEquals(x1, y1); }
     public static Complex times(double x0, double y0, double x1, double y1) { return new Complex(x0, y0).timesEquals(x1, y1); }
     public static Complex div  (double x0, double y0, double x1, double y1) { return new Complex(x0, y0).divEquals  (x1, y1); }
+    public static Complex neg    (double x, double y) { return new Complex(x, y).negEquals(); }
+    public static Complex conj   (double x, double y) { return new Complex(x, y).conjEquals(); }
+    public static Complex perpDot(double x, double y) { return new Complex(y, x).perpDotEquals(); }
+    public static Complex exp    (double x, double y) { return new Complex(y, x).expEquals(); }
+    public static Complex log    (double x, double y) { return new Complex(y, x).logEquals(); }
 
-    // Functions allocating answer, with no RHS.
-    public Complex neg    () { return neg    (this.x, this.y); }
-    public Complex conj   () { return conj   (this.x, this.y); }
-    public Complex perpDot() { return perpDot(this.x, this.y); }
-
-    // Functions allocating answer, with RHS in x,y form.
+    // Functions allocating answer, with RHS (if any) in x,y form.
     public Complex plus (double x, double y) { return plus (this.x, this.y, x, y); }
     public Complex minus(double x, double y) { return minus(this.x, this.y, x, y); }
     public Complex times(double x, double y) { return times(this.x, this.y, x, y); }
     public Complex div  (double x, double y) { return div  (this.x, this.y, x, y); }
-
+    public Complex neg()     { return neg    (this.x, this.y); }
+    public Complex conj()    { return conj   (this.x, this.y); }
+    public Complex perpDot() { return perpDot(this.x, this.y); }
+    public Complex exp()     { return exp    (this.x, this.y); }
+    public Complex log()     { return log    (this.x, this.y); }
 
     // Functions allocating answer, with RHS in Complex form.
     public Complex plus (Complex that) { return this.plus (that.x, that.y); }
@@ -120,6 +155,10 @@ public class Complex
     {
         return MyMath.hypot(x, y); // not Math.hypot since I've heard bad things about it
     }
+    public static double arg(double x, double y)
+    {
+        return Math.atan2(y, x);
+    }
     public String toString(double x, double y)
     {
         return ""+x+"+"+y+"i";
@@ -128,5 +167,6 @@ public class Complex
     // Member functions returning double or String.
     public double abs2    () { return abs2    (this.x, this.y); }
     public double abs     () { return abs     (this.x, this.y); }
+    public double arg     () { return arg     (this.x, this.y); }
     public String toString() { return toString(this.x, this.y); }
 }
