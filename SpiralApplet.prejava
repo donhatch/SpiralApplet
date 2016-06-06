@@ -3,7 +3,7 @@
         Uses System.nanoTime which requires java >= 1.4
         (probably need even later, haven't been keeping track)
 
-    BUG: moment prediction isn't correct yet. why?
+    BUG: moment prediction isn't correct yet. why?  hmm, part of it is I was scaling p01 by same as dudley, need to scale by something like transpose
 
     BUG: tooltip is weird on the "Anim sleep ms" textfield
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
@@ -2227,43 +2227,120 @@ public class SpiralApplet
                         PRINT(predictedArea);
                     }
                     {
-                        // close to limit iterative
-                        double eps = 1e-2;
-                        double nIters = 1e3;
+                        // close to limit iterative (wrong)
+                        OUT("close to limit iterative (wrong):");
+                        double eps = 1e-3;
+                        double nIters = 1e5;
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
                         Complex d1 = p01.times(-eps).plusEquals(1.);
-                        Complex m01 = p01.times(d1.cross(1.)/2.);
+                        double triArea01 = d1.cross(1.)/2.;
+                        Complex m01 = p01.times(triArea01);
 
                         Complex predictedMoment = new Complex(0., 0.);
+                        double predictedArea = 0.;
                         //Complex d1_pow_i = new Complex(d1);  // d1^1
                         Complex d1_pow_i = new Complex(1.);  // d1^0
-                        for (int i = 1; i <= nIters; ++i) // yes, start at 1
+                        double maxXever = 0.;
+                        for (int i = 0; i < nIters; ++i)
                         {
-                            d1_pow_i.timesEquals(d1);
                             predictedMoment.plusEquals(m01.times(d1_pow_i)
                                                           .timesEquals(d1_pow_i.abs2()));
+                            double prevPredictedArea = predictedArea;
+                            predictedArea += triArea01 * d1_pow_i.abs2();
+                            if (predictedArea == prevPredictedArea) {
+                                System.out.println("        hey! area converged on iter "+i);
+                                break;
+                            }
+
+                            maxXever = MAX(maxXever, p01.times(d1_pow_i).x);
+
+
+
+                            d1_pow_i.timesEquals(d1); // so it will be right for next iteration
                         }
-                        OUT("close to limit iterative:");
+                        PRINT(maxXever);
                         PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        // close to limit iterative (corrected)  (but still not right)
+                        OUT("close to limit iterative (corrected):");
+                        double eps = 1e-3;
+                        double nIters = 1e5;
+                        Complex p01 = new Complex(Math.cos(t), Math.sin(t));
+                        Complex d1 = p01.times(-eps).plusEquals(1.);
+                        Complex d1evilTwin = p01.times(-eps).transposedEquals().plusEquals(1.);
+                        PRINT(d1);
+                        PRINT(d1evilTwin);
+                        double triArea01 = d1.cross(1.)/2.;
+
+                        Complex predictedMoment = new Complex(0., 0.);
+                        double predictedArea = 0.;
+                        Complex d1_pow_i = new Complex(1.);  // d1^0
+                        Complex d1evilTwin_pow_i = new Complex(1.);  // d1^0
+                        double maxXever = 0.;
+                        for (int i = 0; i < nIters; ++i)
+                        {
+                            if (i <= 10) {
+                                System.out.println("d1evilTwin^"+i+" = "+d1evilTwin_pow_i);
+                                System.out.println("x = "+p01.times(d1evilTwin_pow_i).x);
+                            }
+
+                            predictedMoment.plusEquals(p01.times(d1evilTwin_pow_i)
+                                                          .timesEquals(triArea01*d1_pow_i.abs2()));
+
+                            double prevPredictedArea = predictedArea;
+                            predictedArea += triArea01 * d1_pow_i.abs2();
+                            if (predictedArea == prevPredictedArea) {
+                                System.out.println("        hey! area converged on iter "+i);
+                                break;
+                            }
+
+                            maxXever = MAX(maxXever, p01.times(d1evilTwin_pow_i).x);
+
+                            d1_pow_i.timesEquals(d1); // so it will be right for next iteration
+                            d1evilTwin_pow_i.timesEquals(d1evilTwin); // so it will be right for next iteration
+                        }
+                        PRINT(maxXever);
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
                     }
                     {
                         // close to limit iterative, different way
-                        double eps = 1e-2;
-                        double nIters = 1e3;
+                        double eps = 1e-3;
+                        double nIters = 1e5;
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
                         Complex d1 = p01.times(-eps).plusEquals(1.);
-                        Complex m01 = p01.times(d1.cross(1.)/2.);
+                        double triArea01 = d1.cross(1.)/2.;
+                        Complex m01 = p01.times(triArea01);
 
+                        OUT("close to limit iterative, different way:");
                         Complex predictedMoment = new Complex(0., 0.);
-                        for (int i = 1; i <= nIters; ++i) // yes, start at 1
+                        double predictedArea = 0.;
+                        for (int i = 0; i < nIters; ++i)
                         {
                             predictedMoment.timesEquals(d1)
                                            .timesEquals(d1.abs2());
                             predictedMoment.plusEquals(m01);
+                            double prevPredictedArea = predictedArea;
+                            predictedArea *= d1.abs2();
+                            predictedArea += triArea01;
+                            if (predictedArea == prevPredictedArea) {
+                                System.out.println("        hey! area converged on iter "+i);
+                                break;
+                            }
                         }
-                        OUT("close to limit iterative, different way:");
                         PRINT(predictedMoment);
+                        PRINT(predictedArea);
                     }
+                    // XXX ok, clearest wrongness perhaps is 89 degrees.
+                    // XXX my estimate produces moment .496,.025, center .0349 or so.
+                    // XXX   but that can't be right since max x ever drawn is .026 ! ok I think
+                    //       this must be the problem.
+                    // XXX the app produces moment 3e-4,.008, center 2e-5,6e-4.
+                    // XXX TODO: keep track of max x drawn?
+
+                    // OH! problem is I'm multiplying p01 by powers of d1... *angle* is right but magnitude is way wrong!
                 }
                 this.params.n.set(n);
                 this.params.nParts.set(nParts);
@@ -4361,6 +4438,7 @@ public class SpiralApplet
                 double area = 0.;
                 boolean centerHasStabilized = false;
 
+                double XXXmaxPrimalXever = 0.;
 
                 double prevPrevVal = val;
                 double prevVal = val;
@@ -4423,6 +4501,8 @@ public class SpiralApplet
                                 {
                                     mg.drawPoint(primalX, primalY, 3);
                                 }
+
+                                XXXmaxPrimalXever = MAX(XXXmaxPrimalXever, primalX);
 
 
                                 boolean drawQuillsFlag = true;
@@ -4598,6 +4678,7 @@ public class SpiralApplet
                     prevPrevVal = prevVal;
                     prevVal = thisVal;
                 }
+                PRINT(XXXmaxPrimalXever);
 
                 if (scanDir < 0 && drawPrimalFlag)
                 {
@@ -4653,6 +4734,18 @@ public class SpiralApplet
 
                         double momentX = centerX*area;
                         double momentY = centerY*area;
+                        if (false)
+                        {
+                            // can probably kill this
+                            OUT("===============");
+                            OUT("wtf:");
+                            PRINT(centerX);
+                            PRINT(centerY);
+                            PRINT(area);
+                            PRINT(momentX);
+                            PRINT(momentY);
+                            OUT("===============");
+                        }
                         {
                             double momentMag = MyMath.hypot(momentX,momentY);
                             double momentAngle = Math.atan2(momentY,momentX);
@@ -4673,6 +4766,11 @@ public class SpiralApplet
 
 
                         arcRadius = Math.sin(2*initialPrimalAng);
+                        // I think what I was thinking in the *4 is that we divide by area-when-45
+                        // so that it will equal center when 45, just so it's in a nice range.
+                        // Maybe should normalize them like that anyway?
+                        // At least use cross product instead of tri areas, for one thing,
+                        // that will get us halfway there anyway.  Maybe.
                         mg.drawPoint(momentX*4,momentY*4,
                                      5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
