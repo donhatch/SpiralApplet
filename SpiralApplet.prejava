@@ -1943,6 +1943,7 @@ public class SpiralApplet
                     int val0 = theSpiralModel.theList[i0];
                     int val1 = theSpiralModel.theList[i1];
                     Rational val = new Rational(val0,1).lerpEquals(val1,1, frac.n,frac.d); // val = lerp(val0,val1,frac)
+                    val.plusEquals(1,2); // add 1/2 get actual non-biased value instead of index
                     g.drawString("value: "+val
                                           +" / "
                                           +theSpiralModel.params.nParts.get()
