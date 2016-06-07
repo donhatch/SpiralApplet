@@ -9,7 +9,7 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
 
-    TODO: should need only 2 passes, I think.   gets rid of assert fail with period= 1000, nParts=900, steepness=45  (and similar... worser when steeper, e.g. period=10000,steepness=60)
+    TODO: think about why it takes 2 full passes before can shortcut to infinity: seems like it should only need 1 (then another to nail down them all).  something about the fact that the sums are up-to-and-including instead of up-to?  oh hmm I think I do need the two passes, but could do the extrapolation at end of pass 1 instead, using 0 as first value... I think?  not sure
     TODO: disable Regenerate button unless out of date?  or turn it red when out of date?
     TODO: combine moment and area into momentAndArea?  it is a homogeneous thing, after all
     TODO: more friendly and usable control of speed
@@ -2228,12 +2228,12 @@ public class SpiralApplet
                         double p_minus1_0_y = p_minus1_0_x * Math.tan(p_minus1_0_angle);
                         Complex p_minus1_0 = new Complex(p_minus1_0_x, p_minus1_0_y);
 
-                        Complex p12 = p01.times(p01).divEquals(p_minus1_0);
+                        Complex p12 = p01.times(p01).overEquals(p_minus1_0);
 
                         Complex m01 = p01.times(triArea01);
                         Complex m12 = p12.times(triArea12);
 
-                        Complex mDelta = m12.div(m01);
+                        Complex mDelta = m12.over(m01);
                         double aDelta = triArea12 / triArea01;
 
                         Complex predictedMoment = SumGeometricSeries(m01, m12);
@@ -5722,8 +5722,8 @@ public class SpiralApplet
     {
         assert(a.abs2() > b.abs2());
 
-        //return a.times(a).divEquals(a.minus(b));      // two allocations
-        return a.times(a).divEquals(a.x-b.x, a.y-b.y);  // only one allocation
+        //return a.times(a).overEquals(a.minus(b));      // two allocations
+        return a.times(a).overEquals(a.x-b.x, a.y-b.y);  // only one allocation
     }
 
     // Assuming b=a*q+r, c=b*q+r, ... take it to infinity.
@@ -5738,9 +5738,9 @@ public class SpiralApplet
     public static Complex OneTwoThreeInfinity(Complex a, Complex b, Complex c)
     {
         Complex b_minus_a = b.minus(a);
-        Complex q = c.minus(b).divEquals(b_minus_a);
+        Complex q = c.minus(b).overEquals(b_minus_a);
         // ok to destroy all intermediates, since we're done.
-        Complex z = b_minus_a.divEquals(q.fromEquals(1)).plusEquals(a);
+        Complex z = b_minus_a.overEquals(q.fromEquals(1)).plusEquals(a);
         return z;
     }
 
