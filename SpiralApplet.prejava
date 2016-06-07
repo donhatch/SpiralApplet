@@ -2155,6 +2155,7 @@ public class SpiralApplet
                 public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 100*1000); // must be positive multiple of 2
                 public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be >= 2
                 public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
+
                 public Listenable.Double deltaStyle_0_degrees = new Listenable.Double(0., 90., 45.);
                 public Listenable.Int randomSeed = new Listenable.Int(0, (1<<31)-1, 1);
             }
@@ -2201,17 +2202,6 @@ public class SpiralApplet
                     PRINT(t_degrees);
                     double t = DTOR(t_degrees);
                     {
-                        // the limit, as computed by wolfram alpha
-                        double predictedArea = Math.tan(t)/4;
-                        double denominator = 9*SQR(Math.cos(t))+SQR(Math.sin(t));
-                        double predictedMomentX = (3*SQR(Math.cos(t))*Math.sin(t)+CUB(Math.sin(t)))/2/denominator;
-                        double predictedMomentY = (Math.cos(t)*SQR(Math.sin(t)))/denominator;
-                        OUT("limit:");
-                        PRINT(predictedMomentX);
-                        PRINT(predictedMomentY);
-                        PRINT(predictedArea);
-                    }
-                    {
                         // close to limit extrapolated to something big
                         OUT("close to limit, extrapolated to infinity:");
                         double eps = 1e-3;
@@ -2243,6 +2233,211 @@ public class SpiralApplet
 
                         Complex predictedMoment = SumGeometricSeries(m01, m12);
                         double predictedArea = SumGeometricSeries(triArea01, triArea12);
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        // Let's see if I can write that out explicitly and simplify.
+                        OUT("more explicit:");
+                        double eps = 1e-3;
+
+                        double ct = Math.cos(t);
+                        double st = Math.sin(t);
+                        Complex p01 = new Complex(ct, st);
+
+                        double triArea01 = eps*st/2.;
+                        double triArea12 = eps*st/2. * (SQR(1.-eps*ct) + SQR(eps*st));
+
+                        double angleDelta = -Math.atan2(-eps*st, 1.-eps*ct);
+                        double p_minus1_0_angle = t + angleDelta;
+                        Complex p_minus1_0 = new Complex(ct, ct * Math.tan(p_minus1_0_angle));
+
+                        Complex p12 = p01.times(p01).divEquals(p_minus1_0);
+
+                        Complex m01 = p01.times(triArea01);
+                        Complex m12 = p12.times(triArea12);
+
+                        Complex mDelta = m12.div(m01);
+                        double aDelta = triArea12 / triArea01;
+
+                        Complex predictedMoment = SumGeometricSeries(m01, m12);
+                        double predictedArea = SumGeometricSeries(triArea01, triArea12);
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        OUT("more explicit but slightly different and simpler (one more term):");
+                        double eps = 1e-3;
+
+                        double ct = Math.cos(t);
+                        double st = Math.sin(t);
+                        Complex p01 = new Complex(ct, st);
+
+                        //double aDelta = SQR(1.-eps*ct) + SQR(eps*st);
+                        double aDelta = 1 - 2*eps*ct + eps*eps;
+                        //double aDelta = 1 - 2*eps*ct; // leave off the eps*eps
+                        double predictedArea = (eps*st/2./aDelta) / (1. - aDelta);
+
+                        double angleDelta = -Math.atan2(-eps*st, 1.-eps*ct);
+                        Complex p_minus1_0 = new Complex(ct, ct * Math.tan(t + angleDelta));
+
+                        Complex predictedMoment = p_minus1_0.div(new Complex(1.).minus( p01.div(p_minus1_0).times(aDelta) ));
+                        predictedMoment.timesEquals(eps*st/2. / aDelta);
+
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        OUT("more explicit but slightly different and even simpler (leave out the eps*eps and pretend aDelta=1 in some places, and angleDelta=eps*st):");
+
+                        double eps = 1e-3;
+
+                        double ct = Math.cos(t);
+                        double st = Math.sin(t);
+                        double predictedArea = (st/ct)/4.;
+                        Complex p01 = new Complex(ct, st);
+
+                        //double angleDelta = eps*st;
+
+                        //Complex p_minus1_0 = new Complex(ct, ct * Math.tan(t + angleDelta));
+
+                        // tan(A+B) = (tanA+tanB) / (1 - tanAtanB)
+                        // tan(t + eps*st) = (tan(t)+tan(eps*st)) / (1 - tan(t)*tan(eps*st))
+                        // tan(t + eps*st) = (tan(t)+tan(eps*st)) / (1 - tan(t)*tan(eps*st))
+                        // then approximate tan(eps*st) by eps*st...
+                        // tan(t + eps*st) = (tan(t)+eps*st) / (1 - tan(t)*eps*st)
+
+                        //Complex p_minus1_0 = new Complex(ct, ct * (Math.tan(t)+eps*st) / (1 - Math.tan(t)*eps*st));
+
+                        //Complex p_minus1_0 = new Complex(ct, ct * (st/ct+eps*st) / (1 - st/ct*eps*st));
+                        //Complex p_minus1_0 = new Complex(ct, ct*st*(1./ct+eps) / (1 - st*st/ct*eps));
+                        Complex p_minus1_0 = new Complex(ct, ct*st*(1.+eps*ct) / (ct - st*st*eps));
+
+                        Complex predictedMoment = p_minus1_0.div(new Complex(1.).minus( p01.div(p_minus1_0).times(1.-2.*eps*ct) ));
+                        predictedMoment.timesEquals(eps*st/2.);
+
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        OUT("more explicit, simplified even more");
+
+                        double eps = 1e-3;
+
+                        double c = Math.cos(t);
+                        double s = Math.sin(t);
+                        double predictedArea = (s/c)/4.;
+
+                        Complex A = new Complex(c, s);
+                        Complex Y = new Complex(1, s*(1+eps*c) / (c - s*s*eps));
+
+                        Complex predictedMoment = Y.div(new Complex(c).minus( A.div(Y).times(1-2*c*eps) ));
+                        predictedMoment.timesEquals(eps*c*c*s/2.);
+
+                        // simplify(A/Y) where A=c+s*i and Y=1+(s*(1+eps*c) / (c - s*s*eps))*i
+                        // Lame!
+
+
+
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        OUT("more explicit, simplified even more");
+
+                        double eps = 1e-4;
+
+                        double c = Math.cos(t);
+                        double s = Math.sin(t);
+                        double predictedArea = (s/c)/4.;
+
+                        Complex A = new Complex(c, s);
+                        Complex X = new Complex(c-s*s*eps, s*(1+eps*c));
+                        //Complex AdivX = A.div(X);
+                        //Complex AdivX = new Complex(0,1).div(new Complex(-s*eps,1)); // whoa!
+                        //Complex AdivX = new Complex(1/(s*s*eps*eps+1), -s*eps/(s*s*eps*eps+1));
+                        //Complex AdivX = new Complex(1, -s*eps).div(s*s*eps*eps+1);
+                        Complex AdivX = new Complex(1, -s*eps); // yeah baby!
+
+                        Complex predictedMoment = X.div(new Complex(c).minus( AdivX.times( (c-s*s*eps)*(1-2*c*eps) )));
+                        predictedMoment.timesEquals(eps*c*s/2);
+
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        OUT("more explicit, simplified yet more");
+
+                        double eps = 1e-4;
+
+                        double c = Math.cos(t);
+                        double s = Math.sin(t);
+                        double predictedArea = (s/c)/4.;
+
+                        Complex X = new Complex(c-s*s*eps, s*(1+eps*c));
+
+                        //Complex predictedMoment = X.div(new Complex(c).minus( AdivX.times( (c-s*s*eps)*(1-2*c*eps) )));
+                        //Complex predictedMoment = X.div(new Complex(c).minus( AdivX.times( c - s*s*eps - 2*c*c*eps + 2*s*s*c*eps*eps)));
+                        //Complex predictedMoment = X.div(new Complex(c).minus( AdivX.times( c - s*s*eps - 2*c*c*eps)));
+                        //Complex predictedMoment = X.div(new Complex(c).minus( new Complex(1, -s*eps).times( c - eps - c*c*eps)));
+                        //Complex predictedMoment = X.div(new Complex(c).minus( new Complex(c-eps-c*c*eps, -s*eps*(c - eps - c*c*eps))));
+                        Complex predictedMoment = X.div(eps+c*c*eps, s*eps*(c - eps - c*c*eps));
+                        predictedMoment.timesEquals(eps*c*s/2);
+
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        OUT("more explicit, simplified yeti more");
+
+                        double eps = 1e-4;
+
+                        double c = Math.cos(t);
+                        double s = Math.sin(t);
+                        double predictedArea = (s/c)/4.;
+
+                        Complex A = new Complex(c-s*s*eps, s*(1+eps*c));
+                        Complex B = new Complex(1+c*c, s*(c-eps-c*c*eps));
+                        //Complex predictedMoment = new Complex(c-s*s*eps, s*(1+eps*c)).div(1+c*c, s*(c-eps-c*c*eps));
+                        //Complex predictedMoment = A.div(B);
+                        //Complex predictedMoment = new Complex(A.dot(B), B.cross(A));
+                        //Complex predictedMoment = new Complex((c-s*s*eps)*(1+c*c)+(s*(1+eps*c))*(s*(c-eps-c*c*eps)), B.cross(A));
+                        Complex predictedMoment = new Complex((c-s*s*eps)*(1+c*c)+(s*(1+eps*c))*(s*(c-eps-c*c*eps)), (1+c*c)*(s*(1+eps*c))-(s*(c-eps-c*c*eps))*(c-s*s*eps));
+                        //predictedMoment.timesEquals(c*s/2 / B.abs2());
+                        //predictedMoment.timesEquals(c*s/2 / (SQR(1+c*c)+SQR(s*(c-eps-c*c*eps))));
+                        predictedMoment.timesEquals(c*s/2 / (SQR(1+c*c)+SQR(s*c))); // ha!
+
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        OUT("more explicit, simplified yetii more");
+
+                        double eps = 1e-4;
+
+                        double c = Math.cos(t);
+                        double s = Math.sin(t);
+                        double predictedArea = (s/c)/4.;
+
+                        //Complex predictedMoment = new Complex((c-s*s*eps)*(1+c*c)+(s*(1+eps*c))*(s*(c-eps-c*c*eps)), (1+c*c)*(s*(1+eps*c))-(s*(c-eps-c*c*eps))*(c-s*s*eps));
+                        //Complex predictedMoment = new Complex(c*(1+c*c)+s*(s*(c)), (1+c*c)*(s*(1+eps*c))-(s*(c-eps-c*c*eps))*(c-s*s*eps));
+                        Complex predictedMoment = new Complex(c*(1+c*c+s*s), (1+c*c)*(s)-(s*(c))*(c));
+                        predictedMoment.timesEquals(c*s/2 / (SQR(1+c*c)+SQR(s*c))); // ha!
+
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+                    }
+                    {
+                        OUT("more explicit, ha got rid of damn eps!");
+
+                        double c = Math.cos(t);
+                        double s = Math.sin(t);
+                        double predictedArea = (s/c)/4.; // i.e. tan(t)/4
+
+                        // This is from an all-night simplifying session with help/hindrance of wolframalpha
+                        Complex predictedMoment = new Complex(c, s/2).timesEquals(c*s / (1+3*c*c));
+                        // Very interesting!  That means every spiral's moment has exactly half the slope of the original, always!?
+
                         PRINT(predictedMoment);
                         PRINT(predictedArea);
                     }
@@ -5637,11 +5832,12 @@ public class SpiralApplet
         return arrayList.toArray(array);
     }
 
+    // Maybe put these in some utility place?
     public static double SumGeometricSeries(double a, double b)
     {
         // The thing being taken to powers is x = b/a.
         // Sum of powers of x is 1/(1-x), so
-        // answer is 1/(1-x) * a = 1/(a-b/a) = a^2/(a-b).
+        // answer is 1/(1-x) * a = 1/(1-b/a) = a^2/(a-b).
         return a*a / (a-b);
     }
     public static Complex SumGeometricSeries(Complex a, Complex b)
