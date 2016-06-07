@@ -2263,7 +2263,7 @@ public class SpiralApplet
                         PRINT(predictedArea);
                     }
                     {
-                        // close to limit iterative (corrected)  (but still not right)
+                        // close to limit iterative (corrected)
                         OUT("close to limit iterative (corrected):");
                         double eps = 1e-3;
                         double nIters = 1e5;
@@ -2314,41 +2314,58 @@ public class SpiralApplet
                         PRINT(predictedArea);
                     }
                     {
-                        // close to limit iterative, different way
+                        // close to limit extrapolated to something big
+                        OUT("close to limit, extrapolated to infinity:");
                         double eps = 1e-3;
-                        double nIters = 1e5;
+                        double nIters = 1e5; // for initial approximation
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
+
+                        double d0 = 1.;
                         Complex d1 = p01.times(-eps).plusEquals(1.);
-                        double triArea01 = d1.cross(1.)/2.;
+                        Complex d2 = d1.times(d1);
+
+                        double triArea01 = d1.cross(d0)/2.;
+                        double triArea12 = d2.cross(d1)/2.;
+
+                        // p_minus1_0 has same x coord as p01.
+                        // what's its y coord?
+                        // Bleah this is pretty hairy.  Need to simplify if possible.
+                        double angleDelta = -d1.arg();
+                        PRINT(angleDelta);
+                        double p_minus1_0_angle = p01.arg() + angleDelta;
+                        double p_minus1_0_x = p01.x;
+                        double p_minus1_0_y = p_minus1_0_x * Math.tan(p_minus1_0_angle);
+                        Complex p_minus1_0 = new Complex(p_minus1_0_x, p_minus1_0_y);
+
+                        Complex p12 = p01.times(p01).divEquals(p_minus1_0);
+
                         Complex m01 = p01.times(triArea01);
+                        Complex m12 = p12.times(triArea12);
 
-                        OUT("close to limit iterative, different way:");
-                        Complex predictedMoment = new Complex(0., 0.);
-                        double predictedArea = 0.;
-                        for (int i = 0; i < nIters; ++i)
+                        Complex mDelta = m12.div(m01);
+                        double aDelta = triArea12 / triArea01;
+
                         {
-                            predictedMoment.timesEquals(d1)
-                                           .timesEquals(d1.abs2());
-                            predictedMoment.plusEquals(m01);
-                            double prevPredictedArea = predictedArea;
-                            predictedArea *= d1.abs2();
-                            predictedArea += triArea01;
-                            if (predictedArea == prevPredictedArea) {
-                                System.out.println("        hey! area converged on iter "+i);
-                                break;
+                            Complex predictedMoment = new Complex(0.);
+                            double predictedArea = 0.;
+                            Complex m = new Complex(m01);
+                            double a = triArea01;
+                            for (int i = 0; i < nIters; ++i) {
+                                predictedMoment.plusEquals(m);
+                                predictedArea += a;
+                                m.timesEquals(mDelta);
+                                a *= aDelta;
                             }
+                            PRINT(predictedMoment);
+                            PRINT(predictedArea);
                         }
-                        PRINT(predictedMoment);
-                        PRINT(predictedArea);
+                        {
+                            Complex predictedMoment = SumGeometricSeries(m01, m12);
+                            double predictedArea = SumGeometricSeries(triArea01, triArea12);
+                            PRINT(predictedMoment);
+                            PRINT(predictedArea);
+                        }
                     }
-                    // XXX ok, clearest wrongness perhaps is 89 degrees.
-                    // XXX my estimate produces moment .496,.025, center .0349 or so.
-                    // XXX   but that can't be right since max x ever drawn is .026 ! ok I think
-                    //       this must be the problem.
-                    // XXX the app produces moment 3e-4,.008, center 2e-5,6e-4.
-                    // XXX TODO: keep track of max x drawn?
-
-                    // OH! problem is I'm multiplying p01 by powers of d1... *angle* is right but magnitude is way wrong!
                 }
                 this.params.n.set(n);
                 this.params.nParts.set(nParts);
@@ -2651,7 +2668,7 @@ public class SpiralApplet
                 double newPrimalMinusDualAng,
                 double newMomentAndArea[])
         {
-            // TODO: redo this in terms of complex multiplication, maybe (it would be simpler but the current implementation has the advantage that it does no memory allocations)
+            // TODO: redo this in terms of complex multiplication, maybe.  It would be simpler but the current implementation has the advantage that it does no memory allocations.  Hmm, can I make single-coord-at-a-time Complex utils? hmm.
 
             assumpt(newPrimalMinusDualAng <= oldPrimalMinusDualAng);
             // dualAng is increasing... (assuming newPrimalMinusDual < oldPrimalMinusDual).
@@ -5738,6 +5755,19 @@ public class SpiralApplet
         // rather than arraryList.size(), supposedly something about the zeroing.
         T[] array = (T[])java.lang.reflect.Array.newInstance(type, 0); // = new T[0]
         return arrayList.toArray(array);
+    }
+
+    public static double SumGeometricSeries(double a, double b)
+    {
+        // The thing being taken to powers is x = b/a.
+        // Sum of powers of x is 1/(1-x), so
+        // answer is 1/(1-x) * a = 1/(a-b/a) = a^2/(a-b).
+        return a*a / (a-b);
+    }
+    public static Complex SumGeometricSeries(Complex a, Complex b)
+    {
+        //return a.times(a).divEquals(a.minus(b));      // two allocations
+        return a.times(a).divEquals(a.x-b.x, a.y-b.y);  // only one allocation
     }
 
 } // class SpiralApplet
