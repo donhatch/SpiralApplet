@@ -2236,8 +2236,15 @@ public class SpiralApplet
                         Complex mDelta = m12.over(m01);
                         double aDelta = triArea12 / triArea01;
 
+                        System.out.println("    using SumGeometricSeries...");
                         Complex predictedMoment = SumGeometricSeries(m01, m12);
                         double predictedArea = SumGeometricSeries(triArea01, triArea12);
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
+
+                        System.out.println("    using OneTwoThreeInfinity...");
+                        predictedMoment = OneTwoThreeInfinity(new Complex(0.), m01, m12.plus(m01));
+                        predictedArea = OneTwoThreeInfinity(0., triArea01, triArea12+triArea01);
                         PRINT(predictedMoment);
                         PRINT(predictedArea);
                     }
