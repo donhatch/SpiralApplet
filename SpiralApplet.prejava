@@ -1933,16 +1933,8 @@ public class SpiralApplet
                              10,
                              20);
                 {
-                    // XXX dup code from in paint
-                    Rational focus = theSpiralView.focus;
-                    int n = theSpiralModel.params.n.get();
-                    int i0 = focus.floor();
-                    Rational frac = focus.minus(i0,1); // frac = focus - i0, before modding i0 by n
-                    i0 = MOD(i0, n);
-                    int i1 = (i0+1)%n;
-                    int val0 = theSpiralModel.theList[i0];
-                    int val1 = theSpiralModel.theList[i1];
-                    Rational val = new Rational(val0,1).lerpEquals(val1,1, frac.n,frac.d); // val = lerp(val0,val1,frac)
+                    // XXX dup code from drawTicker and drawSpiral, I guess maybe should only do these things once? hmm.
+                    Rational val = theSpiralModel.getValBiased(theSpiralView.focus);
                     val.plusEquals(1,2); // add 1/2 get actual non-biased value instead of index
                     g.drawString("value: "+val
                                           +" / "
@@ -2515,6 +2507,27 @@ public class SpiralApplet
                     }
                 }
             } // init
+
+
+            //---------------------------------------------------------------------------------
+            // Convenience (not sure this belongs here, it clutters the SpiralModel definition)
+
+            // Biased like an index.  To unbias, add 1/2.
+            Rational getValBiased(Rational focus)
+            {
+                assert(focus.n >= 0);
+                int n = this.params.n.get();
+                int i0 = focus.floor();
+                Rational frac = focus.minus(i0,1); // frac = focus - i0, before modding i0 by n
+                i0 = MOD(i0, n);
+                int i1 = (i0+1)%n;
+                int val0 = this.theList[i0];
+                int val1 = this.theList[i0];
+                Rational val = new Rational(val0,1).lerpEquals(val1,1, frac); // val = lerp(val.val1,frac)
+                return val;
+            }
+            //---------------------------------------------------------------------------------
+
         }; // public class SpiralModel
         public static class SpiralView
         {
@@ -4069,7 +4082,9 @@ public class SpiralApplet
             //PRINT(val0);
             //PRINT(val1);
             //PRINT(frac);
-            Rational val = new Rational(val0,1).lerpEquals(val1,1, frac.n,frac.d); // val = lerp(val0,val1,frac)
+            Rational val = new Rational(val0,1).lerpEquals(val1,1, frac); // val = lerp(val0,val1,frac)
+            // Note this was the same code as in SpiralModel.getValBiased, but we need val0,val1 too :-(
+            // Note also that val is biased (like an index).
             //PRINT(val);
 
 
@@ -4239,7 +4254,9 @@ public class SpiralApplet
             if (debugLevel >= 1) PRINT(val0);
             if (debugLevel >= 1) PRINT(val1);
             if (debugLevel >= 1) PRINT(frac);
-            double val = LERP(val0,val1,frac.toDouble()); // XXX TODO: use rational arithmetic all the way through... maybe? actually might not be necessary in this function
+            double val = new Rational(val0,1).lerpEquals(val1,1, frac).toDouble(); // val = lerp(val.val1,frac)
+            // Note this was the same code as in SpiralModel.getValBiased, but we need i0,i1 too :-(
+            // Note also that val is biased (like an index), and every time we use it we add .5 or say 2*val+1
             if (debugLevel >= 1) PRINT(val);
 
             if (debugLevel >= 1)
