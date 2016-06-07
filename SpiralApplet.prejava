@@ -9,7 +9,7 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
 
-    TODO: get spiral moment prediction right and nice
+    TODO: should need only 2 passes, I think.   gets rid of assert fail with period= 1000, nParts=900, steepness=45  (and similar... worser when steeper, e.g. period=10000,steepness=60)
     TODO: disable Regenerate button unless out of date?  or turn it red when out of date?
     TODO: combine moment and area into momentAndArea?  it is a homogeneous thing, after all
     TODO: more friendly and usable control of speed
@@ -4350,8 +4350,6 @@ public class SpiralApplet
                 double area = 0.;
                 boolean centerHasStabilized = false;
 
-                double XXXmaxPrimalXever = 0.;
-
                 double prevPrevVal = val;
                 double prevVal = val;
                 for (int i = scanDir==1?i1:i0; ; i = MOD(i+scanDir,n))
@@ -4413,9 +4411,6 @@ public class SpiralApplet
                                 {
                                     mg.drawPoint(primalX, primalY, 3);
                                 }
-
-                                XXXmaxPrimalXever = MAX(XXXmaxPrimalXever, primalX);
-
 
                                 boolean drawQuillsFlag = true;
                                 if (drawQuillsFlag)
@@ -4590,7 +4585,6 @@ public class SpiralApplet
                     prevPrevVal = prevVal;
                     prevVal = thisVal;
                 }
-                PRINT(XXXmaxPrimalXever);
 
                 if (scanDir < 0 && drawPrimalFlag)
                 {
