@@ -2302,7 +2302,7 @@ public class SpiralApplet
                    }
                    PRINT(avgRounded);
                    PRINTVEC(vals);
-                   PRINTARRAY(Arrays.subarray(this.theList, 0, 20));
+                   PRINTARRAY(Arrays.subarray(this.theList, 0, MIN(20,n)));
                 }
                 else if (deltaStyle == DELTASTYLE_1)
                 {
