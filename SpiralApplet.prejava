@@ -2212,112 +2212,9 @@ public class SpiralApplet
                         PRINT(predictedArea);
                     }
                     {
-                        // close to limit
-                        double eps = 1e-6;
-                        Complex p01 = new Complex(Math.cos(t), Math.sin(t));
-                        Complex d1 = p01.times(-eps).plusEquals(1.); // d1 = 1 - eps*p01
-
-                        double predictedArea = eps*Math.sin(t)/2/(1-d1.abs2());
-                        Complex predictedMoment = p01.times(-d1.y/2.).divEquals(
-                                                  d1.times(d1.abs2()).minusEquals(1.)
-                                                                     .timesEquals(-1.));
-
-                        OUT("close to limit:");
-                        PRINT(predictedMoment);
-                        PRINT(predictedArea);
-                    }
-                    {
-                        // close to limit iterative (wrong)
-                        OUT("close to limit iterative (wrong):");
-                        double eps = 1e-3;
-                        double nIters = 1e5;
-                        Complex p01 = new Complex(Math.cos(t), Math.sin(t));
-                        Complex d1 = p01.times(-eps).plusEquals(1.);
-                        double triArea01 = d1.cross(1.)/2.;
-                        Complex m01 = p01.times(triArea01);
-
-                        Complex predictedMoment = new Complex(0., 0.);
-                        double predictedArea = 0.;
-                        //Complex d1_pow_i = new Complex(d1);  // d1^1
-                        Complex d1_pow_i = new Complex(1.);  // d1^0
-                        double maxXever = 0.;
-                        for (int i = 0; i < nIters; ++i)
-                        {
-                            predictedMoment.plusEquals(m01.times(d1_pow_i)
-                                                          .timesEquals(d1_pow_i.abs2()));
-                            double prevPredictedArea = predictedArea;
-                            predictedArea += triArea01 * d1_pow_i.abs2();
-                            if (predictedArea == prevPredictedArea) {
-                                System.out.println("        hey! area converged on iter "+i);
-                                break;
-                            }
-
-                            maxXever = MAX(maxXever, p01.times(d1_pow_i).x);
-
-
-
-                            d1_pow_i.timesEquals(d1); // so it will be right for next iteration
-                        }
-                        PRINT(maxXever);
-                        PRINT(predictedMoment);
-                        PRINT(predictedArea);
-                    }
-                    {
-                        // close to limit iterative (corrected)
-                        OUT("close to limit iterative (corrected):");
-                        double eps = 1e-3;
-                        double nIters = 1e5;
-                        Complex p01 = new Complex(Math.cos(t), Math.sin(t));
-                        Complex d1 = p01.times(-eps).plusEquals(1.);
-
-                        // p_minus1_0 has same x coord as p01.
-                        // what's its y coord?
-                        // Bleah this is pretty hairy.  Need to simplify if possible.
-                        double angleDelta = -d1.arg();
-                        PRINT(angleDelta);
-                        double p_minus1_0_angle = p01.arg() + angleDelta;
-                        double p_minus1_0_x = p01.x;
-                        double p_minus1_0_y = p_minus1_0_x * Math.tan(p_minus1_0_angle);
-                        Complex d1evilTwin = p01.div(p_minus1_0_x, p_minus1_0_y);
-                        PRINT(d1);
-                        PRINT(d1evilTwin);
-                        PRINT(d1.abs());
-                        PRINT(d1evilTwin.abs());
-                        PRINT(d1.arg());
-                        PRINT(d1evilTwin.arg());
-                        double triArea01 = d1.cross(1.)/2.;
-
-                        Complex predictedMoment = new Complex(0., 0.);
-                        double predictedArea = 0.;
-                        Complex d1_pow_i = new Complex(1.);  // d1^0
-                        Complex d1evilTwin_pow_i = new Complex(1.);  // d1^0
-                        double maxXever = 0.;
-                        for (int i = 0; i < nIters; ++i)
-                        {
-                            predictedMoment.plusEquals(p01.times(d1evilTwin_pow_i)
-                                                          .timesEquals(triArea01*d1_pow_i.abs2()));
-
-                            double prevPredictedArea = predictedArea;
-                            predictedArea += triArea01 * d1_pow_i.abs2();
-                            if (predictedArea == prevPredictedArea) {
-                                System.out.println("        hey! area converged on iter "+i);
-                                break;
-                            }
-
-                            maxXever = MAX(maxXever, p01.times(d1evilTwin_pow_i).x);
-
-                            d1_pow_i.timesEquals(d1); // so it will be right for next iteration
-                            d1evilTwin_pow_i.timesEquals(d1evilTwin); // so it will be right for next iteration
-                        }
-                        PRINT(maxXever);
-                        PRINT(predictedMoment);
-                        PRINT(predictedArea);
-                    }
-                    {
                         // close to limit extrapolated to something big
                         OUT("close to limit, extrapolated to infinity:");
                         double eps = 1e-3;
-                        double nIters = 1e5; // for initial approximation
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
 
                         double d0 = 1.;
@@ -2331,7 +2228,6 @@ public class SpiralApplet
                         // what's its y coord?
                         // Bleah this is pretty hairy.  Need to simplify if possible.
                         double angleDelta = -d1.arg();
-                        PRINT(angleDelta);
                         double p_minus1_0_angle = p01.arg() + angleDelta;
                         double p_minus1_0_x = p01.x;
                         double p_minus1_0_y = p_minus1_0_x * Math.tan(p_minus1_0_angle);
@@ -2345,26 +2241,10 @@ public class SpiralApplet
                         Complex mDelta = m12.div(m01);
                         double aDelta = triArea12 / triArea01;
 
-                        {
-                            Complex predictedMoment = new Complex(0.);
-                            double predictedArea = 0.;
-                            Complex m = new Complex(m01);
-                            double a = triArea01;
-                            for (int i = 0; i < nIters; ++i) {
-                                predictedMoment.plusEquals(m);
-                                predictedArea += a;
-                                m.timesEquals(mDelta);
-                                a *= aDelta;
-                            }
-                            PRINT(predictedMoment);
-                            PRINT(predictedArea);
-                        }
-                        {
-                            Complex predictedMoment = SumGeometricSeries(m01, m12);
-                            double predictedArea = SumGeometricSeries(triArea01, triArea12);
-                            PRINT(predictedMoment);
-                            PRINT(predictedArea);
-                        }
+                        Complex predictedMoment = SumGeometricSeries(m01, m12);
+                        double predictedArea = SumGeometricSeries(triArea01, triArea12);
+                        PRINT(predictedMoment);
+                        PRINT(predictedArea);
                     }
                 }
                 this.params.n.set(n);
