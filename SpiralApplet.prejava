@@ -2206,6 +2206,7 @@ public class SpiralApplet
                     if (deltaStyle == DELTASTYLE_0_USER_SPECIFIED) t_degrees = deltaStyle_0_degrees;
                     PRINT(t_degrees);
                     double t = DTOR(t_degrees);
+                    if (t == t) // if not NaN
                     {
                         // close to limit extrapolated to something big
                         OUT("close to limit, extrapolated to infinity:");
@@ -2426,11 +2427,12 @@ public class SpiralApplet
 
                     double prevVal = (double)theList[n-1];
 
-                    double oracleFodder[][] = new double[0][3]; // TODO: allocate this up front
+                    double oracleFodder[][] = new double[3][3]; // need three samples to extrapolate to infinity
 
-                    // Generally stabilizes at iPass=4 i=0,
-                    // but if n is small it needs a few more passes to stabilize.
-                    int maxPasses = 10;
+                    // Generally stabilizes at iPass=3 i=0,
+                    // but if n (period) is small it needs a few more passes to stabilize.
+                    // When n is 4, I've seen it go as high as iPass=739, argh!
+                    int maxPasses = 1000;
                     FORI (iPass, maxPasses)
                     {
                         FORI (i, n)
@@ -2462,6 +2464,9 @@ public class SpiralApplet
                                   && VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea))
                             {
                                 System.out.println("centers and areas stabilized at iPass="+iPass+" i="+i+"/n="+n);
+                                //assert(iPass <= 11); // keep track of max ever seen
+                                //assert(iPass <= 39); // keep track of max ever seen
+                                assert(iPass <= 793); // keep track of max ever seen.   +-1 wrap, period=4 seed=1 or 10.  argh!
                                 System.out.println("=========================");
                                 done = true;
                             }
@@ -2471,13 +2476,11 @@ public class SpiralApplet
                                 {
                                     if (iPass <= 2)
                                     {
-                                        oracleFodder = (double[][])Arrays.append(oracleFodder,
-                                                                                 Arrays.copy(thisMomentAndArea,1));
-                                        PRINTARRAY_NONCOMPACT(oracleFodder);
+                                        VecMath.copyvec(oracleFodder[iPass], thisMomentAndArea);
                                     }
                                     if (iPass == 2)
                                     {
-                                        assert(oracleFodder.length == 3);
+                                        PRINTARRAY_NONCOMPACT(oracleFodder);
                                         Complex moment = OneTwoThreeInfinity(
                                             new Complex(oracleFodder[0][0], oracleFodder[0][1]),
                                             new Complex(oracleFodder[1][0], oracleFodder[1][1]),
@@ -2486,10 +2489,10 @@ public class SpiralApplet
                                             oracleFodder[0][2],
                                             oracleFodder[1][2],
                                             oracleFodder[2][2]);
-                                        System.out.println("shortcutting [0]: 0, "+Arrays.toStringCompact(this.momentsAndAreas[i])+" , "+Arrays.toStringCompact(thisMomentAndArea)+" -> "+Arrays.toStringCompact(new double[]{moment.x,moment.y,area}));
                                         thisMomentAndArea[0] = moment.x;
                                         thisMomentAndArea[1] = moment.y;
                                         thisMomentAndArea[2] = area;
+                                        System.out.println("shortcutting [0] to "+Arrays.toStringCompact(thisMomentAndArea));
                                     }
                                 }
 
@@ -2499,6 +2502,11 @@ public class SpiralApplet
                             VecMath.copyvec(prevMomentAndArea, thisMomentAndArea);
 
                             prevVal = val;
+                        }
+                        if (done)
+                        {
+                            // TODO: maybe should do 1 full pass afterwards to make sure it's all sane?
+                            break;
                         }
                     }
 
@@ -5703,6 +5711,7 @@ public class SpiralApplet
     {
         assert(b >= 0);
         assert(a > b);
+
         // The thing being taken to powers is x = b/a.
         // Sum of powers of x is 1/(1-x), so
         // answer is 1/(1-x) * a = 1/(1-b/a) = a^2/(a-b).
@@ -5712,6 +5721,7 @@ public class SpiralApplet
     public static Complex SumGeometricSeries(Complex a, Complex b)
     {
         assert(a.abs2() > b.abs2());
+
         //return a.times(a).divEquals(a.minus(b));      // two allocations
         return a.times(a).divEquals(a.x-b.x, a.y-b.y);  // only one allocation
     }
