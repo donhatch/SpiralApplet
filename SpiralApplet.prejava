@@ -5734,6 +5734,17 @@ public class SpiralApplet
         double Q = 1./(1.-q); // = 1+q+q^2+q^3+...
         double z = LERP(a,b,Q); // = a + (b-a)*Q = a + (b-a)/(1-q)
         return z;
+
+        // Can we rewrite it more simply to make the Complex version more direct?
+        //     = a + (b-a)/(1-(c-b)/(b-a))
+        //     = a + (b-a)^2/((b-a)-(c-b))
+        //     = a + (b-a)^2/(2*b-a-c)
+        // hmm. maybe:
+        //     b.minus(a).squared()/over(b.times(2).minus(a).minus(b))
+        //     b.minus(a).squaredEquals()/over(b.times(2).minusEquals(a).minusEquals(b))
+        // well, it makes two temporaries, just like the existing version, so maybe no benefit...
+        // although there's only one division so maybe it's more direct?
+        // however the 2*b-a-c looks maybe unstable, (b-a)-(c-b) is maybe better anyway.
     }
     public static Complex OneTwoThreeInfinity(Complex a, Complex b, Complex c)
     {
