@@ -1932,13 +1932,24 @@ public class SpiralApplet
                                       ,
                              10,
                              20);
-                g.drawString("value: "+theSpiralModel.theList[MOD(theSpiralView.focus.round(),
-                                                                  theSpiralModel.params.n.get())]
-                                      +" / "
-                                      +theSpiralModel.params.nParts.get()
-                                      ,
-                             10,
-                             40);
+                {
+                    // XXX dup code from in paint
+                    Rational focus = theSpiralView.focus;
+                    int n = theSpiralModel.params.n.get();
+                    int i0 = focus.floor();
+                    Rational frac = focus.minus(i0,1); // frac = focus - i0, before modding i0 by n
+                    i0 = MOD(i0, n);
+                    int i1 = (i0+1)%n;
+                    int val0 = theSpiralModel.theList[i0];
+                    int val1 = theSpiralModel.theList[i1];
+                    Rational val = new Rational(val0,1).lerpEquals(val1,1, frac.n,frac.d); // val = lerp(val0,val1,frac)
+                    g.drawString("value: "+val
+                                          +" / "
+                                          +theSpiralModel.params.nParts.get()
+                                          ,
+                                 10,
+                                 40);
+                }
 
 
 
