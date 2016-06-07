@@ -2424,9 +2424,13 @@ public class SpiralApplet
 
                     boolean done = false;
 
-                    double prevVal = theList[n-1];
+                    double prevVal = (double)theList[n-1];
 
-                    int maxPasses = 2 + 10000/n; // really should be, roughly, one complete pass plus some fixed number of iterations
+                    double oracleFodder[][] = new double[0][3];
+
+                    int maxPasses = 2 + 10000/n; // the old number. not sure what I'm doing yet.
+                    //int maxPasses = 3; // 2 to finish, third to check
+                    //int maxPasses = 6; // XXX ?  wtf this isn't working like I expected.  experimenting.
                     PRINT(maxPasses);
                     FORI (iPass, maxPasses)
                     {
@@ -2441,7 +2445,7 @@ public class SpiralApplet
                             // when val decreases, it means dualAng is increasing
                             // (i.e. Dudley is moving, Priscilla is turning)
                             // but, we always keep it canonicalized so that dualAng is 0.
-                            double val = theList[i];
+                            double val = (double)theList[i];
                             double prevPrimalAng = Math.PI/2 * ((prevVal+.5)/nParts);
                             double primalAng = Math.PI/2 * ((val+.5)/nParts);
 
@@ -2464,6 +2468,88 @@ public class SpiralApplet
                             }
                             else
                             {
+                                if (i == 0)
+                                {
+                                    if (iPass <= 2)
+                                    {
+                                        oracleFodder = (double[][])Arrays.append(oracleFodder, Arrays.copy(thisMomentAndArea,1));
+#if 0
+                                        PRINTARRAY_NONCOMPACT(oracleFodder);
+                                        double oracleFodderDiffs[][] = new double[oracleFodder.length-1][3];
+                                        FORI (j, oracleFodderDiffs.length)
+                                        {
+                                            VecMath.vmv(oracleFodderDiffs[j],oracleFodder[j+1],oracleFodder[j]);
+                                        }
+                                        PRINTARRAY_NONCOMPACT(oracleFodderDiffs);
+                                        if (oracleFodderDiffs.length >= 1) {
+                                          double oracleFodderDiffRatios[][] = new double[oracleFodderDiffs.length-1][3];
+                                          FORI (j, oracleFodderDiffRatios.length)
+                                          {
+                                              oracleFodderDiffRatios[j][2] = oracleFodderDiffs[j+1][2] / oracleFodderDiffs[j][2];
+                                          }
+                                          PRINTARRAY_NONCOMPACT(oracleFodderDiffRatios);
+
+                                          if (oracleFodderDiffRatios.length >= 1) {
+                                              double x = oracleFodderDiffRatios[oracleFodderDiffRatios.length-1][2];
+                                              PRINT(x);
+                                              double X = 1./(1.-x);
+                                              PRINT(X);
+                                              double Y = oracleFodderDiffs[oracleFodderDiffs.length-2][2] * X;
+                                              PRINT(Y);
+                                              double Z = oracleFodder[oracleFodder.length-3][2] + Y;
+                                              PRINT(Z);
+                                              // YES it works!!!
+                                              PRINT(oracleFodder.length);
+                                              PRINT(OneTwoThreeInfinity(
+                                                oracleFodder[oracleFodder.length-3][2],
+                                                oracleFodder[oracleFodder.length-2][2],
+                                                oracleFodder[oracleFodder.length-1][2]));
+                                              PRINT(iPass);
+                                          }
+                                        }
+
+/*
+for n=100:
+oracleFodderDiffs = {{0.12647159632625288,0.06986385755021593,0.19924734124123206},{0.009833188802447018,-0.0037910411047611947,0.034783011955408616},{2.492006916010592E-4,-7.271685514596837E-4,0.006072140853439545},{-2.8946739000224042E-5,-4.8016986020832375E-5,0.001060025928498659},{-4.040093215418317E-6,-6.338602287492279E-7,1.8505087352391203E-4}}
+
+
+so we have sequence:
+  0.008575216020350591
+  0.20782255726158264
+  0.24260556921699125
+  0.2486777100704308
+  0.24973773599892946
+  0.24992278687245337
+is it converging??  Hopefully to 0.2499619237890968
+given a,b,c
+find q,r such that:
+    b = a*q+r
+    c = b*q+r
+so...
+    c-b = (b-a)*q
+    q = (c-b)/(b-a)
+    r = b-a*q = c-b*q
+differences are:
+*/
+#endif
+                                    }
+                                    if (iPass == 2)
+                                    {
+                                        Complex moment = OneTwoThreeInfinity(
+                                            new Complex(oracleFodder[0][0], oracleFodder[0][1]),
+                                            new Complex(oracleFodder[1][0], oracleFodder[1][1]),
+                                            new Complex(oracleFodder[2][0], oracleFodder[2][1]));
+                                        double area = OneTwoThreeInfinity(
+                                            oracleFodder[0][2],
+                                            oracleFodder[1][2],
+                                            oracleFodder[2][2]);
+                                        System.out.println("shortcutting [0]: 0, "+Arrays.toStringCompact(this.momentsAndAreas[i])+" , "+Arrays.toStringCompact(thisMomentAndArea)+" -> "+Arrays.toStringCompact(new double[]{moment.x,moment.y,area}));
+                                        thisMomentAndArea[0] = moment.x;
+                                        thisMomentAndArea[1] = moment.y;
+                                        thisMomentAndArea[2] = area;
+                                    }
+                                }
+
                                 VecMath.copyvec(this.momentsAndAreas[i], thisMomentAndArea);
                             }
 
@@ -2472,6 +2558,7 @@ public class SpiralApplet
                             prevVal = val;
                         }
                     }
+
                     OUT("===========");
                     PRINTVEC(this.momentsAndAreas[0]);
                     PRINTVEC(this.momentsAndAreas[1]);
@@ -5668,17 +5755,40 @@ public class SpiralApplet
     }
 
     // Maybe put these in some utility place?
+    // Sum geometric series given the first two terms which should be decreasing.
     public static double SumGeometricSeries(double a, double b)
     {
+        assert(b >= 0);
+        assert(a > b);
         // The thing being taken to powers is x = b/a.
         // Sum of powers of x is 1/(1-x), so
         // answer is 1/(1-x) * a = 1/(1-b/a) = a^2/(a-b).
         return a*a / (a-b);
     }
+    // Sum geometric series given the first two terms.
     public static Complex SumGeometricSeries(Complex a, Complex b)
     {
+        assert(a.abs2() > b.abs2());
         //return a.times(a).divEquals(a.minus(b));      // two allocations
         return a.times(a).divEquals(a.x-b.x, a.y-b.y);  // only one allocation
+    }
+
+    // Assuming b=a*q+r, c=b*q+r, ... take it to infinity.
+    public static double OneTwoThreeInfinity(double a, double b, double c)
+    {
+        double q = (c-b)/(b-a);
+        double r = c - b*q;  // = b - a*q
+        double Q = 1./(1.-q); // = 1+q+q^2+q^3+...
+        double z = LERP(a,b,Q); // = a + (b-a)*Q = a + (b-a)/(1-q)
+        return z;
+    }
+    public static Complex OneTwoThreeInfinity(Complex a, Complex b, Complex c)
+    {
+        Complex b_minus_a = b.minus(a);
+        Complex q = c.minus(b).divEquals(b_minus_a);
+        // ok to destroy all intermediates, since we're done.
+        Complex z = b_minus_a.divEquals(q.fromEquals(1)).plusEquals(a);
+        return z;
     }
 
 } // class SpiralApplet
