@@ -2257,6 +2257,7 @@ public class SpiralApplet
                         // This is from an all-night simplifying session with help/hindrance of wolframalpha
                         Complex predictedMoment = new Complex(c, s/2).times(c*s / (1+3*c*c));
                         // Very interesting!  That means every spiral's moment has exactly half the slope of the original, always!?
+                        // So, can find centroid as that point on the half-slope line such that the line from it to p01 forms the correct angle with the half-slope line.  I guess it turns out to be the following.
 
                         Complex predictedCentroid = new Complex(c, s/2).times(4 * c*c / (1+3*c*c));
 
