@@ -2423,6 +2423,7 @@ public class SpiralApplet
 
                     boolean done = false;
 
+                    double secret_stash_for_oracle[] = new double[3]; // zeros initially
                     double prevVal = (double)theList[n-1];
 
                     // Generally stabilizes by iPass=2 i=n-1 or so,
@@ -2469,23 +2470,51 @@ public class SpiralApplet
                             }
                             else
                             {
+                                if (i == n-1)
+                                {
+                                    System.out.println("    end of pass "+iPass+": momentsAndAreas["+i+"] = "+Arrays.toStringCompact(thisMomentAndArea));
+                                }
+
                                 if (iPass == 1 && i == n-1)
                                 {
                                     PRINTMATROW(this.momentsAndAreas, i);
                                     PRINTVEC(thisMomentAndArea);
                                     Complex moment = OneTwoThreeInfinity(
-                                        new Complex(0.,0.),
-                                        new Complex(this.momentsAndAreas[i][0], this.momentsAndAreas[i][1]),
-                                        new Complex(thisMomentAndArea[0], thisMomentAndArea[1]));
+                                        new Complex(secret_stash_for_oracle[0], secret_stash_for_oracle[1]), // zero
+                                        new Complex(this.momentsAndAreas[i][0], this.momentsAndAreas[i][1]), // result of pass 0
+                                        new Complex(thisMomentAndArea[0], thisMomentAndArea[1]));            // result of pass 1
                                     double area = OneTwoThreeInfinity(
-                                        0.,
+                                        secret_stash_for_oracle[2],
                                         this.momentsAndAreas[i][2],
                                         thisMomentAndArea[2]);
                                     thisMomentAndArea[0] = moment.x;
                                     thisMomentAndArea[1] = moment.y;
                                     thisMomentAndArea[2] = area;
-                                    System.out.println("shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
+                                    System.out.println("    pass "+iPass+": shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
+                                    secret_stash_for_oracle = VecMath.copyvec(thisMomentAndArea);
                                 }
+
+                                // Hmm, experimenting with doing that again to try to nip drift.
+                                // Hey, it seems to work!
+                                if (iPass == 3 && i == n-1)
+                                {
+                                    PRINTMATROW(this.momentsAndAreas, i);
+                                    PRINTVEC(thisMomentAndArea);
+                                    Complex moment = OneTwoThreeInfinity(
+                                        new Complex(secret_stash_for_oracle[0], secret_stash_for_oracle[1]), // (corrected) result of pass 1
+                                        new Complex(this.momentsAndAreas[i][0], this.momentsAndAreas[i][1]), // result of pass 2
+                                        new Complex(thisMomentAndArea[0], thisMomentAndArea[1]));            // result of pass 3
+                                    double area = OneTwoThreeInfinity(
+                                        secret_stash_for_oracle[2],
+                                        this.momentsAndAreas[i][2],
+                                        thisMomentAndArea[2]);
+                                    thisMomentAndArea[0] = moment.x;
+                                    thisMomentAndArea[1] = moment.y;
+                                    thisMomentAndArea[2] = area;
+                                    System.out.println("    pass "+iPass+": shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
+                                    secret_stash_for_oracle = VecMath.copyvec(thisMomentAndArea);
+                                }
+
 
                                 VecMath.copyvec(this.momentsAndAreas[i], thisMomentAndArea);
                             }
