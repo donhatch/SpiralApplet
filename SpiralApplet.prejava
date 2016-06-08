@@ -9,6 +9,7 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
 
+    TODO: shortcut management is not completely robust
     TODO: disable Regenerate button unless out of date?  or turn it red when out of date?
     TODO: more friendly and usable control of speed
     TODO: more friendly and usable control of shape. should be able to easily express:
