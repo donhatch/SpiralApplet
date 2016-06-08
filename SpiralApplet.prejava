@@ -9,7 +9,6 @@
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
 
-    TODO: think about why it takes 2 full passes before can shortcut to infinity: seems like it should only need 1 (then another to nail down them all).  something about the fact that the sums are up-to-and-including instead of up-to?  oh hmm I think I do need the two passes, but could do the extrapolation at end of pass 1 instead, using 0 as first value... I think?  not sure
     TODO: disable Regenerate button unless out of date?  or turn it red when out of date?
     TODO: combine moment and area into momentAndArea?  it is a homogeneous thing, after all
     TODO: more friendly and usable control of speed
@@ -2427,8 +2426,6 @@ public class SpiralApplet
 
                     double prevVal = (double)theList[n-1];
 
-                    double oracleFodder[][] = new double[3][3]; // need three samples to extrapolate to infinity
-
                     // Generally stabilizes at iPass=3 i=0,
                     // but if n (period) is small it needs a few more passes to stabilize.
                     // When n is 4, I've seen it go as high as iPass=739, argh!
@@ -2472,28 +2469,22 @@ public class SpiralApplet
                             }
                             else
                             {
-                                if (i == 0)
+                                if (iPass == 1 && i == n-1)
                                 {
-                                    if (iPass <= 2)
-                                    {
-                                        VecMath.copyvec(oracleFodder[iPass], thisMomentAndArea);
-                                    }
-                                    if (iPass == 2)
-                                    {
-                                        PRINTARRAY_NONCOMPACT(oracleFodder);
-                                        Complex moment = OneTwoThreeInfinity(
-                                            new Complex(oracleFodder[0][0], oracleFodder[0][1]),
-                                            new Complex(oracleFodder[1][0], oracleFodder[1][1]),
-                                            new Complex(oracleFodder[2][0], oracleFodder[2][1]));
-                                        double area = OneTwoThreeInfinity(
-                                            oracleFodder[0][2],
-                                            oracleFodder[1][2],
-                                            oracleFodder[2][2]);
-                                        thisMomentAndArea[0] = moment.x;
-                                        thisMomentAndArea[1] = moment.y;
-                                        thisMomentAndArea[2] = area;
-                                        System.out.println("shortcutting [0] to "+Arrays.toStringCompact(thisMomentAndArea));
-                                    }
+                                    PRINTMATROW(this.momentsAndAreas, i);
+                                    PRINTVEC(thisMomentAndArea);
+                                    Complex moment = OneTwoThreeInfinity(
+                                        new Complex(0.,0.),
+                                        new Complex(this.momentsAndAreas[i][0], this.momentsAndAreas[i][1]),
+                                        new Complex(thisMomentAndArea[0], thisMomentAndArea[1]));
+                                    double area = OneTwoThreeInfinity(
+                                        0.,
+                                        this.momentsAndAreas[i][2],
+                                        thisMomentAndArea[2]);
+                                    thisMomentAndArea[0] = moment.x;
+                                    thisMomentAndArea[1] = moment.y;
+                                    thisMomentAndArea[2] = area;
+                                    System.out.println("shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
                                 }
 
                                 VecMath.copyvec(this.momentsAndAreas[i], thisMomentAndArea);
