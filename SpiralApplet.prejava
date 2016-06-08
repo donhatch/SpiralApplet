@@ -2462,9 +2462,16 @@ public class SpiralApplet
                                   && VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea))
                             {
                                 System.out.println("centers and areas stabilized at iPass="+iPass+" i="+i+"/n="+n);
+
+
+                                // These were before implementing 2nd shortcut
                                 //assert(iPass <= 11); // keep track of max ever seen
                                 //assert(iPass <= 39); // keep track of max ever seen
-                                assert(iPass <= 793); // keep track of max ever seen.   +-1 wrap, period=4 seed=1 or 10.  argh!
+                                //assert(iPass <= 793); // keep track of max ever seen.   +-1 wrap, period=4 seed=1 or 10.  argh!
+
+                                //assert(iPass <= 28);
+                                assert(iPass <= 469);
+
                                 System.out.println("=========================");
                                 done = true;
                             }
@@ -2477,8 +2484,6 @@ public class SpiralApplet
 
                                 if (iPass == 1 && i == n-1)
                                 {
-                                    PRINTMATROW(this.momentsAndAreas, i);
-                                    PRINTVEC(thisMomentAndArea);
                                     Complex moment = OneTwoThreeInfinity(
                                         new Complex(secret_stash_for_oracle[0], secret_stash_for_oracle[1]), // zero
                                         new Complex(this.momentsAndAreas[i][0], this.momentsAndAreas[i][1]), // result of pass 0
@@ -2487,19 +2492,28 @@ public class SpiralApplet
                                         secret_stash_for_oracle[2],
                                         this.momentsAndAreas[i][2],
                                         thisMomentAndArea[2]);
+                                    assert(!Double.isNaN(area));
+                                    assert(!Double.isNaN(moment.x));
+                                    assert(!Double.isNaN(moment.y));
+                                    assert(!Double.isInfinite(area));
+                                    assert(!Double.isInfinite(moment.x));
+                                    assert(!Double.isInfinite(moment.y));
+                                    // TODO: implement Complex isNaN, isInfinite, isFinite
                                     thisMomentAndArea[0] = moment.x;
                                     thisMomentAndArea[1] = moment.y;
                                     thisMomentAndArea[2] = area;
                                     System.out.println("    pass "+iPass+": shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
+                                    assert(area == area); // not nan
+                                    assert(area+1. != area); // not infinite
                                     secret_stash_for_oracle = VecMath.copyvec(thisMomentAndArea);
                                 }
 
                                 // Hmm, experimenting with doing that again to try to nip drift.
-                                // Hey, it seems to work!
-                                if (iPass == 3 && i == n-1)
+                                // Hey, it seems to work!  Well except for infinite cases.
+                                // Hmm, in those cases it seems we should just stop short?  Hmm.
+                                //if (iPass == 3 && i == n-1)
+                                if (iPass>=3 && iPass%2==1 && i == n-1)
                                 {
-                                    PRINTMATROW(this.momentsAndAreas, i);
-                                    PRINTVEC(thisMomentAndArea);
                                     Complex moment = OneTwoThreeInfinity(
                                         new Complex(secret_stash_for_oracle[0], secret_stash_for_oracle[1]), // (corrected) result of pass 1
                                         new Complex(this.momentsAndAreas[i][0], this.momentsAndAreas[i][1]), // result of pass 2
@@ -2508,10 +2522,27 @@ public class SpiralApplet
                                         secret_stash_for_oracle[2],
                                         this.momentsAndAreas[i][2],
                                         thisMomentAndArea[2]);
-                                    thisMomentAndArea[0] = moment.x;
-                                    thisMomentAndArea[1] = moment.y;
-                                    thisMomentAndArea[2] = area;
-                                    System.out.println("    pass "+iPass+": shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
+                                    assert(!Double.isNaN(area));
+                                    assert(!Double.isNaN(moment.x));
+                                    assert(!Double.isNaN(moment.y));
+                                    if (Double.isInfinite(area)
+                                     || Double.isInfinite(moment.x)
+                                     || Double.isInfinite(moment.y))
+                                    {
+                                        // Problem cases were:
+                                        // PRINT(OneTwoThreeInfinity(0.21336597976618202, 0.21336597976618205, 0.21336597976618207));
+                                        // PRINT(OneTwoThreeInfinity(0.4242416547300847, 0.42424165473008457, 0.42424165473008446));
+                                        // Reason it was a problem was that those three numbers are actually equally spaced.
+                                        System.out.println("    pass "+iPass+": NOT shortcutting ["+i+"] since area and/or moment would be infinite: moment="+moment+" area="+area);
+                                        // Hopefully this means we're really close to convergence anyway?
+                                    }
+                                    else
+                                    {
+                                        thisMomentAndArea[0] = moment.x;
+                                        thisMomentAndArea[1] = moment.y;
+                                        thisMomentAndArea[2] = area;
+                                        System.out.println("    pass "+iPass+": shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
+                                    }
                                     secret_stash_for_oracle = VecMath.copyvec(thisMomentAndArea);
                                 }
 
@@ -5539,6 +5570,11 @@ public class SpiralApplet
     //
     public static void main(final String args[])
     {
+        if (true)
+        {
+            PRINT(OneTwoThreeInfinity(0.21336597976618202, 0.21336597976618205, 0.21336597976618207));
+        }
+
         PRINT(System.getProperty("swing.defaultlaf"));
 
         if (true)
@@ -5749,10 +5785,21 @@ public class SpiralApplet
     // Assuming b=a*q+r, c=b*q+r, ... take it to infinity.
     public static double OneTwoThreeInfinity(double a, double b, double c)
     {
+        int verboseLevel = 0;
+        if (verboseLevel >= 1) System.out.println("    =====================================");
+        if (verboseLevel >= 1) System.out.println("    in OneTwoThreeInfinity(a="+a+" b="+b+" c="+c+")");
+        if (verboseLevel >= 1) System.out.println("        b-a = "+(b-a));
+        if (verboseLevel >= 1) System.out.println("        c-b = "+(c-b));
+        if (a==b && b==c) return c;
         double q = (c-b)/(b-a);
-        double r = c - b*q;  // = b - a*q
+        if (verboseLevel >= 1) System.out.println("        q = "+q);
         double Q = 1./(1.-q); // = 1+q+q^2+q^3+...
+        // If q is 1, then Q is infinite and the rest should do the right thing
+        if (verboseLevel >= 1) System.out.println("        Q = "+Q);
         double z = LERP(a,b,Q); // = a + (b-a)*Q = a + (b-a)/(1-q)
+        if (verboseLevel >= 1) System.out.println("        z = "+z);
+        if (verboseLevel >= 1) System.out.println("    out OneTwoThreeInfinity(a="+a+" b="+b+" c="+c+"), returning z="+z);
+        if (verboseLevel >= 1) System.out.println("    =====================================");
         return z;
 
         // Can we rewrite it more simply to make the Complex version more direct?
@@ -5768,10 +5815,28 @@ public class SpiralApplet
     }
     public static Complex OneTwoThreeInfinity(Complex a, Complex b, Complex c)
     {
+        int verboseLevel = 0;
+        if (verboseLevel >= 1) System.out.println("    =====================================");
+        if (verboseLevel >= 1) System.out.println("    in OneTwoThreeInfinity(a="+a+" b="+b+" c="+c+")");
+        if (verboseLevel >= 1) System.out.println("        b-a = "+(b.minus(a)));
+        if (verboseLevel >= 1) System.out.println("        c-b = "+(c.minus(b)));
+        if (a.equalsExactly(b) && b.equalsExactly(c)) return new Complex(c);
         Complex b_minus_a = b.minus(a);
         Complex q = c.minus(b).overEquals(b_minus_a);
+        if (verboseLevel >= 1) System.out.println("        q = "+q);
+
+        if (q.equalsExactly(1.,0.)) {
+          // return infinity in the quadrant or axis direction in which it was going.
+          // I might be overthinking this.
+          assert(!b.equalsExactly(c));
+          return new Complex(b.x==c.x ? c.x : (c.x-b.x)*Double.POSITIVE_INFINITY,
+                             b.y==c.y ? c.y : (c.y-b.y)*Double.POSITIVE_INFINITY);
+        }
+
         // ok to destroy all intermediates, since we're done.
         Complex z = b_minus_a.overEquals(q.fromEquals(1)).plusEquals(a);
+        if (verboseLevel >= 1) System.out.println("    out OneTwoThreeInfinity(a="+a+" b="+b+" c="+c+"), returning z="+z);
+        if (verboseLevel >= 1) System.out.println("    =====================================");
         return z;
     }
 
