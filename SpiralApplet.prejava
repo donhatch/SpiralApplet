@@ -10,14 +10,13 @@
     BUG: as soon as a tooltip is shown spilling over edge of window, performance went down, forevermore??  (I think that was on windows? or maybe old version of java, 1.7 and fixed in 1.8?)  so I fudged the window size so that wouldn't happen
 
     TODO: disable Regenerate button unless out of date?  or turn it red when out of date?
-    TODO: combine moment and area into momentAndArea?  it is a homogeneous thing, after all
     TODO: more friendly and usable control of speed
     TODO: more friendly and usable control of shape. should be able to easily express:
               - constant slope of user's choosing  (have this crudely with 0gradual, 0, 0steep) (DONE)
               - arbitrary slope center and std deviation? need to think about it
               - random walk params? maybe need to review that.
     TODO: maybe just pass arraylists to the plotter, not functors... it's not like we get any streaming benefit
-    TODO: non-rotating mode
+    TODO: non-rotating mode!
     TODO: saturation slider
     TODO: keystrokes to change orientation
     TODO: smooth out animation when going very slowly
