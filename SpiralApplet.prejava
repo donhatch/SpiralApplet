@@ -2472,6 +2472,12 @@ public class SpiralApplet
                                 //assert(iPass <= 28);
                                 assert(iPass <= 469);
 
+                                // XXX argh, fails:
+                                //      period=4
+                                //      nParts=200
+                                //      Delta style= 0 very steep
+                                //      gets to 999 :-(
+
                                 System.out.println("=========================");
                                 done = true;
                             }
