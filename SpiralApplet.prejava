@@ -2418,7 +2418,7 @@ public class SpiralApplet
                 {
                     // compute all cumulative centers and areas
 
-                    double prevMomentAndArea[] = {0.,0.,0.};
+                    double prevMomentAndArea[] = this.momentsAndAreas[n-1];
                     double thisMomentAndArea[] = {0.,0.,0.};
 
                     boolean done = false;
@@ -2441,7 +2441,8 @@ public class SpiralApplet
                             // (i.e. Priscilla is moving, Dudley is turning)
                             // when val decreases, it means dualAng is increasing
                             // (i.e. Dudley is moving, Priscilla is turning)
-                            // but, we always keep it canonicalized so that dualAng is 0.
+                            // but, we always keep it canonicalized so that dualAng is 0
+                            // and primal position is unit distance from the origin.
                             double val = (double)theList[i];
                             double prevPrimalAng = Math.PI/2 * ((prevVal+.5)/nParts);
                             double primalAng = Math.PI/2 * ((val+.5)/nParts);
@@ -2489,7 +2490,7 @@ public class SpiralApplet
                                 VecMath.copyvec(this.momentsAndAreas[i], thisMomentAndArea);
                             }
 
-                            VecMath.copyvec(prevMomentAndArea, thisMomentAndArea);
+                            prevMomentAndArea = this.momentsAndAreas[i];
 
                             prevVal = val;
                         }
