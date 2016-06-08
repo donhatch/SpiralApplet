@@ -2425,7 +2425,7 @@ public class SpiralApplet
 
                     double prevVal = (double)theList[n-1];
 
-                    // Generally stabilizes at iPass=3 i=0,
+                    // Generally stabilizes by iPass=2 i=n-1 or so,
                     // but if n (period) is small it needs a few more passes to stabilize.
                     // When n is 4, I've seen it go as high as iPass=739, argh!
                     int maxPasses = 1000;
