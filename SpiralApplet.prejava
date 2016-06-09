@@ -2256,129 +2256,14 @@ public class SpiralApplet
                         // This is from an all-night simplifying session with help/hindrance of wolframalpha
                         Complex predictedMoment = new Complex(c, s/2).times(c*s / (1+3*c*c));
                         // Very interesting!  That means every spiral's moment has exactly half the slope of the original, always!?
-                        // So, can find centroid as that point on the half-slope line such that the line from it to p01 forms the correct angle with the half-slope line.  I guess it turns out to be the following.
-
+                        // Given that, could find centroid as the point on the half-slope line such that the line from origin
+                        // to centroid and then (c,s) forms the same angle as from origin to (c,s) to (c,s)+(0,1).
+                        // And it must turn out to be the following.
                         Complex predictedCentroid = new Complex(c, s/2).times(4 * c*c / (1+3*c*c));
 
-                        // Sanity check: for 45 degrees, centroid is roughly .6,.3.
-                        //      c = s = sqrt(2)
-                        //      centroid = <sqrt(2)/2,sqrt(2)/4> * 4 * 1/2 / (1+3/2)
-                        //               = sqrt(2)/2,sqrt(2)/4 * 2 / (5/2)
-                        //               = sqrt(2)/2,sqrt(2)/4 * 2 * 2/5
-                        //               = sqrt(2)/2,sqrt(2)/4 * 4/5
-                        //               = 2*sqrt(2),sqrt(2) / 5
-                        //               = 2/5*sqrt(2), sqrt(2)/5
-                        //               = .56568, .28284
-                        //      check!
                         PRINT(predictedMoment);
                         PRINT(predictedArea);
                         PRINT(predictedCentroid);
-
-                        if (true)
-                        {
-                            // Sanity check that angles are equal
-                            OUT("===============================");
-                            PRINT(c);
-                            PRINT(s);
-                            Complex A = predictedCentroid;
-                            Complex B = new Complex(c,s).minus(predictedCentroid);
-                            Complex C = new Complex(c,s);
-                            Complex D = Complex.I;
-                            // A,B must form same angle as C,D
-                            double ABangle = B.over(A).arg();
-                            double CDangle = D.over(C).arg();
-                            PRINT(RTOD(ABangle));
-                            PRINT(RTOD(CDangle));
-
-                            PRINT(A.abs());
-                            PRINT(B.abs());
-                            PRINT(C.abs());
-                            PRINT(D.abs());
-
-                            PRINT(A.cross(B)/(A.abs()*B.abs()));
-                            PRINT(C.cross(D)/(C.abs()*D.abs()));
-
-
-                            double frac = 4*c*c/(1+3*c*c);
-                            PRINT(frac);
-                            Complex shouldBeCentroid = new Complex(c,s/2).times(frac);
-                            PRINT(shouldBeCentroid);
-                            double shouldBeAabs = frac*Math.hypot(c, s/2);
-                            double shouldBeBabs = Math.hypot((1-frac)*c, (1-frac/2)*s);
-                            double shouldBeCabs = 1.;
-                            double shouldBeDabs = 1.;
-                            PRINT(shouldBeAabs);
-                            PRINT(shouldBeBabs);
-                            PRINT(shouldBeCabs);
-                            PRINT(shouldBeDabs);
-
-                            PRINT(A.cross(B));
-                            PRINT(C.cross(D));
-                            PRINT(A.abs()*B.abs());
-                            PRINT(C.abs()*D.abs());
-
-                            double shouldBeLHS = c*s*frac/2/(frac*Math.hypot(c,s/2)*Math.hypot((1-frac)*c, (1-frac/2)*s));
-                            PRINT(shouldBeLHS);
-                            double shouldBeRHS = C.cross(D);
-                            PRINT(shouldBeRHS);
-
-                            OUT("===============================");
-                            PRINT(c*s*frac/2/(frac*Math.hypot(c,s/2)*Math.hypot((1-frac)*c, (1-frac/2)*s)));
-                            PRINT(c);
-                            OUT("===============================");
-                            PRINT(s*frac/2/(frac*Math.hypot(c,s/2)*Math.hypot((1-frac)*c, (1-frac/2)*s)));
-                            PRINT(1);
-                            OUT("===============================");
-                            PRINT(s/2/(Math.hypot(c,s/2)*Math.hypot((1-frac)*c, (1-frac/2)*s)));
-                            PRINT(1);
-                            OUT("===============================");
-                            PRINT(s/2/(Math.hypot(c,s/2)*Math.hypot((1-frac)*c, (1-frac/2)*s)));
-                            PRINT(1);
-                            OUT("===============================");
-                            PRINT(s/2);
-                            PRINT(Math.hypot(c,s/2)*Math.hypot((1-frac)*c, (1-frac/2)*s));
-                            OUT("===============================");
-                            PRINT(s*s/4);
-                            PRINT((c*c+s*s/4)*(SQR((1-frac)*c) + SQR((1-frac/2)*s)));
-                            OUT("===============================");
-                            PRINT(s*s/4/(c*c+s*s/4));
-                            PRINT(SQR((1-frac)*c) + SQR((1-frac/2)*s));
-                            OUT("===============================");
-                            PRINT(s*s/4/(c*c+s*s/4));
-                            PRINT((1-frac)*(1-frac)*c*c + (1-frac/2)*(1-frac/2)*s*s);
-                            OUT("===============================");
-                            PRINT(s*s/4/(c*c+s*s/4));
-                            PRINT((1-2*frac+frac*frac)*c*c + (1-frac+frac*frac/4)*s*s);
-                            OUT("===============================");
-                            PRINT(s*s/(4*c*c+s*s));
-                            PRINT((1-2*frac+frac*frac)*c*c + (1-frac+frac*frac/4)*s*s);
-                            OUT("===============================");
-                            PRINT(s*s/(3*c*c+1));
-                            PRINT((1-2*frac+frac*frac)*c*c + (1-frac+frac*frac/4)*s*s);
-                            OUT("===============================");
-                            PRINT(s*s/(3*c*c+1));
-                            PRINT((1-2*frac+frac*frac)*c*c + (1-frac+frac*frac/4)*(1-c*c));
-                            OUT("===============================");
-                            PRINT((1-c*c)/(3*c*c+1));
-                            PRINT((1-2*frac+frac*frac)*c*c + (1-frac+frac*frac/4)*(1-c*c));
-                            OUT("===============================");
-                            double f = frac;
-                            PRINT((1-c*c)/(3*c*c+1));
-                            PRINT((1-2*f+f*f)*c*c + (1-f+f*f/4)*(1-c*c));
-                            OUT("===============================");
-                            PRINT((1-c*c)/(3*c*c+1));
-                            PRINT(c*c - 2*f*c*c + f*f*c*c  +  1-c*c -f+f*c*c + f*f/4-f*f/4*c*c);
-                            OUT("===============================");
-                            PRINT((1-c*c)/(3*c*c+1));
-                            PRINT(-f*c*c + f*f*c*c  +  1 -f + f*f/4 - f*f/4*c*c);
-                            OUT("===============================");
-                            // wolframalpha:
-                            // solve (1-c*c)/(3*c*c+1) == -f*c*c + f*f*c*c  +  1 -f + f*f/4 - f*f/4*c*c  for f
-                            // and it says there are two solutions:
-                            //     f = 4/(3*c^2+1)
-                            //     f = 4*c^2/(3*c^2+1)  <- and that's the answer, as expected.
-                        }
-
                     }
                 }
                 this.params.n.set(n);
