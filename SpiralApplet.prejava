@@ -4927,6 +4927,13 @@ public class SpiralApplet
     //
     public static void main(final String args[])
     {
+        /*
+        TODO: try to figure out why RUNME.hidpi has no effect on font on Darwin (not that it matters)
+        PRINT(System.getProperty("swing.defaultlaf"));
+        PRINT(javax.swing.UIManager.getDefaults());
+        PRINT(javax.swing.UIManager.getLookAndFeelDefaults());
+        */
+
         if (true)
         {
             Rational.confidenceTest();
