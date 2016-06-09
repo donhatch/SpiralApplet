@@ -168,7 +168,7 @@ public class SpiralApplet
             public void add(final JToggleButton button) // checkbox or radio button
             {
                 java.awt.event.ActionListener actionListener = new java.awt.event.ActionListener() {
-                    @Override
+                    OVERRIDE
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         if (button.isSelected())
@@ -199,7 +199,7 @@ public class SpiralApplet
             public void add(final JToggleButton button) // checkbox or radio button
             {
                 java.awt.event.ActionListener actionListener = new java.awt.event.ActionListener() {
-                    @Override
+                    OVERRIDE
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         int nButtons = buttons.size();
@@ -247,7 +247,7 @@ public class SpiralApplet
                 addMouseListener(new java.awt.event.MouseAdapter() {
                     private javax.swing.Timer repeatTimer = null;
                     private java.awt.event.ActionEvent synthesizedActionEvent = null;
-                    @Override
+                    OVERRIDE
                     public void mousePressed(java.awt.event.MouseEvent mouseEvent)
                     {
                         synthesizedActionEvent = new java.awt.event.ActionEvent(
@@ -260,7 +260,7 @@ public class SpiralApplet
                         actionListener.actionPerformed(synthesizedActionEvent); // initial execution
 
                         repeatTimer = new javax.swing.Timer(100, new java.awt.event.ActionListener() {
-                            @Override
+                            OVERRIDE
                             public void actionPerformed(java.awt.event.ActionEvent timerActionEvent)
                             {
                                 actionListener.actionPerformed(synthesizedActionEvent);
@@ -269,7 +269,7 @@ public class SpiralApplet
                         repeatTimer.setInitialDelay(500);
                         repeatTimer.start();
                     }
-                    @Override
+                    OVERRIDE
                     public void mouseReleased(java.awt.event.MouseEvent arg0)
                     {
                         repeatTimer.stop();
@@ -315,15 +315,15 @@ public class SpiralApplet
                                 setBackground(java.awt.Color.white);
                         }
                     }
-                    @Override
+                    OVERRIDE
                     public void insertUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
-                    @Override
+                    OVERRIDE
                     public void removeUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
-                    @Override
+                    OVERRIDE
                     public void changedUpdate(javax.swing.event.DocumentEvent e) {anyUpdate(e);}
                 });
                 addKeyListener(new java.awt.event.KeyAdapter() {
-                    @Override
+                    OVERRIDE
                     public void keyPressed(java.awt.event.KeyEvent e)
                     {
                         if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE)
@@ -333,7 +333,7 @@ public class SpiralApplet
                     }
                 });
                 addActionListener(new java.awt.event.ActionListener() {
-                    @Override
+                    OVERRIDE
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         if (validate(getText()))
@@ -411,7 +411,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
+                                          OVERRIDE
                                           public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_VERYGRADUAL);
@@ -423,7 +423,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
+                                          OVERRIDE
                                           public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_GRADUAL);
@@ -435,7 +435,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
+                                          OVERRIDE
                                           public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0);
@@ -447,7 +447,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
+                                          OVERRIDE
                                           public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_STEEP);
@@ -459,7 +459,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
+                                          OVERRIDE
                                           public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_VERYSTEEP);
@@ -472,7 +472,7 @@ public class SpiralApplet
                                           setMargin(nomargin);
                                           buttonGroup.add(this);
                                           addActionListener(new java.awt.event.ActionListener() {
-                                              @Override
+                                              OVERRIDE
                                               public void actionPerformed(java.awt.event.ActionEvent e)
                                               {
                                                   applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_USER_SPECIFIED);
@@ -486,7 +486,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
+                                          OVERRIDE
                                           public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1);
@@ -498,7 +498,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
+                                          OVERRIDE
                                           public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_ANY);
@@ -510,7 +510,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
+                                          OVERRIDE
                                           public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1_WRAP);
@@ -578,7 +578,7 @@ public class SpiralApplet
                             setMargin(nomargin);
                             // XXX TODO: red if params out of date
                             addActionListener(new java.awt.event.ActionListener() {
-                                @Override
+                                OVERRIDE
                                 public void actionPerformed(java.awt.event.ActionEvent e)
                                 {
                                     applet.theSpiralModel.init(applet.spiralModelParams.n.get(), applet.spiralModelParams.nParts.get(), applet.spiralModelParams.deltaStyle.get(), applet.spiralModelParams.deltaStyle_0_degrees.get(), applet.spiralModelParams.randomSeed.get());
@@ -602,7 +602,7 @@ public class SpiralApplet
                             add(new JButton("reset focus to") {{
                                 setMargin(nomargin);
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.theSpiralView.focus.set(applet.theSpiralView.resetFocusTo.get(),1);
@@ -614,11 +614,11 @@ public class SpiralApplet
                         }});
                         add(new JRow() {{
                             add(new JRepeatingButton("") {
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -635,7 +635,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.fastBackward();
@@ -644,11 +644,11 @@ public class SpiralApplet
                                 setToolTipText("<html>fast backward</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -665,7 +665,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.playBackward();
@@ -674,11 +674,11 @@ public class SpiralApplet
                                 setToolTipText("<html>play backward<br>(shift-left-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -695,7 +695,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.stepBackward();
@@ -704,11 +704,11 @@ public class SpiralApplet
                                 setToolTipText("<html>step backward<br>(left-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -725,7 +725,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.pause();
@@ -734,11 +734,11 @@ public class SpiralApplet
                                 setToolTipText("<html>stop<br>(space key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -755,7 +755,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.stepForward();
@@ -764,11 +764,11 @@ public class SpiralApplet
                                 setToolTipText("<html>step forward<br>(right-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -785,7 +785,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.playForward();
@@ -794,11 +794,11 @@ public class SpiralApplet
                                 setToolTipText("<html>play forward<br>(shift-right-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
+                                OVERRIDE
                                 public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
@@ -815,7 +815,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.fastForward();
@@ -874,11 +874,11 @@ public class SpiralApplet
                         }});
                     }});
                     add(new JRepeatingButton("") {
-                        @Override
+                        OVERRIDE
                         public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45*hidpimag,45*hidpimag); }
-                        @Override
+                        OVERRIDE
                         public java.awt.Dimension getMinimumSize()   { return getPreferredSize(); }
-                        @Override
+                        OVERRIDE
                         public void paint(java.awt.Graphics g)
                         {
                             if (debug) OUT("                    in orientation button paint");
@@ -1043,7 +1043,7 @@ public class SpiralApplet
                     {
                         // Listeners for spiral orientation number control
                         addMouseMotionListener(new java.awt.event.MouseAdapter() {
-                            @Override
+                            OVERRIDE
                             public void mouseMoved(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("        in mouseMoved");
@@ -1051,7 +1051,7 @@ public class SpiralApplet
                                 repaint();
                                 if (debug) OUT("        out mouseMoved");
                             }
-                            @Override
+                            OVERRIDE
                             public void mouseDragged(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("                in mouseDragged");
@@ -1064,7 +1064,7 @@ public class SpiralApplet
                         // apparently we don't get a repaint when rollover ends,
                         // and we need one to remove the highlighting, so...
                         addMouseListener(new java.awt.event.MouseAdapter() {
-                            @Override
+                            OVERRIDE
                             public void mouseEntered(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("    in mouseEntered");
@@ -1073,7 +1073,7 @@ public class SpiralApplet
                                 repaint();
                                 if (debug) OUT("    out mouseEntered");
                             }
-                            @Override
+                            OVERRIDE
                             public void mouseExited(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("    in mouseExited");
@@ -1086,7 +1086,7 @@ public class SpiralApplet
                                 repaint();
                                 if (debug) OUT("    out mouseExited");
                             }
-                            @Override
+                            OVERRIDE
                             public void mousePressed(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("            in mousePressed");
@@ -1096,7 +1096,7 @@ public class SpiralApplet
                                 repaint();
                                 if (debug) OUT("            out mousePressed");
                             }
-                            @Override
+                            OVERRIDE
                             public void mouseReleased(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("            in mouseReleased");
@@ -1110,7 +1110,7 @@ public class SpiralApplet
                             }
                         });
                         addActionListener(new java.awt.event.ActionListener() {
-                            @Override
+                            OVERRIDE
                             public void actionPerformed(java.awt.event.ActionEvent e)
                             {
                                 // note, this is a repeating button
@@ -1156,7 +1156,7 @@ public class SpiralApplet
                             add(new JButton("Dump window positions and sizes") {{
                                 setMargin(nomargin);
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
+                                    OVERRIDE
                                     public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         System.out.println("----------------");
@@ -1245,7 +1245,7 @@ public class SpiralApplet
                 menuBar.add(windowsMenu);
                 windowsMenu.add(new JMenuItem("Control Panel") {{
                     addActionListener(new java.awt.event.ActionListener() {
-                        @Override
+                        OVERRIDE
                         public void actionPerformed(java.awt.event.ActionEvent e)
                         {
                             theControlPanelWindow.setState(JFrame.NORMAL); // not iconified
@@ -1258,7 +1258,7 @@ public class SpiralApplet
                 menuBar.add(helpMenu);
                 helpMenu.add(new JMenuItem("Help") {{
                     addActionListener(new java.awt.event.ActionListener() {
-                        @Override
+                        OVERRIDE
                         public void actionPerformed(java.awt.event.ActionEvent e)
                         {
                             help();
@@ -1279,7 +1279,7 @@ public class SpiralApplet
             {
                 theControlPanelWindow = new JFrame(windowTitle.get() + " Control Panel");
                 windowTitle.addListener(new Listenable.Listener() {
-                    @Override
+                    OVERRIDE
                     public void valueChanged() {
                         theControlPanelWindow.setTitle(windowTitle.get() + " Control Panel");
                     }
@@ -1439,7 +1439,7 @@ public class SpiralApplet
             }
         } // randomlyColorize
 
-        @Override
+        OVERRIDE
         public void init()
         {
             eventVerbose = getParameterInt("EventVerbose", eventVerbose);
@@ -1449,7 +1449,7 @@ public class SpiralApplet
             graphicsAntiAliasingSetter = new GraphicsAntiAliasingSetter();
 
             theSpiralView.pixelsPerPart.addListener(pixelsPerPartListener = new Listenable.Listener() {
-                @Override
+                OVERRIDE
                 public void valueChanged()
                 {
                     if (theSpiralView.pixelsPerPart.get() <= 0)
@@ -1464,7 +1464,7 @@ public class SpiralApplet
                 }
             });
             theSpiralView.animSpeedFrames.addListener(animSpeedFramesListener = new Listenable.Listener() {
-                @Override
+                OVERRIDE
                 public void valueChanged()
                 {
                     if (theSpiralView.animSpeedFrames.get() <= 0)
@@ -1500,14 +1500,14 @@ public class SpiralApplet
             // add this after all others, so that we don't repaint
             // until other processing stabilizes
             repaintWhenValueChanged = new Listenable.Listener() {
-                @Override
+                OVERRIDE
                 public void valueChanged()
                 {
                     theCanvas.repaint();
                 }
             };
             repaintWhenValueChangedIfShowPlotsFlag = new Listenable.Listener() {
-                @Override
+                OVERRIDE
                 public void valueChanged()
                 {
                     if (showPlotsFlag.get())
@@ -1528,19 +1528,19 @@ public class SpiralApplet
             if (eventVerbose >= 1) System.out.println("out init");
         } // init
 
-        @Override
+        OVERRIDE
         public void start()
         {
             if (eventVerbose >= 1) System.out.println("in start");
             if (eventVerbose >= 1) System.out.println("out start");
         }
-        @Override
+        OVERRIDE
         public void stop()
         {
             if (eventVerbose >= 1) System.out.println("in stop");
             if (eventVerbose >= 1) System.out.println("out stop");
         }
-        @Override
+        OVERRIDE
         public void destroy()
         {
             if (eventVerbose >= 1) System.out.println("in destroy");
@@ -1606,7 +1606,7 @@ public class SpiralApplet
             //
             // MouseListener and MouseMotionListener methods...
             //
-            @Override
+            OVERRIDE
             public void mousePressed(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mousePressed: "+e);
@@ -1627,7 +1627,7 @@ public class SpiralApplet
 
                 if (eventVerbose >= 1) System.out.println("out mousePressed: "+e);
             } // mousePressed
-            @Override
+            OVERRIDE
             public void mouseReleased(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseReleased: "+e);
@@ -1636,7 +1636,7 @@ public class SpiralApplet
 
                 if (eventVerbose >= 1) System.out.println("out mouseReleased: "+e);
             } // mouseReleased
-            @Override
+            OVERRIDE
             public void mouseEntered(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseEntered: "+e);
@@ -1645,19 +1645,19 @@ public class SpiralApplet
                 requestFocus(); // hey it works! (javac 1.3, runtime 1.6) and overriding isFocusTraversable() no longer works in 1.7 and gives deprecation warning.
                 if (eventVerbose >= 1) System.out.println("out mouseEntered: "+e);
             }
-            @Override
+            OVERRIDE
             public void mouseExited(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseExited: "+e);
                 if (eventVerbose >= 1) System.out.println("out mouseExited: "+e);
             }
-            @Override
+            OVERRIDE
             public void mouseClicked(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseClicked: "+e);
                 if (eventVerbose >= 1) System.out.println("out mouseClicked: "+e);
             }
-            @Override
+            OVERRIDE
             public void mouseDragged(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 2) System.out.println("  in mouseDragged: "+e);
@@ -1678,7 +1678,7 @@ public class SpiralApplet
 
                 if (eventVerbose >= 2) System.out.println("  out mouseDragged: "+e);
             } // mouseDragged
-            @Override
+            OVERRIDE
             public void mouseMoved(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 3) System.out.println("    in mouseMoved: "+e);
@@ -1689,7 +1689,7 @@ public class SpiralApplet
             //
             // KeyListener methods...
             //
-            @Override
+            OVERRIDE
             public void keyPressed(java.awt.event.KeyEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in keyPressed: "+e);
@@ -1728,7 +1728,7 @@ public class SpiralApplet
                 }
                 if (eventVerbose >= 1) System.out.println("out keyPressed: "+e);
             } // keyPressed
-            @Override
+            OVERRIDE
             public void keyReleased(java.awt.event.KeyEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in keyReleased: "+e);
@@ -1739,7 +1739,7 @@ public class SpiralApplet
                 }
                 if (eventVerbose >= 1) System.out.println("out keyReleased: "+e);
             } // keyReleased
-            @Override
+            OVERRIDE
             public void keyTyped(java.awt.event.KeyEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in keyTyped: "+e);
@@ -1786,7 +1786,7 @@ public class SpiralApplet
 
 
             // PAINT/DISPLAY/DRAW
-            @Override
+            OVERRIDE
             public void paintComponent(java.awt.Graphics g)
             {
                 //try { Thread.sleep(50); } catch (InterruptedException e) {}
@@ -5009,7 +5009,7 @@ public class SpiralApplet
                 {
                     System.out.println("    creating timer");
                     theTimer = new javax.swing.Timer(animSleepMS.get(), new java.awt.event.ActionListener() {
-                        @Override
+                        OVERRIDE
                         public void actionPerformed(java.awt.event.ActionEvent e) {
                             if (eventVerbose >= 1) System.out.println("in timer action");
 
@@ -5160,14 +5160,14 @@ public class SpiralApplet
         {
             super(s.get());
             s.addListener(listener = new Listenable.Listener() {
-                @Override
+                OVERRIDE
                 public void valueChanged()
                 {
                     setText(s.get());
                 }
             });
             addActionListener(new java.awt.event.ActionListener() {
-                @Override
+                OVERRIDE
                 public void actionPerformed(java.awt.event.ActionEvent e)
                 {
                     s.set(getText());
@@ -5182,7 +5182,7 @@ public class SpiralApplet
         private Listenable.Listener listener; // need to keep a strong ref to it for as long as I'm alive
         private Listenable.Number f;
 
-        @Override
+        OVERRIDE
         public boolean validate(String text)
         {
             try {
@@ -5215,14 +5215,14 @@ public class SpiralApplet
             this.f = f;
             updateText(f);
             f.addListener(listener = new Listenable.Listener() {
-                @Override
+                OVERRIDE
                 public void valueChanged()
                 {
                     updateText(f);
                 }
             });
             addActionListener(new java.awt.event.ActionListener() {
-                @Override
+                OVERRIDE
                 public void actionPerformed(java.awt.event.ActionEvent e)
                 {
                     try
@@ -5238,7 +5238,7 @@ public class SpiralApplet
             });
         }
 
-        @Override
+        OVERRIDE
         public java.awt.Dimension getPreferredSize()
         {
             //System.out.println("in JTextFieldForNumber.getPreferredSize()");
@@ -5280,7 +5280,7 @@ public class SpiralApplet
         // weird, the following is called during horizontal shrinking
         // but not during horizontal expanding... if we don't do this too
         // then it looks wrong when shrinking.  what a hack...
-        @Override
+        OVERRIDE
         public java.awt.Dimension getMinimumSize()
         {
             return getPreferredSize();
@@ -5295,14 +5295,14 @@ public class SpiralApplet
             super(name);
             setSelected(b.get());
             addItemListener(new java.awt.event.ItemListener() {
-                @Override
+                OVERRIDE
                 public void itemStateChanged(java.awt.event.ItemEvent e)
                 {
                     b.set(isSelected());
                 }
             });
             b.addListener(listener = new Listenable.Listener() {
-                @Override
+                OVERRIDE
                 public void valueChanged()
                 {
                     setSelected(b.get());
@@ -5347,14 +5347,14 @@ public class SpiralApplet
             setMinorTickSpacing(1);  // .001 units
             setMajorTickSpacing(10); // .01 units
             f.addListener(listener = new Listenable.Listener() {
-                @Override
+                OVERRIDE
                 public void valueChanged()
                 {
                     updateThumb(f);
                 }
             });
             addChangeListener(new javax.swing.event.ChangeListener() {
-                @Override
+                OVERRIDE
                 public void stateChanged(javax.swing.event.ChangeEvent e)
                 {
                     if (false)
@@ -5465,11 +5465,11 @@ public class SpiralApplet
         asciiToColor['b'] = java.awt.Color.black;
         return new JRow() {{
             add(new JRepeatingButton("") {
-                @Override
+                OVERRIDE
                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
-                @Override
+                OVERRIDE
                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
-                @Override
+                OVERRIDE
                 public void paint(java.awt.Graphics g)
                 {
                     super.paint(g);
@@ -5480,7 +5480,7 @@ public class SpiralApplet
                 }
             {
                 addActionListener(new java.awt.event.ActionListener() {
-                    @Override
+                    OVERRIDE
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         f.setDouble(f.getDouble()-increment);
@@ -5489,7 +5489,7 @@ public class SpiralApplet
                 setToolTipText("<html>decrement "+name+"</html>");
             }});
             add(new JTextFieldForNumber(f) {
-                @Override
+                OVERRIDE
                 public boolean validate(String text)
                 {
                     if (!super.validate(text)) return false;
@@ -5507,11 +5507,11 @@ public class SpiralApplet
                 }
             } );
             add(new JRepeatingButton("") {
-                @Override
+                OVERRIDE
                 public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
-                @Override
+                OVERRIDE
                 public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
-                @Override
+                OVERRIDE
                 public void paint(java.awt.Graphics g)
                 {
                     super.paint(g);
@@ -5524,7 +5524,7 @@ public class SpiralApplet
                 }
             {
                 addActionListener(new java.awt.event.ActionListener() {
-                    @Override
+                    OVERRIDE
                     public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         f.setDouble(f.getDouble()+increment);
@@ -5697,7 +5697,7 @@ public class SpiralApplet
         final JFrame frame = new JFrame(applet.windowTitle.get());
 
         applet.windowTitle.addListener(new Listenable.Listener() {
-            @Override
+            OVERRIDE
             public void valueChanged() {
                 frame.setTitle(applet.windowTitle.get());
             }
