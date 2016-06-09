@@ -214,7 +214,17 @@ public class Rational
     }
     public Rational lerpEquals(Rational that, Rational t)
     {
-        return this.equalsLerp(this.n,this.d, that.n,that.d,t. n,t.d);
+        return this.equalsLerp(this.n,this.d, that.n,that.d, t.n,t.d);
+    }
+
+    // Accumulation functions with one RHS in n/d form and the other in Rational form.
+    public Rational lerpEquals(int n1, int d1, Rational t)
+    {
+        return this.equalsLerp(this.n,this.d, n1,d1, t.n,t.d);
+    }
+    public Rational lerpEquals(Rational that, int nt, int dt)
+    {
+        return this.equalsLerp(this.n,this.d, that.n,that.d, nt,dt);
     }
 
 
