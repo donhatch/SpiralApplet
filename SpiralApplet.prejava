@@ -4805,11 +4805,16 @@ public class SpiralApplet
 
 
                         arcRadius = Math.sin(2*initialPrimalAng);
-                        // I think what I was thinking in the *4 is that we divide by area-when-45
-                        // so that it will equal center when 45, just so it's in a nice range.
-                        // Maybe should normalize them like that anyway?
-                        // At least use cross product instead of tri areas, for one thing,
-                        // that will get us halfway there anyway.  Maybe.
+                        // A nice side effect of "scaled so max possible is 1"
+                        // is that, since max moment magnitude happens to be 1/4,
+                        // the scaling is by *4,
+                        // which happens to be 1/area when a medium (45 degrees) spiral;
+                        // so that means we draw the moment at the same position as the centroid when
+                        // drawing that spiral.
+                        // I wonder if it would make sense to use a different notion of area
+                        // so that this is the actual moment?
+                        // Could at least use cross product instead of areas,
+                        // which would get us halfway there.
                         mg.drawPoint(momentX*4,momentY*4,
                                      5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
