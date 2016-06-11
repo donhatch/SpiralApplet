@@ -1145,7 +1145,7 @@ public class SpiralApplet
                             add(makeIncrementableTextFieldForNumber(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
                             add(new JCheckBoxForBoolean("including the expensive one", applet.showTheExpensivePlotTooFlag) {{
                                 setMargin(nomargin);
-                                setToolTipText("<html>You might want to set Period very low and regenerate before turning this on.</html>");
+                                setToolTipText("<html>You might want to set Period to 1000 or so and regenerate before turning this on.</html>");
                             }});
                         }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
@@ -3968,94 +3968,147 @@ public class SpiralApplet
                             new DataFetcher() { // dataFetcher
                                 double data[][];
                                 {
-                                    java.util.ArrayList<double[]> dataArrayList = new java.util.ArrayList<double[]>();
+                                    final java.util.ArrayList<double[]> dataArrayList = new java.util.ArrayList<double[]>();
                                     int n = spiralModel.params.n.get();
                                     System.out.print("    Calculating expensive plot, power="+finalPower+": n="+n+" ... ");
                                     System.out.flush();
 
-                                    int nParts = spiralModel.params.nParts.get();
-                                    if (finalPower == 1)
+                                    final int nParts = spiralModel.params.nParts.get();
+
+                                    if (false)
                                     {
-                                        double momentAndAreaScratch[] = new double[3]; // scratch
-                                        Complex complexScratch = new Complex(0.);
-                                        FORI (iPart, nParts)
+                                        if (finalPower == 1)
                                         {
-                                            double primalAng = (iPart+.5)/nParts*(Math.PI*.5);
-                                            getSpiralMomentAndArea(primalAng, momentAndAreaScratch);
-                                            updateMomentAndAreaWhenSomeoneMoved(
-                                                momentAndAreaScratch[0], momentAndAreaScratch[1], momentAndAreaScratch[2],
-                                                primalAng, focusPrimalAngleMinusDualAngle,
-                                                momentAndAreaScratch);
-                                            dataArrayList.add(new double[]{momentAndAreaScratch[0],
-                                                                           momentAndAreaScratch[1],
-                                                                           primalAng / (Math.PI*.5)}); // hue
-                                        }
-                                    }
-                                    else if (finalPower == 2)
-                                    {
-                                        double primalAngleStack[] = new double[2];
-                                        double momentAndAreaStack[][] = new double[3][3];
-                                        FORI (iPart, nParts)
-                                        {
-                                            primalAngleStack[0] = (iPart+.5)/nParts*(Math.PI*.5);
-                                            getSpiralMomentAndArea(primalAngleStack[0], momentAndAreaStack[0]);
-                                            FORI (jPart, nParts)
+                                            double momentAndAreaScratch[] = new double[3]; // scratch
+                                            Complex complexScratch = new Complex(0.);
+                                            FORI (iPart, nParts)
                                             {
-                                                if (jPart == iPart) continue;
-                                                primalAngleStack[1] = (jPart+.5)/nParts*(Math.PI*.5);
+                                                double primalAng = (iPart+.5)/nParts*(Math.PI*.5);
+                                                getSpiralMomentAndArea(primalAng, momentAndAreaScratch);
                                                 updateMomentAndAreaWhenSomeoneMoved(
-                                                    momentAndAreaStack[0][0], momentAndAreaStack[0][1], momentAndAreaStack[0][2],
-                                                    primalAngleStack[0], primalAngleStack[1],
-                                                    momentAndAreaStack[1]);
-                                                updateMomentAndAreaWhenSomeoneMoved(
-                                                    momentAndAreaStack[1][0], momentAndAreaStack[1][1], momentAndAreaStack[1][2],
-                                                    primalAngleStack[1], focusPrimalAngleMinusDualAngle,
-                                                    momentAndAreaStack[2]);
-                                                dataArrayList.add(new double[]{momentAndAreaStack[2][0],
-                                                                               momentAndAreaStack[2][1],
-                                                                               primalAngleStack[0] / (Math.PI*.5)}); // hue
+                                                    momentAndAreaScratch[0], momentAndAreaScratch[1], momentAndAreaScratch[2],
+                                                    primalAng, focusPrimalAngleMinusDualAngle,
+                                                    momentAndAreaScratch);
+                                                dataArrayList.add(new double[]{momentAndAreaScratch[0],
+                                                                               momentAndAreaScratch[1],
+                                                                               primalAng / (Math.PI*.5)}); // hue
                                             }
                                         }
-                                    }
-                                    else if (finalPower == 3)
-                                    {
-                                        double primalAngleStack[] = new double[3];
-                                        double momentAndAreaStack[][] = new double[4][3];
-                                        FORI (iPart, nParts)
+                                        else if (finalPower == 2)
                                         {
-                                            primalAngleStack[0] = (iPart+.5)/nParts*(Math.PI*.5);
-                                            getSpiralMomentAndArea(primalAngleStack[0], momentAndAreaStack[0]);
-                                            FORI (jPart, nParts)
+                                            double primalAngleStack[] = new double[2];
+                                            double momentAndAreaStack[][] = new double[3][3];
+                                            FORI (iPart, nParts)
                                             {
-                                                if (jPart == iPart) continue;
-                                                primalAngleStack[1] = (jPart+.5)/nParts*(Math.PI*.5);
-                                                updateMomentAndAreaWhenSomeoneMoved(
-                                                    momentAndAreaStack[0][0], momentAndAreaStack[0][1], momentAndAreaStack[0][2],
-                                                    primalAngleStack[0], primalAngleStack[1],
-                                                    momentAndAreaStack[1]);
-                                                FORI (kPart, nParts)
+                                                //if (iPart >= 0 && iPart < 10) continue; // XXX
+                                                //if (iPart >= 40 && iPart < 50) continue; // XXX
+                                                //if (iPart >= 80 && iPart < 90) continue; // XXX
+                                                primalAngleStack[0] = (iPart+.5)/nParts*(Math.PI*.5);
+                                                getSpiralMomentAndArea(primalAngleStack[0], momentAndAreaStack[0]);
+                                                FORI (jPart, nParts)
                                                 {
-                                                    if (kPart == jPart || kPart == iPart) continue;
-                                                    primalAngleStack[2] = (kPart+.5)/nParts*(Math.PI*.5);
+                                                    //if (jPart >= 0 && iPart < 10) continue; // XXX
+                                                    //if (jPart >= 40 && iPart < 50) continue; // XXX
+                                                    //if (jPart >= 80 && iPart < 90) continue; // XXX
+                                                    if (jPart == iPart) continue;
+                                                    primalAngleStack[1] = (jPart+.5)/nParts*(Math.PI*.5);
+                                                    updateMomentAndAreaWhenSomeoneMoved(
+                                                        momentAndAreaStack[0][0], momentAndAreaStack[0][1], momentAndAreaStack[0][2],
+                                                        primalAngleStack[0], primalAngleStack[1],
+                                                        momentAndAreaStack[1]);
                                                     updateMomentAndAreaWhenSomeoneMoved(
                                                         momentAndAreaStack[1][0], momentAndAreaStack[1][1], momentAndAreaStack[1][2],
-                                                        primalAngleStack[1], primalAngleStack[2],
+                                                        primalAngleStack[1], focusPrimalAngleMinusDualAngle,
                                                         momentAndAreaStack[2]);
-                                                    updateMomentAndAreaWhenSomeoneMoved(
-                                                        momentAndAreaStack[2][0], momentAndAreaStack[2][1], momentAndAreaStack[2][2],
-                                                        primalAngleStack[2], focusPrimalAngleMinusDualAngle,
-                                                        momentAndAreaStack[3]);
-                                                    dataArrayList.add(new double[]{momentAndAreaStack[3][0],
-                                                                                   momentAndAreaStack[3][1],
+                                                    dataArrayList.add(new double[]{momentAndAreaStack[2][0],
+                                                                                   momentAndAreaStack[2][1],
                                                                                    primalAngleStack[0] / (Math.PI*.5)}); // hue
                                                 }
                                             }
                                         }
+                                        else if (finalPower == 3)
+                                        {
+                                            double primalAngleStack[] = new double[3];
+                                            double momentAndAreaStack[][] = new double[4][3];
+                                            FORI (iPart, nParts)
+                                            {
+                                                primalAngleStack[0] = (iPart+.5)/nParts*(Math.PI*.5);
+                                                getSpiralMomentAndArea(primalAngleStack[0], momentAndAreaStack[0]);
+                                                FORI (jPart, nParts)
+                                                {
+                                                    if (jPart == iPart) continue;
+                                                    primalAngleStack[1] = (jPart+.5)/nParts*(Math.PI*.5);
+                                                    updateMomentAndAreaWhenSomeoneMoved(
+                                                        momentAndAreaStack[0][0], momentAndAreaStack[0][1], momentAndAreaStack[0][2],
+                                                        primalAngleStack[0], primalAngleStack[1],
+                                                        momentAndAreaStack[1]);
+                                                    FORI (kPart, nParts)
+                                                    {
+                                                        if (kPart == jPart) continue;
+                                                        primalAngleStack[2] = (kPart+.5)/nParts*(Math.PI*.5);
+                                                        updateMomentAndAreaWhenSomeoneMoved(
+                                                            momentAndAreaStack[1][0], momentAndAreaStack[1][1], momentAndAreaStack[1][2],
+                                                            primalAngleStack[1], primalAngleStack[2],
+                                                            momentAndAreaStack[2]);
+                                                        updateMomentAndAreaWhenSomeoneMoved(
+                                                            momentAndAreaStack[2][0], momentAndAreaStack[2][1], momentAndAreaStack[2][2],
+                                                            primalAngleStack[2], focusPrimalAngleMinusDualAngle,
+                                                            momentAndAreaStack[3]);
+                                                        dataArrayList.add(new double[]{momentAndAreaStack[3][0],
+                                                                                       momentAndAreaStack[3][1],
+                                                                                       primalAngleStack[0] / (Math.PI*.5)}); // hue
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            assert(false);
+                                        }
                                     }
                                     else
                                     {
-                                        // TODO: implement recursively so can do arbitrary powers
-                                        assert(false);
+                                        final double primalAngleStack[] = new double[finalPower];
+                                        final double momentAndAreaStack[][] = new double[finalPower+1][3];
+                                        // Implement a nested for-loop
+                                        class Recurse {
+                                            private void recurse(int stackIndex)
+                                            {
+                                                assert(finalPower >= 1);
+                                                assert(stackIndex < finalPower);
+                                                FORI (iPart, nParts)
+                                                {
+                                                    primalAngleStack[stackIndex] = (iPart+.5)/nParts*(Math.PI*.5);
+                                                    if (stackIndex == 0)
+                                                        getSpiralMomentAndArea(primalAngleStack[stackIndex], momentAndAreaStack[stackIndex]);
+                                                    else
+                                                    {
+                                                        if (primalAngleStack[stackIndex] == primalAngleStack[stackIndex-1])
+                                                            continue; // that would make it a smaller problem
+                                                        updateMomentAndAreaWhenSomeoneMoved(
+                                                            momentAndAreaStack[stackIndex-1][0], momentAndAreaStack[stackIndex-1][1], momentAndAreaStack[stackIndex-1][2],
+                                                            primalAngleStack[stackIndex-1], primalAngleStack[stackIndex],
+                                                            momentAndAreaStack[stackIndex]);
+                                                    }
+                                                    if (stackIndex < finalPower-1)
+                                                    {
+                                                        recurse(stackIndex+1);
+                                                    }
+                                                    else
+                                                    {
+                                                        // Do one more update to the target angle, and record the result
+                                                        updateMomentAndAreaWhenSomeoneMoved(
+                                                            momentAndAreaStack[stackIndex][0], momentAndAreaStack[stackIndex][1], momentAndAreaStack[stackIndex][2],
+                                                            primalAngleStack[stackIndex], focusPrimalAngleMinusDualAngle,
+                                                            momentAndAreaStack[stackIndex+1]);
+                                                        dataArrayList.add(new double[]{momentAndAreaStack[stackIndex+1][0],
+                                                                                       momentAndAreaStack[stackIndex+1][1],
+                                                                                       primalAngleStack[0] / (Math.PI*.5)}); // hue
+                                                    }
+                                                }
+                                            }
+                                        };
+                                        new Recurse().recurse(0);
                                     }
 
                                     System.out.print("data.length = "+dataArrayList.size());
@@ -6047,6 +6100,7 @@ public class SpiralApplet
         frame.setSize(622,558);
         frame.setSize(980,562); // 4x2 plots
         frame.setSize(980,846); // 4x3 plots
+        frame.setSize(980,1522); // 4x6 plots
 
         frame.setVisible(true);
 
