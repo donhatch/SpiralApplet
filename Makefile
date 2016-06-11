@@ -50,9 +50,9 @@
 CPPFLAGS+=-DOVERRIDE=@Override
 #JAVAC=javac -source 1.5 -target 1.5
 #JAVAC=javac -source 1.6 -target 1.6
-#JAVAC=javac -source 1.7 -target 1.7
+JAVAC=javac -source 1.7 -target 1.7
 #JAVAC=javac -source 1.8 -target 1.8
-JAVAC=javac
+#JAVAC=javac
 
 JAVAROOT="/usr"
 ifeq ($(wildcard /usr/lib/jvm/java-8-openjdk-amd64/lib/javafx-mx.jar),)

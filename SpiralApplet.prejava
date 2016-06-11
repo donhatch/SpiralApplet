@@ -3,7 +3,6 @@
         Uses System.nanoTime which requires java >= 1.4
         (probably need even later, haven't been keeping track)
 
-
     BUG: tooltip is weird on the "Anim sleep ms" textfield
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
@@ -2477,6 +2476,15 @@ public class SpiralApplet
                                     primalAng,
                                     thisMomentAndArea);
 
+                            // special case: even if it looked like we stabilized, the last element came
+                            // from a different source in case of shortcut, in which case it can still drift.
+                            if (done
+                             && i == n-1
+                             && !VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea)) {
+                                System.out.println("woops, not stable after all at iPass="+iPass+" i="+i+"/n="+n);
+                                done = false;
+                            }
+
                             if (done)
                             {
                                 assert(VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea));
@@ -2501,7 +2509,6 @@ public class SpiralApplet
                                 //      Delta style= 0 very steep
                                 //      gets to 999 :-(
 
-                                System.out.println("=========================");
                                 done = true;
                             }
                             else
@@ -2590,6 +2597,7 @@ public class SpiralApplet
                         }
                     }
 
+                    OUT("=========================");
                     OUT("===========");
                     PRINTVEC(this.momentsAndAreas[0]);
                     PRINTVEC(this.momentsAndAreas[1]);
@@ -3548,14 +3556,13 @@ public class SpiralApplet
 
             if (showTheExpensivePlotTooFlag)
             {
-                // advance downward again
-                y0 += yDelta;
-                y1 += yDelta;
-
-                // moment x vs. moment y,
-                // only at the given focus angle...
-                // and do a whole lot more in-depth analysis than before to hopefully flesh out the shape.
+                int maxPower = 3;
+                for (int power = 1; power <= maxPower; ++power)
                 {
+                    final int finalPower = power;
+                    // advance downward again
+                    y0 += yDelta;
+                    y1 += yDelta;
                     drawOnePlot(
                         g,
                         gsize,
@@ -3721,54 +3728,55 @@ public class SpiralApplet
                         new DataFetcher() { // dataFetcher
                             double data[][];
                             {
-                                java.util.ArrayList<double[]> dataArrayList = new java.util.ArrayList<double[]>();
-                                int n = spiralModel.params.n.get();
-                                System.out.print("    Calculating expensive plot: n="+n+" ... ");
+                                final java.util.ArrayList<double[]> dataArrayList = new java.util.ArrayList<double[]>();
+                                System.out.print("    Calculating expensive plot, power="+finalPower+" ... ");
                                 System.out.flush();
-                                double newMomentAndAreaScratch[] = new double[3];
-                                FORI(i, n)
                                 {
-                                    int val = spiralModel.theList[i];
-                                    double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-
-                                    double momentAndArea[] = spiralModel.momentsAndAreas[i];
-
-                                    if (false)
-                                    {
-                                      // Pretend following primalAng-dualAng is focusPrimalAngleMinusDualAngle
-                                      // and update moment accordingly.
-                                      updateMomentAndAreaWhenSomeoneMoved(
-                                          momentAndArea[0], momentAndArea[1], momentAndArea[2],
-                                          primalAng, focusPrimalAngleMinusDualAngle,
-                                          newMomentAndAreaScratch);
-                                      dataArrayList.add(new double[]{newMomentAndAreaScratch[0],
-                                                                     newMomentAndAreaScratch[1],
-                                                                     primalAng / (Math.PI*.5)}); // hue
-                                    }
-                                    else // the original simpler behavior
-                                    {
-                                        int nParts = spiralModel.params.nParts.get();
-                                        for (int steppingStone = 0; steppingStone < nParts; ++steppingStone) {
-                                            double steppingStoneAng = (steppingStone+.5)/nParts * (Math.PI*.5);
-                                            if (steppingStoneAng <= MIN(primalAng, focusPrimalAngleMinusDualAngle)
-                                             || steppingStoneAng >= MAX(primalAng, focusPrimalAngleMinusDualAngle))
+                                    final int nParts = spiralModel.params.nParts.get();
+                                    final double primalAngleStack[] = new double[finalPower];
+                                    final double momentAndAreaStack[][] = new double[finalPower+1][3];
+                                    // Implement a nested for-loop
+                                    class Recurse {
+                                        private void recurse(int stackIndex)
+                                        {
+                                            assert(finalPower >= 1);
+                                            assert(stackIndex < finalPower);
+                                            FORI (iPart, nParts)
                                             {
-                                                // dudley then priscilla, or priscilla then dudley
-                                                updateMomentAndAreaWhenSomeoneMoved(
-                                                    momentAndArea[0], momentAndArea[1], momentAndArea[2],
-                                                    primalAng, steppingStoneAng,
-                                                    newMomentAndAreaScratch);
-                                                updateMomentAndAreaWhenSomeoneMoved(
-                                                    newMomentAndAreaScratch[0], newMomentAndAreaScratch[1], newMomentAndAreaScratch[2],
-                                                    steppingStoneAng, focusPrimalAngleMinusDualAngle,
-                                                    newMomentAndAreaScratch);
-                                                dataArrayList.add(new double[]{newMomentAndAreaScratch[0],
-                                                                               newMomentAndAreaScratch[1],
-                                                                               primalAng / (Math.PI*.5)}); // hue
-                                            } 
+                                                primalAngleStack[stackIndex] = (iPart+.5)/nParts*(Math.PI*.5);
+                                                if (stackIndex == 0)
+                                                    getSpiralMomentAndArea(primalAngleStack[stackIndex], momentAndAreaStack[stackIndex]);
+                                                else
+                                                {
+                                                    if (primalAngleStack[stackIndex] == primalAngleStack[stackIndex-1])
+                                                        continue; // that would make it a smaller problem
+                                                    updateMomentAndAreaWhenSomeoneMoved(
+                                                        momentAndAreaStack[stackIndex-1][0], momentAndAreaStack[stackIndex-1][1], momentAndAreaStack[stackIndex-1][2],
+                                                        primalAngleStack[stackIndex-1], primalAngleStack[stackIndex],
+                                                        momentAndAreaStack[stackIndex]);
+                                                }
+                                                if (stackIndex < finalPower-1)
+                                                {
+                                                    recurse(stackIndex+1);
+                                                }
+                                                else
+                                                {
+                                                    // Do one more update to the target angle, and record the result
+                                                    updateMomentAndAreaWhenSomeoneMoved(
+                                                        momentAndAreaStack[stackIndex][0], momentAndAreaStack[stackIndex][1], momentAndAreaStack[stackIndex][2],
+                                                        primalAngleStack[stackIndex], focusPrimalAngleMinusDualAngle,
+                                                        momentAndAreaStack[stackIndex+1]);
+                                                    dataArrayList.add(new double[]{momentAndAreaStack[stackIndex+1][0],
+                                                                                   momentAndAreaStack[stackIndex+1][1],
+                                                                                   primalAngleStack[0] / (Math.PI*.5)}); // hue
+                                                }
+                                            }
                                         }
-                                    }
+                                    };
+                                    new Recurse().recurse(0);
                                 }
+
+
                                 System.out.print("data.length = "+dataArrayList.size());
                                 System.out.flush();
 
@@ -3793,255 +3801,6 @@ public class SpiralApplet
                             }
                         }
                     );
-                }
-
-                {
-                    int maxPower = 3;
-                    for (int power = 1; power <= maxPower; ++power)
-                    {
-                        final int finalPower = power;
-                        // advance downward again
-                        y0 += yDelta;
-                        y1 += yDelta;
-                        drawOnePlot(
-                            g,
-                            gsize,
-                            1,40,2, x0,x1, 2,5,1, "moment y at primal-dual = "+doubleToStringNice(RTOD(focusPrimalAngleMinusDualAngle))+" degrees", null, // left to right
-                            1,45,2, y0,y1, 2,15,1, "moment x at primal-dual = "+doubleToStringNice(RTOD(focusPrimalAngleMinusDualAngle))+" degrees", null, // left to right
-
-                            0., .25, // values to put at x bounds
-                            0., .25, // values to put at y bounds
-
-                            5,5, // nMajor x,y
-
-                            java.awt.Color.blue, // outerFrameColor
-                            java.awt.Color.white, // innerFrameColor
-                            gray64, // majorGridColor
-                            gray128, // labelColor
-                            java.awt.Color.green, // boundsColor
-                            java.awt.Color.red, // dataColor
-                            pastelsFlag,
-                            new DataFetcher() { // possibleBoundsFetcher
-                                private double scratch[] = new double[3];
-                                public int nData()
-                                {
-                                    return 6*90;
-                                }
-                                public void getDatum(int ii, double putDatumHere[/*3*/])
-                                {
-                                    int iPicture = ii / 90;
-                                    int i = ii % 90;
-                                    if (iPicture == 0)
-                                    {
-                                        // outer circular arc
-                                        double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
-                                        double angle = (i+.5)/90*(Math.PI/2);
-                                        double xMax = maxMomentMag * Math.cos(angle);
-                                        double yMax = maxMomentMag * Math.sin(angle);
-
-                                        putDatumHere[0] = xMax;
-                                        putDatumHere[1] = yMax;
-                                        putDatumHere[2] = 0.; // hue
-                                    }
-                                    else if (iPicture == 1)
-                                    {
-                                        // more refined inner arc
-                                        // (seems to be mostly true, but violated most visibly at focus ang <= 30)
-                                        double angle = (i+.5)/90*(Math.PI/2);
-                                        double cosAngle = Math.cos(angle);
-                                        double sinAngle = Math.sin(angle);
-                                        //double rMax = Math.sin(2*angle)/4; // same thing
-                                        double rMax = cosAngle*sinAngle/2;
-                                        double xMax = cosAngle*rMax;
-                                        double yMax = sinAngle*rMax;
-
-                                        putDatumHere[0] = xMax;
-                                        putDatumHere[1] = yMax;
-                                        putDatumHere[2] = 0.; // hue
-                                    }
-                                    else if (iPicture == 2)
-                                    {
-                                        // another funky estimate-- this one is a circle
-                                        // tangent the x axis at the origin,
-                                        // that seems to meet the original circle at the right place.
-                                        // still not right though.
-                                        double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
-                                        double R = maxMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
-                                        double t = LERP(-Math.PI*.5, Math.PI*.5, (i+.5)/90);
-                                        double xMax = Math.cos(t)*R;
-                                        double yMax = Math.sin(t)*R + R;
-
-                                        putDatumHere[0] = xMax;
-                                        putDatumHere[1] = yMax;
-                                        putDatumHere[2] = 0.; // hue
-                                    }
-                                    else if (iPicture == 3)
-                                    {
-                                        // trying yet another thing...
-                                        // (turns out to be exactly equal to the circle)
-
-                                        double otherAngle = (i+.5)/90*(Math.PI/2);
-                                        double maxMagForOtherAngle = Math.sin(2*otherAngle)/4;
-                                        double otherX = maxMagForOtherAngle * Math.cos(otherAngle);
-                                        double otherY = maxMagForOtherAngle * Math.sin(otherAngle);
-                                        double otherArea = 100.; // arbitrary, it doesn't matter I don't think
-                                        updateMomentAndAreaWhenSomeoneMoved(
-                                            otherX,  // so otherX,otherY is already a moment? and was dividing to get center
-                                            otherY,
-                                            otherArea,
-                                            otherAngle,
-                                            focusPrimalAngleMinusDualAngle,
-                                            scratch);
-                                        double xMoment = scratch[0];
-                                        double yMoment = scratch[1];
-                                        double area = scratch[2]; // not used
-
-                                        // oh no! it appears to be exactly equal to the circle! damn!
-                                        // let's verify that...
-                                        {
-                                            double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
-                                            double Rexpected = maxMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
-                                            double Rgotttttt = MyMath.hypot(xMoment,yMoment-Rexpected);
-                                            assert(EQ(Rexpected, Rgotttttt, 1e-6));
-                                            //PRINT(Rexpected);
-                                            //PRINT(Rgotttttt);
-                                            //OUT("---");
-                                        }
-
-                                        putDatumHere[0] = xMoment;
-                                        putDatumHere[1] = yMoment;
-                                        putDatumHere[2] = 0.; // hue
-                                    }
-                                    else if (iPicture == 4)
-                                    {
-                                        // XXX revisit the following; at the moment it's greek to me
-
-                                        // attempted transcription of desired xm < 1/2 xd^2 in p=+y space:
-                                        //     rm sin(tp-tm) < 1/2 (rd sin(tp-td))^2
-                                        // in dudley space where rd=1 and td=0:
-                                        //     rm sin(tp-tm) < 1/2 sin(tp)^2
-                                        //     rm (sin(tp)cos(tm)-cos(tp)sin(tm)) < 1/2 sin(tp)^2
-                                        //     (yp xm - xp ym) < 1/2 yp^2
-                                        //         xm < (1/2 yp^2 + xp ym) / yp
-                                        double yp = Math.sin(focusPrimalAngleMinusDualAngle);
-                                        double xp = Math.cos(focusPrimalAngleMinusDualAngle);
-                                        double frac = (i+.5)/90;
-                                        double ym = frac;
-                                        assert(0 < ym && ym < 1);
-                                        double xm = (.5*yp*yp + xp*ym) / yp;
-                                        if (false)
-                                        {
-                                            if (i==0) OUT("---");
-                                            PRINT2(xm,ym);
-                                        }
-                                        putDatumHere[0] = xm;
-                                        putDatumHere[1] = ym;
-                                        putDatumHere[2] = 0.; // hue
-                                    }
-                                    else if (iPicture == 5)
-                                    {
-                                        double frac = (i+.5)/90;
-                                        double c = Math.cos(focusPrimalAngleMinusDualAngle);
-                                        double s = Math.sin(focusPrimalAngleMinusDualAngle);
-                                        double maxMomentMag = c*s/2;
-                                        double x = c * (frac * maxMomentMag);
-                                        double y = s * (frac * maxMomentMag);
-                                        putDatumHere[0] = x;
-                                        putDatumHere[1] = y;
-                                        putDatumHere[2] = 0.; // hue
-                                    }
-                                    else
-                                        assert(false);
-
-                                    if (false)
-                                    {
-                                        // suppress all parts except last
-                                        if (iPicture != 3)
-                                        {
-                                            putDatumHere[0] = 0.;
-                                            putDatumHere[1] = 0.;
-                                            putDatumHere[2] = 0.;
-                                        }
-                                    }
-                                }
-                            },
-                            new DataFetcher() { // dataFetcher
-                                double data[][];
-                                {
-                                    final java.util.ArrayList<double[]> dataArrayList = new java.util.ArrayList<double[]>();
-                                    System.out.print("    Calculating expensive plot, power="+finalPower+" ... ");
-                                    System.out.flush();
-                                    {
-                                        final int nParts = spiralModel.params.nParts.get();
-                                        final double primalAngleStack[] = new double[finalPower];
-                                        final double momentAndAreaStack[][] = new double[finalPower+1][3];
-                                        // Implement a nested for-loop
-                                        class Recurse {
-                                            private void recurse(int stackIndex)
-                                            {
-                                                assert(finalPower >= 1);
-                                                assert(stackIndex < finalPower);
-                                                FORI (iPart, nParts)
-                                                {
-                                                    primalAngleStack[stackIndex] = (iPart+.5)/nParts*(Math.PI*.5);
-                                                    if (stackIndex == 0)
-                                                        getSpiralMomentAndArea(primalAngleStack[stackIndex], momentAndAreaStack[stackIndex]);
-                                                    else
-                                                    {
-                                                        if (primalAngleStack[stackIndex] == primalAngleStack[stackIndex-1])
-                                                            continue; // that would make it a smaller problem
-                                                        updateMomentAndAreaWhenSomeoneMoved(
-                                                            momentAndAreaStack[stackIndex-1][0], momentAndAreaStack[stackIndex-1][1], momentAndAreaStack[stackIndex-1][2],
-                                                            primalAngleStack[stackIndex-1], primalAngleStack[stackIndex],
-                                                            momentAndAreaStack[stackIndex]);
-                                                    }
-                                                    if (stackIndex < finalPower-1)
-                                                    {
-                                                        recurse(stackIndex+1);
-                                                    }
-                                                    else
-                                                    {
-                                                        // Do one more update to the target angle, and record the result
-                                                        updateMomentAndAreaWhenSomeoneMoved(
-                                                            momentAndAreaStack[stackIndex][0], momentAndAreaStack[stackIndex][1], momentAndAreaStack[stackIndex][2],
-                                                            primalAngleStack[stackIndex], focusPrimalAngleMinusDualAngle,
-                                                            momentAndAreaStack[stackIndex+1]);
-                                                        dataArrayList.add(new double[]{momentAndAreaStack[stackIndex+1][0],
-                                                                                       momentAndAreaStack[stackIndex+1][1],
-                                                                                       primalAngleStack[0] / (Math.PI*.5)}); // hue
-                                                    }
-                                                }
-                                            }
-                                        };
-                                        new Recurse().recurse(0);
-                                    }
-
-
-                                    System.out.print("data.length = "+dataArrayList.size());
-                                    System.out.flush();
-
-                                    // gag!
-                                    //data = new double[dataArrayList.size()][];
-                                    //dataArrayList.toArray(data);
-                                    data = MyToArray(dataArrayList, double[].class);
-
-                                    System.out.println();
-                                }
-
-                                public int nData()
-                                {
-                                    return data.length;
-                                }
-                                double scratch[] = new double[3];
-                                public void getDatum(int i, double putDatumHere[/*3*/])
-                                {
-                                    putDatumHere[0] = data[i][0];
-                                    putDatumHere[1] = data[i][1];
-                                    putDatumHere[2] = data[i][2];
-                                }
-                            }
-                        );
-                    }
                 }
             }
 
@@ -6006,7 +5765,7 @@ public class SpiralApplet
         frame.setSize(622,558);
         frame.setSize(980,562); // 4x2 plots
         frame.setSize(980,846); // 4x3 plots
-        frame.setSize(980,1522); // 4x6 plots
+        frame.setSize(980,1262); // 4x5 plots
 
         frame.setVisible(true);
 
