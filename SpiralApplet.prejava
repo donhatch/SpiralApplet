@@ -1144,7 +1144,8 @@ public class SpiralApplet
                             add(makeIncrementableTextFieldForNumber(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
                             add(new JCheckBoxForBoolean("including the expensive one", applet.showTheExpensivePlotTooFlag) {{
                                 setMargin(nomargin);
-                                setToolTipText("<html>You might want to set Period to 1000 or so and regenerate before turning this on.</html>");
+                                // Actually this isn't true any more... and they really aren't that expensive any more
+                                //setToolTipText("<html>You might want to set Period to 1000 or so and regenerate before turning this on.</html>");
                             }});
                         }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
@@ -3743,6 +3744,19 @@ public class SpiralApplet
                                             assert(stackIndex < finalPower);
                                             FORI (iPart, nParts)
                                             {
+                                                // Experimentint with isolating just some parts of the middle one
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 20 && iPart < 30)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 30 && iPart < 40)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 40 && iPart < 50)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 40 && iPart < 50)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 50 && iPart < 60)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 60 && iPart < 70)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 70 && iPart < 80)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 80 && iPart < 85)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart == 44)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart == 44 || iPart >= 80 && iPart < 85)) continue;
+                                                if (finalPower == 2 && stackIndex==1 && !(iPart == 44 || iPart >= 80)) continue;
+
                                                 primalAngleStack[stackIndex] = (iPart+.5)/nParts*(Math.PI*.5);
                                                 if (stackIndex == 0)
                                                     getSpiralMomentAndArea(primalAngleStack[stackIndex], momentAndAreaStack[stackIndex]);
@@ -5139,7 +5153,7 @@ public class SpiralApplet
         public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
         //public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showTheExpensivePlotTooFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showTheExpensivePlotTooFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
