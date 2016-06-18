@@ -2209,11 +2209,11 @@ public class SpiralApplet
                     {
                         // close to limit extrapolated to something big
                         OUT("close to limit, extrapolated to infinity:");
-                        double eps = 1e-3;
+                        double tol = 1e-3;
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
 
                         double d0 = 1.;
-                        Complex d1 = p01.times(-eps).plusEquals(1.);
+                        Complex d1 = p01.times(-tol).plusEquals(1.);
                         Complex d2 = d1.times(d1);
 
                         double triArea01 = d1.cross(d0)/2.;
