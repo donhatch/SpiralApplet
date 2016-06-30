@@ -1,10 +1,13 @@
 // I looked at org.apache.commons.math3.complex.Complex
 // but didn't like it enough.  Just writing my own instead.
-//   - calls things plus,times,etc. rather than add,multiply,etc.
+// Mine:
 //   - exposes x,y as public fields
+//   - calls things plus,times,etc. rather than add,multiply,etc.
+//   - has "from" and "under" (so you don't have to say a.minus(b).neg() or a.over(b).inverse())
 //   - has abs2(),dot,cross,perpDot
-//   - has in-place operations timesEquals etc.
-//   - does do arbitrary ComplexFields (whatever that is)
+//   - has in-place operations timesEquals etc. with no memory allocations
+//   - doesn't do arbitrary ComplexFields (whatever that is)
+// TODO: trig and hyperbolic trig
 
 import com.donhatchsw.util.MyMath; // for hypot. rumor has it Math.hypot is abysmally slow.
 
