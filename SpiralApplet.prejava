@@ -239,7 +239,7 @@ public class SpiralApplet
             {
                 super(text);
             }
-            public void addActionListener(final java.awt.event.ActionListener actionListener)
+            OVERRIDE public void addActionListener(final java.awt.event.ActionListener actionListener)
             {
                 addMouseListener(new java.awt.event.MouseAdapter() {
                     private javax.swing.Timer repeatTimer = null;
@@ -333,7 +333,7 @@ public class SpiralApplet
                     }
                 });
             }
-            public void setText(String text)
+            OVERRIDE public void setText(String text)
             {
                 super.setText(text);
                 if (isEditable()) // use this as hint-- if not editable, probably makeTextComponentLikeLabel was called
@@ -3084,11 +3084,11 @@ public class SpiralApplet
                     java.awt.Color.red, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.nParts.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             double primalAng = (i+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
                             double maybeTopMomentAng = primalAng;
@@ -3098,11 +3098,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3142,11 +3142,11 @@ public class SpiralApplet
                     java.awt.Color.red, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3163,11 +3163,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3208,11 +3208,11 @@ public class SpiralApplet
                     java.awt.Color.red, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 2*90;
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             if (i >= 90)
                             {
@@ -3255,11 +3255,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3300,11 +3300,11 @@ public class SpiralApplet
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         private double scratch[] = new double[3];
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 6*90;
                         }
-                        public void getDatum(int ii, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int ii, double putDatumHere[/*3*/])
                         {
                             int iPicture = ii / 90;
                             int i = ii % 90;
@@ -3443,12 +3443,12 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
                         double scratch[] = new double[3];
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3503,11 +3503,11 @@ public class SpiralApplet
                         pastelsFlag,
                         new DataFetcher() { // possibleBoundsFetcher
                             private double scratch[] = new double[3];
-                            public int nData()
+                            OVERRIDE public int nData()
                             {
                                 return 6*90;
                             }
-                            public void getDatum(int ii, double putDatumHere[/*3*/])
+                            OVERRIDE public void getDatum(int ii, double putDatumHere[/*3*/])
                             {
                                 int iPicture = ii / 90;
                                 int i = ii % 90;
@@ -3721,12 +3721,12 @@ public class SpiralApplet
                                 System.out.println();
                             }
 
-                            public int nData()
+                            OVERRIDE public int nData()
                             {
                                 return data.length;
                             }
                             double scratch[] = new double[3];
-                            public void getDatum(int i, double putDatumHere[/*3*/])
+                            OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                             {
                                 putDatumHere[0] = data[i][0];
                                 putDatumHere[1] = data[i][1];
@@ -3765,11 +3765,11 @@ public class SpiralApplet
                     java.awt.Color.red, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 90;
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             double angle = (i+.5)/90*(Math.PI/2);
                             putDatumHere[0] = Math.cos(angle);
@@ -3778,11 +3778,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3825,11 +3825,11 @@ public class SpiralApplet
                     java.awt.Color.red, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 2*90;
                         }
-                        public void getDatum(int ii, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int ii, double putDatumHere[/*3*/])
                         {
                             int iPicture = ii / 90;
                             int i = ii % 90;
@@ -3855,12 +3855,12 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
                         double scratch[] = new double[3];
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3914,11 +3914,11 @@ public class SpiralApplet
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         private int n = 90;
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 2*n;
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             if (i >= n)
                             {
@@ -3964,11 +3964,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -5649,12 +5649,12 @@ public class SpiralApplet
 
         // the following seems to be necessary, or getParameter() will crash, at least in 1.4.  Want to send params from command line anyway.
         applet.setStub(new java.applet.AppletStub() {
-             public void appletResize(int width, int height)
+             OVERRIDE public void appletResize(int width, int height)
                  { /* should resize frame, but a SpiralApplet never asks to be resized */ }
-             public java.applet.AppletContext getAppletContext() { return null;}
-             public java.net.URL getCodeBase() { return null; }
-             public java.net.URL getDocumentBase() { return null; }
-             public String getParameter(String name)
+             OVERRIDE public java.applet.AppletContext getAppletContext() { return null;}
+             OVERRIDE public java.net.URL getCodeBase() { return null; }
+             OVERRIDE public java.net.URL getDocumentBase() { return null; }
+             OVERRIDE public String getParameter(String name)
              {
                  // case insensitive... and unfortunately there's no
                  // startsWithIgnoreCase
@@ -5665,7 +5665,7 @@ public class SpiralApplet
                          return args[i].substring(prefix.length());
                  return null;
              }
-             public boolean isActive() { return true; }
+             OVERRIDE public boolean isActive() { return true; }
         });
 
         applet.init();
