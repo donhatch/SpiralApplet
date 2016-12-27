@@ -306,7 +306,7 @@ public class SpiralApplet
                                     setBackground(new java.awt.Color(255,192,192)); // pink
                             }
                             else
-                                setBackground(java.awt.Color.white);
+                                setBackground(java.awt.Color.WHITE);
                         }
                     }
                     OVERRIDE public void insertUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
@@ -328,7 +328,7 @@ public class SpiralApplet
                         if (validate(getText()))
                         {
                             committedText = getText();
-                            setBackground(java.awt.Color.white);
+                            setBackground(java.awt.Color.WHITE);
                         }
                     }
                 });
@@ -341,7 +341,7 @@ public class SpiralApplet
                     if (validate(getText()))
                     {
                         committedText = getText();
-                        setBackground(java.awt.Color.white);
+                        setBackground(java.awt.Color.WHITE);
                     }
                 }
             }
@@ -370,9 +370,9 @@ public class SpiralApplet
 
                 final java.awt.Color asciiToColor[] = new java.awt.Color[128];
                 asciiToColor[' '] = null;
-                asciiToColor['b'] = java.awt.Color.black;
+                asciiToColor['b'] = java.awt.Color.BLACK;
                 asciiToColor['g'] = new java.awt.Color(128,128,128); // 50% gray
-                asciiToColor['r'] = java.awt.Color.red;
+                asciiToColor['r'] = java.awt.Color.RED;
 
                 /*
                 contentPane.add(new JSeparator(), stretchx);
@@ -961,7 +961,7 @@ public class SpiralApplet
 
                                         if (false) // can change to true for debugging
                                         {
-                                            fudgedAsciiToColor['w'] = java.awt.Color.white;
+                                            fudgedAsciiToColor['w'] = java.awt.Color.WHITE;
                                             chars[seedRow][seedCol] = 'w';
                                         }
                                     }
@@ -1259,7 +1259,7 @@ public class SpiralApplet
                             new JTextArea(text) {{
                                 // make it like a JLabel as much as possible, but text selectable
                                 this.setEditable(false);
-                                this.setDisabledTextColor(java.awt.Color.black);
+                                this.setDisabledTextColor(java.awt.Color.BLACK);
                                 this.setBackground(null); // same as JLabel
                                 this.setBorder(null); // same as JLabel
                             }}
@@ -1759,7 +1759,7 @@ public class SpiralApplet
                 //
                 // Clear to black...
                 //
-                g.setColor(java.awt.Color.black);
+                g.setColor(java.awt.Color.BLACK);
                 g.fillRect(0,0, size.width,size.height);
 
 
@@ -1838,7 +1838,7 @@ public class SpiralApplet
 
 
                 nPaints++;
-                g.setColor(java.awt.Color.white);
+                g.setColor(java.awt.Color.WHITE);
                 String nPaintsString = ""+nPaints+" paints";
                 g.drawString(nPaintsString,
                              size.width - 5 - g.getFontMetrics().stringWidth(nPaintsString),
@@ -1884,7 +1884,7 @@ public class SpiralApplet
                 {
                     // draw dot at exact center of window,
                     // for debugging.
-                    g.setColor(java.awt.Color.red);
+                    g.setColor(java.awt.Color.RED);
                     // 1 -> 0..1
                     // 2 -> 0..2
                     // 3 -> 1..2
@@ -2968,7 +2968,7 @@ public class SpiralApplet
                               null);
 
             // draw bounds
-            g.setColor(pastelsFlag ? java.awt.Color.white : boundsColor);
+            g.setColor(pastelsFlag ? java.awt.Color.WHITE : boundsColor);
             {
                 int n = possibleBoundsFetcher.nData();
                 double datum[] = new double[3];
@@ -3076,12 +3076,12 @@ public class SpiralApplet
 
                     9,9, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         OVERRIDE public int nData()
@@ -3134,12 +3134,12 @@ public class SpiralApplet
 
                     9,5, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         OVERRIDE public int nData()
@@ -3200,12 +3200,12 @@ public class SpiralApplet
 
                     5,5, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         OVERRIDE public int nData()
@@ -3291,12 +3291,12 @@ public class SpiralApplet
 
                     5,5, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         private double scratch[] = new double[3];
@@ -3494,12 +3494,12 @@ public class SpiralApplet
 
                         5,5, // nMajor x,y
 
-                        java.awt.Color.blue, // outerFrameColor
-                        java.awt.Color.white, // innerFrameColor
+                        java.awt.Color.BLUE, // outerFrameColor
+                        java.awt.Color.WHITE, // innerFrameColor
                         gray64, // majorGridColor
                         gray128, // labelColor
-                        java.awt.Color.green, // boundsColor
-                        java.awt.Color.red, // dataColor
+                        java.awt.Color.GREEN, // boundsColor
+                        java.awt.Color.RED, // dataColor
                         pastelsFlag,
                         new DataFetcher() { // possibleBoundsFetcher
                             private double scratch[] = new double[3];
@@ -3757,12 +3757,12 @@ public class SpiralApplet
 
                     10,10, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         OVERRIDE public int nData()
@@ -3817,12 +3817,12 @@ public class SpiralApplet
 
                     10,10, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         OVERRIDE public int nData()
@@ -3905,12 +3905,12 @@ public class SpiralApplet
 
                     5,5, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         private int n = 90;
@@ -4111,7 +4111,7 @@ public class SpiralApplet
                 if (false)
                 {
                     // blue for base
-                    g.setColor(java.awt.Color.blue);
+                    g.setColor(java.awt.Color.BLUE);
                     FORI (iPart, nParts)
                         g.fillRect(ixBase,iyBase-iPart*pixelsPerPart,1,1);
                 }
@@ -4119,7 +4119,7 @@ public class SpiralApplet
                 if (true)
                 {
                     // yellow for rail
-                    g.setColor(java.awt.Color.yellow);
+                    g.setColor(java.awt.Color.YELLOW);
                     g.fillRect(ixLowerRail,iyLowerRail,1,1);
                     g.fillRect(ixUpperRail,iyUpperRail,1,1);
                 }
@@ -4377,7 +4377,7 @@ public class SpiralApplet
                 if (pastelsFlag)
                     mg.setColor(pastels[(int)(2*val+1)]);
                 else
-                    mg.setColor(java.awt.Color.cyan);
+                    mg.setColor(java.awt.Color.CYAN);
                 double primalAng = Math.PI/2 * ((val+.5)/nParts) + orientationAngleFudge;
                 mg.drawLine(0.,0.,Math.cos(primalAng),Math.sin(primalAng),antiAliasFlag);
             }
@@ -4402,7 +4402,7 @@ public class SpiralApplet
                 else
                 {
                     if (scanDir < 0)
-                        mg.setColor(java.awt.Color.white);
+                        mg.setColor(java.awt.Color.WHITE);
                     else
                     {
                         //mg.setColor(gray64);
@@ -4663,7 +4663,7 @@ public class SpiralApplet
                         double areaScratch = spiralModel.momentsAndAreas[i][2]; // var area already defined, maybe should rename it
                         VecMath.vxs(moment, moment, primalR/dualR); // divide by dualR because we should never have multiplied by it
                         java.awt.Color savedColor = mg.getColor();
-                        mg.setColor(java.awt.Color.yellow);
+                        mg.setColor(java.awt.Color.YELLOW);
 
                         boolean big = (spiralModel.theList[i] > spiralModel.theList[(i+1)%n])
                                  && !(spiralModel.theList[MOD(i-1,n)] > spiralModel.theList[i]);
@@ -4677,7 +4677,7 @@ public class SpiralApplet
 
                 if (scanDir < 0 && drawPrimalFlag)
                 {
-                    mg.setColor(java.awt.Color.yellow);
+                    mg.setColor(java.awt.Color.YELLOW);
                     mg.drawPoint(centerX, centerY, 5);
                     {
                         double centerYinCanonicalOrientation = -centerX*sinOrientationAngleFudge + centerY*cosOrientationAngleFudge;
@@ -4710,7 +4710,7 @@ public class SpiralApplet
                         // I.e. it's in a certain pie slice, bounded by two rays
                         // and an arc.  Draw that arc.
                         double arcRadius = Math.sin(2*initialPrimalAng) / (4*area);
-                        mg.setColor(java.awt.Color.yellow);
+                        mg.setColor(java.awt.Color.YELLOW);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
                                         0.+orientationAngleFudge, // startRadians
@@ -4725,7 +4725,7 @@ public class SpiralApplet
                         if (pastelsFlag)
                             mg.setColor(pastels[(int)(2*val+1)]);
                         else
-                            mg.setColor(java.awt.Color.magenta);
+                            mg.setColor(java.awt.Color.MAGENTA);
 
                         double momentX = centerX*area;
                         double momentY = centerY*area;
@@ -4754,7 +4754,7 @@ public class SpiralApplet
                             if (momentMag > boundIThought*fudge)
                             {
                                 System.out.println("HEY! focus="+spiralView.focus+": moment mag is bigger than naive bound! by factor of "+(momentMag/boundIThought)+" (ang="+RTOD(initialPrimalAng)+" momentAng="+RTOD(momentAngle)+" momentMag="+momentMag+")");
-                                mg.setColor(java.awt.Color.red);
+                                mg.setColor(java.awt.Color.RED);
                             }
 
                         }
@@ -5391,7 +5391,7 @@ public class SpiralApplet
     private static void makeTextComponentLikeLabel(JTextComponent textComponent)
     {
         textComponent.setEditable(false);
-        textComponent.setDisabledTextColor(java.awt.Color.black);
+        textComponent.setDisabledTextColor(java.awt.Color.BLACK);
         textComponent.setBackground(null); // same as JLabel
         textComponent.setBorder(null); // same as JLabel
         textComponent.setEnabled(true); // otherwise not selectable
@@ -5408,7 +5408,7 @@ public class SpiralApplet
         }
         final java.awt.Color asciiToColor[] = new java.awt.Color[128];
         asciiToColor[' '] = null;
-        asciiToColor['b'] = java.awt.Color.black;
+        asciiToColor['b'] = java.awt.Color.BLACK;
         return new JRow() {{
             add(new JRepeatingButton("") {
                 OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
