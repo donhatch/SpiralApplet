@@ -597,7 +597,7 @@ public class SpiralApplet
                                 OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "   b  b",
                                                           "  bb bb",
@@ -623,7 +623,7 @@ public class SpiralApplet
                                 OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "     gb",
                                                           "   gbbb",
@@ -649,7 +649,7 @@ public class SpiralApplet
                                 OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "   b bb",
                                                           "  bb bb",
@@ -675,7 +675,7 @@ public class SpiralApplet
                                 OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "bbb bbb",
                                                           "bbb bbb",
@@ -701,7 +701,7 @@ public class SpiralApplet
                                 OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "bb b   ",
                                                           "bb bb  ",
@@ -727,7 +727,7 @@ public class SpiralApplet
                                 OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "bg     ",
                                                           "bbbg   ",
@@ -753,7 +753,7 @@ public class SpiralApplet
                                 OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "b  b   ",
                                                           "bb bb  ",
@@ -970,7 +970,7 @@ public class SpiralApplet
                             // convert the whole thing back to Strings
                             FORI (iRow, rows.length)
                                 rows[iRow] = new String(chars[iRow]);
-                            drawPixmapCentered(g, getSize(), fudgedAsciiToColor, rows);
+                            drawPixmapCentered(g, getSize(), hidpimag, fudgedAsciiToColor, rows);
                             if (debug) OUT("                    out orientation button paint");
                         } // paint
                         private void updateSpiralOrientationNumber(int mouseX, int mouseY)
@@ -5331,6 +5331,7 @@ public class SpiralApplet
     // nice utility, maybe move to donhatchsw
     public static void drawPixmapCentered(java.awt.Graphics g,
                                           java.awt.Dimension size,
+                                          int mag,
                                           java.awt.Color asciiToColor[],
                                           String[] rows)
     {
@@ -5343,9 +5344,9 @@ public class SpiralApplet
             g.fillRect(0,0, size.width,size.height);
         }
 
-        if (hidpimag != 1)
+        assert(mag >= 0);  // 0 would be weird but legal
+        if (mag != 1)
         {
-            int mag = hidpimag;
             String[] newRows = new String[rows.length*mag];
             FORI (iRow, rows.length)
             {
@@ -5416,7 +5417,7 @@ public class SpiralApplet
                 OVERRIDE public void paint(java.awt.Graphics g)
                 {
                     super.paint(g);
-                    drawPixmapCentered(g, getSize(), asciiToColor,
+                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                        new String[] {
                                           "bbb bbb",
                                        });
@@ -5453,7 +5454,7 @@ public class SpiralApplet
                 OVERRIDE public void paint(java.awt.Graphics g)
                 {
                     super.paint(g);
-                    drawPixmapCentered(g, getSize(), asciiToColor,
+                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                        new String[] {
                                           " b   b ",
                                           "bbb bbb",
