@@ -485,7 +485,7 @@ public class MyGraphics
     {
         // rotate about xformed x,y
         java.awt.Graphics2D g2d = (java.awt.Graphics2D)g;
-        assert(g2d != null);
+        CHECK(g2d != null);
 
         java.awt.geom.AffineTransform origXform = g2d.getTransform();
         java.awt.geom.AffineTransform rotated = (java.awt.geom.AffineTransform)origXform.clone();
