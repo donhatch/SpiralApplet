@@ -104,7 +104,7 @@ public class MyGraphics3D extends MyGraphics
 
     public double xform(double x, double y, double z, double w, double out[/*2 or 3 or 4*/])
     {
-        CHECK(w >= 0.); // shouldn't have any inputs that violate this, any more, currently... although we might in the future
+        CHECK_GE(w, 0.); // shouldn't have any inputs that violate this, any more, currently... although we might in the future
 
         // this gets called zillions of times, so use scratch arrays...
         double out4[] = scratch0;
@@ -151,7 +151,7 @@ public class MyGraphics3D extends MyGraphics
         if (t0 <= t1)
         {
             int nDims = p.length;
-            CHECK(nDims == dir.length);
+            CHECK_EQ(nDims, dir.length);
 
             double pw = p[nDims-1];
             double dirw = dir[nDims-1];

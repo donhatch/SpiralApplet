@@ -47,7 +47,7 @@ class TimingGraph
                 if (iCol==0)
                 {
                     double paintTimeSoFar = now-startTime;
-                    CHECK(paintTimeSoFar >= 0.);
+                    CHECK_GE(paintTimeSoFar, 0.);
                     //PRINT(paintTimeSoFar);
                     g.setColor(java.awt.Color.YELLOW);
                     int barHeight = (int)(.5+paintTimeSoFar*(1000.*pixelsPerMilli));
@@ -58,7 +58,7 @@ class TimingGraph
                 else if (iCol <= endTimes.size() && iCol < startTimes.size())
                 {
                     double paintTime = endTimes.get(endTimes.size()-iCol) - startTimes.get(startTimes.size()-1-iCol);
-                    CHECK(paintTime >= 0.);
+                    CHECK_GE(paintTime, 0.);
                     //PRINT(paintTime);
                     g.setColor(java.awt.Color.GREEN);
                     int barHeight = (int)(.5+paintTime*(1000.*pixelsPerMilli));
@@ -70,7 +70,7 @@ class TimingGraph
                 {
                     double nonPaintTime = (startTimes.get(startTimes.size()-1-(iCol-1)) - endTimes.get(endTimes.size()-1-(iCol-1)));
                     //PRINT(nonPaintTime);
-                    CHECK(nonPaintTime >= 0.);
+                    CHECK_GE(nonPaintTime, 0.);
                     g.setColor(java.awt.Color.RED);
                     int barHeight = (int)(.5+nonPaintTime*(1000.*pixelsPerMilli));
                     g.fillRect(x,y-barHeight,

@@ -26,6 +26,7 @@
 #define CHECK_LT_LE(a,b,c) CHECK_OP_OP(a,<,b,<=,c)
 #define CHECK_LT_LT(a,b,c) CHECK_OP_OP(a,<,b,<,c)
 #define CHECK_NE_NE(a,b,c) CHECK_OP_OP(a,!=,b,!=,c)
+#define CHECK_GT_GE(a,b,c) CHECK_OP_OP(a,>,b,>=,c)
 
 #define CHECK_NAN(x) do { if (!Double.isNaN(x)) throw new Error("Assertion failed at "+__FILE__+"("+__LINE__+"): " + #x + " is "+(x)+", expected NaN"); } while (false)
 // Note: the additional "(a)==(b)||" is to make it work correctly for infinities...

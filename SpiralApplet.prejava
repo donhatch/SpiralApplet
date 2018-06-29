@@ -905,7 +905,7 @@ public class SpiralApplet
 
                                     double cos = Math.cos(angle);
                                     double sin = Math.sin(angle);
-                                    CHECK(rows.length == rows[0].length());
+                                    CHECK_EQ(rows.length, rows[0].length());
 
                                     int seedRow = -1, seedCol = -1;
                                     boolean foundSeed = false;
@@ -2023,7 +2023,7 @@ public class SpiralApplet
                 if (s.startsWith("0."))
                     s = s.substring(1); // change the "0." to just "."
             }
-            CHECK(s.length() >= 1);
+            CHECK_GE(s.length(), 1);
             //System.out.println("    out doubleToStringNice("+x+"), returning "+s);
             return s;
         } // doubleToStringNice
@@ -2035,8 +2035,7 @@ public class SpiralApplet
         // this makes the distinction between low and high values clearer.
         static java.awt.Color getHSBColor(float h, float s, float b)
         {
-            CHECK(h >= 0.);
-            CHECK(h <= 1.);
+            CHECK_LE_LE(0., h, 1.);
             h = CLAMP(h,0.f,1.f);
             h *= (float)(5./6.); // so 1 becomes 5/6 = violet
             return java.awt.Color.getHSBColor(h,s,b);
@@ -2205,10 +2204,10 @@ public class SpiralApplet
                 this.params.randomSeed.set(randomSeed);
 
                 java.util.Random rng = new java.util.Random(randomSeed);
-                CHECK(n >= 2);
-                CHECK(n % 2 == 0); // doesn't work with odd n
-                CHECK(n % 4 == 0); // actually DELTASTYLE_0 only works with n a multiple of 4
-                CHECK(nParts >= 2); // doesn't work with only one part
+                CHECK_GE(n, 2);
+                CHECK_EQ(n % 2, 0); // doesn't work with odd n
+                CHECK_EQ(n % 4, 0); // actually DELTASTYLE_0 only works with n a multiple of 4
+                CHECK_GE(nParts, 2); // doesn't work with only one part
 
                 this.theList = new int[n];
                 if (deltaStyle == DELTASTYLE_0_VERYGRADUAL
@@ -2253,7 +2252,7 @@ public class SpiralApplet
                                 done = true;
                                 break;
                             }
-                            CHECK(val >= 0 && val < nParts);
+                            CHECK_LE_LT(0, val, nParts);
                             this.theList[i] = val;
 
                             if (val == 0)
@@ -2282,7 +2281,8 @@ public class SpiralApplet
                         val = 0; // so it will likely cross over near beginning, so what it's doing will be more obvious at beginning
                     }
                     PRINT(nParts);
-                    CHECK(val >= 0 && val < nParts && val%2 == 0);
+                    CHECK_LE_LT(0, val, nParts);
+                    CHECK_EQ(val%2, 0);
 
                     boolean done = false;
                     int sign = -1; // initial val is biased a bit downwards, so there is guaranteed to be room upwards. so set sign initially to -1, so it will immediately switch to 1 and there will be room.
@@ -2296,7 +2296,7 @@ public class SpiralApplet
                                 done = true;
                                 break;
                             }
-                            CHECK(val >= 0 && val < nParts);
+                            CHECK_LE_LT(0, val, nParts);
                             this.theList[i] = val;
 
                             if (nRemainingThisSign == 0)
@@ -2306,12 +2306,12 @@ public class SpiralApplet
                                     sign = -sign;
                                     if (sign == -1)
                                     {
-                                        CHECK(val > 0);
+                                        CHECK_GT(val, 0);
                                         nRemainingThisSign = 1+rng.nextInt(val);
                                     }
                                     else
                                     {
-                                        CHECK(nParts-1-val > 0);
+                                        CHECK_GT(nParts-1-val, 0);
                                         nRemainingThisSign = 1+rng.nextInt(nParts-1-val);
                                     }
                                 }
@@ -2352,7 +2352,7 @@ public class SpiralApplet
                 // sanity check-- parity of value should be same as parity of index
                 FORI (i, n)
                 {
-                    CHECK((theList[i] + i)%2 == 0);
+                    CHECK_EQ((theList[i] + i)%2, 0);
                 }
 
                 this.momentsAndAreas = new double[n][3];
@@ -2416,12 +2416,12 @@ public class SpiralApplet
 
 
                                 // These were before implementing 2nd shortcut
-                                //CHECK(iPass <= 11); // keep track of max ever seen
-                                //CHECK(iPass <= 39); // keep track of max ever seen
-                                //CHECK(iPass <= 793); // keep track of max ever seen.   +-1 wrap, period=4 seed=1 or 10.  argh!
+                                //CHECK_LE(iPass, 11); // keep track of max ever seen
+                                //CHECK_LE(iPass, 39); // keep track of max ever seen
+                                //CHECK_LE(iPass, 793); // keep track of max ever seen.   +-1 wrap, period=4 seed=1 or 10.  argh!
 
-                                //CHECK(iPass <= 28);
-                                CHECK(iPass <= 469);
+                                //CHECK_LE(iPass, 28);
+                                CHECK_LE(iPass, 469);
 
                                 // XXX argh, fails:
                                 //      period=4
@@ -2459,8 +2459,8 @@ public class SpiralApplet
                                     thisMomentAndArea[1] = moment.y;
                                     thisMomentAndArea[2] = area;
                                     System.out.println("    pass "+iPass+": shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
-                                    CHECK(area == area); // not nan
-                                    CHECK(area+1. != area); // not infinite
+                                    CHECK_EQ(area, area); // not nan
+                                    CHECK_NE(area+1., area); // not infinite
                                     secret_stash_for_oracle = VecMath.copyvec(thisMomentAndArea);
                                 }
 
@@ -2561,7 +2561,7 @@ public class SpiralApplet
             // Biased like an index.  To unbias, add 1/2.
             Rational getValBiased(Rational focus)
             {
-                CHECK(focus.n >= 0);
+                CHECK_GE(focus.n, 0);
                 int n = this.params.n.get();
                 int i0 = focus.floor();
                 Rational frac = focus.minus(i0,1); // frac = focus - i0, before modding i0 by n
@@ -2609,7 +2609,7 @@ public class SpiralApplet
             // nor to the direction from origin to center.
             double shrink = Math.cos(newPrimalMinusDualAng)
                           / Math.cos(oldPrimalMinusDualAng);
-            CHECK(shrink <= 1.);
+            CHECK_LE(shrink, 1.);
             double newMomentX = shrink * oldMomentX;
             double newMomentY = shrink * oldMomentY;
             double newArea = oldArea;
@@ -2635,11 +2635,11 @@ public class SpiralApplet
             // the formula for shrink is magic, worked out on paper
             double shrink = Math.sin(newPrimalMinusDualAng)
                           / Math.sin(oldPrimalMinusDualAng);
-            CHECK(shrink <= 1.);
+            CHECK_LE(shrink, 1.);
 
             // angle to rotate previous picture by (rotate CW, so it's negative)
             double t = newPrimalMinusDualAng-oldPrimalMinusDualAng;
-            CHECK(t <= 0.);
+            CHECK_LE(t, 0.);
             double ct = Math.cos(t);
             double st = Math.sin(t);
 
@@ -2653,7 +2653,7 @@ public class SpiralApplet
 
             // worked this out on paper
             double areaIncrInNewSpace = .5 * shrink*Math.sin(oldPrimalMinusDualAng-newPrimalMinusDualAng);
-            CHECK(areaIncrInNewSpace >= 0.);
+            CHECK_GE(areaIncrInNewSpace, 0.);
 
             double newMomentX = oldMomentInNewSpaceX + areaIncrInNewSpace * Math.cos(newPrimalMinusDualAng);
             double newMomentY = oldMomentInNewSpaceY + areaIncrInNewSpace * Math.sin(newPrimalMinusDualAng);
@@ -2854,7 +2854,7 @@ public class SpiralApplet
                 String tempString;
                 SWAP(gY0Label, gY1Label, tempString);
             }
-            CHECK(gY0 < gY1);
+            CHECK_LT(gY0, gY1);
 
 
             // make a MyGraphics, without changing coords,
@@ -3155,7 +3155,7 @@ public class SpiralApplet
                             double momentMag = VecMath.norm(2, momentAndArea);
 
                             double maxMomentMag = Math.sin(2*primalAng)/4; // i.e. tri area / 2, i.e. sin(primalAng)*cos(primalAng)/2
-                            CHECK(momentMag < maxMomentMag);
+                            CHECK_LT(momentMag, maxMomentMag);
 
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = maxMomentMag;
@@ -3379,7 +3379,7 @@ public class SpiralApplet
                                     double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
                                     double Rexpected = maxMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
                                     double Rgotttttt = MyMath.hypot(xMoment,yMoment-Rexpected);
-                                    CHECK(EQ(Rexpected, Rgotttttt, 1e-6));
+                                    CHECK_ALMOST_EQ(Rexpected, Rgotttttt, 1e-6);
                                     //PRINT(Rexpected);
                                     //PRINT(Rgotttttt);
                                     //OUT("---");
@@ -3404,7 +3404,7 @@ public class SpiralApplet
                                 double xp = Math.cos(focusPrimalAngleMinusDualAngle);
                                 double frac = (i+.5)/90;
                                 double ym = frac;
-                                CHECK(0 < ym && ym < 1);
+                                CHECK_LT_LT(0, ym, 1);
                                 double xm = (.5*yp*yp + xp*ym) / yp;
                                 if (false)
                                 {
@@ -3582,7 +3582,7 @@ public class SpiralApplet
                                         double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
                                         double Rexpected = maxMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
                                         double Rgotttttt = MyMath.hypot(xMoment,yMoment-Rexpected);
-                                        CHECK(EQ(Rexpected, Rgotttttt, 1e-6));
+                                        CHECK_ALMOST_EQ(Rexpected, Rgotttttt, 1e-6);
                                         //PRINT(Rexpected);
                                         //PRINT(Rgotttttt);
                                         //OUT("---");
@@ -3607,7 +3607,7 @@ public class SpiralApplet
                                     double xp = Math.cos(focusPrimalAngleMinusDualAngle);
                                     double frac = (i+.5)/90;
                                     double ym = frac;
-                                    CHECK(0 < ym && ym < 1);
+                                    CHECK_LT_LT(0, ym, 1);
                                     double xm = (.5*yp*yp + xp*ym) / yp;
                                     if (false)
                                     {
@@ -3659,8 +3659,8 @@ public class SpiralApplet
                                     class Recurse {
                                         private void recurse(int stackIndex)
                                         {
-                                            CHECK(finalPower >= 1);
-                                            CHECK(stackIndex < finalPower);
+                                            CHECK_GE(finalPower, 1);
+                                            CHECK_LT(stackIndex, finalPower);
                                             FORI (iPart, nParts)
                                             {
                                                 // Experimentint with isolating just some parts of the middle one
@@ -4010,9 +4010,9 @@ public class SpiralApplet
             //PRINT(gCenterX);
             //PRINT(gCenterY);
 
-            CHECK(n > 0);
-            CHECK(pixelsPerPart > 0);
-            CHECK(n % 2 == 0); // whole thing doesn't work otherwise
+            CHECK_GT(n, 0);
+            CHECK_GT(pixelsPerPart, 0);
+            CHECK_EQ(n % 2, 0); // whole thing doesn't work otherwise
 
 
             java.awt.Color gray128 = new java.awt.Color(128,128,128);
@@ -4188,15 +4188,15 @@ public class SpiralApplet
 
                 //double xOffset = (-upperLeftOffset - lowerLeftOffset);
                 //double yOffset = (-upperLeftOffset + lowerLeftOffset);
-                //CHECK((double)(int)xOffset == xOffset);
-                //CHECK((double)(int)yOffset == yOffset);
+                //CHECK_EQ((double)(int)xOffset, xOffset);
+                //CHECK_EQ((double)(int)yOffset, yOffset);
 
                 Rational xOffset = upperLeftOffset.times(-1,1).minus(lowerLeftOffset);
                 Rational yOffset = upperLeftOffset.times(-1,1).plus(lowerLeftOffset);
                 //PRINT(xOffset);
                 //PRINT(yOffset);
-                CHECK(xOffset.d == 1);
-                CHECK(yOffset.d == 1);
+                CHECK_EQ(xOffset.d, 1);
+                CHECK_EQ(yOffset.d, 1);
 
 
                 ix0 = ixBase + xOffset.n;
@@ -4626,7 +4626,7 @@ public class SpiralApplet
                         if (scanDir < 0)
                         {
                             double areaIncr = .5 * twiceTriangleArea(0.,0., dualX,dualY, nextDualX,nextDualY);
-                            CHECK(areaIncr <= 0.); // area triangle is negative since scanning backwards
+                            CHECK_LE(areaIncr, 0.); // area triangle is negative since scanning backwards
                             areaIncr = ABS(areaIncr);
 
                             if (area+areaIncr == area)
@@ -4685,7 +4685,7 @@ public class SpiralApplet
                         {
                             System.out.println("HEY! centerY is "+centerY);
                         }
-                        //CHECK(centerYinCanonicalOrientation > 0.);
+                        //CHECK_GT(centerYinCanonicalOrientation, 0.);
                     }
 
                     {
@@ -5344,7 +5344,7 @@ public class SpiralApplet
             g.fillRect(0,0, size.width,size.height);
         }
 
-        CHECK(mag >= 0);  // 0 would be weird but legal
+        CHECK_GE(mag, 0);  // 0 would be weird but legal
         if (mag != 1)
         {
             String[] newRows = new String[rows.length*mag];
@@ -5405,7 +5405,7 @@ public class SpiralApplet
                                                         final boolean mustBePositive)
     {
         if (mustBeMultipleOf != 0.) {
-            CHECK(increment % mustBeMultipleOf == 0.); // otherwise incrementing wouldn't be very useful
+            CHECK_EQ(increment % mustBeMultipleOf, 0.); // otherwise incrementing wouldn't be very useful
         }
         final java.awt.Color asciiToColor[] = new java.awt.Color[128];
         asciiToColor[' '] = null;
@@ -5731,9 +5731,7 @@ public class SpiralApplet
     // Sum geometric series given the first two terms which should be decreasing.
     public static double SumGeometricSeries(double a, double b)
     {
-        CHECK(b >= 0);
-        CHECK(a > b);
-
+        CHECK_GT_GE(a, b, 0);
         // The thing being taken to powers is x = b/a.
         // Sum of powers of x is 1/(1-x), so
         // answer is 1/(1-x) * a = 1/(1-b/a) = a^2/(a-b).
@@ -5742,7 +5740,7 @@ public class SpiralApplet
     // Sum geometric series given the first two terms.
     public static Complex SumGeometricSeries(Complex a, Complex b)
     {
-        CHECK(a.abs2() > b.abs2());
+        CHECK_GT(a.abs2(), b.abs2());
 
         //return a.times(a).overEquals(a.minus(b));      // two allocations
         return a.times(a).overEquals(a.x-b.x, a.y-b.y);  // only one allocation

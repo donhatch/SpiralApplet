@@ -120,8 +120,8 @@ public class Rational
         // guarantee that n1>0 and d1>0,
         // however failure isn't exactly obvious...
         // so assert that explicitly here too.
-        CHECK(n1 > 0);
-        CHECK(d1 > 0);
+        CHECK_GT(n1, 0);
+        CHECK_GT(d1, 0);
 
 
         // a%b = frac(a/b)*b
@@ -145,7 +145,7 @@ public class Rational
     public Rational equalsFrac(int n, int d)
     {
         this.set(n,d).minusEquals(floor(n,d),1);
-        CHECK(this.n >= 0);
+        CHECK_GE(this.n, 0);
         return this;
     }
 
@@ -474,13 +474,13 @@ public class Rational
 
     private static int intmod(int a, int b)
     {
-        CHECK(b > 0);
+        CHECK_GT(b, 0);
         int answer = a % b;
         // work around stupid semantics for when a<0
         if (! (answer >= 0))
         {
             answer += b;
-            CHECK(answer >= 0);
+            CHECK_GE(answer, 0);
         }
         return answer;
     }
@@ -553,7 +553,7 @@ public class Rational
             int n = this.n;
             if (d == 1)
                 return ""+n;
-            CHECK(n != 0);
+            CHECK_NE(n, 0);
             String answer;
             if (n < 0)
             {
@@ -577,7 +577,7 @@ public class Rational
     // in all other places, Rationals are kept in reduced form throughout.
     private void reduce()
     {
-        CHECK(this.d != 0);
+        CHECK_NE(this.d, 0);
         if (this.d < 0)
         {
             this.n = -this.n;
@@ -633,13 +633,13 @@ public class Rational
         if (true)
         {
             // the following is prone to overflowing an int if done naively
-            CHECK(new Rational(2149,1).mod(new Rational(1000*1000,1)).toDouble() == 2149.);
+            CHECK_EQ(new Rational(2149,1).mod(new Rational(1000*1000,1)).toDouble(), 2149.);
 
             // the following was failing
-            CHECK(new Rational(52228,1).plus(1,100).minus(1,100).toDouble() == 52228.);
-            CHECK(new Rational(52228,1).plus(1,1000).minus(1,1000).toDouble() == 52228.);
-            CHECK(new Rational(52228,1).minus(1,1000).plus(1,1000).toDouble() == 52228.);
-            CHECK(new Rational(52228,1).plus(1,1000).plus(1,1000).minus(1,1000).minus(1,1000).toDouble() == 52228.);
+            CHECK_EQ(new Rational(52228,1).plus(1,100).minus(1,100).toDouble(), 52228.);
+            CHECK_EQ(new Rational(52228,1).plus(1,1000).minus(1,1000).toDouble(), 52228.);
+            CHECK_EQ(new Rational(52228,1).minus(1,1000).plus(1,1000).toDouble(), 52228.);
+            CHECK_EQ(new Rational(52228,1).plus(1,1000).plus(1,1000).minus(1,1000).minus(1,1000).toDouble(), 52228.);
         }
 
         int nMin = -4;
@@ -650,36 +650,36 @@ public class Rational
         for (int d0 = dMin; d0 <= dMax; ++d0)
         {
             Rational a = new Rational(n0,d0);
-            CHECK(EQ(a.toDouble(), 1.*n0/d0, 1e-6));
+            CHECK_ALMOST_EQ(a.toDouble(), 1.*n0/d0, 1e-6);
 
-            CHECK(a.floor() == (int)Math.floor(a.toDouble()));
-            CHECK(a.ceil() == (int)Math.ceil(a.toDouble()));
-            CHECK(a.round() == (int)Math.round(a.toDouble()));
-            CHECK(a.abs().toDouble() == ABS(a.toDouble()));
-            CHECK(a.neg().toDouble() == -a.toDouble());
+            CHECK_EQ(a.floor(), (int)Math.floor(a.toDouble()));
+            CHECK_EQ(a.ceil(), (int)Math.ceil(a.toDouble()));
+            CHECK_EQ(a.round(), (int)Math.round(a.toDouble()));
+            CHECK_EQ(a.abs().toDouble(), ABS(a.toDouble()));
+            CHECK_EQ(a.neg().toDouble(), -a.toDouble());
 
             for (int n1 = nMin; n1 <= nMax; ++n1)
             for (int d1 = dMin; d1 <= dMax; ++d1)
             {
                 Rational b = new Rational(n1,d1);
 
-                CHECK(EQ(b.toDouble(), 1.*n1/d1, 1e-6));
+                CHECK_ALMOST_EQ(b.toDouble(), 1.*n1/d1, 1e-6);
 
-                CHECK(EQ(a.plus(b).toDouble(), (1.*n0/d0) + (1.*n1/d1), 1e-6));
+                CHECK_ALMOST_EQ(a.plus(b).toDouble(), (1.*n0/d0) + (1.*n1/d1), 1e-6);
 
-                CHECK(EQ(a.minus(b).toDouble(), (1.*n0/d0) - (1.*n1/d1), 1e-6));
+                CHECK_ALMOST_EQ(a.minus(b).toDouble(), (1.*n0/d0) - (1.*n1/d1), 1e-6);
 
-                CHECK(EQ(a.times(b).toDouble(), (1.*n0/d0) * (1.*n1/d1), 1e-6));
+                CHECK_ALMOST_EQ(a.times(b).toDouble(), (1.*n0/d0) * (1.*n1/d1), 1e-6);
 
                 if (n1 != 0)
                 {
-                    CHECK(EQ(a.div(b).toDouble(), (1.*n0/d0) / (1.*n1/d1), 1e-6));
+                    CHECK_ALMOST_EQ(a.div(b).toDouble(), (1.*n0/d0) / (1.*n1/d1), 1e-6);
                 }
 
                 if (n1 > 0
                  && d0 != 3 && d0 != -3 && d1 != 3 && d1 != -3) // if nonexact, can run into trouble where floating point results in slightly negative numbers, resulting in wildly different answer from exact one... this is expected
                 {
-                    CHECK(EQ(a.mod(b).toDouble(), fmod((1.*n0/d0) , (1.*n1/d1)), 1e-6));
+                    CHECK_ALMOST_EQ(a.mod(b).toDouble(), fmod((1.*n0/d0) , (1.*n1/d1)), 1e-6);
                 }
             }
 
