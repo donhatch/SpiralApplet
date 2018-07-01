@@ -1774,7 +1774,7 @@ public class SpiralApplet
                         System.exit(1);
                     }
                     default:
-                        System.out.println("Unknown key '"+c+"'("+(int)e.getKeyChar()+") typed");
+                        System.out.println("Unknown key "+Arrays.toStringCompact(c)+"("+(int)c+") typed");
                         break;
                 }
                 if (eventVerbose >= 1) System.out.println("out keyTyped: "+e);
