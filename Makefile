@@ -39,15 +39,28 @@
 #JAVAC=javac1.7
 #JAVAROOT="c:/Program Files/Java/jdk1.7.0_21"
 
+
+
 # Currently works on ubuntu, after: apt install openjdk-8-jdk openjfx
-JAVAC=javac
+
+#CPPFLAGS+=-DOVERRIDE=
+#JAVAC=javac -source 1.3 -target 1.3
+#JAVAC=javac -source 1.4 -target 1.4  # currently doesn't compile since using generics
+
+CPPFLAGS+=-DOVERRIDE=@Override
+#JAVAC=javac -source 1.5 -target 1.5
+#JAVAC=javac -source 1.6 -target 1.6
+JAVAC=javac -source 1.7 -target 1.7
+#JAVAC=javac -source 1.8 -target 1.8
+#JAVAC=javac
+
 JAVAROOT="/usr"
 ifeq ($(wildcard /usr/lib/jvm/java-8-openjdk-amd64/lib/javafx-mx.jar),)
   # javafx isn't installed
-  CPPFLAGS=-DUSE_JAVAFX=0
+  CPPFLAGS+=-DUSE_JAVAFX=0
 else
   # javafx is installed
-  CPPFLAGS=-DUSE_JAVAFX=1
+  CPPFLAGS+=-DUSE_JAVAFX=1
 endif
 
 

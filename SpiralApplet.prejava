@@ -3,7 +3,6 @@
         Uses System.nanoTime which requires java >= 1.4
         (probably need even later, haven't been keeping track)
 
-
     BUG: tooltip is weird on the "Anim sleep ms" textfield
     BUG: on assert fail in paint, displayed line number is too small by a few lines I think
     BUG: ending criteria isn't quite right-- should end when *all* contributing things have gone off screen or become tiny, need to clean up logic for that
@@ -168,8 +167,7 @@ public class SpiralApplet
             public void add(final JToggleButton button) // checkbox or radio button
             {
                 java.awt.event.ActionListener actionListener = new java.awt.event.ActionListener() {
-                    @Override
-                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         if (button.isSelected())
                         {
@@ -199,8 +197,7 @@ public class SpiralApplet
             public void add(final JToggleButton button) // checkbox or radio button
             {
                 java.awt.event.ActionListener actionListener = new java.awt.event.ActionListener() {
-                    @Override
-                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         int nButtons = buttons.size();
                         if (button.isSelected())
@@ -242,13 +239,12 @@ public class SpiralApplet
             {
                 super(text);
             }
-            public void addActionListener(final java.awt.event.ActionListener actionListener)
+            OVERRIDE public void addActionListener(final java.awt.event.ActionListener actionListener)
             {
                 addMouseListener(new java.awt.event.MouseAdapter() {
                     private javax.swing.Timer repeatTimer = null;
                     private java.awt.event.ActionEvent synthesizedActionEvent = null;
-                    @Override
-                    public void mousePressed(java.awt.event.MouseEvent mouseEvent)
+                    OVERRIDE public void mousePressed(java.awt.event.MouseEvent mouseEvent)
                     {
                         synthesizedActionEvent = new java.awt.event.ActionEvent(
                             JRepeatingButton.this,
@@ -260,8 +256,7 @@ public class SpiralApplet
                         actionListener.actionPerformed(synthesizedActionEvent); // initial execution
 
                         repeatTimer = new javax.swing.Timer(100, new java.awt.event.ActionListener() {
-                            @Override
-                            public void actionPerformed(java.awt.event.ActionEvent timerActionEvent)
+                            OVERRIDE public void actionPerformed(java.awt.event.ActionEvent timerActionEvent)
                             {
                                 actionListener.actionPerformed(synthesizedActionEvent);
                             }
@@ -269,8 +264,7 @@ public class SpiralApplet
                         repeatTimer.setInitialDelay(500);
                         repeatTimer.start();
                     }
-                    @Override
-                    public void mouseReleased(java.awt.event.MouseEvent arg0)
+                    OVERRIDE public void mouseReleased(java.awt.event.MouseEvent arg0)
                     {
                         repeatTimer.stop();
                         repeatTimer = null;
@@ -312,19 +306,15 @@ public class SpiralApplet
                                     setBackground(new java.awt.Color(255,192,192)); // pink
                             }
                             else
-                                setBackground(java.awt.Color.white);
+                                setBackground(java.awt.Color.WHITE);
                         }
                     }
-                    @Override
-                    public void insertUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
-                    @Override
-                    public void removeUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
-                    @Override
-                    public void changedUpdate(javax.swing.event.DocumentEvent e) {anyUpdate(e);}
+                    OVERRIDE public void insertUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
+                    OVERRIDE public void removeUpdate(javax.swing.event.DocumentEvent e)  {anyUpdate(e);}
+                    OVERRIDE public void changedUpdate(javax.swing.event.DocumentEvent e) {anyUpdate(e);}
                 });
                 addKeyListener(new java.awt.event.KeyAdapter() {
-                    @Override
-                    public void keyPressed(java.awt.event.KeyEvent e)
+                    OVERRIDE public void keyPressed(java.awt.event.KeyEvent e)
                     {
                         if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ESCAPE)
                         {
@@ -333,18 +323,17 @@ public class SpiralApplet
                     }
                 });
                 addActionListener(new java.awt.event.ActionListener() {
-                    @Override
-                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         if (validate(getText()))
                         {
                             committedText = getText();
-                            setBackground(java.awt.Color.white);
+                            setBackground(java.awt.Color.WHITE);
                         }
                     }
                 });
             }
-            public void setText(String text)
+            OVERRIDE public void setText(String text)
             {
                 super.setText(text);
                 if (isEditable()) // use this as hint-- if not editable, probably makeTextComponentLikeLabel was called
@@ -352,7 +341,7 @@ public class SpiralApplet
                     if (validate(getText()))
                     {
                         committedText = getText();
-                        setBackground(java.awt.Color.white);
+                        setBackground(java.awt.Color.WHITE);
                     }
                 }
             }
@@ -381,9 +370,9 @@ public class SpiralApplet
 
                 final java.awt.Color asciiToColor[] = new java.awt.Color[128];
                 asciiToColor[' '] = null;
-                asciiToColor['b'] = java.awt.Color.black;
+                asciiToColor['b'] = java.awt.Color.BLACK;
                 asciiToColor['g'] = new java.awt.Color(128,128,128); // 50% gray
-                asciiToColor['r'] = java.awt.Color.red;
+                asciiToColor['r'] = java.awt.Color.RED;
 
                 /*
                 contentPane.add(new JSeparator(), stretchx);
@@ -411,8 +400,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
-                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_VERYGRADUAL);
                                               // no need to repaint
@@ -423,8 +411,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
-                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_GRADUAL);
                                               // no need to repaint
@@ -435,8 +422,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
-                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0);
                                               // no need to repaint
@@ -447,8 +433,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
-                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_STEEP);
                                               // no need to repaint
@@ -459,8 +444,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
-                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_VERYSTEEP);
                                               // no need to repaint
@@ -472,8 +456,7 @@ public class SpiralApplet
                                           setMargin(nomargin);
                                           buttonGroup.add(this);
                                           addActionListener(new java.awt.event.ActionListener() {
-                                              @Override
-                                              public void actionPerformed(java.awt.event.ActionEvent e)
+                                              OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                               {
                                                   applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_0_USER_SPECIFIED);
                                                   // no need to repaint
@@ -486,8 +469,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
-                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1);
                                               // no need to repaint
@@ -498,8 +480,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
-                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_ANY);
                                               // no need to repaint
@@ -510,8 +491,7 @@ public class SpiralApplet
                                       setMargin(nomargin);
                                       buttonGroup.add(this);
                                       addActionListener(new java.awt.event.ActionListener() {
-                                          @Override
-                                          public void actionPerformed(java.awt.event.ActionEvent e)
+                                          OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                           {
                                               applet.spiralModelParams.deltaStyle.set(SpiralModel.DELTASTYLE_1_WRAP);
                                               // no need to repaint
@@ -578,8 +558,7 @@ public class SpiralApplet
                             setMargin(nomargin);
                             // XXX TODO: red if params out of date
                             addActionListener(new java.awt.event.ActionListener() {
-                                @Override
-                                public void actionPerformed(java.awt.event.ActionEvent e)
+                                OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                 {
                                     applet.theSpiralModel.init(applet.spiralModelParams.n.get(), applet.spiralModelParams.nParts.get(), applet.spiralModelParams.deltaStyle.get(), applet.spiralModelParams.deltaStyle_0_degrees.get(), applet.spiralModelParams.randomSeed.get());
 
@@ -602,8 +581,7 @@ public class SpiralApplet
                             add(new JButton("reset focus to") {{
                                 setMargin(nomargin);
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.theSpiralView.focus.set(applet.theSpiralView.resetFocusTo.get(),1);
                                         applet.theCanvas.repaint();
@@ -614,15 +592,12 @@ public class SpiralApplet
                         }});
                         add(new JRow() {{
                             add(new JRepeatingButton("") {
-                                @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public void paint(java.awt.Graphics g)
+                                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "   b  b",
                                                           "  bb bb",
@@ -635,8 +610,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.fastBackward();
                                     }
@@ -644,15 +618,12 @@ public class SpiralApplet
                                 setToolTipText("<html>fast backward</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public void paint(java.awt.Graphics g)
+                                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "     gb",
                                                           "   gbbb",
@@ -665,8 +636,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.playBackward();
                                     }
@@ -674,15 +644,12 @@ public class SpiralApplet
                                 setToolTipText("<html>play backward<br>(shift-left-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public void paint(java.awt.Graphics g)
+                                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "   b bb",
                                                           "  bb bb",
@@ -695,8 +662,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.stepBackward();
                                     }
@@ -704,15 +670,12 @@ public class SpiralApplet
                                 setToolTipText("<html>step backward<br>(left-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public void paint(java.awt.Graphics g)
+                                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "bbb bbb",
                                                           "bbb bbb",
@@ -725,8 +688,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.pause();
                                     }
@@ -734,15 +696,12 @@ public class SpiralApplet
                                 setToolTipText("<html>stop<br>(space key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public void paint(java.awt.Graphics g)
+                                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "bb b   ",
                                                           "bb bb  ",
@@ -755,8 +714,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.stepForward();
                                     }
@@ -764,15 +722,12 @@ public class SpiralApplet
                                 setToolTipText("<html>step forward<br>(right-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public void paint(java.awt.Graphics g)
+                                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "bg     ",
                                                           "bbbg   ",
@@ -785,8 +740,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.playForward();
                                     }
@@ -794,15 +748,12 @@ public class SpiralApplet
                                 setToolTipText("<html>play forward<br>(shift-right-arrow key)</html>");
                             }}, stretchxy);
                             add(new JRepeatingButton("") {
-                                @Override
-                                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
-                                @Override
-                                public void paint(java.awt.Graphics g)
+                                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(20*hidpimag,20*hidpimag); }
+                                OVERRIDE public void paint(java.awt.Graphics g)
                                 {
                                     super.paint(g);
-                                    drawPixmapCentered(g, getSize(), asciiToColor,
+                                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                                        new String[] {
                                                           "b  b   ",
                                                           "bb bb  ",
@@ -815,8 +766,7 @@ public class SpiralApplet
                                 }
                             {
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         applet.fastForward();
                                     }
@@ -874,12 +824,9 @@ public class SpiralApplet
                         }});
                     }});
                     add(new JRepeatingButton("") {
-                        @Override
-                        public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45*hidpimag,45*hidpimag); }
-                        @Override
-                        public java.awt.Dimension getMinimumSize()   { return getPreferredSize(); }
-                        @Override
-                        public void paint(java.awt.Graphics g)
+                        OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(45*hidpimag,45*hidpimag); }
+                        OVERRIDE public java.awt.Dimension getMinimumSize()   { return getPreferredSize(); }
+                        OVERRIDE public void paint(java.awt.Graphics g)
                         {
                             if (debug) OUT("                    in orientation button paint");
                             super.paint(g);
@@ -958,7 +905,7 @@ public class SpiralApplet
 
                                     double cos = Math.cos(angle);
                                     double sin = Math.sin(angle);
-                                    assert(rows.length == rows[0].length());
+                                    CHECK_EQ(rows.length, rows[0].length());
 
                                     int seedRow = -1, seedCol = -1;
                                     boolean foundSeed = false;
@@ -972,7 +919,7 @@ public class SpiralApplet
                                             break;
                                         }
                                     }
-                                    assert(foundSeed);
+                                    CHECK(foundSeed);
 
                                     // seed fill, setting outline to highlight char
                                     {
@@ -1002,7 +949,7 @@ public class SpiralApplet
                                                     int col1 = col0+dcol;
                                                     if (!INRANGE(0 <=, row1, < rows.length)
                                                      || !INRANGE(0 <=, col1, < rows.length))
-                                                        assert(false); // shouldn't happen
+                                                        CHECK(false); // shouldn't happen
                                                     if (isSeen[row1][col1]) continue;
                                                     isSeen[row1][col1] = true;
                                                     seen[nSeen][0] = row1;
@@ -1014,7 +961,7 @@ public class SpiralApplet
 
                                         if (false) // can change to true for debugging
                                         {
-                                            fudgedAsciiToColor['w'] = java.awt.Color.white;
+                                            fudgedAsciiToColor['w'] = java.awt.Color.WHITE;
                                             chars[seedRow][seedCol] = 'w';
                                         }
                                     }
@@ -1023,7 +970,7 @@ public class SpiralApplet
                             // convert the whole thing back to Strings
                             FORI (iRow, rows.length)
                                 rows[iRow] = new String(chars[iRow]);
-                            drawPixmapCentered(g, getSize(), fudgedAsciiToColor, rows);
+                            drawPixmapCentered(g, getSize(), hidpimag, fudgedAsciiToColor, rows);
                             if (debug) OUT("                    out orientation button paint");
                         } // paint
                         private void updateSpiralOrientationNumber(int mouseX, int mouseY)
@@ -1043,16 +990,14 @@ public class SpiralApplet
                     {
                         // Listeners for spiral orientation number control
                         addMouseMotionListener(new java.awt.event.MouseAdapter() {
-                            @Override
-                            public void mouseMoved(java.awt.event.MouseEvent mouseEvent)
+                            OVERRIDE public void mouseMoved(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("        in mouseMoved");
                                 updateSpiralOrientationNumber(mouseEvent.getX(), mouseEvent.getY());
                                 repaint();
                                 if (debug) OUT("        out mouseMoved");
                             }
-                            @Override
-                            public void mouseDragged(java.awt.event.MouseEvent mouseEvent)
+                            OVERRIDE public void mouseDragged(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("                in mouseDragged");
                                 updateSpiralOrientationNumber(mouseEvent.getX(), mouseEvent.getY());
@@ -1064,8 +1009,7 @@ public class SpiralApplet
                         // apparently we don't get a repaint when rollover ends,
                         // and we need one to remove the highlighting, so...
                         addMouseListener(new java.awt.event.MouseAdapter() {
-                            @Override
-                            public void mouseEntered(java.awt.event.MouseEvent mouseEvent)
+                            OVERRIDE public void mouseEntered(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("    in mouseEntered");
                                 entered = true;
@@ -1073,8 +1017,7 @@ public class SpiralApplet
                                 repaint();
                                 if (debug) OUT("    out mouseEntered");
                             }
-                            @Override
-                            public void mouseExited(java.awt.event.MouseEvent mouseEvent)
+                            OVERRIDE public void mouseExited(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("    in mouseExited");
                                 entered = false;
@@ -1086,8 +1029,7 @@ public class SpiralApplet
                                 repaint();
                                 if (debug) OUT("    out mouseExited");
                             }
-                            @Override
-                            public void mousePressed(java.awt.event.MouseEvent mouseEvent)
+                            OVERRIDE public void mousePressed(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("            in mousePressed");
                                 pressed = true;
@@ -1096,8 +1038,7 @@ public class SpiralApplet
                                 repaint();
                                 if (debug) OUT("            out mousePressed");
                             }
-                            @Override
-                            public void mouseReleased(java.awt.event.MouseEvent mouseEvent)
+                            OVERRIDE public void mouseReleased(java.awt.event.MouseEvent mouseEvent)
                             {
                                 if (debug) OUT("            in mouseReleased");
                                 pressed = false;
@@ -1110,8 +1051,7 @@ public class SpiralApplet
                             }
                         });
                         addActionListener(new java.awt.event.ActionListener() {
-                            @Override
-                            public void actionPerformed(java.awt.event.ActionEvent e)
+                            OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                             {
                                 // note, this is a repeating button
                                 // so we'll get events as long as the button is down. cool!
@@ -1145,7 +1085,8 @@ public class SpiralApplet
                             add(makeIncrementableTextFieldForNumber(applet.theSpiralView.focusAngleDegrees, "focus angle for stats plot", 5));
                             add(new JCheckBoxForBoolean("including the expensive one", applet.showTheExpensivePlotTooFlag) {{
                                 setMargin(nomargin);
-                                setToolTipText("<html>You might want to set Period very low and regenerate before turning this on.</html>");
+                                // Actually this isn't true any more... and they really aren't that expensive any more
+                                //setToolTipText("<html>You might want to set Period to 1000 or so and regenerate before turning this on.</html>");
                             }});
                         }});
                         add(new JCheckBoxForBoolean("print vsync lapses", applet.showVsyncLapsesFlag) {{
@@ -1156,8 +1097,7 @@ public class SpiralApplet
                             add(new JButton("Dump window positions and sizes") {{
                                 setMargin(nomargin);
                                 addActionListener(new java.awt.event.ActionListener() {
-                                    @Override
-                                    public void actionPerformed(java.awt.event.ActionEvent e)
+                                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                                     {
                                         System.out.println("----------------");
                                         System.out.println("      main applet: "+applet.theMainAppletWindow.getWidth()+"x"+applet.theMainAppletWindow.getHeight()+"+"+applet.theMainAppletWindow.getX()+"+"+applet.theMainAppletWindow.getY()+"");
@@ -1245,8 +1185,7 @@ public class SpiralApplet
                 menuBar.add(windowsMenu);
                 windowsMenu.add(new JMenuItem("Control Panel") {{
                     addActionListener(new java.awt.event.ActionListener() {
-                        @Override
-                        public void actionPerformed(java.awt.event.ActionEvent e)
+                        OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                         {
                             theControlPanelWindow.setState(JFrame.NORMAL); // not iconified
                             theControlPanelWindow.setVisible(true); // also brings it to front, apparently
@@ -1258,8 +1197,7 @@ public class SpiralApplet
                 menuBar.add(helpMenu);
                 helpMenu.add(new JMenuItem("Help") {{
                     addActionListener(new java.awt.event.ActionListener() {
-                        @Override
-                        public void actionPerformed(java.awt.event.ActionEvent e)
+                        OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                         {
                             help();
                         }
@@ -1279,8 +1217,8 @@ public class SpiralApplet
             {
                 theControlPanelWindow = new JFrame(windowTitle.get() + " Control Panel");
                 windowTitle.addListener(new Listenable.Listener() {
-                    @Override
-                    public void valueChanged() {
+                    OVERRIDE public void valueChanged()
+                    {
                         theControlPanelWindow.setTitle(windowTitle.get() + " Control Panel");
                     }
                 });
@@ -1321,7 +1259,7 @@ public class SpiralApplet
                             new JTextArea(text) {{
                                 // make it like a JLabel as much as possible, but text selectable
                                 this.setEditable(false);
-                                this.setDisabledTextColor(java.awt.Color.black);
+                                this.setDisabledTextColor(java.awt.Color.BLACK);
                                 this.setBackground(null); // same as JLabel
                                 this.setBorder(null); // same as JLabel
                             }}
@@ -1439,8 +1377,7 @@ public class SpiralApplet
             }
         } // randomlyColorize
 
-        @Override
-        public void init()
+        OVERRIDE public void init()
         {
             eventVerbose = getParameterInt("EventVerbose", eventVerbose);
             if (eventVerbose >= 1) System.out.println("in init");
@@ -1449,8 +1386,7 @@ public class SpiralApplet
             graphicsAntiAliasingSetter = new GraphicsAntiAliasingSetter();
 
             theSpiralView.pixelsPerPart.addListener(pixelsPerPartListener = new Listenable.Listener() {
-                @Override
-                public void valueChanged()
+                OVERRIDE public void valueChanged()
                 {
                     if (theSpiralView.pixelsPerPart.get() <= 0)
                     {
@@ -1464,8 +1400,7 @@ public class SpiralApplet
                 }
             });
             theSpiralView.animSpeedFrames.addListener(animSpeedFramesListener = new Listenable.Listener() {
-                @Override
-                public void valueChanged()
+                OVERRIDE public void valueChanged()
                 {
                     if (theSpiralView.animSpeedFrames.get() <= 0)
                     {
@@ -1500,15 +1435,13 @@ public class SpiralApplet
             // add this after all others, so that we don't repaint
             // until other processing stabilizes
             repaintWhenValueChanged = new Listenable.Listener() {
-                @Override
-                public void valueChanged()
+                OVERRIDE public void valueChanged()
                 {
                     theCanvas.repaint();
                 }
             };
             repaintWhenValueChangedIfShowPlotsFlag = new Listenable.Listener() {
-                @Override
-                public void valueChanged()
+                OVERRIDE public void valueChanged()
                 {
                     if (showPlotsFlag.get())
                         theCanvas.repaint();
@@ -1528,20 +1461,17 @@ public class SpiralApplet
             if (eventVerbose >= 1) System.out.println("out init");
         } // init
 
-        @Override
-        public void start()
+        OVERRIDE public void start()
         {
             if (eventVerbose >= 1) System.out.println("in start");
             if (eventVerbose >= 1) System.out.println("out start");
         }
-        @Override
-        public void stop()
+        OVERRIDE public void stop()
         {
             if (eventVerbose >= 1) System.out.println("in stop");
             if (eventVerbose >= 1) System.out.println("out stop");
         }
-        @Override
-        public void destroy()
+        OVERRIDE public void destroy()
         {
             if (eventVerbose >= 1) System.out.println("in destroy");
             if (eventVerbose >= 1) System.out.println("out destroy");
@@ -1606,8 +1536,7 @@ public class SpiralApplet
             //
             // MouseListener and MouseMotionListener methods...
             //
-            @Override
-            public void mousePressed(java.awt.event.MouseEvent e)
+            OVERRIDE public void mousePressed(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mousePressed: "+e);
                 if (eventVerbose >= 1)
@@ -1627,8 +1556,7 @@ public class SpiralApplet
 
                 if (eventVerbose >= 1) System.out.println("out mousePressed: "+e);
             } // mousePressed
-            @Override
-            public void mouseReleased(java.awt.event.MouseEvent e)
+            OVERRIDE public void mouseReleased(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseReleased: "+e);
 
@@ -1636,8 +1564,7 @@ public class SpiralApplet
 
                 if (eventVerbose >= 1) System.out.println("out mouseReleased: "+e);
             } // mouseReleased
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e)
+            OVERRIDE public void mouseEntered(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseEntered: "+e);
                 // steal keyboard focus!  canvases and applets don't get it by default
@@ -1645,20 +1572,17 @@ public class SpiralApplet
                 requestFocus(); // hey it works! (javac 1.3, runtime 1.6) and overriding isFocusTraversable() no longer works in 1.7 and gives deprecation warning.
                 if (eventVerbose >= 1) System.out.println("out mouseEntered: "+e);
             }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e)
+            OVERRIDE public void mouseExited(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseExited: "+e);
                 if (eventVerbose >= 1) System.out.println("out mouseExited: "+e);
             }
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e)
+            OVERRIDE public void mouseClicked(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in mouseClicked: "+e);
                 if (eventVerbose >= 1) System.out.println("out mouseClicked: "+e);
             }
-            @Override
-            public void mouseDragged(java.awt.event.MouseEvent e)
+            OVERRIDE public void mouseDragged(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 2) System.out.println("  in mouseDragged: "+e);
 
@@ -1678,8 +1602,7 @@ public class SpiralApplet
 
                 if (eventVerbose >= 2) System.out.println("  out mouseDragged: "+e);
             } // mouseDragged
-            @Override
-            public void mouseMoved(java.awt.event.MouseEvent e)
+            OVERRIDE public void mouseMoved(java.awt.event.MouseEvent e)
             {
                 if (eventVerbose >= 3) System.out.println("    in mouseMoved: "+e);
 
@@ -1689,8 +1612,7 @@ public class SpiralApplet
             //
             // KeyListener methods...
             //
-            @Override
-            public void keyPressed(java.awt.event.KeyEvent e)
+            OVERRIDE public void keyPressed(java.awt.event.KeyEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in keyPressed: "+e);
 
@@ -1728,8 +1650,7 @@ public class SpiralApplet
                 }
                 if (eventVerbose >= 1) System.out.println("out keyPressed: "+e);
             } // keyPressed
-            @Override
-            public void keyReleased(java.awt.event.KeyEvent e)
+            OVERRIDE public void keyReleased(java.awt.event.KeyEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in keyReleased: "+e);
                 switch(e.getKeyCode())
@@ -1739,8 +1660,7 @@ public class SpiralApplet
                 }
                 if (eventVerbose >= 1) System.out.println("out keyReleased: "+e);
             } // keyReleased
-            @Override
-            public void keyTyped(java.awt.event.KeyEvent e)
+            OVERRIDE public void keyTyped(java.awt.event.KeyEvent e)
             {
                 if (eventVerbose >= 1) System.out.println("in keyTyped: "+e);
                 char c = e.getKeyChar();
@@ -1786,8 +1706,7 @@ public class SpiralApplet
 
 
             // PAINT/DISPLAY/DRAW
-            @Override
-            public void paintComponent(java.awt.Graphics g)
+            OVERRIDE public void paintComponent(java.awt.Graphics g)
             {
                 //try { Thread.sleep(50); } catch (InterruptedException e) {}
                 java.awt.Dimension size = getSize();
@@ -1840,7 +1759,7 @@ public class SpiralApplet
                 //
                 // Clear to black...
                 //
-                g.setColor(java.awt.Color.black);
+                g.setColor(java.awt.Color.BLACK);
                 g.fillRect(0,0, size.width,size.height);
 
 
@@ -1919,7 +1838,7 @@ public class SpiralApplet
 
 
                 nPaints++;
-                g.setColor(java.awt.Color.white);
+                g.setColor(java.awt.Color.WHITE);
                 String nPaintsString = ""+nPaints+" paints";
                 g.drawString(nPaintsString,
                              size.width - 5 - g.getFontMetrics().stringWidth(nPaintsString),
@@ -1965,7 +1884,7 @@ public class SpiralApplet
                 {
                     // draw dot at exact center of window,
                     // for debugging.
-                    g.setColor(java.awt.Color.red);
+                    g.setColor(java.awt.Color.RED);
                     // 1 -> 0..1
                     // 2 -> 0..2
                     // 3 -> 1..2
@@ -2071,7 +1990,7 @@ public class SpiralApplet
 
             String s = ""+x;
 
-            assert(!s.startsWith("-"));
+            CHECK(!s.startsWith("-"));
 
             int decimalPointIndex = s.indexOf('.');
             if (decimalPointIndex != -1)
@@ -2104,7 +2023,7 @@ public class SpiralApplet
                 if (s.startsWith("0."))
                     s = s.substring(1); // change the "0." to just "."
             }
-            assert(s.length() >= 1);
+            CHECK_GE(s.length(), 1);
             //System.out.println("    out doubleToStringNice("+x+"), returning "+s);
             return s;
         } // doubleToStringNice
@@ -2116,8 +2035,7 @@ public class SpiralApplet
         // this makes the distinction between low and high values clearer.
         static java.awt.Color getHSBColor(float h, float s, float b)
         {
-            assert(h >= 0.);
-            assert(h <= 1.);
+            CHECK_LE_LE(0., h, 1.);
             h = CLAMP(h,0.f,1.f);
             h *= (float)(5./6.); // so 1 becomes 5/6 = violet
             return java.awt.Color.getHSBColor(h,s,b);
@@ -2155,7 +2073,8 @@ public class SpiralApplet
             public static class Params
             {
                 // XXX same thing in applet... should this be a little subclass?
-                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 100*1000); // must be positive multiple of 2
+                //public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 100*1000); // must be positive multiple of 2
+                public Listenable.Int n = new Listenable.Int(2, 1000*1000*1000, 1000); // must be positive multiple of 2
                 public Listenable.Int nParts = new Listenable.Int(1, 1000*1000*1000, 90); // must be >= 2
                 public Listenable.Int deltaStyle = new Listenable.Int(SpiralModel.DELTASTYLE_MIN, SpiralModel.DELTASTYLE_MAX, SpiralModel.DELTASTYLE_ANY);
 
@@ -2208,11 +2127,11 @@ public class SpiralApplet
                     {
                         // close to limit extrapolated to something big
                         OUT("close to limit, extrapolated to infinity:");
-                        double eps = 1e-3;
+                        double tol = 1e-3;
                         Complex p01 = new Complex(Math.cos(t), Math.sin(t));
 
                         double d0 = 1.;
-                        Complex d1 = p01.times(-eps).plusEquals(1.);
+                        Complex d1 = p01.times(-tol).plusEquals(1.);
                         Complex d2 = d1.times(d1);
 
                         double triArea01 = d1.cross(d0)/2.;
@@ -2264,6 +2183,19 @@ public class SpiralApplet
                         PRINT(predictedMoment);
                         PRINT(predictedArea);
                         PRINT(predictedCentroid);
+
+                        /*
+                        gnuplot:
+			  x(t) = cos(t)*cos(t)*sin(t) / (1+3*cos(t)**2)
+			  Y(t) = sin(t)/2*cos(t)*sin(t) / (1+3*cos(t)**2)
+			  x(t) = cos(t)*4*cos(t)**2 / (1+3*cos(t)**2)
+			  y(t) = sin(t)/2*4*cos(t)**2 / (1+3*cos(t)**2)
+			  X(t) = cos(t)*cos(t)*sin(t) / (1+3*cos(t)**2)
+			  Y(t) = sin(t)/2*cos(t)*sin(t) / (1+3*cos(t)**2)
+			  plot [0:t1] [0:1] [0:1] cos(t),sin(t), x(t),y(t),   (cos(2*t)+1)/2, sin(2*t)/4, X(t)*4,Y(t)*4,   cos(t)*sin(t)/cos(t)/4, sin(t)*sin(t)/cos(t)/4
+
+
+                        */
                     }
                 }
                 this.params.n.set(n);
@@ -2272,10 +2204,10 @@ public class SpiralApplet
                 this.params.randomSeed.set(randomSeed);
 
                 java.util.Random rng = new java.util.Random(randomSeed);
-                assert(n >= 2);
-                assert(n % 2 == 0); // doesn't work with odd n
-                assert(n % 4 == 0); // actually DELTASTYLE_0 only works with n a multiple of 4
-                assert(nParts >= 2); // doesn't work with only one part
+                CHECK_GE(n, 2);
+                CHECK_EQ(n % 2, 0); // doesn't work with odd n
+                CHECK_EQ(n % 4, 0); // actually DELTASTYLE_0 only works with n a multiple of 4
+                CHECK_GE(nParts, 2); // doesn't work with only one part
 
                 this.theList = new int[n];
                 if (deltaStyle == DELTASTYLE_0_VERYGRADUAL
@@ -2320,7 +2252,7 @@ public class SpiralApplet
                                 done = true;
                                 break;
                             }
-                            assert(val >= 0 && val < nParts);
+                            CHECK_LE_LT(0, val, nParts);
                             this.theList[i] = val;
 
                             if (val == 0)
@@ -2335,7 +2267,7 @@ public class SpiralApplet
                         if (done)
                             break;
                     }
-                    assert(done);
+                    CHECK(done);
                 }
                 else if (deltaStyle == DELTASTYLE_ANY
                       || deltaStyle == DELTASTYLE_1_WRAP)
@@ -2349,7 +2281,8 @@ public class SpiralApplet
                         val = 0; // so it will likely cross over near beginning, so what it's doing will be more obvious at beginning
                     }
                     PRINT(nParts);
-                    assert(val >= 0 && val < nParts && val%2 == 0);
+                    CHECK_LE_LT(0, val, nParts);
+                    CHECK_EQ(val%2, 0);
 
                     boolean done = false;
                     int sign = -1; // initial val is biased a bit downwards, so there is guaranteed to be room upwards. so set sign initially to -1, so it will immediately switch to 1 and there will be room.
@@ -2363,7 +2296,7 @@ public class SpiralApplet
                                 done = true;
                                 break;
                             }
-                            assert(val >= 0 && val < nParts);
+                            CHECK_LE_LT(0, val, nParts);
                             this.theList[i] = val;
 
                             if (nRemainingThisSign == 0)
@@ -2373,12 +2306,12 @@ public class SpiralApplet
                                     sign = -sign;
                                     if (sign == -1)
                                     {
-                                        assert(val > 0);
+                                        CHECK_GT(val, 0);
                                         nRemainingThisSign = 1+rng.nextInt(val);
                                     }
                                     else
                                     {
-                                        assert(nParts-1-val > 0);
+                                        CHECK_GT(nParts-1-val, 0);
                                         nRemainingThisSign = 1+rng.nextInt(nParts-1-val);
                                     }
                                 }
@@ -2411,15 +2344,15 @@ public class SpiralApplet
                         if (done)
                             break;
                     }
-                    assert(done);
+                    CHECK(done);
                 }
                 else
-                    assert(false);
+                    CHECK(false);
 
                 // sanity check-- parity of value should be same as parity of index
                 FORI (i, n)
                 {
-                    assert((theList[i] + i)%2 == 0);
+                    CHECK_EQ((theList[i] + i)%2, 0);
                 }
 
                 this.momentsAndAreas = new double[n][3];
@@ -2463,9 +2396,18 @@ public class SpiralApplet
                                     primalAng,
                                     thisMomentAndArea);
 
+                            // special case: even if it looked like we stabilized, the last element came
+                            // from a different source in case of shortcut, in which case it can still drift.
+                            if (done
+                             && i == n-1
+                             && !VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea)) {
+                                System.out.println("woops, not stable after all at iPass="+iPass+" i="+i+"/n="+n);
+                                done = false;
+                            }
+
                             if (done)
                             {
-                                assert(VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea));
+                                CHECK(VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea));
                             }
                             else if (iPass > 0
                                   && VecMath.equalsExactly(this.momentsAndAreas[i], thisMomentAndArea))
@@ -2474,12 +2416,12 @@ public class SpiralApplet
 
 
                                 // These were before implementing 2nd shortcut
-                                //assert(iPass <= 11); // keep track of max ever seen
-                                //assert(iPass <= 39); // keep track of max ever seen
-                                //assert(iPass <= 793); // keep track of max ever seen.   +-1 wrap, period=4 seed=1 or 10.  argh!
+                                //CHECK_LE(iPass, 11); // keep track of max ever seen
+                                //CHECK_LE(iPass, 39); // keep track of max ever seen
+                                //CHECK_LE(iPass, 793); // keep track of max ever seen.   +-1 wrap, period=4 seed=1 or 10.  argh!
 
-                                //assert(iPass <= 28);
-                                assert(iPass <= 469);
+                                //CHECK_LE(iPass, 28);
+                                CHECK_LE(iPass, 469);
 
                                 // XXX argh, fails:
                                 //      period=4
@@ -2487,7 +2429,6 @@ public class SpiralApplet
                                 //      Delta style= 0 very steep
                                 //      gets to 999 :-(
 
-                                System.out.println("=========================");
                                 done = true;
                             }
                             else
@@ -2507,19 +2448,19 @@ public class SpiralApplet
                                         secret_stash_for_oracle[2],
                                         this.momentsAndAreas[i][2],
                                         thisMomentAndArea[2]);
-                                    assert(!Double.isNaN(area));
-                                    assert(!Double.isNaN(moment.x));
-                                    assert(!Double.isNaN(moment.y));
-                                    assert(!Double.isInfinite(area));
-                                    assert(!Double.isInfinite(moment.x));
-                                    assert(!Double.isInfinite(moment.y));
+                                    CHECK(!Double.isNaN(area));
+                                    CHECK(!Double.isNaN(moment.x));
+                                    CHECK(!Double.isNaN(moment.y));
+                                    CHECK(!Double.isInfinite(area));
+                                    CHECK(!Double.isInfinite(moment.x));
+                                    CHECK(!Double.isInfinite(moment.y));
                                     // TODO: implement Complex isNaN, isInfinite, isFinite
                                     thisMomentAndArea[0] = moment.x;
                                     thisMomentAndArea[1] = moment.y;
                                     thisMomentAndArea[2] = area;
                                     System.out.println("    pass "+iPass+": shortcutting ["+i+"] to "+Arrays.toStringCompact(thisMomentAndArea));
-                                    assert(area == area); // not nan
-                                    assert(area+1. != area); // not infinite
+                                    CHECK_EQ(area, area); // not nan
+                                    CHECK_NE(area+1., area); // not infinite
                                     secret_stash_for_oracle = VecMath.copyvec(thisMomentAndArea);
                                 }
 
@@ -2537,9 +2478,9 @@ public class SpiralApplet
                                         secret_stash_for_oracle[2],
                                         this.momentsAndAreas[i][2],
                                         thisMomentAndArea[2]);
-                                    assert(!Double.isNaN(area));
-                                    assert(!Double.isNaN(moment.x));
-                                    assert(!Double.isNaN(moment.y));
+                                    CHECK(!Double.isNaN(area));
+                                    CHECK(!Double.isNaN(moment.x));
+                                    CHECK(!Double.isNaN(moment.y));
                                     if (Double.isInfinite(area)
                                      || Double.isInfinite(moment.x)
                                      || Double.isInfinite(moment.y))
@@ -2576,6 +2517,7 @@ public class SpiralApplet
                         }
                     }
 
+                    OUT("=========================");
                     OUT("===========");
                     PRINTVEC(this.momentsAndAreas[0]);
                     PRINTVEC(this.momentsAndAreas[1]);
@@ -2584,7 +2526,7 @@ public class SpiralApplet
                     PRINTVEC(VecMath.vxs(this.momentsAndAreas[1], 1./this.momentsAndAreas[1][2]));
                     PRINTVEC(VecMath.vxs(this.momentsAndAreas[2], 1./this.momentsAndAreas[2][2]));
                     OUT("===========");
-                    assert(done);
+                    CHECK(done);
                 }
 
 
@@ -2619,7 +2561,7 @@ public class SpiralApplet
             // Biased like an index.  To unbias, add 1/2.
             Rational getValBiased(Rational focus)
             {
-                assert(focus.n >= 0);
+                CHECK_GE(focus.n, 0);
                 int n = this.params.n.get();
                 int i0 = focus.floor();
                 Rational frac = focus.minus(i0,1); // frac = focus - i0, before modding i0 by n
@@ -2667,7 +2609,7 @@ public class SpiralApplet
             // nor to the direction from origin to center.
             double shrink = Math.cos(newPrimalMinusDualAng)
                           / Math.cos(oldPrimalMinusDualAng);
-            assert(shrink <= 1.);
+            CHECK_LE(shrink, 1.);
             double newMomentX = shrink * oldMomentX;
             double newMomentY = shrink * oldMomentY;
             double newArea = oldArea;
@@ -2693,11 +2635,11 @@ public class SpiralApplet
             // the formula for shrink is magic, worked out on paper
             double shrink = Math.sin(newPrimalMinusDualAng)
                           / Math.sin(oldPrimalMinusDualAng);
-            assert(shrink <= 1.);
+            CHECK_LE(shrink, 1.);
 
             // angle to rotate previous picture by (rotate CW, so it's negative)
             double t = newPrimalMinusDualAng-oldPrimalMinusDualAng;
-            assert(t <= 0.);
+            CHECK_LE(t, 0.);
             double ct = Math.cos(t);
             double st = Math.sin(t);
 
@@ -2711,7 +2653,7 @@ public class SpiralApplet
 
             // worked this out on paper
             double areaIncrInNewSpace = .5 * shrink*Math.sin(oldPrimalMinusDualAng-newPrimalMinusDualAng);
-            assert(areaIncrInNewSpace >= 0.);
+            CHECK_GE(areaIncrInNewSpace, 0.);
 
             double newMomentX = oldMomentInNewSpaceX + areaIncrInNewSpace * Math.cos(newPrimalMinusDualAng);
             double newMomentY = oldMomentInNewSpaceY + areaIncrInNewSpace * Math.sin(newPrimalMinusDualAng);
@@ -2912,7 +2854,7 @@ public class SpiralApplet
                 String tempString;
                 SWAP(gY0Label, gY1Label, tempString);
             }
-            assert(gY0 < gY1);
+            CHECK_LT(gY0, gY1);
 
 
             // make a MyGraphics, without changing coords,
@@ -3026,7 +2968,7 @@ public class SpiralApplet
                               null);
 
             // draw bounds
-            g.setColor(pastelsFlag ? java.awt.Color.white : boundsColor);
+            g.setColor(pastelsFlag ? java.awt.Color.WHITE : boundsColor);
             {
                 int n = possibleBoundsFetcher.nData();
                 double datum[] = new double[3];
@@ -3107,10 +3049,15 @@ public class SpiralApplet
             java.awt.Color gray64 = new java.awt.Color(64,64,64);
             java.awt.Color gray128 = new java.awt.Color(128,128,128);
 
-            int x0 = 60;
-            int x1 = x0 + pixelsInPlot;
-            int y1 = 40;
-            int y0 = y1 + pixelsInPlot;
+            int x00 = 60;
+            int x11 = x00 + pixelsInPlot;
+            int y11 = 40;                 // higher in window, smaller value
+            int y00 = y11 + pixelsInPlot; // lower in window, bigger value
+
+            int x0 = x00;
+            int x1 = x11;
+            int y1 = y11;
+            int y0 = y00;
 
             int xDelta = 1+40+2+pixelsInPlot+2+5+1 + 5; // ARGH
             int yDelta = 1+45+2+pixelsInPlot+2+15+1 + 5; // ARGH
@@ -3129,19 +3076,19 @@ public class SpiralApplet
 
                     9,9, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.nParts.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             double primalAng = (i+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
                             double maybeTopMomentAng = primalAng;
@@ -3151,11 +3098,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3187,19 +3134,19 @@ public class SpiralApplet
 
                     9,5, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3208,7 +3155,7 @@ public class SpiralApplet
                             double momentMag = VecMath.norm(2, momentAndArea);
 
                             double maxMomentMag = Math.sin(2*primalAng)/4; // i.e. tri area / 2, i.e. sin(primalAng)*cos(primalAng)/2
-                            assert(momentMag < maxMomentMag);
+                            CHECK_LT(momentMag, maxMomentMag);
 
                             putDatumHere[0] = RTOD(primalAng);
                             putDatumHere[1] = maxMomentMag;
@@ -3216,11 +3163,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3234,11 +3181,11 @@ public class SpiralApplet
                 );
             }
 
-            // advance upward and to right
+            // advance to right and first row again
             x0 += xDelta;
             x1 += xDelta;
-            y0 -= yDelta;
-            y1 -= yDelta;
+            y0 = y00;
+            y1 = y11;
 
             // moment x vs. moment y
             {
@@ -3253,19 +3200,19 @@ public class SpiralApplet
 
                     5,5, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 2*90;
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             if (i >= 90)
                             {
@@ -3308,11 +3255,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3344,20 +3291,20 @@ public class SpiralApplet
 
                     5,5, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         private double scratch[] = new double[3];
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 6*90;
                         }
-                        public void getDatum(int ii, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int ii, double putDatumHere[/*3*/])
                         {
                             int iPicture = ii / 90;
                             int i = ii % 90;
@@ -3432,7 +3379,7 @@ public class SpiralApplet
                                     double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
                                     double Rexpected = maxMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
                                     double Rgotttttt = MyMath.hypot(xMoment,yMoment-Rexpected);
-                                    assert(EQ(Rexpected, Rgotttttt, 1e-6));
+                                    CHECK_ALMOST_EQ(Rexpected, Rgotttttt, 1e-6);
                                     //PRINT(Rexpected);
                                     //PRINT(Rgotttttt);
                                     //OUT("---");
@@ -3457,7 +3404,7 @@ public class SpiralApplet
                                 double xp = Math.cos(focusPrimalAngleMinusDualAngle);
                                 double frac = (i+.5)/90;
                                 double ym = frac;
-                                assert(0 < ym && ym < 1);
+                                CHECK_LT_LT(0, ym, 1);
                                 double xm = (.5*yp*yp + xp*ym) / yp;
                                 if (false)
                                 {
@@ -3481,7 +3428,7 @@ public class SpiralApplet
                                 putDatumHere[2] = 0.; // hue
                             }
                             else
-                                assert(false);
+                                CHECK(false);
 
                             if (false)
                             {
@@ -3496,12 +3443,12 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
                         double scratch[] = new double[3];
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3529,14 +3476,13 @@ public class SpiralApplet
 
             if (showTheExpensivePlotTooFlag)
             {
-                // advance downward again
-                y0 += yDelta;
-                y1 += yDelta;
-
-                // moment x vs. moment y,
-                // only at the given focus angle...
-                // and do a whole lot more in-depth analysis than before to hopefully flesh out the shape.
+                int maxPower = 3;
+                for (int power = 1; power <= maxPower; ++power)
                 {
+                    final int finalPower = power;
+                    // advance downward again
+                    y0 += yDelta;
+                    y1 += yDelta;
                     drawOnePlot(
                         g,
                         gsize,
@@ -3548,20 +3494,20 @@ public class SpiralApplet
 
                         5,5, // nMajor x,y
 
-                        java.awt.Color.blue, // outerFrameColor
-                        java.awt.Color.white, // innerFrameColor
+                        java.awt.Color.BLUE, // outerFrameColor
+                        java.awt.Color.WHITE, // innerFrameColor
                         gray64, // majorGridColor
                         gray128, // labelColor
-                        java.awt.Color.green, // boundsColor
-                        java.awt.Color.red, // dataColor
+                        java.awt.Color.GREEN, // boundsColor
+                        java.awt.Color.RED, // dataColor
                         pastelsFlag,
                         new DataFetcher() { // possibleBoundsFetcher
                             private double scratch[] = new double[3];
-                            public int nData()
+                            OVERRIDE public int nData()
                             {
                                 return 6*90;
                             }
-                            public void getDatum(int ii, double putDatumHere[/*3*/])
+                            OVERRIDE public void getDatum(int ii, double putDatumHere[/*3*/])
                             {
                                 int iPicture = ii / 90;
                                 int i = ii % 90;
@@ -3636,7 +3582,7 @@ public class SpiralApplet
                                         double maxMomentMag = Math.sin(2*focusPrimalAngleMinusDualAngle)/4; // i.e. tri area / 2
                                         double Rexpected = maxMomentMag / (2*Math.sin(focusPrimalAngleMinusDualAngle));
                                         double Rgotttttt = MyMath.hypot(xMoment,yMoment-Rexpected);
-                                        assert(EQ(Rexpected, Rgotttttt, 1e-6));
+                                        CHECK_ALMOST_EQ(Rexpected, Rgotttttt, 1e-6);
                                         //PRINT(Rexpected);
                                         //PRINT(Rgotttttt);
                                         //OUT("---");
@@ -3661,7 +3607,7 @@ public class SpiralApplet
                                     double xp = Math.cos(focusPrimalAngleMinusDualAngle);
                                     double frac = (i+.5)/90;
                                     double ym = frac;
-                                    assert(0 < ym && ym < 1);
+                                    CHECK_LT_LT(0, ym, 1);
                                     double xm = (.5*yp*yp + xp*ym) / yp;
                                     if (false)
                                     {
@@ -3685,7 +3631,7 @@ public class SpiralApplet
                                     putDatumHere[2] = 0.; // hue
                                 }
                                 else
-                                    assert(false);
+                                    CHECK(false);
 
                                 if (false)
                                 {
@@ -3702,54 +3648,68 @@ public class SpiralApplet
                         new DataFetcher() { // dataFetcher
                             double data[][];
                             {
-                                java.util.ArrayList<double[]> dataArrayList = new java.util.ArrayList<double[]>();
-                                int n = spiralModel.params.n.get();
-                                System.out.print("    Calculating expensive plot: n="+n+" ... ");
+                                final java.util.ArrayList<double[]> dataArrayList = new java.util.ArrayList<double[]>();
+                                System.out.print("    Calculating expensive plot, power="+finalPower+" ... ");
                                 System.out.flush();
-                                double newMomentAndAreaScratch[] = new double[3];
-                                FORI(i, n)
                                 {
-                                    int val = spiralModel.theList[i];
-                                    double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
-
-                                    double momentAndArea[] = spiralModel.momentsAndAreas[i];
-
-                                    if (false)
-                                    {
-                                      // Pretend following primalAng-dualAng is focusPrimalAngleMinusDualAngle
-                                      // and update moment accordingly.
-                                      updateMomentAndAreaWhenSomeoneMoved(
-                                          momentAndArea[0], momentAndArea[1], momentAndArea[2],
-                                          primalAng, focusPrimalAngleMinusDualAngle,
-                                          newMomentAndAreaScratch);
-                                      dataArrayList.add(new double[]{newMomentAndAreaScratch[0],
-                                                                     newMomentAndAreaScratch[1],
-                                                                     primalAng / (Math.PI*.5)}); // hue
-                                    }
-                                    else // the original simpler behavior
-                                    {
-                                        int nParts = spiralModel.params.nParts.get();
-                                        for (int steppingStone = 0; steppingStone < nParts; ++steppingStone) {
-                                            double steppingStoneAng = (steppingStone+.5)/nParts * (Math.PI*.5);
-                                            if (steppingStoneAng <= MIN(primalAng, focusPrimalAngleMinusDualAngle)
-                                             || steppingStoneAng >= MAX(primalAng, focusPrimalAngleMinusDualAngle))
+                                    final int nParts = spiralModel.params.nParts.get();
+                                    final double primalAngleStack[] = new double[finalPower];
+                                    final double momentAndAreaStack[][] = new double[finalPower+1][3];
+                                    // Implement a nested for-loop
+                                    class Recurse {
+                                        private void recurse(int stackIndex)
+                                        {
+                                            CHECK_GE(finalPower, 1);
+                                            CHECK_LT(stackIndex, finalPower);
+                                            FORI (iPart, nParts)
                                             {
-                                                // dudley then priscilla, or priscilla then dudley
-                                                updateMomentAndAreaWhenSomeoneMoved(
-                                                    momentAndArea[0], momentAndArea[1], momentAndArea[2],
-                                                    primalAng, steppingStoneAng,
-                                                    newMomentAndAreaScratch);
-                                                updateMomentAndAreaWhenSomeoneMoved(
-                                                    newMomentAndAreaScratch[0], newMomentAndAreaScratch[1], newMomentAndAreaScratch[2],
-                                                    steppingStoneAng, focusPrimalAngleMinusDualAngle,
-                                                    newMomentAndAreaScratch);
-                                                dataArrayList.add(new double[]{newMomentAndAreaScratch[0],
-                                                                               newMomentAndAreaScratch[1],
-                                                                               primalAng / (Math.PI*.5)}); // hue
-                                            } 
+                                                // Experimentint with isolating just some parts of the middle one
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 20 && iPart < 30)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 30 && iPart < 40)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 40 && iPart < 50)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 40 && iPart < 50)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 50 && iPart < 60)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 60 && iPart < 70)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 70 && iPart < 80)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart >= 80 && iPart < 85)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart == 44)) continue;
+                                                //if (finalPower == 2 && stackIndex==1 && !(iPart == 44 || iPart >= 80 && iPart < 85)) continue;
+                                                if (finalPower == 2 && stackIndex==1 && !(iPart == 44 || iPart >= 80)) continue;
+
+                                                primalAngleStack[stackIndex] = (iPart+.5)/nParts*(Math.PI*.5);
+                                                if (stackIndex == 0)
+                                                    getSpiralMomentAndArea(primalAngleStack[stackIndex], momentAndAreaStack[stackIndex]);
+                                                else
+                                                {
+                                                    if (primalAngleStack[stackIndex] == primalAngleStack[stackIndex-1])
+                                                        continue; // that would make it a smaller problem
+                                                    updateMomentAndAreaWhenSomeoneMoved(
+                                                        momentAndAreaStack[stackIndex-1][0], momentAndAreaStack[stackIndex-1][1], momentAndAreaStack[stackIndex-1][2],
+                                                        primalAngleStack[stackIndex-1], primalAngleStack[stackIndex],
+                                                        momentAndAreaStack[stackIndex]);
+                                                }
+                                                if (stackIndex < finalPower-1)
+                                                {
+                                                    recurse(stackIndex+1);
+                                                }
+                                                else
+                                                {
+                                                    // Do one more update to the target angle, and record the result
+                                                    updateMomentAndAreaWhenSomeoneMoved(
+                                                        momentAndAreaStack[stackIndex][0], momentAndAreaStack[stackIndex][1], momentAndAreaStack[stackIndex][2],
+                                                        primalAngleStack[stackIndex], focusPrimalAngleMinusDualAngle,
+                                                        momentAndAreaStack[stackIndex+1]);
+                                                    dataArrayList.add(new double[]{momentAndAreaStack[stackIndex+1][0],
+                                                                                   momentAndAreaStack[stackIndex+1][1],
+                                                                                   primalAngleStack[0] / (Math.PI*.5)}); // hue
+                                                }
+                                            }
                                         }
-                                    }
+                                    };
+                                    new Recurse().recurse(0);
                                 }
+
+
                                 System.out.print("data.length = "+dataArrayList.size());
                                 System.out.flush();
 
@@ -3761,12 +3721,12 @@ public class SpiralApplet
                                 System.out.println();
                             }
 
-                            public int nData()
+                            OVERRIDE public int nData()
                             {
                                 return data.length;
                             }
                             double scratch[] = new double[3];
-                            public void getDatum(int i, double putDatumHere[/*3*/])
+                            OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                             {
                                 putDatumHere[0] = data[i][0];
                                 putDatumHere[1] = data[i][1];
@@ -3775,18 +3735,14 @@ public class SpiralApplet
                         }
                     );
                 }
-
-                // advance back upward to pretend we never did that
-                y0 -= yDelta;
-                y1 -= yDelta;
             }
 
 
-            // advance upward and to right
+            // advance to right and first row
             x0 += xDelta;
             x1 += xDelta;
-            y0 -= yDelta;
-            y1 -= yDelta;
+            y0 = y00;
+            y1 = y11;
 
             // center x vs. center y
             {
@@ -3801,19 +3757,19 @@ public class SpiralApplet
 
                     10,10, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 90;
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             double angle = (i+.5)/90*(Math.PI/2);
                             putDatumHere[0] = Math.cos(angle);
@@ -3822,11 +3778,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3861,19 +3817,19 @@ public class SpiralApplet
 
                     10,10, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 2*90;
                         }
-                        public void getDatum(int ii, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int ii, double putDatumHere[/*3*/])
                         {
                             int iPicture = ii / 90;
                             int i = ii % 90;
@@ -3899,12 +3855,12 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
                         double scratch[] = new double[3];
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -3933,8 +3889,8 @@ public class SpiralApplet
             // advance upward and to right
             x0 += xDelta;
             x1 += xDelta;
-            y0 -= yDelta;
-            y1 -= yDelta;
+            y0 = y00;
+            y1 = y11;
 
             // moment x vs. moment y  but measured from primal angle instead of dual
             {
@@ -3949,20 +3905,20 @@ public class SpiralApplet
 
                     5,5, // nMajor x,y
 
-                    java.awt.Color.blue, // outerFrameColor
-                    java.awt.Color.white, // innerFrameColor
+                    java.awt.Color.BLUE, // outerFrameColor
+                    java.awt.Color.WHITE, // innerFrameColor
                     gray64, // majorGridColor
                     gray128, // labelColor
-                    java.awt.Color.green, // boundsColor
-                    java.awt.Color.red, // dataColor
+                    java.awt.Color.GREEN, // boundsColor
+                    java.awt.Color.RED, // dataColor
                     pastelsFlag,
                     new DataFetcher() { // possibleBoundsFetcher
                         private int n = 90;
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return 2*n;
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             if (i >= n)
                             {
@@ -4008,11 +3964,11 @@ public class SpiralApplet
                         }
                     },
                     new DataFetcher() { // dataFetcher
-                        public int nData()
+                        OVERRIDE public int nData()
                         {
                             return spiralModel.params.n.get();
                         }
-                        public void getDatum(int i, double putDatumHere[/*3*/])
+                        OVERRIDE public void getDatum(int i, double putDatumHere[/*3*/])
                         {
                             int val = spiralModel.theList[i];
                             double primalAng = (val+.5)/spiralModel.params.nParts.get() * (Math.PI*.5);
@@ -4054,9 +4010,9 @@ public class SpiralApplet
             //PRINT(gCenterX);
             //PRINT(gCenterY);
 
-            assert(n > 0);
-            assert(pixelsPerPart > 0);
-            assert(n % 2 == 0); // whole thing doesn't work otherwise
+            CHECK_GT(n, 0);
+            CHECK_GT(pixelsPerPart, 0);
+            CHECK_EQ(n % 2, 0); // whole thing doesn't work otherwise
 
 
             java.awt.Color gray128 = new java.awt.Color(128,128,128);
@@ -4155,7 +4111,7 @@ public class SpiralApplet
                 if (false)
                 {
                     // blue for base
-                    g.setColor(java.awt.Color.blue);
+                    g.setColor(java.awt.Color.BLUE);
                     FORI (iPart, nParts)
                         g.fillRect(ixBase,iyBase-iPart*pixelsPerPart,1,1);
                 }
@@ -4163,7 +4119,7 @@ public class SpiralApplet
                 if (true)
                 {
                     // yellow for rail
-                    g.setColor(java.awt.Color.yellow);
+                    g.setColor(java.awt.Color.YELLOW);
                     g.fillRect(ixLowerRail,iyLowerRail,1,1);
                     g.fillRect(ixUpperRail,iyUpperRail,1,1);
                 }
@@ -4232,15 +4188,15 @@ public class SpiralApplet
 
                 //double xOffset = (-upperLeftOffset - lowerLeftOffset);
                 //double yOffset = (-upperLeftOffset + lowerLeftOffset);
-                //assert((double)(int)xOffset == xOffset);
-                //assert((double)(int)yOffset == yOffset);
+                //CHECK_EQ((double)(int)xOffset, xOffset);
+                //CHECK_EQ((double)(int)yOffset, yOffset);
 
                 Rational xOffset = upperLeftOffset.times(-1,1).minus(lowerLeftOffset);
                 Rational yOffset = upperLeftOffset.times(-1,1).plus(lowerLeftOffset);
                 //PRINT(xOffset);
                 //PRINT(yOffset);
-                assert(xOffset.d == 1);
-                assert(yOffset.d == 1);
+                CHECK_EQ(xOffset.d, 1);
+                CHECK_EQ(yOffset.d, 1);
 
 
                 ix0 = ixBase + xOffset.n;
@@ -4333,9 +4289,9 @@ public class SpiralApplet
             int debugLevel = 0; // 1 = global, 2 = and some per-increment
 
             // have to be drawing something
-            assert(drawPrimalFlag || drawDualFlag || drawRungsFlag);
+            CHECK(drawPrimalFlag || drawDualFlag || drawRungsFlag);
             // don't allow drawing primal and dual at same time
-            assert(!drawPrimalFlag || !drawDualFlag);
+            CHECK(!drawPrimalFlag || !drawDualFlag);
 
             if (debugLevel >= 1) System.out.println("    in drawSpiral "+(drawPrimalFlag?"primal":"")+(drawDualFlag?"dual":"")+(drawRungsFlag?",rungs":""));
 
@@ -4407,7 +4363,7 @@ public class SpiralApplet
                         orientationAngleFudge = Math.PI*.5 - primalAng;
                         break;
                     default:
-                        assert(false);
+                        CHECK(false);
                 }
                 // then add the appropriate multiple of 90 degrees depending on the quadrant
                 orientationAngleFudge += (orientationNumber/3) * (Math.PI*.5);
@@ -4421,7 +4377,7 @@ public class SpiralApplet
                 if (pastelsFlag)
                     mg.setColor(pastels[(int)(2*val+1)]);
                 else
-                    mg.setColor(java.awt.Color.cyan);
+                    mg.setColor(java.awt.Color.CYAN);
                 double primalAng = Math.PI/2 * ((val+.5)/nParts) + orientationAngleFudge;
                 mg.drawLine(0.,0.,Math.cos(primalAng),Math.sin(primalAng),antiAliasFlag);
             }
@@ -4446,7 +4402,7 @@ public class SpiralApplet
                 else
                 {
                     if (scanDir < 0)
-                        mg.setColor(java.awt.Color.white);
+                        mg.setColor(java.awt.Color.WHITE);
                     else
                     {
                         //mg.setColor(gray64);
@@ -4670,7 +4626,7 @@ public class SpiralApplet
                         if (scanDir < 0)
                         {
                             double areaIncr = .5 * twiceTriangleArea(0.,0., dualX,dualY, nextDualX,nextDualY);
-                            assert(areaIncr <= 0.); // area triangle is negative since scanning backwards
+                            CHECK_LE(areaIncr, 0.); // area triangle is negative since scanning backwards
                             areaIncr = ABS(areaIncr);
 
                             if (area+areaIncr == area)
@@ -4707,7 +4663,7 @@ public class SpiralApplet
                         double areaScratch = spiralModel.momentsAndAreas[i][2]; // var area already defined, maybe should rename it
                         VecMath.vxs(moment, moment, primalR/dualR); // divide by dualR because we should never have multiplied by it
                         java.awt.Color savedColor = mg.getColor();
-                        mg.setColor(java.awt.Color.yellow);
+                        mg.setColor(java.awt.Color.YELLOW);
 
                         boolean big = (spiralModel.theList[i] > spiralModel.theList[(i+1)%n])
                                  && !(spiralModel.theList[MOD(i-1,n)] > spiralModel.theList[i]);
@@ -4721,7 +4677,7 @@ public class SpiralApplet
 
                 if (scanDir < 0 && drawPrimalFlag)
                 {
-                    mg.setColor(java.awt.Color.yellow);
+                    mg.setColor(java.awt.Color.YELLOW);
                     mg.drawPoint(centerX, centerY, 5);
                     {
                         double centerYinCanonicalOrientation = -centerX*sinOrientationAngleFudge + centerY*cosOrientationAngleFudge;
@@ -4729,7 +4685,7 @@ public class SpiralApplet
                         {
                             System.out.println("HEY! centerY is "+centerY);
                         }
-                        //assert(centerYinCanonicalOrientation > 0.);
+                        //CHECK_GT(centerYinCanonicalOrientation, 0.);
                     }
 
                     {
@@ -4754,7 +4710,7 @@ public class SpiralApplet
                         // I.e. it's in a certain pie slice, bounded by two rays
                         // and an arc.  Draw that arc.
                         double arcRadius = Math.sin(2*initialPrimalAng) / (4*area);
-                        mg.setColor(java.awt.Color.yellow);
+                        mg.setColor(java.awt.Color.YELLOW);
                         mg.drawThickArc(-arcRadius,-arcRadius,
                                         2*arcRadius,2*arcRadius,
                                         0.+orientationAngleFudge, // startRadians
@@ -4769,7 +4725,7 @@ public class SpiralApplet
                         if (pastelsFlag)
                             mg.setColor(pastels[(int)(2*val+1)]);
                         else
-                            mg.setColor(java.awt.Color.magenta);
+                            mg.setColor(java.awt.Color.MAGENTA);
 
                         double momentX = centerX*area;
                         double momentY = centerY*area;
@@ -4798,18 +4754,23 @@ public class SpiralApplet
                             if (momentMag > boundIThought*fudge)
                             {
                                 System.out.println("HEY! focus="+spiralView.focus+": moment mag is bigger than naive bound! by factor of "+(momentMag/boundIThought)+" (ang="+RTOD(initialPrimalAng)+" momentAng="+RTOD(momentAngle)+" momentMag="+momentMag+")");
-                                mg.setColor(java.awt.Color.red);
+                                mg.setColor(java.awt.Color.RED);
                             }
 
                         }
 
 
                         arcRadius = Math.sin(2*initialPrimalAng);
-                        // I think what I was thinking in the *4 is that we divide by area-when-45
-                        // so that it will equal center when 45, just so it's in a nice range.
-                        // Maybe should normalize them like that anyway?
-                        // At least use cross product instead of tri areas, for one thing,
-                        // that will get us halfway there anyway.  Maybe.
+                        // A nice side effect of "scaled so max possible is 1"
+                        // is that, since max moment magnitude happens to be 1/4,
+                        // the scaling is by *4,
+                        // which happens to be 1/area when a medium (45 degrees) spiral;
+                        // so that means we draw the moment at the same position as the centroid when
+                        // drawing that spiral.
+                        // I wonder if it would make sense to use a different notion of area
+                        // so that this is the actual moment?
+                        // Could at least use cross product instead of areas,
+                        // which would get us halfway there.
                         mg.drawPoint(momentX*4,momentY*4,
                                      5);
                         mg.drawThickArc(-arcRadius,-arcRadius,
@@ -4878,7 +4839,7 @@ public class SpiralApplet
                                             break;
                                         }
                                         default:
-                                            assert(false);
+                                            CHECK(false);
                                     }
                                     rotate(speculativeNextCenterX,
                                            speculativeNextCenterY,
@@ -5004,8 +4965,8 @@ public class SpiralApplet
                 {
                     System.out.println("    creating timer");
                     theTimer = new javax.swing.Timer(animSleepMS.get(), new java.awt.event.ActionListener() {
-                        @Override
-                        public void actionPerformed(java.awt.event.ActionEvent e) {
+                        OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
+                        {
                             if (eventVerbose >= 1) System.out.println("in timer action");
 
                             // TODO: make a synchronizedGet() and synchronizedSet() method to facilitate this?
@@ -5109,8 +5070,9 @@ public class SpiralApplet
         public Listenable.Boolean showTimingFlag = new Listenable.Boolean(false);
         public Listenable.Boolean showTickerFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showSpiralFlag = new Listenable.Boolean(true);
-        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(false);
-        public Listenable.Boolean showTheExpensivePlotTooFlag = new Listenable.Boolean(false);
+        //public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(false);
+        public Listenable.Boolean showPlotsFlag = new Listenable.Boolean(true);
+        public Listenable.Boolean showTheExpensivePlotTooFlag = new Listenable.Boolean(true);
         public Listenable.Boolean showVsyncLapsesFlag = new Listenable.Boolean(false);
         public JRow focusInControlPanelRow = null;
 
@@ -5155,15 +5117,13 @@ public class SpiralApplet
         {
             super(s.get());
             s.addListener(listener = new Listenable.Listener() {
-                @Override
-                public void valueChanged()
+                OVERRIDE public void valueChanged()
                 {
                     setText(s.get());
                 }
             });
             addActionListener(new java.awt.event.ActionListener() {
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent e)
+                OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                 {
                     s.set(getText());
                 }
@@ -5177,8 +5137,7 @@ public class SpiralApplet
         private Listenable.Listener listener; // need to keep a strong ref to it for as long as I'm alive
         private Listenable.Number f;
 
-        @Override
-        public boolean validate(String text)
+        OVERRIDE public boolean validate(String text)
         {
             try {
                 // attempt to parse, ignore return value
@@ -5210,15 +5169,13 @@ public class SpiralApplet
             this.f = f;
             updateText(f);
             f.addListener(listener = new Listenable.Listener() {
-                @Override
-                public void valueChanged()
+                OVERRIDE public void valueChanged()
                 {
                     updateText(f);
                 }
             });
             addActionListener(new java.awt.event.ActionListener() {
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent e)
+                OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                 {
                     try
                     {
@@ -5233,8 +5190,7 @@ public class SpiralApplet
             });
         }
 
-        @Override
-        public java.awt.Dimension getPreferredSize()
+        OVERRIDE public java.awt.Dimension getPreferredSize()
         {
             //System.out.println("in JTextFieldForNumber.getPreferredSize()");
             // default seems taller than necessary
@@ -5275,8 +5231,7 @@ public class SpiralApplet
         // weird, the following is called during horizontal shrinking
         // but not during horizontal expanding... if we don't do this too
         // then it looks wrong when shrinking.  what a hack...
-        @Override
-        public java.awt.Dimension getMinimumSize()
+        OVERRIDE public java.awt.Dimension getMinimumSize()
         {
             return getPreferredSize();
         }
@@ -5290,15 +5245,13 @@ public class SpiralApplet
             super(name);
             setSelected(b.get());
             addItemListener(new java.awt.event.ItemListener() {
-                @Override
-                public void itemStateChanged(java.awt.event.ItemEvent e)
+                OVERRIDE public void itemStateChanged(java.awt.event.ItemEvent e)
                 {
                     b.set(isSelected());
                 }
             });
             b.addListener(listener = new Listenable.Listener() {
-                @Override
-                public void valueChanged()
+                OVERRIDE public void valueChanged()
                 {
                     setSelected(b.get());
                 }
@@ -5342,15 +5295,13 @@ public class SpiralApplet
             setMinorTickSpacing(1);  // .001 units
             setMajorTickSpacing(10); // .01 units
             f.addListener(listener = new Listenable.Listener() {
-                @Override
-                public void valueChanged()
+                OVERRIDE public void valueChanged()
                 {
                     updateThumb(f);
                 }
             });
             addChangeListener(new javax.swing.event.ChangeListener() {
-                @Override
-                public void stateChanged(javax.swing.event.ChangeEvent e)
+                OVERRIDE public void stateChanged(javax.swing.event.ChangeEvent e)
                 {
                     if (false)
                     {
@@ -5380,6 +5331,7 @@ public class SpiralApplet
     // nice utility, maybe move to donhatchsw
     public static void drawPixmapCentered(java.awt.Graphics g,
                                           java.awt.Dimension size,
+                                          int mag,
                                           java.awt.Color asciiToColor[],
                                           String[] rows)
     {
@@ -5392,9 +5344,9 @@ public class SpiralApplet
             g.fillRect(0,0, size.width,size.height);
         }
 
-        if (hidpimag != 1)
+        CHECK_GE(mag, 0);  // 0 would be weird but legal
+        if (mag != 1)
         {
-            int mag = hidpimag;
             String[] newRows = new String[rows.length*mag];
             FORI (iRow, rows.length)
             {
@@ -5440,7 +5392,7 @@ public class SpiralApplet
     private static void makeTextComponentLikeLabel(JTextComponent textComponent)
     {
         textComponent.setEditable(false);
-        textComponent.setDisabledTextColor(java.awt.Color.black);
+        textComponent.setDisabledTextColor(java.awt.Color.BLACK);
         textComponent.setBackground(null); // same as JLabel
         textComponent.setBorder(null); // same as JLabel
         textComponent.setEnabled(true); // otherwise not selectable
@@ -5453,30 +5405,26 @@ public class SpiralApplet
                                                         final boolean mustBePositive)
     {
         if (mustBeMultipleOf != 0.) {
-            assert(increment % mustBeMultipleOf == 0.); // otherwise incrementing wouldn't be very useful
+            CHECK_EQ(increment % mustBeMultipleOf, 0.); // otherwise incrementing wouldn't be very useful
         }
         final java.awt.Color asciiToColor[] = new java.awt.Color[128];
         asciiToColor[' '] = null;
-        asciiToColor['b'] = java.awt.Color.black;
+        asciiToColor['b'] = java.awt.Color.BLACK;
         return new JRow() {{
             add(new JRepeatingButton("") {
-                @Override
-                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
-                @Override
-                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
-                @Override
-                public void paint(java.awt.Graphics g)
+                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
+                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
+                OVERRIDE public void paint(java.awt.Graphics g)
                 {
                     super.paint(g);
-                    drawPixmapCentered(g, getSize(), asciiToColor,
+                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                        new String[] {
                                           "bbb bbb",
                                        });
                 }
             {
                 addActionListener(new java.awt.event.ActionListener() {
-                    @Override
-                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         f.setDouble(f.getDouble()-increment);
                     }
@@ -5484,8 +5432,7 @@ public class SpiralApplet
                 setToolTipText("<html>decrement "+name+"</html>");
             }});
             add(new JTextFieldForNumber(f) {
-                @Override
-                public boolean validate(String text)
+                OVERRIDE public boolean validate(String text)
                 {
                     if (!super.validate(text)) return false;
                     try {
@@ -5502,15 +5449,12 @@ public class SpiralApplet
                 }
             } );
             add(new JRepeatingButton("") {
-                @Override
-                public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
-                @Override
-                public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
-                @Override
-                public void paint(java.awt.Graphics g)
+                OVERRIDE public java.awt.Dimension getPreferredSize() { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
+                OVERRIDE public java.awt.Dimension getMinimumSize()   { return new java.awt.Dimension(11*hidpimag,11*hidpimag); }
+                OVERRIDE public void paint(java.awt.Graphics g)
                 {
                     super.paint(g);
-                    drawPixmapCentered(g, getSize(), asciiToColor,
+                    drawPixmapCentered(g, getSize(), hidpimag, asciiToColor,
                                        new String[] {
                                           " b   b ",
                                           "bbb bbb",
@@ -5519,8 +5463,7 @@ public class SpiralApplet
                 }
             {
                 addActionListener(new java.awt.event.ActionListener() {
-                    @Override
-                    public void actionPerformed(java.awt.event.ActionEvent e)
+                    OVERRIDE public void actionPerformed(java.awt.event.ActionEvent e)
                     {
                         f.setDouble(f.getDouble()+increment);
                     }
@@ -5560,8 +5503,8 @@ public class SpiralApplet
             Object answer = nanoTimeMethod.invoke(null, new Object[]{});
             return ((Long)answer).longValue();
         }
-        catch (IllegalAccessException e) {assert(false); return 0L;}
-        catch (java.lang.reflect.InvocationTargetException e) {assert(false); return 0L;}
+        catch (IllegalAccessException e) {CHECK(false); return 0L;}
+        catch (java.lang.reflect.InvocationTargetException e) {CHECK(false); return 0L;}
     }
 
     // Time in seconds from when we initialize the times,
@@ -5692,8 +5635,8 @@ public class SpiralApplet
         final JFrame frame = new JFrame(applet.windowTitle.get());
 
         applet.windowTitle.addListener(new Listenable.Listener() {
-            @Override
-            public void valueChanged() {
+            OVERRIDE public void valueChanged()
+            {
                 frame.setTitle(applet.windowTitle.get());
             }
         });
@@ -5707,12 +5650,12 @@ public class SpiralApplet
 
         // the following seems to be necessary, or getParameter() will crash, at least in 1.4.  Want to send params from command line anyway.
         applet.setStub(new java.applet.AppletStub() {
-             public void appletResize(int width, int height)
+             OVERRIDE public void appletResize(int width, int height)
                  { /* should resize frame, but a SpiralApplet never asks to be resized */ }
-             public java.applet.AppletContext getAppletContext() { return null;}
-             public java.net.URL getCodeBase() { return null; }
-             public java.net.URL getDocumentBase() { return null; }
-             public String getParameter(String name)
+             OVERRIDE public java.applet.AppletContext getAppletContext() { return null;}
+             OVERRIDE public java.net.URL getCodeBase() { return null; }
+             OVERRIDE public java.net.URL getDocumentBase() { return null; }
+             OVERRIDE public String getParameter(String name)
              {
                  // case insensitive... and unfortunately there's no
                  // startsWithIgnoreCase
@@ -5723,7 +5666,7 @@ public class SpiralApplet
                          return args[i].substring(prefix.length());
                  return null;
              }
-             public boolean isActive() { return true; }
+             OVERRIDE public boolean isActive() { return true; }
         });
 
         applet.init();
@@ -5736,6 +5679,7 @@ public class SpiralApplet
         frame.setSize(622,558);
         frame.setSize(980,562); // 4x2 plots
         frame.setSize(980,846); // 4x3 plots
+        frame.setSize(980,1262); // 4x5 plots
 
         frame.setVisible(true);
 
@@ -5755,7 +5699,7 @@ public class SpiralApplet
                     System.out.println("in thread run");
                     System.out.println("    sleeping forever (http://www.javamex.com/tutorials/threads/sleep_issues.shtml)");
                     try { Thread.sleep(Long.MAX_VALUE); } catch (InterruptedException e) {}
-                    assert(false);
+                    CHECK(false);
                     System.out.println("out thread run");
                     System.exit(1);
                 }
@@ -5787,9 +5731,7 @@ public class SpiralApplet
     // Sum geometric series given the first two terms which should be decreasing.
     public static double SumGeometricSeries(double a, double b)
     {
-        assert(b >= 0);
-        assert(a > b);
-
+        CHECK_GT_GE(a, b, 0);
         // The thing being taken to powers is x = b/a.
         // Sum of powers of x is 1/(1-x), so
         // answer is 1/(1-x) * a = 1/(1-b/a) = a^2/(a-b).
@@ -5798,7 +5740,7 @@ public class SpiralApplet
     // Sum geometric series given the first two terms.
     public static Complex SumGeometricSeries(Complex a, Complex b)
     {
-        assert(a.abs2() > b.abs2());
+        CHECK_GT(a.abs2(), b.abs2());
 
         //return a.times(a).overEquals(a.minus(b));      // two allocations
         return a.times(a).overEquals(a.x-b.x, a.y-b.y);  // only one allocation
@@ -5850,7 +5792,7 @@ public class SpiralApplet
         if (q.equalsExactly(1.,0.)) {
           // return infinity in the quadrant or axis direction in which it was going.
           // I might be overthinking this.
-          assert(!b.equalsExactly(c));
+          CHECK(!b.equalsExactly(c));
           return new Complex(b.x==c.x ? c.x : (c.x-b.x)*Double.POSITIVE_INFINITY,
                              b.y==c.y ? c.y : (c.y-b.y)*Double.POSITIVE_INFINITY);
         }
@@ -5860,6 +5802,16 @@ public class SpiralApplet
         if (verboseLevel >= 1) System.out.println("    out OneTwoThreeInfinity(a="+a+" b="+b+" c="+c+"), returning z="+z);
         if (verboseLevel >= 1) System.out.println("    =====================================");
         return z;
+    }
+
+    static void getSpiralMomentAndArea(double primalAng, double momentAndArea[/*3*/])
+    {
+        double c = Math.cos(primalAng);
+        double s = Math.sin(primalAng);
+        double frac = c*s / (1+3*(c*c));
+        momentAndArea[0] = c * frac;
+        momentAndArea[1] = s/2 * frac;
+        momentAndArea[2] = (s/c)/4; // area
     }
 
 } // class SpiralApplet
