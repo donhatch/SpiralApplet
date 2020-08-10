@@ -43,15 +43,11 @@
 
 # Currently works on ubuntu, after: apt install openjdk-8-jdk openjfx
 
-#CPPFLAGS+=-DOVERRIDE=
-#JAVAC=javac -source 1.3 -target 1.3
-#JAVAC=javac -source 1.4 -target 1.4  # currently doesn't compile since using generics
-
-CPPFLAGS+=-DOVERRIDE=@Override
-#JAVAC=javac -source 1.5 -target 1.5
-#JAVAC=javac -source 1.6 -target 1.6
 JAVAC=javac -source 1.7 -target 1.7
 #JAVAC=javac -source 1.8 -target 1.8
+#JAVAC=javac -source 1.9 -target 1.9
+#JAVAC=javac -source 1.10 -target 1.10
+#JAVAC=javac -source 11 -target 11
 #JAVAC=javac
 
 JAVAROOT="/usr"
