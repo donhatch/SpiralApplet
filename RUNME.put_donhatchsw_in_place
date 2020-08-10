@@ -1,0 +1,7 @@
+#!/usr/bin/tcsh -f
+
+set verbose
+rm -f donhatchsw.jar
+cp -a ../donhatchsw/donhatchsw.jar .
+rm -rf com
+cp -a ../donhatchsw/com .
