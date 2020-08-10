@@ -37,12 +37,6 @@
 
 #include "macros.h"
 
-// So can compile in pre-1.4,
-// we use these instead of java.awt.event.MouseEvent.BUTTON1 etc.
-#define java_awt_event_MouseEvent_BUTTON1 1
-#define java_awt_event_MouseEvent_BUTTON2 2
-#define java_awt_event_MouseEvent_BUTTON3 3
-
 import com.donhatchsw.util.Arrays;
 import com.donhatchsw.util.Complex;
 import com.donhatchsw.util.MyMath;
@@ -245,13 +239,19 @@ public class SpiralApplet
                     private java.awt.event.ActionEvent synthesizedActionEvent = null;
                     OVERRIDE public void mousePressed(java.awt.event.MouseEvent mouseEvent)
                     {
+                        // TODO: this used to be mouseEvent.getModifiers(), but that got
+                        // deprecated.  Unfortunately the value returned by getModifiersEx()
+                        // isn't suitable for constructing the ActionEvent, since the bits
+                        // are interpreted differently.  E.g. BUTTON1_MASK=16 vs. BUTTON1_DOWN_MASK=1024.
+                        int modifiers = 0;  // for now, can't modify
                         synthesizedActionEvent = new java.awt.event.ActionEvent(
                             JRepeatingButton.this,
                             java.awt.event.ActionEvent.ACTION_PERFORMED,
                             JRepeatingButton.this.getText(),
-                            mouseEvent.getModifiers());
+                            modifiers);
                         // the ctor that takes "when" introduced some time in (1.3, 1.6]
                         // so don't use it, so we can compile using 1.3
+                        // TODO: use it!
                         actionListener.actionPerformed(synthesizedActionEvent); // initial execution
 
                         repeatTimer = new javax.swing.Timer(100, new java.awt.event.ActionListener() {
@@ -1476,41 +1476,6 @@ public class SpiralApplet
             if (eventVerbose >= 1) System.out.println("out destroy");
         }
 
-        //
-        // Button behavor changed incompatibly between Java 1.1 and 1.4
-        // (not sure exactly what version it changed in though).
-        // (I think it was 1.4 since that's when getButton() was added
-        // to MouseEvent).
-        //
-        private static int getButton(java.awt.event.MouseEvent e)
-        {
-            // gag me! we can't even query the java spec version number
-            // since System.getProperty() throws a security exception
-            // in netscape!
-            // so use empirical evidence...
-            int mods = e.getModifiers();
-#if 0 // can't seem to get this to work under IE at all, so don't try for now, it will just be wrong under 1.4
-            boolean is_1_4_or_greater = ((mods & ~0x1fff) != 0);
-            if (is_1_4_or_greater)
-            {
-                try
-                {
-                    return e.getButton();
-                }
-                catch (NoSuchMethodError err)
-                {
-                    // this only happens in IE, not netscape. fall through...
-                }
-            }
-#endif
-
-            if ((mods & java.awt.event.InputEvent.ALT_MASK) != 0)
-                return java_awt_event_MouseEvent_BUTTON2;
-            if ((mods & java.awt.event.InputEvent.META_MASK) != 0)
-                return java_awt_event_MouseEvent_BUTTON3;
-            return java_awt_event_MouseEvent_BUTTON1;
-        } // getButton
-
         private class TheCanvas
             extends JPanel
             implements java.awt.event.MouseListener,
@@ -1540,11 +1505,11 @@ public class SpiralApplet
                 if (eventVerbose >= 1) System.out.println("in mousePressed: "+e);
                 if (eventVerbose >= 1)
                 {
-                    if (getButton(e) == java_awt_event_MouseEvent_BUTTON1)
+                    if (e.getButton() == java.awt.event.MouseEvent.BUTTON1)
                         System.out.println("    (left mouse)");
-                    if (getButton(e) == java_awt_event_MouseEvent_BUTTON2)
+                    if (e.getButton() == java.awt.event.MouseEvent.BUTTON2)
                         System.out.println("    (middle mouse)");
-                    if (getButton(e) == java_awt_event_MouseEvent_BUTTON3)
+                    if (e.getButton() == java.awt.event.MouseEvent.BUTTON3)
                         System.out.println("    (right mouse)");
                 }
                 prevMouseX = e.getX();
