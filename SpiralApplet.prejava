@@ -5499,6 +5499,14 @@ public class SpiralApplet
         PRINT(javax.swing.UIManager.getLookAndFeelDefaults());
         */
 
+        // Voodoo.  There's no satisfactory doc on this.
+        // - reduces horribleness of flickering on resize if we add the full applet
+        //   to the content panel of the JFrame (although we don't any more;
+        //   we transplant the contents instead)
+        // - may improve performance anyway.
+        System.setProperty("sun.awt.noerasebackground", "true");
+
+
         if (true)
         {
             PRINT(OneTwoThreeInfinity(0.21336597976618202, 0.21336597976618205, 0.21336597976618207));
@@ -5608,7 +5616,16 @@ public class SpiralApplet
         //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // supposedly exists since java 1.4, but I can see starting in 1.3, weird
         MainWindowCount.setExitOnLastClose(frame);
 
-        frame.getContentPane().add(applet);
+        if (true) {
+            // Bold new idea: take the applet's content pane child, and transplant it into the frame's content pane.
+            // OBSERVATION:  this prevents the flickering on resize!!!  wow!!!
+            java.awt.Component theCanvas = applet.getContentPane().getComponent(0);
+            frame.getContentPane().add(theCanvas);
+            frame.setJMenuBar(applet.getJMenuBar());
+        } else {
+            // Old way: this flicker on resize (super badly if not sun.awt.noerasebackground)
+            frame.getContentPane().add(applet);
+        }
 
         //dumpComponentHierarchy(frame, 0, 0, 1);
 
