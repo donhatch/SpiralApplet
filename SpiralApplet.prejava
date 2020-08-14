@@ -1382,8 +1382,6 @@ public class SpiralApplet
             if (eventVerbose >= 1) System.out.println("in init");
 
 
-            graphicsAntiAliasingSetter = new GraphicsAntiAliasingSetter();
-
             theSpiralView.pixelsPerPart.addListener(pixelsPerPartListener = new Listenable.Listener() {
                 @Override public void valueChanged()
                 {
@@ -1712,11 +1710,14 @@ public class SpiralApplet
 
                 if (implementAntiAliasingInHardware)
                 {
-                    graphicsAntiAliasingSetter.setAntiAliasing(g,
-                                                               antiAliasingFlag,
-                                                               //1
-                                                               eventVerbose
-                                                               );
+                    java.awt.Graphics2D g2d = (java.awt.Graphics2D)g;
+                    g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                        antiAliasingFlag ? java.awt.RenderingHints.VALUE_ANTIALIAS_ON
+                                       : java.awt.RenderingHints.VALUE_ANTIALIAS_OFF);
+                    if (eventVerbose >= 1)
+                    {
+                        System.out.println("    successfully set antialising to "+antiAliasingFlag);
+                    }
                 }
 
 
@@ -5060,7 +5061,6 @@ public class SpiralApplet
     //
     // Applet-generic member variables...
     //
-        private GraphicsAntiAliasingSetter graphicsAntiAliasingSetter;
         private int eventVerbose = 0; // can set with eventVerbose=1 on command line
         private static int nonEventVerbose = 0; // so static classes can refer to it
         private boolean antiAliasingFlag = false;
