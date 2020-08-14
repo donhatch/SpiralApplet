@@ -47,8 +47,8 @@ public class GraphicsAntiAliasingSetter
                                  new Object[]
                                  {
                                      g,
-                                     new Boolean(doAntiAliasing),
-                                     new Integer(verbose)
+                                     doAntiAliasing,
+                                     verbose,
                                  });
                 return ((Boolean)ret).booleanValue();
             }
